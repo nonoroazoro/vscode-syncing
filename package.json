@@ -1,0 +1,42 @@
+{
+  "name": "syncing",
+  "displayName": "syncing",
+  "description": "Sync VSCode Settings to GitHub Gist.",
+  "version": "0.0.1",
+  "publisher": "nonoroazoro",
+  "main": "./src/extension",
+  "engines": {
+    "vscode": "^1.5.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "syncing.uploadSettings",
+        "title": "Syncing: Upload Settings"
+      },
+      {
+        "command": "syncing.downloadSettings",
+        "title": "Syncing: Download Settings"
+      }
+    ],
+    "keybindings": []
+  },
+  "scripts": {
+    "postinstall": "node ./node_modules/vscode/bin/install",
+    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
+  },
+  "devDependencies": {
+    "babel-eslint": "^7.0.0",
+    "eslint": "^3.7.1",
+    "eslint-config-zoro": "^1.1.4",
+    "eslint-plugin-react": "^6.4.1",
+    "mocha": "^3.1.2",
+    "vscode": "^1.0.0"
+  }
+}
