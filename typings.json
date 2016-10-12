@@ -1,6 +1,7 @@
 {
   "globalDevDependencies": {
     "mocha": "registry:dt/mocha#2.2.5+20160720003353",
+    "should": "registry:dt/should#8.1.1+20160608082854",
     "typescript": "registry:dt/typescript#0.4.0+20160317120654"
   }
 }
