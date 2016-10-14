@@ -28,8 +28,7 @@
     "keybindings": []
   },
   "scripts": {
-    "postinstall": "node ./node_modules/vscode/bin/install",
-    "compile": "node ./node_modules/vscode/bin/compile -watch -p ./"
+    "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {
     "babel-eslint": "^7.0.0",
