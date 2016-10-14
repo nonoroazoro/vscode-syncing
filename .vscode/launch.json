@@ -9,7 +9,8 @@
             "args": [
                 "--extensionDevelopmentPath=${workspaceRoot}"
             ],
-            "stopOnEntry": false
+            "stopOnEntry": false,
+            "sourceMaps": true
         },
         {
             "name": "Launch Tests",
