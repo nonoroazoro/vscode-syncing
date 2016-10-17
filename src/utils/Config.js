@@ -1,4 +1,5 @@
 const os = require("os");
+const fs = require("fs");
 const path = require("path");
 
 /**
@@ -19,6 +20,7 @@ class Config
         this._codeBasePath = this._getCodeBasePath();
         this._codeUserPath = path.join(this._codeBasePath, "User");
         this._uploads = this._getUploads(this._codeUserPath);
+        this._settings = this._loadSettings(this._codeUserPath);
     }
 
     /**
@@ -89,6 +91,13 @@ class Config
 
     /**
      * get configs list (to upload).
+     * example:
+     *  {
+     *      name:"extensions"
+     *      path:"C:\\Users\\AppData\\Roaming\\Code\\User\\extensions.json"
+     *      remote:"extensions.json"
+     *      type:"file"
+     *  }
      */
     get uploads()
     {
@@ -123,6 +132,38 @@ class Config
                 });
             }
         });
+    }
+
+    /**
+     * get extension's settings.
+     */
+    get settings()
+    {
+        return this._settings;
+    }
+
+    /**
+     * load extension settings from local file.
+     * @param {String} p_codeUserPath vscode config user path.
+     * @returns {Object} settings.
+     */
+    _loadSettings(p_codeUserPath)
+    {
+        let settings = {};
+        const filename = "syncing.json";
+        const filepath = path.join(p_codeUserPath, filename);
+        try
+        {
+            if (fs.existsSync(filepath))
+            {
+                settings = JSON.parse(fs.readFileSync(filepath, "utf8"));
+            }
+        }
+        catch (e)
+        {
+            throw new Error(`Cannot read Syncing's Config file: ${filename}.`);
+        }
+        return settings;
     }
 }
 
