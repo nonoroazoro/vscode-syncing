@@ -38,5 +38,8 @@
     "mocha": "^3.1.2",
     "should": "^11.1.1",
     "vscode": "^1.0.0"
+  },
+  "dependencies": {
+    "github": "^5.2.1"
   }
 }

@@ -1,15 +1,20 @@
 const vscode = require("vscode");
-const Config = require("./Config");
+const Config = require("./utils/Config");
+const Gist = require("./utils/Gist");
 
 function activate(p_context)
 {
-    const config = _initConfig(p_context);
+    const config = new Config(p_context);
     _initCommands(p_context);
-}
 
-function _initConfig(p_context)
-{
-    return new Config(p_context);
+    const api = new Gist("", config);
+    api.prepare("").then((value) =>
+    {
+        console.log(value);
+    }).catch((err) =>
+    {
+        console.log(err);
+    });
 }
 
 function _initCommands(p_context)
@@ -30,7 +35,7 @@ function _initCommands(p_context)
 }
 
 /**
- * wrap registerCommand.
+ * registerCommand wrapper.
  */
 function _registerCommand(p_context, p_command, p_callback)
 {
