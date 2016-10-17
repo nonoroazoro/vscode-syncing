@@ -18,7 +18,7 @@ class Config
         );
         this._codeBasePath = this._getCodeBasePath();
         this._codeUserPath = path.join(this._codeBasePath, "User");
-        this._uploads = this._getUploads(this._codeUserPath, this._isMac);
+        this._uploads = this._getUploads(this._codeUserPath);
     }
 
     /**
@@ -98,39 +98,31 @@ class Config
     /**
      * get configs list (to upload).
      */
-    _getUploads(p_codeUserPath, p_isMac)
+    _getUploads(p_codeUserPath)
     {
-        const list = {};
-
-        // 1. files
-        [
-            "extensions",
-            "keybindings",
-            "locale",
-            "settings"
-        ].forEach((value) =>
+        return [
+            { type: "file", name: "extensions" },
+            { type: "file", name: "keybindings" },
+            { type: "file", name: "locale" },
+            { type: "file", name: "settings" },
+            { type: "folder", name: "snippets" }
+        ].map((item) =>
         {
-            list[value] = {
-                "local": path.join(p_codeUserPath, `${value}.json`),
-                "remote": `${value}.json`
-            };
-
-            if (value === "keybindings" && p_isMac)
+            if (item.type === "file")
             {
-                list[value].remote = `${value}-mac.json`;
+                return Object.assign({}, item, {
+                    "path": path.join(p_codeUserPath, `${item.name}.json`),
+                    "remote": `${item.name}.json`
+                });
+            }
+            else
+            {
+                return Object.assign({}, item, {
+                    "path": path.join(p_codeUserPath, item.name, path.sep),
+                    "remote": item.name
+                });
             }
         });
-
-        // 2. folders
-        ["snippets"].forEach((value) =>
-        {
-            list[value] = {
-                "local": path.join(p_codeUserPath, `${value}`, path.sep),
-                "remote": `${value}`
-            };
-        });
-
-        return list;
     }
 }
 
