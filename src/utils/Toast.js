@@ -1,3 +1,7 @@
+/**
+ * vscode message utils.
+ */
+
 const vscode = require("vscode");
 
 /**
