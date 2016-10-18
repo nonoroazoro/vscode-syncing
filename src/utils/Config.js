@@ -1,7 +1,7 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
-const vscode = require("vscode");
+const extension = require("./Extension");
 
 /**
  * Syncing's config.
@@ -47,7 +47,7 @@ class Config
     }
 
     /**
-     * get vscode's configs base path.
+     * get vscode's config base path.
      */
     get codeBasePath()
     {
@@ -78,7 +78,7 @@ class Config
     }
 
     /**
-     * get vscode's configs `User` path.
+     * get vscode's config `User` path.
      */
     get codeUserPath()
     {
@@ -166,7 +166,7 @@ class Config
     {
         if (p_item.name === "extensions")
         {
-            return JSON.stringify(this.getExtensions());
+            return JSON.stringify(extension.getAll());
         }
         else
         {
@@ -208,28 +208,6 @@ class Config
             }
             p_resolve(result);
         });
-    }
-
-    /**
-     * get all installed extensions.
-     * @returns {Array} or `[]`.
-     */
-    getExtensions()
-    {
-        const result = [];
-        for (const ext of vscode.extensions.all)
-        {
-            if (!ext.packageJSON.isBuiltin)
-            {
-                result.push({
-                    metadata: ext.packageJSON.__metadata,
-                    name: ext.packageJSON.name,
-                    publisher: ext.packageJSON.publisher,
-                    version: ext.packageJSON.version
-                });
-            }
-        }
-        return result;
     }
 }
 
