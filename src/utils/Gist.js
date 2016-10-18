@@ -1,8 +1,9 @@
+/**
+ * GitHub Gist utils.
+ */
+
 const GitHubAPI = require("github");
 
-/**
- * GitHub Gist Utils.
- */
 class Gist
 {
     /**
