@@ -6,81 +6,26 @@ const GitHubAPI = require("github");
 class Gist
 {
     /**
-     * init Gist.
-     * @param {String} p_token GitHub access token.
-     * @param {object} p_config extension's' Config.
-     *
+     * @param {string} p_token GitHub access token.
+     * @constructor
      */
-    constructor(p_token, p_config)
+    constructor(p_token)
     {
         if (!p_token)
         {
             throw new Error("Invalid GitHub Token.");
         }
-        else if (!p_config)
-        {
-            throw new Error("Invalid Syncing Config.");
-        }
-        else
-        {
-            this._api = new GitHubAPI({ timeout: 5000 });
-            this._api.authenticate({
-                type: "oauth",
-                token: p_token
-            });
 
-            // empty settings template.
-            this._template = {
-                description: "VSCode's Settings - Syncing",
-                public: false,
-                files: {}
-            };
-            p_config.uploads.forEach((item) =>
-            {
-                if (item.type === "file")
-                {
-                    this._template.files[item.remote] = { content: "// init" };
-                }
-            });
-        }
-    }
-
-    /**
-     * prepare syncing's settings.
-     * if p_id is empty, create empty settings in Gist.
-     * else check if gist of p_id exists.
-     * @param {String} [p_id] gist id.
-     * @param {Object} [p_options] options.
-     * @returns {Promise}
-     */
-    prepare(p_id, p_options)
-    {
-        const options = p_options || {};
-        return new Promise((p_resolve, p_reject) =>
-        {
-            this.exists(p_id).then((exists) =>
-            {
-                if (exists)
-                {
-                    p_resolve(p_id);
-                }
-                else
-                {
-                    this.createTemplate(options.public).then((gist) =>
-                    {
-                        p_resolve(gist.id);
-                    }).catch((err) =>
-                    {
-                        p_reject(new Error(`Error Requesting Remote Gist, Code: ${err.code}`));
-                    });
-                }
-            });
+        this._api = new GitHubAPI({ timeout: 5000 });
+        this._api.authenticate({
+            type: "oauth",
+            token: p_token
         });
     }
 
     /**
      * get gist.
-     * @param {String} p_id gist id.
+     * @param {string} p_id gist id.
      * @returns {Promise}
      */
     get(p_id)
@@ -90,7 +35,7 @@ class Gist
 
     /**
      * delete gist.
-     * @param {String} p_id gist id.
+     * @param {string} p_id gist id.
      * @returns {Promise}
      */
     delete(p_id)
@@ -99,8 +44,18 @@ class Gist
     }
 
     /**
+     * update gist.
+     * @param {Object} p_json gist content.
+     * @returns {Promise}
+     */
+    update(p_json)
+    {
+        return this._api.gists.edit(p_json);
+    }
+
+    /**
      * check if gist exists.
-     * @param {String} p_id gist id.
+     * @param {string} p_id gist id.
      * @returns {Promise}
      */
     exists(p_id)
@@ -117,7 +72,7 @@ class Gist
 
     /**
      * create gist.
-     * @param {String} p_id gist id.
+     * @param {Object} p_json gist content.
      * @returns {Promise}
      */
     create(p_json)
@@ -126,25 +81,57 @@ class Gist
     }
 
     /**
-     * create initial gist from template.
-     * @param {Boolean} p_public default is false, gist is private.
+     * create settings gist.
+     * @param {Array} p_files settings files.
+     * @param {boolean} [p_public=false] default is false, gist is private.
      * @returns {Promise}
      */
-    createTemplate(p_public = false)
+    createSettings(p_files = {}, p_public = false)
     {
-        return this.create(Object.assign({}, this._template, { public: p_public }));
+        return this.create({
+            description: "VSCode's Settings - Syncing",
+            public: p_public,
+            files: p_files
+        });
     }
 
     /**
      * find and update gist.
-     * @param {String} p_id gist id.
-     * @param {Object} p_gist gist content.
-     * @param {Boolean} p_upsert default is true, create new if gist not exists.
+     * @param {string} p_id gist id.
+     * @param {Object} p_uploads settings that will be uploaded.
+     * @param {boolean} [p_upsert=true] default is true, create new if gist not exists.
      * @returns {Promise}
      */
-    findAndUpdate(p_id, p_gist, p_upsert = true)
+    findAndUpdate(p_id, p_uploads, p_upsert = true)
     {
-        // TODO
+        return new Promise((p_resolve, p_reject) =>
+        {
+            const gist = { id: p_id, files: {} };
+            for (const item of p_uploads)
+            {
+                gist.files[item.remote] = { content: item.content };
+            }
+
+            this.exists(p_id).then((exists) =>
+            {
+                if (exists)
+                {
+                    p_resolve(this.update(gist));
+                }
+                else
+                {
+                    if (p_upsert)
+                    {
+                        // TODO: pass gist public.
+                        p_resolve(this.createSettings(gist.files));
+                    }
+                    else
+                    {
+                        p_reject(new Error(`No such id in Gist: ${p_id}`));
+                    }
+                }
+            });
+        });
     }
 }
 
