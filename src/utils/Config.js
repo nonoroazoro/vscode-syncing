@@ -1,9 +1,10 @@
-const os = require("os");
 const fs = require("fs");
+const os = require("os");
 const path = require("path");
+const vscode = require("vscode");
 
 /**
- * Configs of current vscode.
+ * Syncing's config.
  */
 class Config
 {
@@ -17,10 +18,8 @@ class Config
             this._isInsiders ? ".vscode-insiders" : ".vscode",
             "extensions"
         );
-        this._codeBasePath = this._getCodeBasePath();
+        this._codeBasePath = this._getCodeBasePath(this._isInsiders);
         this._codeUserPath = path.join(this._codeBasePath, "User");
-        this._uploads = this._getUploads(this._codeUserPath);
-        this._settings = this._loadSettings(this._codeUserPath);
     }
 
     /**
@@ -32,7 +31,7 @@ class Config
     }
 
     /**
-     * check if vscode is a insiders version.
+     * check if vscode is an insiders version.
      */
     get isInsiders()
     {
@@ -40,7 +39,7 @@ class Config
     }
 
     /**
-     * get vscode extensions base path.
+     * get vscode's extensions base path.
      */
     get extensionsPath()
     {
@@ -48,17 +47,14 @@ class Config
     }
 
     /**
-     * get vscode config base path.
+     * get vscode's configs base path.
      */
     get codeBasePath()
     {
         return this._codeBasePath;
     }
 
-    /**
-     * get vscode config base path.
-     */
-    _getCodeBasePath()
+    _getCodeBasePath(p_isInsiders)
     {
         let basePath;
         switch (process.platform)
@@ -78,11 +74,11 @@ class Config
             default:
                 basePath = "/var/local";
         }
-        return path.join(basePath, this.isInsiders ? "Code - Insiders" : "Code");
+        return path.join(basePath, p_isInsiders ? "Code - Insiders" : "Code");
     }
 
     /**
-     * get vscode config user path.
+     * get vscode's configs `User` path.
      */
     get codeUserPath()
     {
@@ -90,80 +86,150 @@ class Config
     }
 
     /**
-     * get configs list (to upload).
-     * example:
-     *  {
-     *      name:"extensions"
-     *      path:"C:\\Users\\AppData\\Roaming\\Code\\User\\extensions.json"
-     *      remote:"extensions.json"
-     *      type:"file"
-     *  }
+     * get uploads.
+     * @param  {Object} [{ full = false, load = false }={}] full: default is false, the result is corresponding to current OS.
+     * load: default is false, do not load file contens.
+     * @returns {Promise}
+     * for example:
+     *    [
+     *        {
+     *            name: "extensions",
+     *            path: "C:\\Users\\AppData\\Roaming\\Code\\User\\extensions.json",
+     *            remote: "extensions.json",
+     *            content: "// init"
+     *        },
+     *        ...
+     *    ]
      */
-    get uploads()
+    getUploads({ full = false, load = false } = {})
     {
-        return this._uploads;
-    }
-
-    /**
-     * get configs list (to upload).
-     */
-    _getUploads(p_codeUserPath)
-    {
-        return [
-            { type: "file", name: "extensions" },
-            { type: "file", name: "keybindings" },
-            { type: "file", name: "locale" },
-            { type: "file", name: "settings" },
-            { type: "folder", name: "snippets" }
-        ].map((item) =>
+        return new Promise((p_resolve, p_reject) =>
         {
-            if (item.type === "file")
+            const list = [
+                { name: "extensions" },
+                { name: "locale" },
+                { name: "settings" }
+                // { name: "snippets" }
+            ];
+
+            if (full)
             {
-                return Object.assign({}, item, {
-                    "path": path.join(p_codeUserPath, `${item.name}.json`),
-                    "remote": `${item.name}.json`
-                });
+                list.push(
+                    { name: "keybindings-mac" },
+                    { name: "keybindings" }
+                );
             }
             else
             {
-                return Object.assign({}, item, {
-                    "path": path.join(p_codeUserPath, item.name, path.sep),
-                    "remote": item.name
-                });
+                list.push(
+                    this._isMac ?
+                        { name: "keybindings-mac" }
+                        : { name: "keybindings" }
+                );
+            }
+
+            try
+            {
+                p_resolve(
+                    list.map((item) =>
+                    {
+                        const result = Object.assign({}, item, {
+                            "path": path.join(
+                                this.codeUserPath,
+                                item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
+                            ),
+                            "remote": `${item.name}.json`
+                        });
+
+                        if (load)
+                        {
+                            result.content = this._loadItemContent(result);
+                        }
+
+                        return result;
+                    })
+                );
+            }
+            catch (e)
+            {
+                p_reject(e);
             }
         });
     }
 
     /**
-     * get extension's settings.
+     * load item content.
+     * @param {Object} p_item item of uploads.
+     * @returns {string}
      */
-    get settings()
+    _loadItemContent(p_item)
     {
-        return this._settings;
+        if (p_item.name === "extensions")
+        {
+            return JSON.stringify(this.getExtensions());
+        }
+        else
+        {
+            try
+            {
+                return fs.readFileSync(p_item.path, "utf8");
+            }
+            catch (e)
+            {
+                throw new Error(`Cannot read Syncing's Config file: ${p_item.remote}.`);
+            }
+        }
     }
 
     /**
-     * load extension settings from local file.
-     * @param {String} p_codeUserPath vscode config user path.
-     * @returns {Object} settings.
+     * load Syncing's settings.
+     * @returns {Promise}
      */
-    _loadSettings(p_codeUserPath)
+    loadSettings()
     {
-        let settings = {};
-        const filename = "syncing.json";
-        const filepath = path.join(p_codeUserPath, filename);
-        try
+        return new Promise((p_resolve, p_reject) =>
         {
-            if (fs.existsSync(filepath))
+            let result = {};
+            if (this.codeUserPath)
             {
-                settings = JSON.parse(fs.readFileSync(filepath, "utf8"));
+                const filename = "syncing.json";
+                const filepath = path.join(this.codeUserPath, filename);
+                try
+                {
+                    if (fs.existsSync(filepath))
+                    {
+                        result = JSON.parse(fs.readFileSync(filepath, "utf8"));
+                    }
+                }
+                catch (e)
+                {
+                    result = new Error(`Cannot read Syncing's Settings file: ${filename}.`);
+                }
+            }
+            p_resolve(result);
+        });
+    }
+
+    /**
+     * get all installed extensions.
+     * @returns {Array} or `[]`.
+     */
+    getExtensions()
+    {
+        const result = [];
+        for (const ext of vscode.extensions.all)
+        {
+            if (!ext.packageJSON.isBuiltin)
+            {
+                result.push({
+                    metadata: ext.packageJSON.__metadata,
+                    name: ext.packageJSON.name,
+                    publisher: ext.packageJSON.publisher,
+                    version: ext.packageJSON.version
+                });
             }
         }
-        catch (e)
-        {
-            throw new Error(`Cannot read Syncing's Config file: ${filename}.`);
-        }
-        return settings;
+        return result;
     }
 }
 
