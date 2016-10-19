@@ -26,11 +26,11 @@ function _initGlobals(p_context)
 
 function _initCommands(p_context)
 {
-    _registerCommand(p_context, "syncing.downloadSettings", _downloadSettings);
     _registerCommand(p_context, "syncing.uploadSettings", _uploadSettings);
+    _registerCommand(p_context, "syncing.downloadSettings", _downloadSettings);
 
     // DEBUG
-    vscode.commands.executeCommand("syncing.uploadSettings");
+    // vscode.commands.executeCommand("syncing.uploadSettings");
 }
 
 /**
@@ -42,27 +42,17 @@ function _registerCommand(p_context, p_command, p_callback)
 }
 
 /**
- * download settings.
- */
-function _downloadSettings()
-{
-    Toast.status("syncing: download settings...");
-
-    Toast.statusInfo("syncing: download finished.");
-}
-
-/**
  * upload settings.
  */
 function _uploadSettings()
 {
-    Toast.status("Syncing: upload settings...");
-
+    Toast.status("Syncing: gathering local settings...");
     _config.getUploads({ load: true }).then((uploads) =>
     {
+        Toast.status("Syncing: uploading settings...");
         _api.findAndUpdate(_gistID, uploads).then((gist) =>
         {
-            Toast.statusInfo("Syncing: upload finished.");
+            Toast.statusInfo("Syncing: settings uploaded.");
         }).catch((err) =>
         {
             Toast.statusError("Syncing: upload failed, please check your Internet connection.");
@@ -71,6 +61,21 @@ function _uploadSettings()
     {
         Toast.statusError(`Syncing: upload failed: ${err.message}`);
     });
+}
+
+/**
+ * download settings.
+ */
+function _downloadSettings()
+{
+    Toast.status("syncing: downloading settings...");
+    // _api.get(_gistID).then((gist) =>
+    // {
+    //     Toast.statusInfo("Syncing: settings downloaded.");
+    // }).catch((err) =>
+    // {
+    //     Toast.statusError(`Syncing: download failed: ${err.message}`);
+    // });
 }
 
 module.exports.activate = activate;
