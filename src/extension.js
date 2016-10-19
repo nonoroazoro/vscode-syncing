@@ -1,9 +1,11 @@
 const vscode = require("vscode");
-const Config = require("./utils/Config");
+
 const Gist = require("./utils/Gist");
+const Config = require("./utils/Config");
+const Toast = require("./utils/Toast");
 
 let _api;
-let _configs;
+let _config;
 let _gistID;
 let _token;
 
@@ -15,20 +17,11 @@ function activate(p_context)
 
 function _initGlobals(p_context)
 {
-    // extension configs.
-    _configs = new Config(p_context);
-    _token = "";
+    // Syncing's config.
     _gistID = "";
-
-    // gist api.
+    _token = "";
+    _config = new Config(p_context);
     _api = new Gist(_token);
-    // _api.prepare(_gistID).then((value) =>
-    // {
-    //     console.log(value);
-    // }).catch((err) =>
-    // {
-    //     console.log(err);
-    // });
 }
 
 function _initCommands(p_context)
@@ -53,25 +46,30 @@ function _registerCommand(p_context, p_command, p_callback)
  */
 function _downloadSettings()
 {
-    vscode.window.showInformationMessage("syncing: download settings...");
+    Toast.status("syncing: download settings...");
+
+    Toast.statusInfo("syncing: download finished.");
 }
 
 /**
- * download settings.
+ * upload settings.
  */
 function _uploadSettings()
 {
-    vscode.window.showInformationMessage("syncing: upload settings...");
+    Toast.status("Syncing: upload settings...");
 
-    _configs.getUploads({ load: true }).then((p_uploads) =>
+    _config.getUploads({ load: true }).then((uploads) =>
     {
-        _api.findAndUpdate(_gistID, p_uploads).then((gist) =>
+        _api.findAndUpdate(_gistID, uploads).then((gist) =>
         {
-            vscode.window.showInformationMessage("syncing: upload finished.");
+            Toast.statusInfo("Syncing: upload finished.");
         }).catch((err) =>
         {
-            vscode.window.showInformationMessage("syncing: upload failed.");
+            Toast.statusError("Syncing: upload failed, please check your Internet connection.");
         });
+    }).catch((err) =>
+    {
+        Toast.statusError(`Syncing: upload failed: ${err.message}`);
     });
 }
 
