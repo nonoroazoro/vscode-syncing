@@ -65,7 +65,7 @@ class Gist
         {
             p_id ?
                 this.get(p_id)
-                    .then(() => p_resolve(true))
+                    .then((gist) => p_resolve(gist))
                     .catch(() => p_resolve(false))
                 : p_resolve(false);
         });
@@ -107,17 +107,26 @@ class Gist
     {
         return new Promise((p_resolve, p_reject) =>
         {
-            const gist = { id: p_id, files: {} };
-            for (const item of p_uploads)
-            {
-                gist.files[item.remote] = { content: item.content };
-            }
-
             this.exists(p_id).then((exists) =>
             {
+                const gist = { id: p_id, files: {} };
+                for (const item of p_uploads)
+                {
+                    gist.files[item.remote] = { content: item.content };
+                }
+
                 if (exists)
                 {
-                    p_resolve(this.update(gist));
+                    // only update when files are modified.
+                    gist.files = this._getModifiedFiles(gist.files, exists.files);
+                    if (gist.files)
+                    {
+                        p_resolve(this.update(gist));
+                    }
+                    else
+                    {
+                        p_resolve(exists);
+                    }
                 }
                 else
                 {
@@ -133,6 +142,25 @@ class Gist
                 }
             });
         });
+    }
+
+    /**
+     * get modified files list.
+     * @returns {} or `undefined`.
+     */
+    _getModifiedFiles(p_localFiles, p_remoteFiles)
+    {
+        let file;
+        const result = {};
+        for (const key of Object.keys(p_localFiles))
+        {
+            file = p_localFiles[key];
+            if (file.content !== p_remoteFiles[key].content)
+            {
+                result[key] = file;
+            }
+        }
+        return (Object.keys(result).length === 0) ? undefined : result;
     }
 }
 
