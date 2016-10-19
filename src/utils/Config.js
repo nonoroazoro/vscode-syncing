@@ -1,11 +1,12 @@
+/**
+ * Syncing's config.
+ */
+
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
 const extension = require("./Extension");
 
-/**
- * Syncing's config.
- */
 class Config
 {
     constructor(p_context)
