@@ -129,32 +129,32 @@ class Config
                 );
             }
 
-            try
+            let result;
+            const results = [];
+            for (const item of list)
             {
-                p_resolve(
-                    list.map((item) =>
+                result = Object.assign({}, item, {
+                    "path": path.join(
+                        this.codeUserPath,
+                        item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
+                    ),
+                    "remote": `${item.name}.json`
+                });
+
+                if (load)
+                {
+                    try
                     {
-                        const result = Object.assign({}, item, {
-                            "path": path.join(
-                                this.codeUserPath,
-                                item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
-                            ),
-                            "remote": `${item.name}.json`
-                        });
-
-                        if (load)
-                        {
-                            result.content = this._loadItemContent(result);
-                        }
-
-                        return result;
-                    })
-                );
+                        result.content = this._loadItemContent(result);
+                        results.push(result);
+                    }
+                    catch (e)
+                    {
+                        console.log(`Cannot read Syncing's config file: ${result.remote}, will be ignore.`);
+                    }
+                }
             }
-            catch (e)
-            {
-                p_reject(e);
-            }
+            p_resolve(results);
         });
     }
 
@@ -171,14 +171,7 @@ class Config
         }
         else
         {
-            try
-            {
-                return fs.readFileSync(p_item.path, "utf8");
-            }
-            catch (e)
-            {
-                throw new Error(`Cannot read Syncing's Config file: ${p_item.remote}.`);
-            }
+            return fs.readFileSync(p_item.path, "utf8");
         }
     }
 
