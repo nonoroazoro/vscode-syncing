@@ -150,6 +150,7 @@ class Config
                     }
                     catch (e)
                     {
+                        // TODO: log file.
                         console.log(`Cannot read Syncing's config file: ${result.remote}, will be ignore.`);
                     }
                 }
