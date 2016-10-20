@@ -5,6 +5,7 @@
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
+const async = require("async");
 const extension = require("./Extension");
 
 class Config
@@ -130,33 +131,50 @@ class Config
             }
 
             let result;
+            const that = this;
             const results = [];
-            for (const item of list)
-            {
-                result = Object.assign({}, item, {
-                    "path": path.join(
-                        this.codeUserPath,
-                        item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
-                    ),
-                    "remote": `${item.name}.json`
-                });
-
-                if (load)
+            const errors = [];
+            async.eachSeries(
+                list,
+                (item, done) =>
                 {
-                    try
+                    result = Object.assign({}, item, {
+                        "path": path.join(
+                            this.codeUserPath,
+                            item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
+                        ),
+                        "remote": `${item.name}.json`
+                    });
+
+                    if (load)
                     {
-                        // result.content could be null.
-                        result.content = this._loadItemContent(result);
+                        that._loadItemContent(result).then((value) =>
+                        {
+                            result.content = value;
+                            results.push(result);
+                            done();
+                        }).catch((err) =>
+                        {
+                            errors.push(result.remote);
+                            results.push(result);
+                            done();
+                        });
                     }
-                    catch (e)
+                    else
                     {
-                        // TODO: log file.
-                        console.log(`Cannot read Syncing's config file: ${result.remote}, will be ignore.`);
+                        results.push(result);
+                        done();
                     }
+                },
+                () =>
+                {
+                    if (errors.length > 0)
+                    {
+                        console.log(`Cannot read Syncing's config file: ${errors.join("\n")}, will be ignore.`);
+                    }
+                    p_resolve(results);
                 }
-                results.push(result);
-            }
-            p_resolve(results);
+            );
         });
     }
 
@@ -173,34 +191,35 @@ class Config
             {
                 this.getConfigs().then((configs) =>
                 {
-                    let err;
                     let file;
+                    const that = this;
                     const savedFiles = [];
-                    for (const item of configs)
-                    {
-                        file = p_files[item.remote];
-                        if (file)
+                    async.eachSeries(
+                        configs,
+                        (item, done) =>
                         {
-                            try
+                            file = p_files[item.remote];
+                            that._saveItemContent(Object.assign({}, item, { content: file.content })).then((saved) =>
                             {
-                                savedFiles.push(this._saveItemContent(Object.assign({}, item, { content: file.content })));
+                                savedFiles.push(saved);
+                                done();
+                            }).catch((err) =>
+                            {
+                                done(new Error(`Cannot save settings file: ${item.remote} : ${err.message}`));
+                            });
+                        },
+                        (err) =>
+                        {
+                            if (err)
+                            {
+                                p_reject(err);
                             }
-                            catch (e)
+                            else
                             {
-                                err = new Error(`Cannot save settings file: ${item.remote} : ${e.message}`);
-                                break;
+                                p_resolve(savedFiles);
                             }
                         }
-                    }
-
-                    if (err)
-                    {
-                        p_reject(err);
-                    }
-                    else
-                    {
-                        p_resolve(savedFiles);
-                    }
+                    );
                 });
             }
             else
@@ -213,39 +232,76 @@ class Config
     /**
      * load item content.
      * @param {Object} p_item item of uploads.
-     * @returns {string}
+     * @returns {Promise}
      */
     _loadItemContent(p_item)
     {
-        if (p_item.name === "extensions")
+        return new Promise((p_resolve, p_reject) =>
         {
-            return JSON.stringify(extension.getAll());
-        }
-        else
-        {
-            return fs.readFileSync(p_item.path, "utf8");
-        }
+            if (p_item.name === "extensions")
+            {
+                try
+                {
+                    p_resolve(JSON.stringify(extension.getAll()));
+                }
+                catch (err)
+                {
+                    p_reject(err);
+                }
+            }
+            else
+            {
+                fs.readFile(p_item.path, "utf8", (err, res) =>
+                {
+                    if (err)
+                    {
+                        p_reject(err);
+                    }
+                    else
+                    {
+                        p_resolve(res);
+                    }
+                });
+            }
+        });
     }
 
     /**
      * save item content to file or install extensions.
      * @param {Object} p_item item of configs.
-     * @returns {Object}
+     * @returns {Promise}
      */
     _saveItemContent(p_item)
     {
-        const saved = p_item;
-        if (p_item.name === "extensions")
+        return new Promise((p_resolve, p_reject) =>
         {
-            // TODO: install extensions.
-
-            // return installed extensions list.
-        }
-        else
-        {
-            fs.writeFileSync(p_item.path, p_item.content || "{}");
-        }
-        return saved;
+            if (p_item.name === "extensions")
+            {
+                extension.install(JSON.parse(p_item.content)).then((saved) =>
+                {
+                    p_resolve(saved);
+                }).catch((err) =>
+                {
+                    p_reject(err);
+                });
+            }
+            else
+            {
+                const temp = "D:\\Downloads\\vscode";
+                // fs.writeFile(p_item.path, p_item.content || "{}", (err) =>
+                fs.writeFile(path.join(temp, p_item.remote), p_item.content || "{}", (err) =>
+                {
+                    if (err)
+                    {
+                        p_reject(err);
+                    }
+                    else
+                    {
+                        p_resolve(p_item);
+                    }
+                });
+            }
+        });
     }
 
     /**

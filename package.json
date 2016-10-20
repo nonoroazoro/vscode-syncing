@@ -45,6 +45,7 @@
     "vscode": "^1.0.0"
   },
   "dependencies": {
+    "async": "^2.1.2",
     "github": "^5.2.1"
   }
 }
