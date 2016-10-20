@@ -155,7 +155,8 @@ class Gist
         for (const key of Object.keys(p_localFiles))
         {
             file = p_localFiles[key];
-            if (file.content !== p_remoteFiles[key].content)
+            // ignore null file.
+            if (file.content && file.content !== p_remoteFiles[key].content)
             {
                 result[key] = file;
             }
