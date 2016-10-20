@@ -287,9 +287,9 @@ class Config
             }
             else
             {
-                const temp = "D:\\Downloads\\vscode";
-                // fs.writeFile(p_item.path, p_item.content || "{}", (err) =>
-                fs.writeFile(path.join(temp, p_item.remote), p_item.content || "{}", (err) =>
+                // const temp = "D:\\Downloads\\vscode";
+                // fs.writeFile(path.join(temp, p_item.remote), p_item.content || "{}", (err) =>
+                fs.writeFile(p_item.path, p_item.content || "{}", (err) =>
                 {
                     if (err)
                     {
