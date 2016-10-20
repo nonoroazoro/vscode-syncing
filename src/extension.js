@@ -11,6 +11,11 @@ let _token;
 
 function activate(p_context)
 {
+    // console.log(vscode.commands.getCommands().then((commands) =>
+    // {
+    //     console.log(commands.join("\n"));
+    // }));
+
     _initGlobals(p_context);
     _initCommands(p_context);
 }
@@ -30,7 +35,7 @@ function _initCommands(p_context)
     _registerCommand(p_context, "syncing.downloadSettings", _downloadSettings);
 
     // DEBUG
-    vscode.commands.executeCommand("syncing.downloadSettings");
+    // vscode.commands.executeCommand("syncing.downloadSettings");
 }
 
 /**
@@ -52,8 +57,9 @@ function _uploadSettings()
         Toast.status("Syncing: uploading settings...");
         _api.findAndUpdate(_gistID, uploads).then((gist) =>
         {
+            // TODO: check if auto created a new gist id, save it!
             Toast.statusInfo("Syncing: settings uploaded.");
-        }).catch((err) =>
+        }).catch(() =>
         {
             Toast.statusError("Syncing: upload failed, please check your Internet connection.");
         });
@@ -69,21 +75,19 @@ function _uploadSettings()
 function _downloadSettings()
 {
     Toast.status("syncing: checking remote settings...");
-
-    Toast.status("syncing: downloading settings...");
     _api.get(_gistID).then((gist) =>
     {
-        Toast.status("syncing: saving settings...");
+        Toast.status("syncing: downloading settings...");
         _config.saveConfigs(gist.files).then((saved) =>
         {
             Toast.statusInfo("Syncing: settings downloaded.");
         }).catch((err) =>
         {
-            Toast.statusInfo(`Syncing: settings failed: ${err.message}`);
+            Toast.statusError(`Syncing: download failed: ${err.message}`);
         });
-    }).catch((err) =>
+    }).catch(() =>
     {
-        Toast.statusError(`Syncing: download failed: ${err.message}`);
+        Toast.statusError("Syncing: download failed, please check your Internet connection.");
     });
 }
 
