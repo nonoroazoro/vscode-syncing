@@ -87,7 +87,7 @@ class Config
     }
 
     /**
-     * get uploads.
+     * get vscode configs list (will be uploaded or downloaded, anyway).
      * @param  {Object} [{ full = false, load = false }={}] full: default is false, the result is corresponding to current OS.
      * load: default is false, do not load file contens.
      * @returns {Promise}
@@ -102,7 +102,7 @@ class Config
      *        ...
      *    ]
      */
-    getUploads({ full = false, load = false } = {})
+    getConfigs({ full = false, load = false } = {})
     {
         return new Promise((p_resolve, p_reject) =>
         {
@@ -145,8 +145,8 @@ class Config
                 {
                     try
                     {
+                        // result.content could be null.
                         result.content = this._loadItemContent(result);
-                        results.push(result);
                     }
                     catch (e)
                     {
@@ -154,8 +154,60 @@ class Config
                         console.log(`Cannot read Syncing's config file: ${result.remote}, will be ignore.`);
                     }
                 }
+                results.push(result);
             }
             p_resolve(results);
+        });
+    }
+
+    /**
+     * save vscode configs to files.
+     * @param  {Array} vscode configs from Gist.
+     * @returns {Promise}
+     */
+    saveConfigs(p_files)
+    {
+        return new Promise((p_resolve, p_reject) =>
+        {
+            if (p_files)
+            {
+                this.getConfigs().then((configs) =>
+                {
+                    let err;
+                    let file;
+                    const savedFiles = [];
+                    for (const item of configs)
+                    {
+                        file = p_files[item.remote];
+                        if (file)
+                        {
+                            try
+                            {
+                                fs.writeFileSync(item.path, file.content || "{}");
+                                savedFiles.push(item);
+                            }
+                            catch (e)
+                            {
+                                err = new Error(`Cannot save settings file: ${item.remote} : ${e.message}`);
+                                break;
+                            }
+                        }
+                    }
+
+                    if (err)
+                    {
+                        p_reject(err);
+                    }
+                    else
+                    {
+                        p_resolve(savedFiles);
+                    }
+                });
+            }
+            else
+            {
+                p_resolve();
+            }
         });
     }
 
@@ -177,10 +229,10 @@ class Config
     }
 
     /**
-     * load Syncing's settings.
+     * load Syncing's settings (load from settings file: `syncing.json`).
      * @returns {Promise}
      */
-    loadSettings()
+    loadSyncingSettings()
     {
         return new Promise((p_resolve, p_reject) =>
         {
@@ -198,10 +250,10 @@ class Config
                 }
                 catch (e)
                 {
-                    result = new Error(`Cannot read Syncing's Settings file: ${filename}.`);
+                    return p_reject(Error(`Cannot read Syncing's Settings file: ${filename}.`));
                 }
             }
-            p_resolve(result);
+            return p_resolve(result);
         });
     }
 }
