@@ -183,8 +183,7 @@ class Config
                         {
                             try
                             {
-                                fs.writeFileSync(item.path, file.content || "{}");
-                                savedFiles.push(item);
+                                savedFiles.push(this._saveItemContent(Object.assign({}, item, { content: file.content })));
                             }
                             catch (e)
                             {
@@ -226,6 +225,27 @@ class Config
         {
             return fs.readFileSync(p_item.path, "utf8");
         }
+    }
+
+    /**
+     * save item content to file or install extensions.
+     * @param {Object} p_item item of configs.
+     * @returns {Object}
+     */
+    _saveItemContent(p_item)
+    {
+        const saved = p_item;
+        if (p_item.name === "extensions")
+        {
+            // TODO: install extensions.
+
+            // return installed extensions list.
+        }
+        else
+        {
+            fs.writeFileSync(p_item.path, p_item.content || "{}");
+        }
+        return saved;
     }
 
     /**
