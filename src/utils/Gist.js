@@ -8,16 +8,16 @@ class Gist
 {
     /**
      * @param {string} p_token GitHub access token.
+     * @param {Object} [p_options] node-github options.
      * @constructor
      */
-    constructor(p_token)
+    constructor(p_token, p_options)
     {
         if (!p_token)
         {
             throw new Error("Invalid GitHub Token.");
         }
-
-        this._api = new GitHubAPI({ timeout: 5000 });
+        this._api = new GitHubAPI(Object.assign({ timeout: 5000 }, p_options));
         this._api.authenticate({
             type: "oauth",
             token: p_token
