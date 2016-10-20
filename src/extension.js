@@ -35,6 +35,7 @@ function _initCommands(p_context)
     _registerCommand(p_context, "syncing.downloadSettings", _downloadSettings);
 
     // DEBUG
+    // vscode.commands.executeCommand("syncing.uploadSettings");
     // vscode.commands.executeCommand("syncing.downloadSettings");
 }
 
