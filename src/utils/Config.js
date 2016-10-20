@@ -312,24 +312,40 @@ class Config
     {
         return new Promise((p_resolve, p_reject) =>
         {
-            let result = {};
             if (this.codeUserPath)
             {
                 const filename = "syncing.json";
                 const filepath = path.join(this.codeUserPath, filename);
-                try
+                if (fs.existsSync(filepath))
                 {
-                    if (fs.existsSync(filepath))
+                    fs.readFile(filepath, "utf8", (err, res) =>
                     {
-                        result = JSON.parse(fs.readFileSync(filepath, "utf8"));
-                    }
+                        if (err)
+                        {
+                            p_reject(new Error(`Cannot read Syncing's Settings file: ${filename}.`));
+                        }
+                        else
+                        {
+                            try
+                            {
+                                p_resolve(JSON.parse(res));
+                            }
+                            catch (e)
+                            {
+                                p_reject(new Error(`Cannot read Syncing's Settings file: ${filename} : Syntax Error`));
+                            }
+                        }
+                    });
                 }
-                catch (e)
+                else
                 {
-                    return p_reject(Error(`Cannot read Syncing's Settings file: ${filename}.`));
+                    p_reject(new Error(`Cannot find Syncing's Settings file: ${filename}.`));
                 }
             }
-            return p_resolve(result);
+            else
+            {
+                p_reject(new Error("Cannot find VSCode's Settings folder."));
+            }
         });
     }
 }
