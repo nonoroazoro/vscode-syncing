@@ -277,13 +277,20 @@ class Config
         {
             if (p_item.name === "extensions")
             {
-                extension.install(JSON.parse(p_item.content)).then((saved) =>
+                try
                 {
-                    p_resolve(saved);
-                }).catch((err) =>
+                    extension.install(JSON.parse(p_item.content)).then((saved) =>
+                    {
+                        p_resolve(saved);
+                    }).catch((err) =>
+                    {
+                        p_reject(err);
+                    });
+                }
+                catch (err)
                 {
                     p_reject(err);
-                });
+                }
             }
             else
             {
