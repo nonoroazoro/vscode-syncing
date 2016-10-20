@@ -1,5 +1,6 @@
 {
     "globalDependencies": {
+        "async": "registry:dt/async#2.0.1+20160804113311",
         "node": "registry:dt/node#6.0.0+20160909174046"
     },
     "globalDevDependencies": {
