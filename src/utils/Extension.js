@@ -27,7 +27,6 @@ function getAll(p_includeBuiltin = false)
     return result;
 }
 
-
 /**
  * install extensions.
  * @param {string|Array} p_list extension id or extension id list.
