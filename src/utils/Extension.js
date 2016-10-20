@@ -17,10 +17,10 @@ function getAll(p_includeBuiltin = false)
         if (p_includeBuiltin || !ext.packageJSON.isBuiltin)
         {
             result.push({
-                metadata: ext.packageJSON.__metadata,
                 name: ext.packageJSON.name,
                 publisher: ext.packageJSON.publisher,
-                version: ext.packageJSON.version
+                version: ext.packageJSON.version,
+                id: `${ext.packageJSON.publisher}.${ext.packageJSON.name}`
             });
         }
     }
@@ -29,29 +29,83 @@ function getAll(p_includeBuiltin = false)
 
 /**
  * install extensions.
- * @param {string|Array} p_list extension id or extension id list.
+ * @param {Array} p_extensions extensions list.
  */
 function install(p_extensions)
 {
     return new Promise((p_resolve, p_reject) =>
     {
-        if (p_extensions)
+        _getDifferentExtensions(p_extensions).then((diff) =>
         {
-            let extensions = p_extensions;
-            if (typeof p_extensions === "string")
+            if (diff.added.length > 0)
             {
-                extensions = [p_extensions];
+                // TODO: add extensions
             }
 
-            if (Array.isArray(extensions))
+            if (diff.changed.length > 0)
             {
-                // TODO: install extension.
-                // for (let ext of extensions)
-                // {
-                // }
+                // TODO: changed extensions (maybe updated)
+            }
+
+            if (diff.removed.length > 0)
+            {
+                // TODO: remove extensions
+            }
+        });
+        p_resolve();
+    });
+}
+
+/**
+ * get extensions that are added/changed/removed.
+ * @param {Array} p_extensions
+ * @returns {Promise}
+ */
+function _getDifferentExtensions(p_extensions)
+{
+    return new Promise((p_resolve, p_reject) =>
+    {
+        const extensions = { added: [], changed: [], removed: [] };
+        if (p_extensions)
+        {
+            let localExtension;
+            const reservedExtensions = [];
+
+            // find added & changed extensions.
+            for (const extension of p_extensions)
+            {
+                localExtension = vscode.extensions.getExtension(extension.id);
+                if (localExtension)
+                {
+                    if (localExtension.packageJSON.version === extension.version)
+                    {
+                        // reserved.
+                        reservedExtensions.push(extension.id);
+                    }
+                    else
+                    {
+                        // changed.
+                        extensions.changed.push(extension);
+                    }
+                }
+                else
+                {
+                    // added.
+                    extensions.added.push(extension);
+                }
+            }
+
+            const localExtensions = getAll();
+            for (const extension of localExtensions)
+            {
+                if (!reservedExtensions.includes(extension.id))
+                {
+                    // removed.
+                    extensions.removed.push(extension);
+                }
             }
         }
-        p_resolve();
+        p_resolve(extensions);
     });
 }
 
