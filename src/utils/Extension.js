@@ -51,8 +51,9 @@ function install(p_extensions)
             {
                 // TODO: remove extensions
             }
+
+            p_resolve();
         });
-        p_resolve();
     });
 }
 
@@ -69,39 +70,39 @@ function _getDifferentExtensions(p_extensions)
         if (p_extensions)
         {
             let localExtension;
-            const reservedExtensions = [];
+            const reservedExtensionIDs = [];
 
             // find added & changed extensions.
-            for (const extension of p_extensions)
+            for (const ext of p_extensions)
             {
-                localExtension = vscode.extensions.getExtension(extension.id);
+                localExtension = vscode.extensions.getExtension(ext.id);
                 if (localExtension)
                 {
-                    if (localExtension.packageJSON.version === extension.version)
+                    if (localExtension.packageJSON.version === ext.version)
                     {
                         // reserved.
-                        reservedExtensions.push(extension.id);
+                        reservedExtensionIDs.push(ext.id);
                     }
                     else
                     {
                         // changed.
-                        extensions.changed.push(extension);
+                        extensions.changed.push(ext);
                     }
                 }
                 else
                 {
                     // added.
-                    extensions.added.push(extension);
+                    extensions.added.push(ext);
                 }
             }
 
             const localExtensions = getAll();
-            for (const extension of localExtensions)
+            for (const ext of localExtensions)
             {
-                if (!reservedExtensions.includes(extension.id))
+                if (!reservedExtensionIDs.includes(ext.id))
                 {
                     // removed.
-                    extensions.removed.push(extension);
+                    extensions.removed.push(ext);
                 }
             }
         }
