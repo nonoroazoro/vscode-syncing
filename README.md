@@ -7,8 +7,8 @@
 
 **In order to keep this extension as simple as possible, there will be no other features, just these two:**
 
-1. Upload VSCode settings and extensions to Gist (auto create new Gist for the first time).
-2. Download VSCode settings and extensions from Gist.
+1. **Upload** VSCode settings and extensions to Gist (auto create new Gist for the first time).
+2. **Download** VSCode settings and extensions from Gist.
 
 
 ## Extension Commands
