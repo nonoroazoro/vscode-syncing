@@ -94,6 +94,11 @@ class Environment
 }
 
 let _instance;
+/**
+ * only create one instance.
+ * @param {Object} p_context
+ * @returns {Environment}
+ */
 function create(p_context)
 {
     if (_instance === undefined)
