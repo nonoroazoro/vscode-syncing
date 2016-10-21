@@ -351,6 +351,11 @@ class Extension
 }
 
 let _instance;
+/**
+ * only create one instance.
+ * @param {Object} p_context
+ * @returns {Extension}
+ */
 function create(p_context)
 {
     if (_instance === undefined)
