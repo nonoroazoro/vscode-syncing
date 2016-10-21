@@ -97,7 +97,10 @@ class Extension
                 (item, done) =>
                 {
                     that.downloadExtension(item)
-                        .then(that.extractExtension.bind(that))
+                        .then((extension) =>
+                        {
+                            return that.extractExtension(extension);
+                        })
                         .then(() =>
                         {
                             result.added.push(item);
@@ -133,8 +136,14 @@ class Extension
                 (item, done) =>
                 {
                     that.downloadExtension(item)
-                        .then(that.uninstallExtension.bind(that))
-                        .then(that.extractExtension.bind(that))
+                        .then((extension) =>
+                        {
+                            return that.uninstallExtension(extension);
+                        })
+                        .then((extension) =>
+                        {
+                            return that.extractExtension(extension);
+                        })
                         .then(() =>
                         {
                             result.updated.push(item);
@@ -243,7 +252,7 @@ class Extension
     }
 
     /**
-     * download extension from vscode Marketplace.
+     * extract extension to vscode extensions folder.
      * @param {Object} p_extension
      * returns {Promise}
      */
@@ -295,7 +304,7 @@ class Extension
                 }
                 else
                 {
-                    p_resolve();
+                    p_resolve(p_extension);
                 }
             });
         });
