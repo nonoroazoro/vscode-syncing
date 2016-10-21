@@ -24,7 +24,7 @@
 
 ## Extension Keybindings
 
-The keybindings are **disabled by default**, but you can enable them by updating VSCode's `Keyboard Shortcuts`:
+The keybindings are **not set by default**, but you can enable them by updating VSCode's `Keyboard Shortcuts`:
 
 ```javascript
 {
