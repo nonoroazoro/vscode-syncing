@@ -2,11 +2,14 @@
   "name": "syncing",
   "displayName": "syncing",
   "description": "Sync VSCode Settings (including Extensions) to GitHub Gist.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "publisher": "nonoroazoro",
   "license": "MIT",
   "main": "src/extension",
   "icon": "src/res/logo.png",
+  "galleryBanner": {
+    "color": "#352C2D"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/nonoroazoro/syncing"
