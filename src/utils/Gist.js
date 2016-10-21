@@ -6,22 +6,36 @@ const GitHubAPI = require("github");
 
 class Gist
 {
-    /**
-     * @param {string} p_token GitHub access token.
-     * @param {Object} [p_options] node-github options.
-     * @constructor
-     */
-    constructor(p_token, p_options)
+    constructor(p_token, p_proxy)
     {
         if (!p_token)
         {
             throw new Error("Invalid GitHub Token.");
         }
-        this._api = new GitHubAPI(Object.assign({ timeout: 5000 }, p_options));
+
+        this._token = p_token;
+        this._proxy = p_proxy;
+        this._api = new GitHubAPI(Object.assign({ timeout: 5000 }, p_proxy ? { proxy: p_proxy } : {}));
         this._api.authenticate({
             type: "oauth",
             token: p_token
         });
+    }
+
+    /**
+     * get GitHub access token.
+     */
+    get token()
+    {
+        return this._token;
+    }
+
+    /**
+     * get proxy url.
+     */
+    get proxy()
+    {
+        return this._proxy;
     }
 
     /**
@@ -165,4 +179,22 @@ class Gist
     }
 }
 
-module.exports = Gist;
+let _instance;
+/**
+ * only create new instance when params are changed.
+ * @param {string} p_token GitHub access token.
+ * @param {string} [p_proxy] proxy url.
+ * @returns {Gist}
+ */
+function create(p_token, p_proxy)
+{
+    if (_instance === undefined || _instance.token !== p_token || _instance.proxy !== p_proxy)
+    {
+        _instance = new Gist(p_token, p_proxy);
+    }
+    return _instance;
+}
+
+module.exports = {
+    create
+};
