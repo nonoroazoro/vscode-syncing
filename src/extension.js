@@ -3,7 +3,9 @@ const vscode = require("vscode");
 const Gist = require("./utils/Gist");
 const Toast = require("./utils/Toast");
 const Config = require("./utils/Config");
+const Environment = require("./utils/Environment");
 
+let _env;
 let _config;
 
 function activate(p_context)
@@ -18,6 +20,7 @@ function activate(p_context)
  */
 function _initGlobals(p_context)
 {
+    _env = Environment.create(p_context);
     _config = Config.create(p_context);
 }
 
@@ -43,7 +46,7 @@ function _uploadSettings()
     Toast.status("Syncing: gathering local settings...");
     _config.prepareSyncingSettings(false).then((settings) =>
     {
-        const api = Gist.create(settings.token, _config.getSyncingProxy());
+        const api = Gist.create(settings.token, _env.getSyncingProxy());
         _config.getConfigs({ load: true }).then((uploads) =>
         {
             Toast.status("Syncing: uploading settings...");
@@ -82,7 +85,7 @@ function _downloadSettings()
     Toast.status("syncing: checking remote settings...");
     _config.prepareSyncingSettings().then((settings) =>
     {
-        const api = Gist.create(settings.token, _config.getSyncingProxy());
+        const api = Gist.create(settings.token, _env.getSyncingProxy());
         api.get(settings.id).then((gist) =>
         {
             Toast.status("syncing: downloading settings...");

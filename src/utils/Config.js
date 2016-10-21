@@ -5,7 +5,6 @@
 const fs = require("fs");
 const path = require("path");
 const async = require("async");
-const vscode = require("vscode");
 
 const Toast = require("./Toast");
 const Extension = require("./Extension");
@@ -245,24 +244,6 @@ class Config
                 });
             }
         });
-    }
-
-    /**
-     * get proxy settings of Syncing.
-     * @returns {string} or `undefined`.
-     */
-    getSyncingProxy()
-    {
-        let proxy = vscode.workspace.getConfiguration("syncing")["proxy"];
-        if (typeof proxy === "string")
-        {
-            proxy = proxy.trim();
-            if (proxy !== "")
-            {
-                return proxy;
-            }
-        }
-        return undefined;
     }
 
     /**
