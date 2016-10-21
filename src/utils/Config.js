@@ -209,7 +209,7 @@ class Config
             {
                 try
                 {
-                    this._extension.install(JSON.parse(p_item.content)).then((saved) =>
+                    this._extension.sync(JSON.parse(p_item.content)).then((saved) =>
                     {
                         p_resolve(saved);
                     }).catch((err) =>
