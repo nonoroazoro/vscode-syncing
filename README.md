@@ -7,7 +7,7 @@
 
 ## Features
 
-**In order to keep this extension as simple as possible, there will be no other features, just these two:**
+**In order to keep this extension as simple as possible, there will be no other features, only these two:**
 
 1. **Upload** VSCode settings and extensions to Gist (auto create new Gist for the first time).
 2. **Download** VSCode settings and extensions from Gist.
