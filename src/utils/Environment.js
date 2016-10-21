@@ -18,6 +18,7 @@ class Environment
         );
         this._codeBasePath = this._getCodeBasePath(this._isInsiders);
         this._codeUserPath = path.join(this._codeBasePath, "User");
+        this._syncingSettingsPath = path.join(this._codeUserPath, "syncing.json");
     }
 
     /**
@@ -81,6 +82,14 @@ class Environment
     get codeUserPath()
     {
         return this._codeUserPath;
+    }
+
+    /**
+     * get Syncing's config file path.
+     */
+    get syncingSettingPath()
+    {
+        return this._syncingSettingsPath;
     }
 }
 
