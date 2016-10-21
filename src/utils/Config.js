@@ -247,6 +247,17 @@ class Config
     }
 
     /**
+     * clear GitHub token.
+     * @returns {Promise}
+     */
+    clearSyncingToken()
+    {
+        const settings = this.loadSyncingSettings();
+        settings.token = "";
+        return this.saveSyncingSettings(settings, false);
+    }
+
+    /**
      * prepare Syncing's settings, will ask for settings if not exist.
      * @param {boolean} [p_checkGistID=true] default is true, check if Gist id is empty.
      * @returns {Promise}
@@ -326,10 +337,11 @@ class Config
 
     /**
      * save Syncing's settings (to settings file: `syncing.json`).
-     * @param {Object}
+     * @param {Object} p_json settings.
+     * @param {boolean} [p_toast=true] default is true, toast error.
      * @returns {Promise}
      */
-    saveSyncingSettings(p_json)
+    saveSyncingSettings(p_json, p_toast = true)
     {
         return new Promise((p_resolve) =>
         {
@@ -337,7 +349,7 @@ class Config
             {
                 fs.writeFile(this._env.syncingSettingPath, JSON.stringify(p_json) || "{}", (err) =>
                 {
-                    if (err)
+                    if (err && p_toast)
                     {
                         Toast.statusError(`Syncing: Cannot save Syncing settings: ${err}`);
                     }
@@ -346,7 +358,10 @@ class Config
             }
             catch (err)
             {
-                Toast.statusError(`Syncing: Cannot save Syncing settings: ${err}`);
+                if (err && p_toast)
+                {
+                    Toast.statusError(`Syncing: Cannot save Syncing settings: ${err}`);
+                }
                 p_resolve();
             }
         });
