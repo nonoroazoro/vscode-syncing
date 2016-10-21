@@ -45,8 +45,11 @@
     "vscode": "^1.0.0"
   },
   "dependencies": {
+    "adm-zip": "^0.4.7",
     "async": "^2.1.2",
+    "fs-extra": "^0.30.0",
     "github": "^5.2.1",
-    "https-proxy-agent": "^1.0.0"
+    "https-proxy-agent": "^1.0.0",
+    "temp": "^0.8.3"
   }
 }
