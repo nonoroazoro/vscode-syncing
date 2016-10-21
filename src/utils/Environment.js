@@ -4,6 +4,7 @@
 
 const os = require("os");
 const path = require("path");
+const vscode = require("vscode");
 
 class Environment
 {
@@ -90,6 +91,24 @@ class Environment
     get syncingSettingPath()
     {
         return this._syncingSettingsPath;
+    }
+
+    /**
+     * get proxy settings of Syncing.
+     * @returns {string} or `undefined`.
+     */
+    getSyncingProxy()
+    {
+        let proxy = vscode.workspace.getConfiguration("syncing")["proxy"];
+        if (typeof proxy === "string")
+        {
+            proxy = proxy.trim();
+            if (proxy !== "")
+            {
+                return proxy;
+            }
+        }
+        return undefined;
     }
 }
 
