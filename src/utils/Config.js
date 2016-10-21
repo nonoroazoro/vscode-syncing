@@ -9,6 +9,12 @@ const async = require("async");
 const Extension = require("./Extension");
 const Environment = require("./Environment");
 
+// the default Syncing's settings.
+const defaultSyncingSettings = {
+    "token": "",
+    "id": ""
+};
+
 class Config
 {
     constructor(p_context)
@@ -241,45 +247,57 @@ class Config
 
     /**
      * load Syncing's settings (load from settings file: `syncing.json`).
-     * @returns {Promise}
+     * @returns {Object} or `{}`.
      */
     loadSyncingSettings()
     {
+        const settings = Object.assign({}, defaultSyncingSettings);
+        try
+        {
+            Object.assign(
+                settings,
+                JSON.parse(fs.readFileSync(this._env.syncingSettingPath, "utf8"))
+            );
+        }
+        catch (err)
+        {
+        }
+        return settings;
+    }
+
+    /**
+     * save Syncing's settings (to settings file: `syncing.json`).
+     * @param {Object}
+     * @returns {Promise}
+     */
+    saveSyncingSettings(p_json)
+    {
         return new Promise((p_resolve, p_reject) =>
         {
-            if (this._env.codeUserPath)
+            if (p_json)
             {
-                const filename = "syncing.json";
-                const filepath = path.join(this._env.codeUserPath, filename);
-                if (fs.existsSync(filepath))
+                try
                 {
-                    fs.readFile(filepath, "utf8", (err, res) =>
+                    fs.writeFile(this._env.syncingSettingPath, JSON.stringify(p_json) || "{}", (err) =>
                     {
                         if (err)
                         {
-                            p_reject(new Error(`Cannot read Syncing's Settings file: ${filename}.`));
+                            p_reject(err);
                         }
                         else
                         {
-                            try
-                            {
-                                p_resolve(JSON.parse(res));
-                            }
-                            catch (e)
-                            {
-                                p_reject(new Error(`Cannot read Syncing's Settings file: ${filename} : Syntax Error`));
-                            }
+                            p_resolve();
                         }
                     });
                 }
-                else
+                catch (err)
                 {
-                    p_reject(new Error(`Cannot find Syncing's Settings file: ${filename}.`));
+                    p_reject(err);
                 }
             }
             else
             {
-                p_reject(new Error("Cannot find VSCode's Settings folder."));
+                p_resolve();
             }
         });
     }
