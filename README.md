@@ -2,6 +2,8 @@
 
 **"Syncing"** is a VSCode extension, proposed to sync VSCode's settings (**including extensions**) to GitHub Gist.
 
+> I wrote it cause I wanna keep it **simple**.
+
 
 ## Features
 
@@ -13,7 +15,7 @@
 
 ## Extension Commands
 
-**Type `>Syncing` in VSCode Command Palette to:**
+**Type `syncing` (or just `upload/download`) in VSCode Command Palette to:**
 
 * `Syncing: Upload Settings`
 * `Syncing: Download Settings`
