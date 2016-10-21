@@ -15,8 +15,9 @@
 
 **Type `>Syncing` in VSCode Command Palette to:**
 
-* `Upload VSCode Settings`
-* `Download VSCode Settings`
+* `Syncing: Upload Settings`
+* `Syncing: Download Settings`
+* `Syncing: Open Syncing Settings`
 
 
 ## Extension Keybindings
@@ -31,7 +32,20 @@ The keybindings are **disabled by default**, but you can enable them by updating
 {
     "key": "",
     "command": "syncing.downloadSettings"
+},
+{
+    "key": "",
+    "command": "syncing.openSettings"
 }
+```
+
+## Extension Proxy Settings
+
+You can add a proxy to accelerate the synchronization, just set in VSCode `User Settings` like:
+
+```javascript
+// Syncing Configuration
+"syncing.proxy" = "http://127.0.0.1:1080"
 ```
 
 
