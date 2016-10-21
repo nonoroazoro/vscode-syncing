@@ -2,6 +2,7 @@
 
 **"syncing"** is a VSCode extension, proposed to sync VSCode's settings (**include extensions**) to GitHub Gist.
 
+
 ## Features
 
 **In order to keep this extension as simple as possible, there will be no other features, just these two:**
@@ -32,6 +33,7 @@ The keybindings are **disabled by default**, but you can enable them by updating
     "command": "syncing.downloadSettings"
 }
 ```
+
 
 ## About GitHub Access Token and Gist ID
 
