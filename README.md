@@ -12,6 +12,8 @@
 
 ## Extension Commands
 
+**Type `>Syncing` in VSCode Command Palette to:**
+
 * `Upload VSCode Settings`
 * `Download VSCode Settings`
 
@@ -30,3 +32,17 @@ The keybindings are **disabled by default**, but you can enable them by updating
         "command": "syncing.downloadSettings"
     }
 ```
+
+## About GitHub Access Token and Gist ID
+
+1. **generate new token**:
+  ![generate new token](./docs/1.png "generate new token")
+
+2. **allow gist**:
+  ![allow gist](./docs/2.png "allow gist")
+
+3. **copy/backup token**:
+  ![copy/backup token](./docs/3.png "copy/backup token")
+
+4. **after uploading, you can check you settings in Gist**:
+  ![gist](./docs/4.png "gist")
