@@ -45,7 +45,23 @@ class Gist
      */
     get(p_id)
     {
-        return this._api.gists.get({ id: p_id });
+        return new Promise((p_resolve, p_reject) =>
+        {
+            this._api.gists.get({ id: p_id }).then((gist) =>
+            {
+                p_resolve(gist);
+            }).catch((err) =>
+            {
+                if (err.code === 404)
+                {
+                    p_reject(new Error(`Gist id not exist: ${p_id}`));
+                }
+                else
+                {
+                    p_reject(new Error("Please check your Internet connection."));
+                }
+            });
+        });
     }
 
     /**
