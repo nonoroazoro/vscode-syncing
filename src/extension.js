@@ -6,16 +6,11 @@ const Toast = require("./utils/Toast");
 
 let _api;
 let _config;
-let _gistID;
 let _token;
+let _gistID;
 
 function activate(p_context)
 {
-    // console.log(vscode.commands.getCommands().then((commands) =>
-    // {
-    //     console.log(commands.join("\n"));
-    // }));
-
     _initGlobals(p_context);
     _initCommands(p_context);
 }
@@ -33,10 +28,6 @@ function _initCommands(p_context)
 {
     _registerCommand(p_context, "syncing.uploadSettings", _uploadSettings);
     _registerCommand(p_context, "syncing.downloadSettings", _downloadSettings);
-
-    // DEBUG
-    // vscode.commands.executeCommand("syncing.uploadSettings");
-    // vscode.commands.executeCommand("syncing.downloadSettings");
 }
 
 /**
