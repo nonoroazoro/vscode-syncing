@@ -23,14 +23,14 @@
 The keybindings are **disabled by default**, but you can enable them by updating VSCode's `Keyboard Shortcuts`:
 
 ```javascript
-    {
-        "key": "",
-        "command": "syncing.uploadSettings"
-    },
-    {
-        "key": "",
-        "command": "syncing.downloadSettings"
-    }
+{
+    "key": "",
+    "command": "syncing.uploadSettings"
+},
+{
+    "key": "",
+    "command": "syncing.downloadSettings"
+}
 ```
 
 ## About GitHub Access Token and Gist ID
