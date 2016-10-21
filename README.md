@@ -53,16 +53,16 @@ You can add a proxy to accelerate the synchronization, just set in VSCode `User 
 
 1. **generate new token**
 
-![generate new token](./docs/1.png?raw=true "generate new token")
+    ![generate new token](./docs/1.png?raw=true "generate new token")
 
 2. **allow gist**
 
-![allow gist](./docs/2.png?raw=true "allow gist")
+    ![allow gist](./docs/2.png?raw=true "allow gist")
 
 3. **copy/backup token**
 
-![copy/backup token](./docs/3.png?raw=true "copy/backup token")
+    ![copy/backup token](./docs/3.png?raw=true "copy/backup token")
 
 4. **after uploading, you can check your settings and Gist ID in Gist**
 
-![gist](./docs/4.png?raw=true "gist")
+    ![gist](./docs/4.png?raw=true "gist")
