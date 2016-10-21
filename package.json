@@ -1,8 +1,8 @@
 {
   "name": "syncing",
   "displayName": "syncing",
-  "description": "Sync VSCode Settings to GitHub Gist.",
-  "version": "1.0.6",
+  "description": "Sync VSCode Settings (include Extensions) to GitHub Gist.",
+  "version": "1.0.7",
   "publisher": "nonoroazoro",
   "license": "MIT",
   "main": "./src/extension",
