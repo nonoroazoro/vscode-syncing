@@ -211,9 +211,14 @@ class Extension
 
             const options = {
                 host: `${p_extension.publisher}.gallery.vsassets.io`,
-                path: `/_apis/public/gallery/publisher/${p_extension.publisher}/extension/${p_extension.name}/${p_extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`,
-                agent: new HttpsProxyAgent("http://127.0.0.1:1080")
+                path: `/_apis/public/gallery/publisher/${p_extension.publisher}/extension/${p_extension.name}/${p_extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
             };
+            const proxy = this._env.getSyncingProxy();
+            if (proxy)
+            {
+                options.agent = new HttpsProxyAgent(proxy);
+            }
+
             https.get(options, (res) =>
             {
                 if (res.statusCode === 200)
