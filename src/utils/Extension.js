@@ -3,7 +3,11 @@
  */
 
 const fs = require("fs");
+const fse = require("fs-extra");
+const temp = require("temp");
 const path = require("path");
+const async = require("async");
+const AdmZip = require("adm-zip");
 const https = require("https");
 const vscode = require("vscode");
 const HttpsProxyAgent = require("https-proxy-agent");
@@ -46,57 +50,170 @@ class Extension
      */
     install(p_extensions)
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((p_resolve) =>
         {
             this._getDifferentExtensions(p_extensions).then((diff) =>
             {
-                this.downloadExtension(p_extensions[0]).then(console.log);
+                // add/update/remove extensions.
+                const result = { extension: {} };
+                const tasks = [
+                    this._addExtensions.bind(this, diff.added),
+                    this._updateExtensions.bind(this, diff.updated),
+                    this._removeExtensions.bind(this, diff.removed)
+                ];
 
-                if (diff.added.length > 0)
-                {
-                    // TODO: add extensions
-                }
-
-                if (diff.changed.length > 0)
-                {
-                    // TODO: changed extensions (maybe updated)
-                }
-
-                if (diff.removed.length > 0)
-                {
-                    // TODO: remove extensions
-                }
-
-                p_resolve();
+                async.eachSeries(
+                    tasks,
+                    (task, done) =>
+                    {
+                        task().then((value) =>
+                        {
+                            Object.assign(result.extension, value);
+                            done();
+                        });
+                    },
+                    () =>
+                    {
+                        p_resolve(result);
+                    }
+                );
             });
         });
     }
 
     /**
+     * add extensions.
+     * @param {Array} p_extensions
+     * @returns {Promise}
+     */
+    _addExtensions(p_extensions)
+    {
+        return new Promise((p_resolve) =>
+        {
+            const that = this;
+            const result = { added: [], addedErrors: [] };
+            async.eachSeries(
+                p_extensions,
+                (item, done) =>
+                {
+                    that.downloadExtension(item)
+                        .then(that.extractExtension.bind(that))
+                        .then(() =>
+                        {
+                            result.added.push(item);
+                            done();
+                        })
+                        .catch(() =>
+                        {
+                            result.addedErrors.push(item);
+                            done();
+                        });
+                },
+                () =>
+                {
+                    p_resolve(result);
+                }
+            );
+        });
+    }
+
+    /**
+     * update extensions.
+     * @param {Array} p_extensions
+     * @returns {Promise}
+     */
+    _updateExtensions(p_extensions)
+    {
+        return new Promise((p_resolve) =>
+        {
+            const that = this;
+            const result = { updated: [], updatedErrors: [] };
+            async.eachSeries(
+                p_extensions,
+                (item, done) =>
+                {
+                    that.downloadExtension(item)
+                        .then(that.uninstallExtension.bind(that))
+                        .then(that.extractExtension.bind(that))
+                        .then(() =>
+                        {
+                            result.updated.push(item);
+                            done();
+                        })
+                        .catch(() =>
+                        {
+                            result.updatedErrors.push(item);
+                            done();
+                        });
+                },
+                () =>
+                {
+                    p_resolve(result);
+                }
+            );
+        });
+    }
+
+    /**
+     * remove extensions.
+     * @param {Array} p_extensions
+     * @returns {Promise}
+     */
+    _removeExtensions(p_extensions)
+    {
+        return new Promise((p_resolve) =>
+        {
+            const that = this;
+            const result = { removed: [], removedErrors: [] };
+            async.eachSeries(
+                p_extensions,
+                (item, done) =>
+                {
+                    that.uninstallExtension(item).then(() =>
+                    {
+                        result.removed.push(item);
+                        done();
+                    }).catch(() =>
+                    {
+                        result.removedErrors.push(item);
+                        done();
+                    });
+                },
+                () =>
+                {
+                    p_resolve(result);
+                }
+            );
+        });
+    }
+
+    /**
      * download extension from vscode Marketplace.
-     * @param {Promise}
+     * @param {Object} p_extension
+     * @returns {Promise}
      */
     downloadExtension(p_extension)
     {
         return new Promise((p_resolve, p_reject) =>
         {
+            const filepath = temp.path({ suffix: `.${p_extension.id}.zip` });
+            const file = fs.createWriteStream(filepath);
+            file.on("finish", () =>
+            {
+                p_resolve(Object.assign({}, p_extension, { path: filepath }));
+            }).on("error", (err) =>
+            {
+                temp.cleanup(() =>
+                {
+                    p_reject(err);
+                });
+            });
+
             const options = {
                 host: `${p_extension.publisher}.gallery.vsassets.io`,
                 path: `/_apis/public/gallery/publisher/${p_extension.publisher}/extension/${p_extension.name}/${p_extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`,
                 agent: new HttpsProxyAgent("http://127.0.0.1:1080")
             };
-
-            const filepath = path.join("C:\\Downloads\\vscode", `${p_extension.name}.zip`);
-            const file = fs.createWriteStream(filepath);
-            file.on("finish", () =>
-            {
-                p_resolve(filepath);
-            }).on("error", (err) =>
-            {
-                fs.unlink(filepath);
-                p_reject(err);
-            });
-
             https.get(options, (res) =>
             {
                 if (res.statusCode === 200)
@@ -105,33 +222,96 @@ class Extension
                 }
                 else
                 {
-                    fs.unlink(filepath);
-                    p_reject();
+                    temp.cleanup(() =>
+                    {
+                        p_reject();
+                    });
                 }
             }).on("error", (err) =>
             {
-                fs.unlink(filepath);
-                p_reject(err);
+                temp.cleanup(() =>
+                {
+                    p_reject(err);
+                });
             });
         });
     }
 
     /**
-     * get extensions that are added/changed/removed.
+     * download extension from vscode Marketplace.
+     * @param {Object} p_extension
+     * returns {Promise}
+     */
+    extractExtension(p_extension)
+    {
+        return new Promise((p_resolve, p_reject) =>
+        {
+            try
+            {
+                temp.mkdir("syncing-", (err, res) =>
+                {
+                    if (err)
+                    {
+                        throw err;
+                    }
+                    else
+                    {
+                        const zip = new AdmZip(p_extension.path);
+                        zip.extractAllTo(res, true);
+                        fse.copySync(
+                            path.join(res, "extension"),
+                            path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`)
+                        );
+                        p_resolve();
+                    }
+                });
+            }
+            catch (err)
+            {
+                p_reject(`Cannot extract extension: ${p_extension.id}.`);
+            }
+        });
+    }
+
+    /**
+     * uninstall vscode extension.
+     * @param {Object} p_extension
+     * returns {Promise}
+     */
+    uninstallExtension(p_extension)
+    {
+        return new Promise((p_resolve, p_reject) =>
+        {
+            fse.remove(path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`), (err) =>
+            {
+                if (err)
+                {
+                    p_reject(new Error(`Cannot uninstall extension: ${p_extension.id}`));
+                }
+                else
+                {
+                    p_resolve();
+                }
+            });
+        });
+    }
+
+    /**
+     * get extensions that are added/updated/removed.
      * @param {Array} p_extensions
      * @returns {Promise}
      */
     _getDifferentExtensions(p_extensions)
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((p_resolve) =>
         {
-            const extensions = { added: [], changed: [], removed: [] };
+            const extensions = { added: [], updated: [], removed: [] };
             if (p_extensions)
             {
                 let localExtension;
                 const reservedExtensionIDs = [];
 
-                // find added & changed extensions.
+                // find added & updated extensions.
                 for (const ext of p_extensions)
                 {
                     localExtension = vscode.extensions.getExtension(ext.id);
@@ -144,8 +324,8 @@ class Extension
                         }
                         else
                         {
-                            // changed.
-                            extensions.changed.push(ext);
+                            // updated.
+                            extensions.updated.push(ext);
                         }
                     }
                     else
