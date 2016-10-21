@@ -52,9 +52,15 @@ class Gist
                 p_resolve(gist);
             }).catch((err) =>
             {
-                if (err.code === 404)
+                if (err.code === 401)
                 {
-                    p_reject(new Error(`Gist id not exist: ${p_id}`));
+                    const error = new Error("Please check your GitHub access token.");
+                    error.code = err.code;
+                    p_reject(error);
+                }
+                else if (err.code === 404)
+                {
+                    p_reject(new Error("Please check your Gist id."));
                 }
                 else
                 {
@@ -108,7 +114,25 @@ class Gist
      */
     create(p_json)
     {
-        return this._api.gists.create(p_json);
+        return new Promise((p_resolve, p_reject) =>
+        {
+            this._api.gists.create(p_json).then((gist) =>
+            {
+                p_resolve(gist);
+            }).catch((err) =>
+            {
+                if (err.code === 401)
+                {
+                    const error = new Error("Please check your GitHub access token.");
+                    error.code = err.code;
+                    p_reject(error);
+                }
+                else
+                {
+                    p_reject(new Error("Please check your Internet connection."));
+                }
+            });
+        });
     }
 
     /**
