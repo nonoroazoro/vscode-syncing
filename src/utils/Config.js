@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const async = require("async");
 
+const Toast = require("./Toast");
 const Extension = require("./Extension");
 const Environment = require("./Environment");
 
@@ -246,6 +247,65 @@ class Config
     }
 
     /**
+     * prepare Syncing's settings, will ask for settings if not exist.
+     * @param {boolean} [p_checkGistID=true] default is true, check if Gist id is empty.
+     * @returns {Promise}
+     */
+    prepareSyncingSettings(p_checkGistID = true)
+    {
+        return new Promise((p_resolve, p_reject) =>
+        {
+            const tasks = [];
+            const settings = this.loadSyncingSettings();
+            if (!settings.token)
+            {
+                tasks.push(Toast.showGitHubTokenInputBox);
+            }
+            if (!settings.id && p_checkGistID)
+            {
+                tasks.push(Toast.showGistInputBox);
+            }
+
+            if (tasks.length === 0)
+            {
+                p_resolve(settings);
+            }
+            else
+            {
+                async.eachSeries(
+                    tasks,
+                    (task, done) =>
+                    {
+                        task().then((value) =>
+                        {
+                            Object.assign(settings, value);
+                            done();
+                        }).catch((err) =>
+                        {
+                            done(err);
+                        });
+                    },
+                    (err) =>
+                    {
+                        if (err || !settings.token || !settings.id)
+                        {
+                            p_reject();
+                        }
+                        else
+                        {
+                            this.saveSyncingSettings(settings).then(() =>
+                            {
+                                p_resolve(settings);
+                            });
+                        }
+                    }
+                );
+            }
+        });
+    }
+
+
+    /**
      * load Syncing's settings (load from settings file: `syncing.json`).
      * @returns {Object} or `{}`.
      */
@@ -272,31 +332,22 @@ class Config
      */
     saveSyncingSettings(p_json)
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((p_resolve) =>
         {
-            if (p_json)
+            try
             {
-                try
+                fs.writeFile(this._env.syncingSettingPath, JSON.stringify(p_json) || "{}", (err) =>
                 {
-                    fs.writeFile(this._env.syncingSettingPath, JSON.stringify(p_json) || "{}", (err) =>
+                    if (err)
                     {
-                        if (err)
-                        {
-                            p_reject(err);
-                        }
-                        else
-                        {
-                            p_resolve();
-                        }
-                    });
-                }
-                catch (err)
-                {
-                    p_reject(err);
-                }
+                        Toast.statusError(`Syncing: Cannot save Syncing settings: ${err}`);
+                    }
+                    p_resolve();
+                });
             }
-            else
+            catch (err)
             {
+                Toast.statusError(`Syncing: Cannot save Syncing settings: ${err}`);
                 p_resolve();
             }
         });
