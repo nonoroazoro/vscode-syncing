@@ -45,10 +45,10 @@ class Extension
     }
 
     /**
-     * install extensions.
+     * sync extensions (add/update/remove).
      * @param {Array} p_extensions extensions list.
      */
-    install(p_extensions)
+    sync(p_extensions)
     {
         return new Promise((p_resolve) =>
         {
