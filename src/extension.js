@@ -63,9 +63,19 @@ function _uploadSettings()
                         Toast.statusInfo("Syncing: settings uploaded.");
                     });
                 }
-            }).catch(() =>
+            }).catch((err) =>
             {
-                Toast.statusError("Syncing: upload failed, please check your Internet connection.");
+                if (err.code === 401)
+                {
+                    _config.clearSyncingToken().then(() =>
+                    {
+                        Toast.statusError(`Syncing: upload failed. ${err.message}`);
+                    });
+                }
+                else
+                {
+                    Toast.statusError(`Syncing: upload failed. ${err.message}`);
+                }
             });
         }).catch((err) =>
         {
@@ -99,7 +109,17 @@ function _downloadSettings()
             });
         }).catch((err) =>
         {
-            Toast.statusError(`Syncing: download failed. ${err.message}`);
+            if (err.code === 401)
+            {
+                _config.clearSyncingToken().then(() =>
+                {
+                    Toast.statusError(`Syncing: download failed. ${err.message}`);
+                });
+            }
+            else
+            {
+                Toast.statusError(`Syncing: download failed. ${err.message}`);
+            }
         });
     }).catch(() =>
     {
