@@ -43,7 +43,7 @@ function _uploadSettings()
     Toast.status("Syncing: gathering local settings...");
     _config.prepareSyncingSettings(false).then((settings) =>
     {
-        const api = Gist.create(settings.token, "http://127.0.0.1:1080");
+        const api = Gist.create(settings.token, _config.getSyncingProxy());
         _config.getConfigs({ load: true }).then((uploads) =>
         {
             Toast.status("Syncing: uploading settings...");
@@ -82,7 +82,7 @@ function _downloadSettings()
     Toast.status("syncing: checking remote settings...");
     _config.prepareSyncingSettings().then((settings) =>
     {
-        const api = Gist.create(settings.token, "http://127.0.0.1:1080");
+        const api = Gist.create(settings.token, _config.getSyncingProxy());
         api.get(settings.id).then((gist) =>
         {
             Toast.status("syncing: downloading settings...");
