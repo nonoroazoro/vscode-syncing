@@ -1,6 +1,6 @@
 # syncing - VSCode Extension
 
-**"syncing"** is vscode extension, proposed to sync vscode's settings (**include extensions**) to GitHub Gist.
+**"syncing"** is a vscode extension, proposed to sync vscode's settings (**include extensions**) to GitHub Gist.
 
 ## Features
 
