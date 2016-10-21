@@ -39,6 +39,10 @@
       {
         "command": "syncing.downloadSettings",
         "title": "Syncing: Download Settings"
+      },
+      {
+        "command": "syncing.openSettings",
+        "title": "Syncing: Open Syncing Settings"
       }
     ],
     "keybindings": [
@@ -49,6 +53,10 @@
       {
         "key": "",
         "command": "syncing.downloadSettings"
+      },
+      {
+        "key": "",
+        "command": "syncing.openSettings"
       }
     ]
   },
