@@ -298,7 +298,7 @@ class Config
                     },
                     (err) =>
                     {
-                        if (err || !settings.token || !settings.id)
+                        if (err || !settings.token || (p_checkGistID && !settings.id))
                         {
                             p_reject();
                         }
