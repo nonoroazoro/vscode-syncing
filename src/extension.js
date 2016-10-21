@@ -48,10 +48,10 @@ function _uploadSettings()
     _config.prepareSyncingSettings(false).then((settings) =>
     {
         const api = Gist.create(settings.token, _env.getSyncingProxy());
-        _config.getConfigs({ load: true }).then((uploads) =>
+        _config.getConfigs({ load: true }).then((configs) =>
         {
             Toast.status("Syncing: uploading settings...");
-            api.findAndUpdate(settings.id, uploads).then((gist) =>
+            api.findAndUpdate(settings.id, configs).then((gist) =>
             {
                 if (gist.id === settings.id)
                 {
