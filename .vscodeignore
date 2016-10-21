@@ -1,10 +1,10 @@
 # Editor files
 *.sublime-project
 *.sublime-workspace
-.vs
-.vscode
-.vscode-test
-typings
+.vs/**
+.vscode/**
+.vscode-test/**
+typings/**
 jsconfig.json
 
 # Compiled source
@@ -15,7 +15,7 @@ jsconfig.json
 *.suo
 *.tmp
 *.user
-obj
+obj/**
 
 # OS generated files
 .DS_Store
@@ -27,12 +27,8 @@ Icon?
 ehthumbs.db
 Thumbs.db
 
-# Node
-node_modules
-
 # Project specific stuff
-docs
-test
+test/**
 .gitignore
 .typingsrc
 .eslintrc
