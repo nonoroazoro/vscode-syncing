@@ -28,6 +28,7 @@ function _initCommands(p_context)
 {
     _registerCommand(p_context, "syncing.uploadSettings", _uploadSettings);
     _registerCommand(p_context, "syncing.downloadSettings", _downloadSettings);
+    _registerCommand(p_context, "syncing.openSettings", _openSettings);
 }
 
 /**
@@ -125,6 +126,14 @@ function _downloadSettings()
     {
         Toast.statusInfo("Syncing: canceled as Github Access Token or Gist ID isn't set.");
     });
+}
+
+/**
+ * open Syncing's settings.
+ */
+function _openSettings()
+{
+    vscode.commands.executeCommand("vscode.open", vscode.Uri.file(_env.syncingSettingPath));
 }
 
 module.exports.activate = activate;
