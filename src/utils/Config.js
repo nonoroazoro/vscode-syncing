@@ -3,88 +3,18 @@
  */
 
 const fs = require("fs");
-const os = require("os");
 const path = require("path");
 const async = require("async");
-const extension = require("./Extension");
+
+const Extension = require("./Extension");
+const Environment = require("./Environment");
 
 class Config
 {
     constructor(p_context)
     {
-        this.context = p_context;
-        this._isMac = process.platform === "darwin";
-        this._isInsiders = p_context.extensionPath.includes("insiders");
-        this._extensionsPath = path.join(
-            os.homedir(),
-            this._isInsiders ? ".vscode-insiders" : ".vscode",
-            "extensions"
-        );
-        this._codeBasePath = this._getCodeBasePath(this._isInsiders);
-        this._codeUserPath = path.join(this._codeBasePath, "User");
-    }
-
-    /**
-     * check if mac.
-    */
-    get isMac()
-    {
-        return this._isMac;
-    }
-
-    /**
-     * check if vscode is an insiders version.
-     */
-    get isInsiders()
-    {
-        return this._isInsiders;
-    }
-
-    /**
-     * get vscode's extensions base path.
-     */
-    get extensionsPath()
-    {
-        return this._extensionsPath;
-    }
-
-    /**
-     * get vscode's config base path.
-     */
-    get codeBasePath()
-    {
-        return this._codeBasePath;
-    }
-
-    _getCodeBasePath(p_isInsiders)
-    {
-        let basePath;
-        switch (process.platform)
-        {
-            case "win32":
-                basePath = process.env.APPDATA;
-                break;
-
-            case "darwin":
-                basePath = path.join(process.env.HOME, "Library/Application Support");
-                break;
-
-            case "linux":
-                basePath = path.join(os.homedir(), ".config");
-                break;
-
-            default:
-                basePath = "/var/local";
-        }
-        return path.join(basePath, p_isInsiders ? "Code - Insiders" : "Code");
-    }
-
-    /**
-     * get vscode's config `User` path.
-     */
-    get codeUserPath()
-    {
-        return this._codeUserPath;
+        this._env = Environment.create(p_context);
+        this._extension = Extension.create(p_context);
     }
 
     /**
@@ -124,7 +54,7 @@ class Config
             else
             {
                 list.push(
-                    this._isMac ?
+                    this._env.isMac ?
                         { name: "keybindings-mac" }
                         : { name: "keybindings" }
                 );
@@ -140,7 +70,7 @@ class Config
                 {
                     result = Object.assign({}, item, {
                         "path": path.join(
-                            this.codeUserPath,
+                            this._env.codeUserPath,
                             item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
                         ),
                         "remote": `${item.name}.json`
@@ -242,7 +172,7 @@ class Config
             {
                 try
                 {
-                    p_resolve(JSON.stringify(extension.getAll()));
+                    p_resolve(JSON.stringify(this._extension.getAll()));
                 }
                 catch (err)
                 {
@@ -279,7 +209,7 @@ class Config
             {
                 try
                 {
-                    extension.install(JSON.parse(p_item.content)).then((saved) =>
+                    this._extension.install(JSON.parse(p_item.content)).then((saved) =>
                     {
                         p_resolve(saved);
                     }).catch((err) =>
@@ -294,9 +224,9 @@ class Config
             }
             else
             {
-                // const temp = "D:\\Downloads\\vscode";
-                // fs.writeFile(path.join(temp, p_item.remote), p_item.content || "{}", (err) =>
-                fs.writeFile(p_item.path, p_item.content || "{}", (err) =>
+                const temp = "D:\\Downloads\\vscode";
+                fs.writeFile(path.join(temp, p_item.remote), p_item.content || "{}", (err) =>
+                // fs.writeFile(p_item.path, p_item.content || "{}", (err) =>
                 {
                     if (err)
                     {
@@ -319,10 +249,10 @@ class Config
     {
         return new Promise((p_resolve, p_reject) =>
         {
-            if (this.codeUserPath)
+            if (this._env.codeUserPath)
             {
                 const filename = "syncing.json";
-                const filepath = path.join(this.codeUserPath, filename);
+                const filepath = path.join(this._env.codeUserPath, filename);
                 if (fs.existsSync(filepath))
                 {
                     fs.readFile(filepath, "utf8", (err, res) =>
