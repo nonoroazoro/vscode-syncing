@@ -33,4 +33,5 @@ node_modules
 # Project specific stuff
 test
 .gitignore
+.typingsrc
 .eslintrc
