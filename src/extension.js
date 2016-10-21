@@ -93,13 +93,13 @@ function _uploadSettings()
  */
 function _downloadSettings()
 {
-    Toast.status("syncing: checking remote settings...");
+    Toast.status("Syncing: checking remote settings...");
     _config.prepareSyncingSettings().then((settings) =>
     {
         const api = Gist.create(settings.token, _env.getSyncingProxy());
         api.get(settings.id).then((gist) =>
         {
-            Toast.status("syncing: downloading settings...");
+            Toast.status("Syncing: downloading settings...");
             _config.saveConfigs(gist.files).then((saved) =>
             {
                 // TODO: log saved files.

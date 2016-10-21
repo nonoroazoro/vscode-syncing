@@ -1,6 +1,6 @@
 # syncing - VSCode Extension
 
-**"syncing"** is a VSCode extension, proposed to sync VSCode's settings (**include extensions**) to GitHub Gist.
+**"syncing"** is a VSCode extension, proposed to sync VSCode's settings (**including extensions**) to GitHub Gist.
 
 
 ## Features
@@ -52,13 +52,17 @@ You can add a proxy to accelerate the synchronization, just set in VSCode `User 
 ## About GitHub Access Token and Gist ID
 
 1. **generate new token**
-  ![generate new token](./docs/1.png "generate new token")
+
+    ![generate new token](./docs/1.png?raw=true "generate new token")
 
 2. **allow gist**
-  ![allow gist](./docs/2.png "allow gist")
+
+    ![allow gist](./docs/2.png?raw=true "allow gist")
 
 3. **copy/backup token**
-  ![copy/backup token](./docs/3.png "copy/backup token")
+
+    ![copy/backup token](./docs/3.png?raw=true "copy/backup token")
 
 4. **after uploading, you can check your settings and Gist ID in Gist**
-  ![gist](./docs/4.png "gist")
+
+    ![gist](./docs/4.png?raw=true "gist")
