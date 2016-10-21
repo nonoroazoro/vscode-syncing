@@ -6,7 +6,7 @@
 
 **In order to keep this extension as simple as possible, there will be no other features, just these two:**
 
-1. Upload VSCode settings and extensions to Gist.
+1. Upload VSCode settings and extensions to Gist (auto create new Gist for the first time).
 2. Download VSCode settings and extensions from Gist.
 
 
@@ -44,5 +44,5 @@ The keybindings are **disabled by default**, but you can enable them by updating
 3. **copy/backup token**
   ![copy/backup token](./docs/3.png "copy/backup token")
 
-4. **after uploading, you can check your settings in Gist**
+4. **after uploading, you can check your settings and Gist ID in Gist**
   ![gist](./docs/4.png "gist")
