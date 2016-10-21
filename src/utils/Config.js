@@ -354,4 +354,21 @@ class Config
     }
 }
 
-module.exports = Config;
+let _instance;
+/**
+ * only create one instance.
+ * @param {Object} p_context
+ * @returns {Config}
+ */
+function create(p_context)
+{
+    if (_instance === undefined)
+    {
+        _instance = new Config(p_context);
+    }
+    return _instance;
+}
+
+module.exports = {
+    create
+};
