@@ -20,6 +20,17 @@
     "*"
   ],
   "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Syncing Configuration",
+      "properties": {
+        "syncing.proxy": {
+          "type": "string",
+          "default": "",
+          "description": "Proxy setting which is used by Syncing."
+        }
+      }
+    },
     "commands": [
       {
         "command": "syncing.uploadSettings",
