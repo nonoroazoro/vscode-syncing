@@ -224,9 +224,7 @@ class Config
             }
             else
             {
-                const temp = "D:\\Downloads\\vscode";
-                fs.writeFile(path.join(temp, p_item.remote), p_item.content || "{}", (err) =>
-                // fs.writeFile(p_item.path, p_item.content || "{}", (err) =>
+                fs.writeFile(p_item.path, p_item.content || "{}", (err) =>
                 {
                     if (err)
                     {
@@ -234,7 +232,7 @@ class Config
                     }
                     else
                     {
-                        p_resolve(p_item);
+                        p_resolve({ file: p_item });
                     }
                 });
             }
