@@ -41,7 +41,16 @@
         "title": "Syncing: Download Settings"
       }
     ],
-    "keybindings": []
+    "keybindings": [
+      {
+        "key": "",
+        "command": "syncing.uploadSettings"
+      },
+      {
+        "key": "",
+        "command": "syncing.downloadSettings"
+      }
+    ]
   },
   "scripts": {
     "postinstall": "node ./node_modules/vscode/bin/install"
