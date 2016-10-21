@@ -46,6 +46,7 @@
   },
   "dependencies": {
     "async": "^2.1.2",
-    "github": "^5.2.1"
+    "github": "^5.2.1",
+    "https-proxy-agent": "^1.0.0"
   }
 }
