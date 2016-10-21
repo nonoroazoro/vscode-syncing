@@ -5,8 +5,8 @@
   "version": "1.0.9",
   "publisher": "nonoroazoro",
   "license": "MIT",
-  "main": "./src/extension",
-  "icon": "./src/res/logo.png",
+  "main": "src/extension",
+  "icon": "src/res/logo.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/nonoroazoro/syncing"
