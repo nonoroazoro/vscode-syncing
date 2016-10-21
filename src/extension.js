@@ -1,3 +1,4 @@
+const async = require("async");
 const vscode = require("vscode");
 
 const Gist = require("./utils/Gist");
@@ -8,6 +9,7 @@ let _api;
 let _config;
 let _token;
 let _gistID;
+let _settings;
 
 function activate(p_context)
 {
@@ -17,11 +19,63 @@ function activate(p_context)
 
 function _initGlobals(p_context)
 {
+    // TODO:
+    _config = new Config(p_context);
+    _prepareSyncingSettings(_config).then(() =>
+    {
+        console.log("");
+    }).catch(() =>
+    {
+        Toast.statusInfo("Syncing: canceled as Github Access Token or Gist ID isn't set.");
+    });
+
     // Syncing's config.
     _gistID = "";
     _token = "";
-    _config = new Config(p_context);
     _api = new Gist(_token, { proxy: "http://127.0.0.1:1080" });
+}
+
+function _prepareSyncingSettings(p_config)
+{
+    return new Promise((p_resolve, p_reject) =>
+    {
+        _settings = p_config.loadSyncingSettings();
+
+        const tasks = [];
+        if (!_settings.token)
+        {
+            tasks.push(Toast.showGitHubTokenInputBox);
+        }
+        if (!_settings.id)
+        {
+            tasks.push(Toast.showGistInputBox);
+        }
+        async.eachSeries(
+            tasks,
+            (task, done) =>
+            {
+                task().then((value) =>
+                {
+                    Object.assign(_settings, value);
+                    done();
+                }).catch((err) =>
+                {
+                    done(err);
+                });
+            },
+            (err) =>
+            {
+                if (err || !_settings.token || !_settings.id)
+                {
+                    p_reject();
+                }
+                else
+                {
+                    p_resolve();
+                }
+            }
+        );
+    });
 }
 
 function _initCommands(p_context)
