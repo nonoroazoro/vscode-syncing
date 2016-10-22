@@ -12,6 +12,7 @@ const https = require("https");
 const vscode = require("vscode");
 const HttpsProxyAgent = require("https-proxy-agent");
 
+const Toast = require("./Toast");
 const Environment = require("./Environment");
 
 class Extension
@@ -90,6 +91,8 @@ class Extension
     {
         return new Promise((p_resolve) =>
         {
+            Toast.status("Syncing: installing new extensions...");
+
             const that = this;
             const result = { added: [], addedErrors: [] };
             async.eachSeries(
@@ -129,6 +132,8 @@ class Extension
     {
         return new Promise((p_resolve) =>
         {
+            Toast.status("Syncing: updating extensions...");
+
             const that = this;
             const result = { updated: [], updatedErrors: [] };
             async.eachSeries(
@@ -172,6 +177,8 @@ class Extension
     {
         return new Promise((p_resolve) =>
         {
+            Toast.status("Syncing: removing unused extensions...");
+
             const that = this;
             const result = { removed: [], removedErrors: [] };
             async.eachSeries(
