@@ -4,7 +4,7 @@
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)
 
 
-**"Syncing"** is a VSCode extension, proposed to sync VSCode's settings (**including extensions**) to GitHub Gist.
+**"Syncing"** is a VSCode extension, proposed to sync VSCode's settings (**including extensions/snippets**) to GitHub Gist.
 
 > I wrote it cause I wanna keep it **simple**.
 

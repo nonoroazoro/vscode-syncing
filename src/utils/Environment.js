@@ -19,6 +19,7 @@ class Environment
         );
         this._codeBasePath = this._getCodeBasePath(this._isInsiders);
         this._codeUserPath = path.join(this._codeBasePath, "User");
+        this._snippetsPath = path.join(this._codeUserPath, "snippets");
         this._syncingSettingsPath = path.join(this._codeUserPath, "syncing.json");
     }
 
@@ -86,11 +87,29 @@ class Environment
     }
 
     /**
+     * get vscode's config `snippets` path.
+     */
+    get snippetsPath()
+    {
+        return this._snippetsPath;
+    }
+
+    /**
      * get Syncing's config file path.
      */
     get syncingSettingPath()
     {
         return this._syncingSettingsPath;
+    }
+
+    /**
+     * get local snippet filepath from filename.
+     * @param {string} p_filename snippet filename.
+     * @returns {string}
+     */
+    getSnippetFilePath(p_filename)
+    {
+        return path.join(this.snippetsPath, p_filename);
     }
 
     /**
