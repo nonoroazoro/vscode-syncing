@@ -94,12 +94,12 @@ class Environment
     }
 
     /**
-     * get proxy settings of Syncing.
+     * get proxy settings of Syncing, using vscode's `http.proxy`.
      * @returns {string} or `undefined`.
      */
     getSyncingProxy()
     {
-        let proxy = vscode.workspace.getConfiguration("syncing")["proxy"];
+        let proxy = vscode.workspace.getConfiguration("http")["proxy"];
         if (typeof proxy === "string")
         {
             proxy = proxy.trim();
