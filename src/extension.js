@@ -1,3 +1,4 @@
+const fs = require("fs");
 const vscode = require("vscode");
 
 const Gist = require("./utils/Gist");
@@ -133,7 +134,22 @@ function _downloadSettings()
  */
 function _openSettings()
 {
-    vscode.commands.executeCommand("vscode.open", vscode.Uri.file(_env.syncingSettingPath));
+    if (fs.existsSync(_env.syncingSettingPath))
+    {
+        _openFile(_env.syncingSettingPath);
+    }
+    else
+    {
+        _config.initSyncingSettings().then(() =>
+        {
+            _openFile(_env.syncingSettingPath);
+        });
+    }
+}
+
+function _openFile(p_filepath)
+{
+    vscode.commands.executeCommand("vscode.open", vscode.Uri.file(p_filepath));
 }
 
 module.exports.activate = activate;
