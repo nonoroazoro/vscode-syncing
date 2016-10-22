@@ -16,6 +16,9 @@ const defaultSyncingSettings = {
     "id": ""
 };
 
+// the remote snippet file prefix;
+const snippetPrefix = "snippet-";
+
 class Config
 {
     constructor(p_context)
@@ -47,61 +50,76 @@ class Config
             // the item order is very important to ensure that the small files are synced first.
             // thus, the extensions will be the last one to sync.
             const list = [
-                { name: "locale" },
-                { name: "settings" },
-                // { name: "snippets" },
-                { name: "extensions" }
+                { name: "locale", type: "file" },
+                { name: "settings", type: "file" },
+                { name: "snippets", type: "folder" },
+                { name: "extensions", type: "file" }
             ];
 
             if (full)
             {
                 list.unshift(
-                    { name: "keybindings-mac" },
-                    { name: "keybindings" }
+                    { name: "keybindings-mac", type: "file" },
+                    { name: "keybindings", type: "file" }
                 );
             }
             else
             {
                 list.unshift(
                     this._env.isMac ?
-                        { name: "keybindings-mac" }
-                        : { name: "keybindings" }
+                        { name: "keybindings-mac", type: "file" }
+                        : { name: "keybindings", type: "file" }
                 );
             }
 
-            let result;
-            const that = this;
+            let temp;
             const results = [];
             const errors = [];
             async.eachSeries(
                 list,
                 (item, done) =>
                 {
-                    result = Object.assign({}, item, {
-                        "path": path.join(
-                            this._env.codeUserPath,
-                            item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
-                        ),
-                        "remote": `${item.name}.json`
-                    });
+                    if (item.type === "folder")
+                    {
+                        // attention: snippets may be empty.
+                        temp = this._getSnippets(this._env.snippetsPath);
+                    }
+                    else
+                    {
+                        temp = [
+                            Object.assign({}, {
+                                "name": item.name,
+                                "path": path.join(
+                                    this._env.codeUserPath,
+                                    item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
+                                ),
+                                "remote": `${item.name}.json`
+                            })
+                        ];
+                    }
 
                     if (load)
                     {
-                        that._loadItemContent(result).then((value) =>
+                        this._loadItemContent(temp).then((values) =>
                         {
-                            result.content = value;
-                            results.push(result);
-                            done();
-                        }).catch((err) =>
-                        {
-                            errors.push(result.remote);
-                            results.push(result);
+                            values.forEach((value) =>
+                            {
+                                if (value.content)
+                                {
+                                    results.push(value);
+                                }
+                                else
+                                {
+                                    errors.push(value.remote);
+                                    results.push(value);
+                                }
+                            });
                             done();
                         });
                     }
                     else
                     {
-                        results.push(result);
+                        results.push(...temp);
                         done();
                     }
                 },
@@ -118,8 +136,35 @@ class Config
     }
 
     /**
+     * get all snippet files.
+     * @param {string} p_folderpath snippets path.
+     * @returns {Array} or `[]`.
+     */
+    _getSnippets(p_folderpath)
+    {
+        const result = [];
+        try
+        {
+            const filenames = fs.readdirSync(p_folderpath);
+            filenames.forEach((filename) =>
+            {
+                // add prefix `snippet-` for all snippets.
+                result.push({
+                    name: filename,
+                    path: path.join(p_folderpath, filename),
+                    remote: `${snippetPrefix}${filename}`
+                });
+            });
+        }
+        catch (err)
+        {
+        }
+        return result;
+    }
+
+    /**
      * save vscode configs to files.
-     * @param  {Array} vscode configs from Gist.
+     * @param  {Object} vscode configs from Gist.
      * @returns {Promise}
      */
     saveConfigs(p_files)
@@ -128,23 +173,86 @@ class Config
         {
             if (p_files)
             {
+                let extensionsFile;
+                const saveFiles = [];
+                const removeFiles = [];
+                const existsFileKeys = [];
                 this.getConfigs().then((configs) =>
                 {
                     let file;
-                    const that = this;
-                    const savedFiles = [];
+                    for (const item of configs)
+                    {
+                        file = p_files[item.remote];
+                        if (file)
+                        {
+                            // file exists in remote and local, sync it.
+                            if (item.name === "extensions")
+                            {
+                                // temp extensions file.
+                                extensionsFile = Object.assign({}, item, { content: file.content });
+                            }
+                            else
+                            {
+                                // temp other file.
+                                saveFiles.push(Object.assign({}, item, { content: file.content }));
+                            }
+                            existsFileKeys.push(item.remote);
+                        }
+                        else
+                        {
+                            // file exists in remote, but not exists in local.
+                            // if it is snippet file, delete!
+                            if (item.remote.startsWith(snippetPrefix))
+                            {
+                                removeFiles.push(item);
+                            }
+                        }
+                    }
+
+                    let filename;
+                    for (const key of Object.keys(p_files))
+                    {
+                        if (!existsFileKeys.includes(key))
+                        {
+                            file = p_files[key];
+                            if (file.filename.startsWith(snippetPrefix))
+                            {
+                                filename = file.filename.slice(snippetPrefix.length);
+                                if (filename)
+                                {
+                                    saveFiles.push({
+                                        content: file.content,
+                                        name: filename,
+                                        path: this._env.getSnippetFilePath(filename),
+                                        remote: file.filename
+                                    });
+                                }
+                            }
+                            else
+                            {
+                                // unknow files, do not process.
+                            }
+                        }
+                    }
+
+                    // put extensions file to the last.
+                    if (extensionsFile)
+                    {
+                        saveFiles.push(extensionsFile);
+                    }
+
+                    const syncedFiles = { updated: [], removed: [] };
                     async.eachSeries(
-                        configs,
+                        saveFiles,
                         (item, done) =>
                         {
-                            file = p_files[item.remote];
-                            that._saveItemContent(Object.assign({}, item, { content: file.content })).then((saved) =>
+                            this._saveItemContent(item).then((saved) =>
                             {
-                                savedFiles.push(saved);
+                                syncedFiles.updated.push(saved);
                                 done();
                             }).catch((err) =>
                             {
-                                done(new Error(`Cannot save settings file: ${item.remote} : ${err.message}`));
+                                done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
                             });
                         },
                         (err) =>
@@ -155,7 +263,12 @@ class Config
                             }
                             else
                             {
-                                p_resolve(savedFiles);
+                                // todo remove files
+                                this.removeConfigs(removeFiles).then((removed) =>
+                                {
+                                    syncedFiles.removed = removed;
+                                    p_resolve(syncedFiles);
+                                }).catch(p_reject);
                             }
                         }
                     );
@@ -169,39 +282,35 @@ class Config
     }
 
     /**
-     * load item content.
-     * @param {Object} p_item item of uploads.
+     * load items content.
+     * @param {Array} p_items items of configs.
      * @returns {Promise}
      */
-    _loadItemContent(p_item)
+    _loadItemContent(p_items)
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((p_resolve) =>
         {
-            if (p_item.name === "extensions")
+            let content;
+            const result = p_items.map((item) =>
             {
                 try
                 {
-                    p_resolve(JSON.stringify(this._extension.getAll()));
-                }
-                catch (err)
-                {
-                    p_reject(err);
-                }
-            }
-            else
-            {
-                fs.readFile(p_item.path, "utf8", (err, res) =>
-                {
-                    if (err)
+                    if (item.name === "extensions")
                     {
-                        p_reject(err);
+                        content = JSON.stringify(this._extension.getAll());
                     }
                     else
                     {
-                        p_resolve(res);
+                        content = fs.readFileSync(item.path, "utf8");
                     }
-                });
-            }
+                }
+                catch (err)
+                {
+                    content = null;
+                }
+                return Object.assign({}, item, { content });
+            });
+            p_resolve(result);
         });
     }
 
@@ -245,6 +354,48 @@ class Config
                     }
                 });
             }
+        });
+    }
+
+    /**
+     * delete config files.
+     * @param {Array} p_files config files.
+     * @returns {Promise}
+     */
+    removeConfigs(p_files)
+    {
+        const removed = [];
+        return new Promise((p_resolve, p_reject) =>
+        {
+            async.eachSeries(
+                p_files,
+                (item, done) =>
+                {
+                    fs.unlink(item.path, (err) =>
+                    {
+                        if (err)
+                        {
+                            done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
+                        }
+                        else
+                        {
+                            removed.push({ file: item });
+                            done();
+                        }
+                    });
+                },
+                (err) =>
+                {
+                    if (err)
+                    {
+                        p_reject(err);
+                    }
+                    else
+                    {
+                        p_resolve(removed);
+                    }
+                }
+            );
         });
     }
 
