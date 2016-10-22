@@ -2,7 +2,7 @@
   "name": "syncing",
   "displayName": "Syncing",
   "description": "Sync VSCode Settings (including Extensions) to GitHub Gist.",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "publisher": "nonoroazoro",
   "license": "MIT",
   "main": "src/extension",
@@ -21,17 +21,6 @@
     "*"
   ],
   "contributes": {
-    "configuration": {
-      "type": "object",
-      "title": "Syncing Configuration",
-      "properties": {
-        "syncing.proxy": {
-          "type": "string",
-          "default": "",
-          "description": "Proxy setting which is used by Syncing."
-        }
-      }
-    },
     "commands": [
       {
         "command": "syncing.uploadSettings",
