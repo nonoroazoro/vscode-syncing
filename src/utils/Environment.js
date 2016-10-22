@@ -11,7 +11,7 @@ class Environment
     constructor(p_context)
     {
         this._isMac = process.platform === "darwin";
-        this._isInsiders = p_context.extensionPath.includes("insiders");
+        this._isInsiders = p_context.extensionPath.includes("insider");
         this._extensionsPath = path.join(
             os.homedir(),
             this._isInsiders ? ".vscode-insiders" : ".vscode",
