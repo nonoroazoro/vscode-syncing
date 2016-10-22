@@ -247,7 +247,16 @@ class Config
     }
 
     /**
-     * clear GitHub token.
+     * init Syncing settings file.
+     * @returns {Promise}
+     */
+    initSyncingSettings()
+    {
+        return this.saveSyncingSettings(defaultSyncingSettings, false);
+    }
+
+    /**
+     * clear GitHub token and save to file.
      * @returns {Promise}
      */
     clearSyncingToken()
