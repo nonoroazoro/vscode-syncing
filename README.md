@@ -43,11 +43,12 @@ The keybindings are **not set by default**, but you can enable them by updating 
 
 ## Extension Proxy Settings
 
-You can add a proxy to accelerate the synchronization, just set in VSCode `User Settings` like:
+You can add a proxy to accelerate the synchronization, find and set the `"http.proxy"` property in VSCode `User Settings` like:
 
 ```javascript
-// Syncing Configuration
-"syncing.proxy" = "http://127.0.0.1:1080"
+// HTTP
+// The proxy setting to use. If not set will be taken from the http_proxy and https_proxy environment variables
+"http.proxy": "http://127.0.0.1:1080"
 ```
 
 
