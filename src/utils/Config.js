@@ -44,23 +44,25 @@ class Config
     {
         return new Promise((p_resolve, p_reject) =>
         {
+            // the item order is very important to ensure that the small files are synced first.
+            // thus, the extensions will be the last one to sync.
             const list = [
-                { name: "extensions" },
                 { name: "locale" },
-                { name: "settings" }
-                // { name: "snippets" }
+                { name: "settings" },
+                // { name: "snippets" },
+                { name: "extensions" }
             ];
 
             if (full)
             {
-                list.push(
+                list.unshift(
                     { name: "keybindings-mac" },
                     { name: "keybindings" }
                 );
             }
             else
             {
-                list.push(
+                list.unshift(
                     this._env.isMac ?
                         { name: "keybindings-mac" }
                         : { name: "keybindings" }
