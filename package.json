@@ -1,8 +1,8 @@
 {
   "name": "syncing",
   "displayName": "Syncing",
-  "description": "Sync VSCode Settings (including Extensions) to GitHub Gist.",
-  "version": "1.1.14",
+  "description": "Sync VSCode Settings to GitHub Gist.",
+  "version": "1.1.15",
   "publisher": "nonoroazoro",
   "author": {
     "email": "xiaochao.k@gmail.com",
