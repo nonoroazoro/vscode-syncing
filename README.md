@@ -1,20 +1,29 @@
-# Syncing - VSCode Extension
+# Syncing
 [![Version](http://vsmarketplacebadge.apphb.com/version/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Installs](http://vsmarketplacebadge.apphb.com/installs/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)
 
+**Syncing** is a VSCode extension, proposed to sync **all of the VSCode's settings** to GitHub Gist.
 
-**"Syncing"** is a VSCode extension, proposed to sync VSCode's settings (**including extensions/snippets**) to GitHub Gist.
-
-> I wrote it cause I wanna keep it **simple**.
+> To keep the synchronization **simple & reliable**.
 
 
 ## Features
 
 **In order to keep this extension as simple as possible, there will be no other features, only these two:**
 
-1. **Upload** VSCode settings and extensions to Gist (auto create new Gist for the first time).
+1. **Upload** VSCode settings and extensions to Gist:
+
+    * **upload** `settings`, `locale`, `snippets`, `keybindings (multiple OS supported)`, `extensions`.
+    * auto create new Gist if it doesn't exist.
+    * auto remove remote files that don't exist in local.
+    * auto exclude unchanged settings (in order to speed up the synchronization).
+
 2. **Download** VSCode settings and extensions from Gist.
+
+    * **always overwrite** local settings.
+    * auto `install`, `update`, `remove` extensions.
+    * auto remove local files that don't exist in remote.
 
 
 ## Extension Commands
@@ -31,28 +40,29 @@
 The keybindings are **not set by default**, but you can enable them by updating VSCode's `Keyboard Shortcuts`:
 
 ```javascript
-{
-    "key": "",
-    "command": "syncing.uploadSettings"
-},
-{
-    "key": "",
-    "command": "syncing.downloadSettings"
-},
-{
-    "key": "",
-    "command": "syncing.openSettings"
-}
+    {
+        "key": "",
+        "command": "syncing.uploadSettings"
+    },
+    {
+        "key": "",
+        "command": "syncing.downloadSettings"
+    },
+    {
+        "key": "",
+        "command": "syncing.openSettings"
+    }
 ```
+
 
 ## Extension Proxy Settings
 
 You can add a proxy to accelerate the synchronization, find and set the `"http.proxy"` property in VSCode `User Settings` like:
 
 ```javascript
-// HTTP
-// The proxy setting to use. If not set will be taken from the http_proxy and https_proxy environment variables
-"http.proxy": "http://127.0.0.1:1080"
+    // HTTP
+    // The proxy setting to use. If not set will be taken from the http_proxy and https_proxy environment variables
+    "http.proxy": "http://127.0.0.1:1080"
 ```
 
 

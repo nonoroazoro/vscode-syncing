@@ -204,17 +204,44 @@ class Gist
      */
     _getModifiedFiles(p_localFiles, p_remoteFiles)
     {
-        let file;
+        let localFile;
+        let remoteFile;
         const result = {};
+        const recordedKeys = [];
+        for (const key of Object.keys(p_remoteFiles))
+        {
+            localFile = p_localFiles[key];
+            remoteFile = p_remoteFiles[key];
+            if (localFile)
+            {
+                // ignore null local file.
+                if (localFile.content && localFile.content !== remoteFile.content)
+                {
+                    result[key] = localFile;
+                }
+            }
+            else
+            {
+                // remove remote file.
+                result[key] = null;
+            }
+            recordedKeys.push(key);
+        }
+
+        // add rest local files.
         for (const key of Object.keys(p_localFiles))
         {
-            file = p_localFiles[key];
-            // ignore null file.
-            if (file.content && file.content !== p_remoteFiles[key].content)
+            if (!recordedKeys.includes(key))
             {
-                result[key] = file;
+                // ignore null local file.
+                localFile = p_localFiles[key];
+                if (localFile.content)
+                {
+                    result[key] = localFile;
+                }
             }
         }
+
         return (Object.keys(result).length === 0) ? undefined : result;
     }
 }
