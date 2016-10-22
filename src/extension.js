@@ -101,9 +101,9 @@ function _downloadSettings()
         api.get(settings.id).then((gist) =>
         {
             Toast.status("Syncing: downloading settings...");
-            _config.saveConfigs(gist.files).then((saved) =>
+            _config.saveConfigs(gist.files).then((synced) =>
             {
-                // TODO: log saved files.
+                // TODO: log synced files.
                 Toast.statusInfo("Syncing: settings downloaded.");
             }).catch((err) =>
             {
