@@ -87,14 +87,14 @@ class Config
                     else
                     {
                         temp = [
-                            Object.assign({}, {
+                            {
                                 "name": item.name,
                                 "path": path.join(
                                     this._env.codeUserPath,
                                     item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
                                 ),
                                 "remote": `${item.name}.json`
-                            })
+                            }
                         ];
                     }
 
