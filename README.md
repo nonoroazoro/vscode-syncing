@@ -5,7 +5,7 @@
 
 **Syncing** is a VSCode extension, proposed to sync **all of the VSCode's settings** to GitHub Gist.
 
-> I wrote it cause I wanna keep it **simple & reliable**.
+> To keep the synchronization **simple & reliable**.
 
 
 ## Features
