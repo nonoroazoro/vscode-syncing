@@ -104,15 +104,11 @@ class Config
                         {
                             values.forEach((value) =>
                             {
-                                if (value.content)
-                                {
-                                    results.push(value);
-                                }
-                                else
+                                if (!value.content)
                                 {
                                     errors.push(value.remote);
-                                    results.push(value);
                                 }
+                                results.push(value);
                             });
                             done();
                         });
