@@ -14,7 +14,8 @@
 
 1. **Upload** VSCode settings and extensions to Gist:
 
-    * **upload** `settings`, `locale`, `snippets`, `keybindings (multiple OS supported)`, `extensions`.
+    * **upload** `settings`, `locale`, `snippets`, `keybindings`, `extensions`.
+    * **separate Mac and non-Mac's** `settings` and `keybindings` (in case you have multiple devices).
     * auto create new Gist if it doesn't exist.
     * auto remove remote files that don't exist in local.
     * auto exclude unchanged settings (in order to speed up the synchronization).
