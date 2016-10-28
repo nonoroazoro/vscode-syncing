@@ -51,7 +51,6 @@ class Config
             // thus, the extensions will be the last one to sync.
             const list = [
                 { name: "locale", type: "file" },
-                { name: "settings", type: "file" },
                 { name: "snippets", type: "folder" },
                 { name: "extensions", type: "file" }
             ];
@@ -59,6 +58,8 @@ class Config
             if (full)
             {
                 list.unshift(
+                    { name: "settings-mac", type: "file" },
+                    { name: "settings", type: "file" },
                     { name: "keybindings-mac", type: "file" },
                     { name: "keybindings", type: "file" }
                 );
@@ -67,12 +68,16 @@ class Config
             {
                 list.unshift(
                     this._env.isMac ?
+                        { name: "settings-mac", type: "file" }
+                        : { name: "settings", type: "file" },
+                    this._env.isMac ?
                         { name: "keybindings-mac", type: "file" }
                         : { name: "keybindings", type: "file" }
                 );
             }
 
             let temp;
+            let localFilename;
             const results = [];
             const errors = [];
             async.eachSeries(
@@ -86,12 +91,22 @@ class Config
                     }
                     else
                     {
+                        localFilename = `${item.name}.json`;
+                        if (item.name.includes("settings"))
+                        {
+                            localFilename = "settings.json";
+                        }
+                        else if (item.name.includes("keybindings"))
+                        {
+                            localFilename = "keybindings.json";
+                        }
+
                         temp = [
                             {
                                 "name": item.name,
                                 "path": path.join(
                                     this._env.codeUserPath,
-                                    item.name.includes("keybindings") ? "keybindings.json" : `${item.name}.json`
+                                    localFilename
                                 ),
                                 "remote": `${item.name}.json`
                             }
