@@ -222,8 +222,8 @@ class Gist
             }
             else
             {
-                // remove remote file (don't remove keybindings).
-                if (!key.includes("keybindings"))
+                // remove remote file (don't remove remote keybindings and settings).
+                if (!key.includes("keybindings") && !key.includes("settings"))
                 {
                     result[key] = null;
                 }
