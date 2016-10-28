@@ -222,8 +222,11 @@ class Gist
             }
             else
             {
-                // remove remote file.
-                result[key] = null;
+                // remove remote file (don't remove keybindings).
+                if (!key.includes("keybindings"))
+                {
+                    result[key] = null;
+                }
             }
             recordedKeys.push(key);
         }
