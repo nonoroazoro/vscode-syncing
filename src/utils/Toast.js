@@ -56,14 +56,7 @@ function showGitHubTokenInputBox()
         };
         vscode.window.showInputBox(options).then((value) =>
         {
-            if (value)
-            {
-                p_resolve({ token: value.trim() });
-            }
-            else
-            {
-                p_reject(new Error("Canceled."));
-            }
+            p_resolve({ token: value ? value.trim() : "" });
         });
     });
 }
@@ -77,21 +70,14 @@ function showGistInputBox()
     return new Promise((p_resolve, p_reject) =>
     {
         const options = {
-            placeHolder: "Enter Your Gist ID.",
+            placeHolder: "Enter Your Gist ID (or just leave it blank to automatically create a new Gist).",
             password: false,
             prompt: "Used to sync vscode settings to Gist.",
             ignoreFocusOut: true
         };
         vscode.window.showInputBox(options).then((value) =>
         {
-            if (value)
-            {
-                p_resolve({ id: value.trim() });
-            }
-            else
-            {
-                p_reject(new Error("Canceled."));
-            }
+            p_resolve({ id: value ? value.trim() : "" });
         });
     });
 }
