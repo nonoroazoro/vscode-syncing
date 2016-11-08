@@ -46,7 +46,7 @@ function _registerCommand(p_context, p_command, p_callback)
 function _uploadSettings()
 {
     Toast.status("Syncing: gathering local settings...");
-    _config.prepareSyncingSettings(false).then((settings) =>
+    _config.prepareUploadSettings(false).then((settings) =>
     {
         const api = Gist.create(settings.token, _env.getSyncingProxy());
         _config.getConfigs({ load: true }).then((configs) =>
@@ -95,7 +95,7 @@ function _uploadSettings()
 function _downloadSettings()
 {
     Toast.status("Syncing: checking remote settings...");
-    _config.prepareSyncingSettings().then((settings) =>
+    _config.prepareDownloadSettings().then((settings) =>
     {
         const api = Gist.create(settings.token, _env.getSyncingProxy());
         api.get(settings.id).then((gist) =>
