@@ -8,18 +8,17 @@ class Gist
 {
     constructor(p_token, p_proxy)
     {
-        if (!p_token)
-        {
-            throw new Error("Invalid GitHub Token.");
-        }
-
         this._token = p_token;
         this._proxy = p_proxy;
         this._api = new GitHubAPI(Object.assign({ timeout: 5000 }, p_proxy ? { proxy: p_proxy } : {}));
-        this._api.authenticate({
-            type: "oauth",
-            token: p_token
-        });
+
+        if (p_token)
+        {
+            this._api.authenticate({
+                type: "oauth",
+                token: p_token
+            });
+        }
     }
 
     /**
