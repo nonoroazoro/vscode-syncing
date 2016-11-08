@@ -431,11 +431,31 @@ class Config
     }
 
     /**
-     * prepare Syncing's settings, will ask for settings if not exist.
-     * @param {boolean} [p_checkGistID=true] default is true, check if Gist id is empty.
+     * prepare Syncing's settings for upload.
      * @returns {Promise}
      */
-    prepareSyncingSettings(p_checkGistID = true)
+    prepareUploadSettings()
+    {
+        // GitHub token must exist, but Gist ID could be none.
+        return this.prepareSyncingSettings(true);
+    }
+
+    /**
+     * prepare Syncing's settings for download.
+     * @returns {Promise}
+     */
+    prepareDownloadSettings()
+    {
+        // GitHub token could be none, but Gist ID must exist.
+        return this.prepareSyncingSettings(false);
+    }
+
+    /**
+     * prepare Syncing's settings, will ask for settings if not exist.
+     * @param {boolean} [p_forUpload=true] default is true, GitHub token must exist, but Gist ID could be none, else, GitHub token could be none, but Gist ID must exist.
+     * @returns {Promise}
+     */
+    prepareSyncingSettings(p_forUpload = true)
     {
         return new Promise((p_resolve, p_reject) =>
         {
@@ -445,7 +465,7 @@ class Config
             {
                 tasks.push(Toast.showGitHubTokenInputBox);
             }
-            if (!settings.id && p_checkGistID)
+            if (!settings.id)
             {
                 tasks.push(Toast.showGistInputBox);
             }
@@ -464,14 +484,11 @@ class Config
                         {
                             Object.assign(settings, value);
                             done();
-                        }).catch((err) =>
-                        {
-                            done(err);
                         });
                     },
                     (err) =>
                     {
-                        if (err || !settings.token || (p_checkGistID && !settings.id))
+                        if (err || (p_forUpload && settings.token === "") || (!p_forUpload && settings.id === ""))
                         {
                             p_reject();
                         }
