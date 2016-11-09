@@ -82,10 +82,27 @@ function showGistInputBox()
     });
 }
 
+/**
+ * show a "reload vscode" prompt dialog.
+ */
+function showReloadBox()
+{
+    const title = "Reload";
+    const message = "Syncing: Extensions are successfully synced. Reload VSCode to take effect.";
+    vscode.window.showInformationMessage(message, { title: title }).then((btn) =>
+    {
+        if (btn && btn.title === title)
+        {
+            vscode.commands.executeCommand("workbench.action.reloadWindow");
+        }
+    });
+}
+
 module.exports = {
     status,
     statusInfo,
     statusError,
     showGistInputBox,
-    showGitHubTokenInputBox
+    showGitHubTokenInputBox,
+    showReloadBox
 };

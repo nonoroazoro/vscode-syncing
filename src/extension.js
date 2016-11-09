@@ -105,6 +105,11 @@ function _downloadSettings()
             {
                 // TODO: log synced files.
                 Toast.statusInfo("Syncing: settings downloaded.");
+
+                if (_isExtensionsSynced(synced))
+                {
+                    Toast.showReloadBox();
+                }
             }).catch((err) =>
             {
                 Toast.statusError(`Syncing: download failed: ${err.message}`);
@@ -145,6 +150,22 @@ function _openSettings()
             _openFile(_env.syncingSettingPath);
         });
     }
+}
+
+/**
+ * check if extensions are actually synced.
+ * @returns {boolean}
+ */
+function _isExtensionsSynced(p_synced)
+{
+    for (const item of p_synced.updated)
+    {
+        if (item.extension)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 function _openFile(p_filepath)
