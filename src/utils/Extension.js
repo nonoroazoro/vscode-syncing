@@ -289,7 +289,7 @@ class Extension
                             path.join(res, "extension"),
                             path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`)
                         );
-                        p_resolve();
+                        p_resolve(p_extension);
                     }
                 });
             }
