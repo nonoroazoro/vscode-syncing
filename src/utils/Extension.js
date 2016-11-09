@@ -29,17 +29,23 @@ class Extension
      */
     getAll(p_includeBuiltin = false)
     {
+        let item;
         const result = [];
         for (const ext of vscode.extensions.all)
         {
             if (p_includeBuiltin || !ext.packageJSON.isBuiltin)
             {
-                result.push({
+                item = {
                     name: ext.packageJSON.name,
                     publisher: ext.packageJSON.publisher,
                     version: ext.packageJSON.version,
                     id: `${ext.packageJSON.publisher}.${ext.packageJSON.name}`
-                });
+                };
+                if (ext.packageJSON.__metadata)
+                {
+                    item.__metadata = ext.packageJSON.__metadata;
+                }
+                result.push(item);
             }
         }
         return result;
