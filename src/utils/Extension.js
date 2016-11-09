@@ -151,7 +151,7 @@ class Extension
                     this.downloadExtension(item)
                         .then((extension) =>
                         {
-                            return this.uninstallExtension(extension);
+                            return this.uninstallExtension(extension, false);
                         })
                         .then((extension) =>
                         {
@@ -223,6 +223,8 @@ class Extension
     {
         return new Promise((p_resolve, p_reject) =>
         {
+            Toast.status(`Syncing: downloading extension: ${p_extension.id}`);
+
             const filepath = temp.path({ suffix: `.${p_extension.id}.zip` });
             const file = fs.createWriteStream(filepath);
             file.on("finish", () =>
@@ -278,6 +280,8 @@ class Extension
     {
         return new Promise((p_resolve, p_reject) =>
         {
+            Toast.status(`Syncing: installing extension: ${p_extension.id}`);
+
             try
             {
                 temp.mkdir("syncing-", (err, res) =>
@@ -340,12 +344,18 @@ class Extension
     /**
      * uninstall vscode extension.
      * @param {Object} p_extension
+     * @param {boolean} [p_showToast=true] default is true, show toast.
      * returns {Promise}
      */
-    uninstallExtension(p_extension)
+    uninstallExtension(p_extension, p_showToast = true)
     {
         return new Promise((p_resolve, p_reject) =>
         {
+            if (p_showToast)
+            {
+                Toast.status(`Syncing: removing extension: ${p_extension.id}`);
+            }
+
             fse.remove(path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`), (err) =>
             {
                 if (err)
