@@ -1,13 +1,13 @@
 {
     "globalDependencies": {
         "adm-zip": "registry:dt/adm-zip#0.0.0+20160317120654",
-        "async": "registry:dt/async#2.0.1+20160804113311",
+        "async": "registry:dt/async#2.0.1+20161101122556",
         "fs-extra": "registry:dt/fs-extra#0.0.0+20161004190449",
         "node": "registry:dt/node#6.0.0+20160909174046",
         "temp": "registry:dt/temp#0.8.3+20160105142454"
     },
     "globalDevDependencies": {
-        "mocha": "registry:dt/mocha#2.2.5+20160720003353",
+        "mocha": "registry:dt/mocha#2.2.5+20161028141524",
         "should": "registry:dt/should#8.1.1+20160608082854"
     }
 }
