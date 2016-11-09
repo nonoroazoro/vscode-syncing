@@ -99,16 +99,19 @@ class Extension
         {
             Toast.status("Syncing: installing new extensions...");
 
-            const that = this;
             const result = { added: [], addedErrors: [] };
             async.eachSeries(
                 p_extensions,
                 (item, done) =>
                 {
-                    that.downloadExtension(item)
+                    this.downloadExtension(item)
                         .then((extension) =>
                         {
-                            return that.extractExtension(extension);
+                            return this.extractExtension(extension);
+                        })
+                        .then((extension) =>
+                        {
+                            return this.updateMetadata(extension);
                         })
                         .then(() =>
                         {
@@ -140,20 +143,23 @@ class Extension
         {
             Toast.status("Syncing: updating extensions...");
 
-            const that = this;
             const result = { updated: [], updatedErrors: [] };
             async.eachSeries(
                 p_extensions,
                 (item, done) =>
                 {
-                    that.downloadExtension(item)
+                    this.downloadExtension(item)
                         .then((extension) =>
                         {
-                            return that.uninstallExtension(extension);
+                            return this.uninstallExtension(extension);
                         })
                         .then((extension) =>
                         {
-                            return that.extractExtension(extension);
+                            return this.extractExtension(extension);
+                        })
+                        .then((extension) =>
+                        {
+                            return this.updateMetadata(extension);
                         })
                         .then(() =>
                         {
@@ -185,13 +191,12 @@ class Extension
         {
             Toast.status("Syncing: removing unused extensions...");
 
-            const that = this;
             const result = { removed: [], removedErrors: [] };
             async.eachSeries(
                 p_extensions,
                 (item, done) =>
                 {
-                    that.uninstallExtension(item).then(() =>
+                    this.uninstallExtension(item).then(() =>
                     {
                         result.removed.push(item);
                         done();
@@ -222,7 +227,7 @@ class Extension
             const file = fs.createWriteStream(filepath);
             file.on("finish", () =>
             {
-                p_resolve(Object.assign({}, p_extension, { path: filepath }));
+                p_resolve(Object.assign({}, p_extension, { zip: filepath }));
             }).on("error", (err) =>
             {
                 temp.cleanup(() =>
@@ -283,19 +288,51 @@ class Extension
                     }
                     else
                     {
-                        const zip = new AdmZip(p_extension.path);
+                        const zip = new AdmZip(p_extension.zip);
                         zip.extractAllTo(res, true);
+                        const extPath = path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`);
                         fse.copySync(
                             path.join(res, "extension"),
-                            path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`)
+                            extPath
                         );
-                        p_resolve(p_extension);
+                        p_resolve(Object.assign({}, p_extension, { path: extPath }));
                     }
                 });
             }
             catch (err)
             {
                 p_reject(`Cannot extract extension: ${p_extension.id}.`);
+            }
+        });
+    }
+
+    /**
+     * update extension's __metadata.
+     * @param {Object} p_extension
+     * returns {Promise}
+     */
+    updateMetadata(p_extension)
+    {
+        return new Promise((p_resolve, p_reject) =>
+        {
+            if (p_extension && p_extension.__metadata)
+            {
+                try
+                {
+                    const filepath = path.join(p_extension.path, "package.json");
+                    const packageJSON = JSON.parse(fs.readFileSync(filepath, "utf8"));
+                    packageJSON.__metadata = p_extension.__metadata;
+                    fs.writeFileSync(filepath, JSON.stringify(packageJSON), "utf8");
+                    p_resolve(p_extension);
+                }
+                catch (err)
+                {
+                    p_reject(`Cannot update extension's metadata: ${p_extension.id}.`);
+                }
+            }
+            else
+            {
+                p_resolve(p_extension);
             }
         });
     }
