@@ -32,3 +32,4 @@ test/**
 .gitignore
 .typingsrc
 .eslintrc
+typings.json
