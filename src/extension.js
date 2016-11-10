@@ -160,7 +160,11 @@ function _isExtensionsSynced(p_synced)
 {
     for (const item of p_synced.updated)
     {
-        if (item.extension)
+        if (item.extension && (
+            item.extension.added.length > 0
+            || item.extension.removed.length > 0
+            || item.extension.updated.length > 0)
+        )
         {
             return true;
         }
