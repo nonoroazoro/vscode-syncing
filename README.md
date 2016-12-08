@@ -1,4 +1,5 @@
 # Syncing
+
 [![Version](http://vsmarketplacebadge.apphb.com/version/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Installs](http://vsmarketplacebadge.apphb.com/installs/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)
@@ -20,7 +21,7 @@
     * auto remove remote files that don't exist in local.
     * auto exclude unchanged settings (in order to speed up the synchronization).
 
-2. **Download** VSCode settings and extensions from Gist.
+1. **Download** VSCode settings and extensions from Gist.
 
     * **always overwrite** local settings.
     * auto `install`, `update`, `remove` extensions.
@@ -73,14 +74,14 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
     ![generate new token](./docs/1.png?raw=true "generate new token")
 
-2. **allow gist**
+1. **allow gist**
 
     ![allow gist](./docs/2.png?raw=true "allow gist")
 
-3. **copy/backup token**
+1. **copy/backup token**
 
     ![copy/backup token](./docs/3.png?raw=true "copy/backup token")
 
-4. **after uploading, you can check your settings and Gist ID in Gist**
+1. **after uploading, you can check your settings and Gist ID in Gist**
 
     ![gist](./docs/4.png?raw=true "gist")
