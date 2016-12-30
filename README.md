@@ -27,9 +27,6 @@
     * auto `install`, `update`, `remove` extensions.
     * auto remove local files that don't exist in remote.
 
-But of course **you can change your GitHub Token and Gist Id via `Syncing: Open Syncing Settings`, see [Extension Commands](#Extension Commands)**.
-
-
 ## Extension Commands
 
 **Type `syncing` (or just `upload/download`) in VSCode Command Palette to:**
@@ -37,6 +34,8 @@ But of course **you can change your GitHub Token and Gist Id via `Syncing: Open 
 * `Syncing: Upload Settings`
 * `Syncing: Download Settings`
 * `Syncing: Open Syncing Settings`
+
+**You also can change the GitHub Token and Gist ID via `Syncing: Open Syncing Settings` command**.
 
 
 ## Extension Keybindings
