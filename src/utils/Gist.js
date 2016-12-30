@@ -98,11 +98,16 @@ class Gist
     {
         return new Promise((p_resolve) =>
         {
-            p_id ?
+            if (p_id)
+            {
                 this.get(p_id)
                     .then((gist) => p_resolve(gist))
-                    .catch(() => p_resolve(false))
-                : p_resolve(false);
+                    .catch(() => p_resolve(false));
+            }
+            else
+            {
+                p_resolve(false);
+            }
         });
     }
 
@@ -165,7 +170,11 @@ class Gist
                 const gist = { id: p_id, files: {} };
                 for (const item of p_uploads)
                 {
-                    gist.files[item.remote] = { content: item.content };
+                    // any `null` content will be filtered out, just in case.
+                    if (item.content)
+                    {
+                        gist.files[item.remote] = { content: item.content };
+                    }
                 }
 
                 if (exists)
