@@ -27,6 +27,7 @@
     * auto `install`, `update`, `remove` extensions.
     * auto remove local files that don't exist in remote.
 
+
 ## Extension Commands
 
 There're **`only 3 commands`** in this extension.
