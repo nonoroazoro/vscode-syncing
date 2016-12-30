@@ -119,11 +119,14 @@ class Config
                         {
                             values.forEach((value) =>
                             {
-                                if (!value.content)
+                                if (value.content)
+                                {
+                                    results.push(value);
+                                }
+                                else
                                 {
                                     errors.push(value.remote);
                                 }
-                                results.push(value);
                             });
                             done();
                         });
@@ -293,7 +296,7 @@ class Config
     }
 
     /**
-     * load items content.
+     * load items content. if load failed, the content will exactly be `null`.
      * @param {Array} p_items items of configs.
      * @returns {Promise}
      */
