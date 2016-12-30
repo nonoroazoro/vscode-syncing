@@ -34,12 +34,12 @@ There're **`only 3 commands`** in this extension.
 
 Type `syncing` (or just `upload/download`) in VSCode Command Palette to:
 
-* `Syncing: Upload Settings`
-* `Syncing: Download Settings`
+* **`Syncing: Upload Settings`**
+* **`Syncing: Download Settings`**
 
 Also, you can change your `GitHub Token` or `Gist ID` by:
 
-* `Syncing: Open Syncing Settings`
+* **`Syncing: Open Syncing Settings`**
 
 
 ## Extension Keybindings
