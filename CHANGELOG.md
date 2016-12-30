@@ -1,5 +1,9 @@
 # Changelogs
 
+## December 30, 2016 (version 1.2.8)
+
+- ENHANCE: Update READMEs.
+
 ## December 30, 2016 (version 1.2.7)
 
 - FIX: Ignore `null` content to avoid node-github error.
