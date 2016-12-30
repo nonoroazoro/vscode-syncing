@@ -1,5 +1,9 @@
 # Changelogs
 
+## December 30, 2016 (version 1.2.7)
+
+- FIX: Ignore `null` content to avoid node-github error.
+
 ## November 10, 2016 (version 1.2.6)
 
 - FIX: Don't show reload dialog when extensions aren't changed.
