@@ -70,17 +70,17 @@
   },
   "devDependencies": {
     "babel-eslint": "^7.1.1",
-    "eslint": "^3.12.2",
+    "eslint": "^3.15.0",
     "eslint-config-zoro": "^1.2.8",
     "mocha": "^3.2.0",
-    "should": "^11.1.2",
+    "should": "^11.2.0",
     "vscode": "^1.0.3"
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
     "async": "^2.1.4",
-    "fs-extra": "^1.0.0",
-    "github": "^7.2.0",
+    "fs-extra": "^2.0.0",
+    "github": "^8.1.1",
     "https-proxy-agent": "^1.0.0",
     "temp": "^0.8.3"
   }
