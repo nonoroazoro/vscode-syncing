@@ -1,5 +1,9 @@
 # Changelogs
 
+## February 8, 2017 (version 1.2.9)
+
+- ENHANCE: Pretty JSON files: `extensions.json`, `syncing.json`, to make it a little more user-friendly (Thanks [@fengcen](https://github.com/fengcen) for the advice).
+
 ## December 30, 2016 (version 1.2.8)
 
 - ENHANCE: Update READMEs.
