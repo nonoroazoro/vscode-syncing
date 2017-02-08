@@ -4,7 +4,7 @@
 
 const fs = require("fs");
 const fse = require("fs-extra");
-const temp = require("temp");
+const temp = require("temp").track();
 const path = require("path");
 const async = require("async");
 const AdmZip = require("adm-zip");
@@ -230,13 +230,7 @@ class Extension
             file.on("finish", () =>
             {
                 p_resolve(Object.assign({}, p_extension, { zip: filepath }));
-            }).on("error", (err) =>
-            {
-                temp.cleanup(() =>
-                {
-                    p_reject(err);
-                });
-            });
+            }).on("error", p_reject);
 
             const options = {
                 host: `${p_extension.publisher}.gallery.vsassets.io`,
@@ -256,18 +250,9 @@ class Extension
                 }
                 else
                 {
-                    temp.cleanup(() =>
-                    {
-                        p_reject();
-                    });
+                    p_reject();
                 }
-            }).on("error", (err) =>
-            {
-                temp.cleanup(() =>
-                {
-                    p_reject(err);
-                });
-            });
+            }).on("error", p_reject);
         });
     }
 
@@ -299,6 +284,10 @@ class Extension
                             path.join(res, "extension"),
                             extPath
                         );
+
+                        // clear temp file (async).
+                        fse.remove(p_extension.zip);
+
                         p_resolve(Object.assign({}, p_extension, { path: extPath }));
                     }
                 });
