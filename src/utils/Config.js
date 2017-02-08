@@ -311,7 +311,7 @@ class Config
                 {
                     if (item.name === "extensions")
                     {
-                        content = JSON.stringify(this._extension.getAll());
+                        content = JSON.stringify(this._extension.getAll(), null, 4);
                     }
                     else
                     {
@@ -540,7 +540,7 @@ class Config
         {
             try
             {
-                fs.writeFile(this._env.syncingSettingPath, JSON.stringify(p_json) || "{}", (err) =>
+                fs.writeFile(this._env.syncingSettingPath, JSON.stringify(p_json, null, 4) || "{}", (err) =>
                 {
                     if (err && p_toast)
                     {
