@@ -11,7 +11,7 @@
 
 ## Features
 
-**In order to keep this extension as simple as possible, there will be no other features, only these two:**
+**In order to keep this extension as simple as possible, there will be no other features, only these 2:**
 
 1. **Upload** VSCode settings and extensions to Gist:
 
@@ -30,7 +30,7 @@
 
 ## Extension Commands
 
-There're **`only 3 commands`** in this extension.
+There're **`3 commands`** in this extension.
 
 Type `syncing` (or just `upload/download`) in VSCode Command Palette to:
 
