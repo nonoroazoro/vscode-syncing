@@ -491,9 +491,20 @@ class Config
                     },
                     (err) =>
                     {
-                        if (err || (p_forUpload && settings.token === "") || (!p_forUpload && settings.id === ""))
+                        const isTokenError = p_forUpload && settings.token === "";
+                        const isIDError = !p_forUpload && settings.id === "";
+                        if (err || isTokenError || isIDError)
                         {
-                            p_reject();
+                            const error = new Error();
+                            if (isTokenError)
+                            {
+                                error.message = "the GitHub Personal Access Token is not set.";
+                            }
+                            else if (isIDError)
+                            {
+                                error.message = "the Gist ID is not set.";
+                            }
+                            p_reject(error);
                         }
                         else
                         {
