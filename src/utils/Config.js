@@ -466,11 +466,11 @@ class Config
             const settings = this.loadSyncingSettings();
             if (!settings.token)
             {
-                tasks.push(Toast.showGitHubTokenInputBox);
+                tasks.push(Toast.showGitHubTokenInputBox.bind(this, p_forUpload));
             }
             if (!settings.id)
             {
-                tasks.push(Toast.showGistInputBox);
+                tasks.push(Toast.showGistInputBox.bind(this, p_forUpload));
             }
 
             if (tasks.length === 0)
