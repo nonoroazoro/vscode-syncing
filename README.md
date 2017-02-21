@@ -74,7 +74,7 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 ```
 
 
-## Get Your Own GitHub Personal Access Token and Gist ID
+## Get Your Own GitHub Personal Access Token and Gist ID (4 Steps)
 
 1. **login to your `Settings` page**
 
