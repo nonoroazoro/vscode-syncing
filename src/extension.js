@@ -81,11 +81,11 @@ function _uploadSettings()
             });
         }).catch((err) =>
         {
-            Toast.statusError(`Syncing: upload failed: ${err.message}`);
+            Toast.statusError(`Syncing: upload failed. ${err.message}`);
         });
-    }).catch(() =>
+    }).catch((err) =>
     {
-        Toast.statusInfo("Syncing: canceled as GitHub Access Token or Gist ID isn't set.");
+        Toast.statusError(`Syncing: canceled because ${err.message}`);
     });
 }
 
@@ -112,7 +112,7 @@ function _downloadSettings()
                 }
             }).catch((err) =>
             {
-                Toast.statusError(`Syncing: download failed: ${err.message}`);
+                Toast.statusError(`Syncing: download failed. ${err.message}`);
             });
         }).catch((err) =>
         {
@@ -128,9 +128,9 @@ function _downloadSettings()
                 Toast.statusError(`Syncing: download failed. ${err.message}`);
             }
         });
-    }).catch(() =>
+    }).catch((err) =>
     {
-        Toast.statusInfo("Syncing: canceled as GitHub Access Token or Gist ID isn't set.");
+        Toast.statusError(`Syncing: canceled because ${err.message}`);
     });
 }
 
