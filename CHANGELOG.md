@@ -4,6 +4,7 @@
 
 - ENHANCE: Upload and Download dialogs.
 - ENHANCE: Separate error messages of invalid GitHub Personal Access Token and Gist ID.
+- ENHANCE: Update guides.
 
 ## February 8, 2017 (version 1.2.9)
 
