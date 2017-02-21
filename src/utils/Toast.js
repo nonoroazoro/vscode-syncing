@@ -42,16 +42,20 @@ function statusError(p_message)
 
 /**
  * show GitHub access token box.
+ * @param {boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
  */
-function showGitHubTokenInputBox()
+function showGitHubTokenInputBox(p_forUpload = true)
 {
     return new Promise((p_resolve, p_reject) =>
     {
+        const placeHolder = p_forUpload ?
+            "Enter GitHub Personal Access Token." :
+            "Enter GitHub Personal Access Token (Leave blank to download from a public Gist).";
         const options = {
-            placeHolder: "Enter Your Github Personal Access Token.",
+            placeHolder: placeHolder,
             password: false,
-            prompt: "Used to access your GitHub account.",
+            prompt: "Used for authenticating to your GitHub Gist.",
             ignoreFocusOut: true
         };
         vscode.window.showInputBox(options).then((value) =>
@@ -63,16 +67,20 @@ function showGitHubTokenInputBox()
 
 /**
  * show Gist id box.
+ * @param {boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
  */
-function showGistInputBox()
+function showGistInputBox(p_forUpload = true)
 {
     return new Promise((p_resolve, p_reject) =>
     {
+        const placeHolder = p_forUpload ?
+            "Enter Your Gist ID (Leave it blank to create a new Gist automatically)." :
+            "Enter GitHub Personal Access Token.";
         const options = {
-            placeHolder: "Enter Your Gist ID (or just leave it blank to automatically create a new Gist).",
+            placeHolder: placeHolder,
             password: false,
-            prompt: "Used to sync vscode settings to Gist.",
+            prompt: "Used for synchronizing your settings to Gist.",
             ignoreFocusOut: true
         };
         vscode.window.showInputBox(options).then((value) =>
