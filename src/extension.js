@@ -46,7 +46,7 @@ function _registerCommand(p_context, p_command, p_callback)
 function _uploadSettings()
 {
     Toast.status("Syncing: gathering local settings...");
-    _config.prepareUploadSettings(false).then((settings) =>
+    _config.prepareUploadSettings().then((settings) =>
     {
         const api = Gist.create(settings.token, _env.getSyncingProxy());
         _config.getConfigs({ load: true }).then((configs) =>
@@ -85,7 +85,7 @@ function _uploadSettings()
         });
     }).catch(() =>
     {
-        Toast.statusInfo("Syncing: canceled as Github Access Token or Gist ID isn't set.");
+        Toast.statusInfo("Syncing: canceled as GitHub Access Token or Gist ID isn't set.");
     });
 }
 
@@ -130,7 +130,7 @@ function _downloadSettings()
         });
     }).catch(() =>
     {
-        Toast.statusInfo("Syncing: canceled as Github Access Token or Gist ID isn't set.");
+        Toast.statusInfo("Syncing: canceled as GitHub Access Token or Gist ID isn't set.");
     });
 }
 
