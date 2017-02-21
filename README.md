@@ -17,15 +17,15 @@
 
     * **upload** `settings`, `locale`, `snippets`, `keybindings`, `extensions`.
     * **auto separate Mac and non-Mac**'s `settings` and `keybindings` (in case you have multiple devices).
-    * auto create new Gist if it doesn't exist.
-    * auto remove remote files that don't exist in local.
-    * auto exclude unchanged settings (in order to speed up the synchronization).
+    * auto create new Gist if it is not found in remote.
+    * auto remove remote files when they're removed in local.
+    * auto exclude unchanged settings (to speed up the synchronization).
 
 1. **Download** VSCode settings and extensions from Gist.
 
     * **always overwrite** local settings.
     * auto `install`, `update`, `remove` extensions.
-    * auto remove local files that don't exist in remote.
+    * auto remove local files when they're removed in remote.
     * you can leave out the `GitHub Personal Access Token` blank to `download settings from a public Gist` (and don't forget to add your own GitHub token before uploading your settings :grimacing:).
 
 
@@ -74,9 +74,13 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 ```
 
 
-## About GitHub Access Token and Gist ID
+## Get Your Own GitHub Personal Access Token and Gist ID
 
-1. **generate new token**
+1. **login to your `Settings` page**
+
+    ![generate new token](./docs/0.png?raw=true "settings page")
+
+1. **select `Personal access tokens` tab and generate new token**
 
     ![generate new token](./docs/1.png?raw=true "generate new token")
 
@@ -84,10 +88,10 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
     ![allow gist](./docs/2.png?raw=true "allow gist")
 
-1. **copy/backup token**
+1. **copy/backup your token**
 
-    ![copy/backup token](./docs/3.png?raw=true "copy/backup token")
+    ![copy/backup token](./docs/3.png?raw=true "copy/backup your token")
 
-1. **after uploading, you can check your settings and Gist ID in Gist**
+1. **after uploading, you can find the settings and the corresponding Gist ID in your GitHub Gist**
 
     ![gist](./docs/4.png?raw=true "gist")
