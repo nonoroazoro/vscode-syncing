@@ -85,7 +85,7 @@ function showGistInputBox(p_forUpload = true)
     {
         const placeHolder = p_forUpload ?
             "Enter Your Gist ID (Leave it blank to create a new Gist automatically)." :
-            "Enter GitHub Personal Access Token.";
+            "Enter Your Gist ID.";
         const options = {
             placeHolder: placeHolder,
             password: false,
