@@ -1,5 +1,10 @@
 # Changelogs
 
+## February 21, 2017 (version 1.3.0)
+
+- ENHANCE: Upload and Download dialogs.
+- ENHANCE: Separate error messages of invalid GitHub Personal Access Token and Gist ID.
+
 ## February 8, 2017 (version 1.2.9)
 
 - ENHANCE: Clean up temporary files automatically.
