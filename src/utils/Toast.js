@@ -41,6 +41,15 @@ function statusError(p_message)
 }
 
 /**
+ * toast `fatal` message in vscode status bar (auto-hide).
+ * @param {any} p_message
+ */
+function statusFatal(p_message)
+{
+    status(p_message, 12000);
+}
+
+/**
  * show GitHub access token box.
  * @param {boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
@@ -110,6 +119,7 @@ module.exports = {
     status,
     statusInfo,
     statusError,
+    statusFatal,
     showGistInputBox,
     showGitHubTokenInputBox,
     showReloadBox
