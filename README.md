@@ -26,7 +26,7 @@
     * **always overwrite** local settings.
     * auto `install`, `update`, `remove` extensions.
     * auto remove local files that don't exist in remote.
-    * also, you can leave out the `GitHub Personal Access Token` blank to `download settings from a public Gist` (and don't forget to add your own GitHub token before uploading your settings :smile).
+    * you can leave out the `GitHub Personal Access Token` blank to `download settings from a public Gist` (and don't forget to add your own GitHub token before uploading your settings :smile).
 
 
 ## Extension Commands
