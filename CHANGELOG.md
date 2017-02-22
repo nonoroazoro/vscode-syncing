@@ -2,7 +2,7 @@
 
 ## February 21, 2017 (version 1.3.1)
 
-- FIX: message error of Download dialog.
+- FIX: Message error of Download dialog.
 
 ## February 21, 2017 (version 1.3.0)
 
