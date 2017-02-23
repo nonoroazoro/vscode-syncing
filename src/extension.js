@@ -37,6 +37,7 @@ function _initCommands(p_context)
  */
 function _registerCommand(p_context, p_command, p_callback)
 {
+    // add to a list of disposables which are disposed when this extension is deactivated.
     p_context.subscriptions.push(vscode.commands.registerCommand(p_command, p_callback));
 }
 
