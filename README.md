@@ -78,20 +78,20 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
 1. **login to your `Settings` page**
 
-    ![generate new token](./docs/0.png?raw=true "settings page")
+    ![generate new token](docs/0.png?raw=true "settings page")
 
 1. **select `Personal access tokens` tab and generate new token**
 
-    ![generate new token](./docs/1.png?raw=true "generate new token")
+    ![generate new token](docs/1.png?raw=true "generate new token")
 
 1. **allow gist**
 
-    ![allow gist](./docs/2.png?raw=true "allow gist")
+    ![allow gist](docs/2.png?raw=true "allow gist")
 
 1. **copy/backup your token**
 
-    ![copy/backup token](./docs/3.png?raw=true "copy/backup your token")
+    ![copy/backup token](docs/3.png?raw=true "copy/backup your token")
 
 1. **after uploading, you can find the settings and the corresponding Gist ID in your GitHub Gist**
 
-    ![gist](./docs/4.png?raw=true "gist")
+    ![gist](docs/4.png?raw=true "gist")
