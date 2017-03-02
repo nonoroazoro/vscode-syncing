@@ -1,5 +1,10 @@
 # Changelogs
 
+## March 2, 2017 (version 1.3.2)
+
+- ENHANCE: Update error message of `Settings File Not Found`(and `Setting File Invalid`) error.
+- ENHANCE: Upload an `empty array` (instead of `null`) when extension list is empty, to avoid potential error.
+
 ## February 21, 2017 (version 1.3.1)
 
 - FIX: Message error of Download dialog.
