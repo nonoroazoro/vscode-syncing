@@ -141,7 +141,7 @@ class Config
                 {
                     if (errors.length > 0)
                     {
-                        console.log(`Cannot read Syncing's config file: ${errors.join("\n")}, will be ignore.`);
+                        console.log(`Some of the VSCode's settings are invalid (will be ignored): ${errors.join(" ")}`);
                     }
                     p_resolve(results);
                 }
@@ -311,7 +311,7 @@ class Config
                 {
                     if (item.name === "extensions")
                     {
-                        content = JSON.stringify(this._extension.getAll(), null, 4);
+                        content = JSON.stringify(this._extension.getAll() || [], null, 4);
                     }
                     else
                     {
