@@ -1,5 +1,9 @@
 # Changelogs
 
+## March 3, 2017 (version 1.3.3)
+
+- FIX: Add user validation when uploading settings.
+
 ## March 2, 2017 (version 1.3.2)
 
 - ENHANCE: Update error message of `Settings File Not Found`(and `Setting File Invalid`) error.
