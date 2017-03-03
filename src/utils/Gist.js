@@ -38,6 +38,36 @@ class Gist
     }
 
     /**
+     * get the currently authenticated GitHub user.
+     * @returns {Promise}
+     */
+    user()
+    {
+        return new Promise((p_resolve) =>
+        {
+            if (this._user)
+            {
+                p_resolve(this._user);
+            }
+            else
+            {
+                this._api.users
+                    .get({})
+                    .then((p_value) =>
+                    {
+                        this._user = { name: p_value.login, id: p_value.id };
+                        p_resolve(this._user);
+                    })
+                    .catch((err) =>
+                    {
+                        this._user = null;
+                        p_resolve(null);
+                    });
+            }
+        });
+    }
+
+    /**
      * get gist.
      * @param {string} p_id gist id.
      * @returns {Promise}
@@ -90,7 +120,7 @@ class Gist
     }
 
     /**
-     * check if gist exists.
+     * check if gist exists of the currently authenticated user.
      * @param {string} p_id gist id.
      * @returns {Promise}
      */
@@ -101,7 +131,28 @@ class Gist
             if (p_id)
             {
                 this.get(p_id)
-                    .then((gist) => p_resolve(gist))
+                    .then((gist) =>
+                    {
+                        if (this.token)
+                        {
+                            this.user().then((value) =>
+                            {
+                                // check if the Gist's owner is the currently authenticated user.
+                                if (value && value.id === gist.owner.id)
+                                {
+                                    p_resolve(gist);
+                                }
+                                else
+                                {
+                                    p_resolve(false);
+                                }
+                            });
+                        }
+                        else
+                        {
+                            p_resolve(gist);
+                        }
+                    })
                     .catch(() => p_resolve(false));
             }
             else
