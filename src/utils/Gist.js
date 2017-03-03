@@ -83,17 +83,17 @@ class Gist
             {
                 if (err.code === 401)
                 {
-                    const error = new Error("Please check your GitHub access token.");
+                    const error = new Error("Please check your GitHub Personal Access Token.");
                     error.code = err.code;
                     p_reject(error);
                 }
                 else if (err.code === 404)
                 {
-                    p_reject(new Error("Please check your Gist id."));
+                    p_reject(new Error("Please check your Gist ID."));
                 }
                 else
                 {
-                    p_reject(new Error("Please check your Internet connection."));
+                    p_reject(new Error("Please check your internet connection."));
                 }
             });
         });
