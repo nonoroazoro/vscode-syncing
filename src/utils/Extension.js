@@ -24,7 +24,7 @@ class Extension
 
     /**
      * get all installed extensions.
-     * @param {boolean} [p_includeBuiltin=false] default is false, builtin extensions are not included.
+     * @param {Boolean} [p_includeBuiltin=false] default is false, builtin extensions are not included.
      * @returns {Array} or `[]`.
      */
     getAll(p_includeBuiltin = false)
@@ -333,7 +333,7 @@ class Extension
     /**
      * uninstall vscode extension.
      * @param {Object} p_extension
-     * @param {boolean} [p_showToast=true] default is true, show toast.
+     * @param {Boolean} [p_showToast=true] default is true, show toast.
      * returns {Promise}
      */
     uninstallExtension(p_extension, p_showToast = true)

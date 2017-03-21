@@ -25,6 +25,10 @@ function _initGlobals(p_context)
     _config = Config.create(p_context);
 }
 
+/**
+ * init Syncing's commands.
+ * @param {Object} p_context
+ */
 function _initCommands(p_context)
 {
     _registerCommand(p_context, "syncing.uploadSettings", _uploadSettings);
@@ -33,7 +37,7 @@ function _initCommands(p_context)
 }
 
 /**
- * registerCommand wrapper.
+ * vscode's registerCommand wrapper.
  */
 function _registerCommand(p_context, p_command, p_callback)
 {
@@ -155,7 +159,7 @@ function _openSettings()
 
 /**
  * check if extensions are actually synced.
- * @returns {boolean}
+ * @returns {Boolean}
  */
 function _isExtensionsSynced(p_synced)
 {
@@ -173,6 +177,10 @@ function _isExtensionsSynced(p_synced)
     return false;
 }
 
+/**
+ * open file in vscode.
+ * @param {String} p_filepath
+ */
 function _openFile(p_filepath)
 {
     vscode.commands.executeCommand("vscode.open", vscode.Uri.file(p_filepath));
