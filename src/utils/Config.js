@@ -151,7 +151,7 @@ class Config
 
     /**
      * get all snippet files.
-     * @param {string} p_folderpath snippets path.
+     * @param {String} p_folderpath snippets path.
      * @returns {Array} or `[]`.
      */
     _getSnippets(p_folderpath)
@@ -215,7 +215,7 @@ class Config
                         else
                         {
                             // file exists in remote, but not exists in local.
-                            // if it is snippet file, delete!
+                            // and delete it if it's a snippet file.
                             if (item.remote.startsWith(snippetPrefix))
                             {
                                 removeFiles.push(item);
@@ -277,7 +277,6 @@ class Config
                             }
                             else
                             {
-                                // todo remove files
                                 this.removeConfigs(removeFiles).then((removed) =>
                                 {
                                     syncedFiles.removed = removed;
@@ -341,13 +340,8 @@ class Config
             {
                 try
                 {
-                    this._extension.sync(JSON.parse(p_item.content)).then((saved) =>
-                    {
-                        p_resolve(saved);
-                    }).catch((err) =>
-                    {
-                        p_reject(err);
-                    });
+                    this._extension.sync(JSON.parse(p_item.content))
+                        .then(p_resolve).catch(p_reject);
                 }
                 catch (err)
                 {
@@ -372,8 +366,8 @@ class Config
     }
 
     /**
-     * delete config files.
-     * @param {Array} p_files config files.
+     * delete the physical files.
+     * @param {Array} p_files files list.
      * @returns {Promise}
      */
     removeConfigs(p_files)
@@ -455,7 +449,7 @@ class Config
 
     /**
      * prepare Syncing's settings, will ask for settings if not exist.
-     * @param {boolean} [p_forUpload=true] default is true, GitHub token must exist, but Gist ID could be none, else, GitHub token could be none, but Gist ID must exist.
+     * @param {Boolean} [p_forUpload=true] default is true, GitHub token must exist, but Gist ID could be none, else, GitHub token could be none, but Gist ID must exist.
      * @returns {Promise}
      */
     prepareSyncingSettings(p_forUpload = true)
@@ -542,7 +536,7 @@ class Config
     /**
      * save Syncing's settings (to settings file: `syncing.json`).
      * @param {Object} p_json settings.
-     * @param {boolean} [p_toast=true] default is true, toast error.
+     * @param {Boolean} [p_toast=true] default is true, toast error.
      * @returns {Promise}
      */
     saveSyncingSettings(p_json, p_toast = true)
