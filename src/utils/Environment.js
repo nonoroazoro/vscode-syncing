@@ -104,8 +104,8 @@ class Environment
 
     /**
      * get local snippet filepath from filename.
-     * @param {string} p_filename snippet filename.
-     * @returns {string}
+     * @param {String} p_filename snippet filename.
+     * @returns {String}
      */
     getSnippetFilePath(p_filename)
     {
@@ -114,7 +114,7 @@ class Environment
 
     /**
      * get proxy settings of Syncing, using vscode's `http.proxy`.
-     * @returns {string} or `undefined`.
+     * @returns {String} or `undefined`.
      */
     getSyncingProxy()
     {

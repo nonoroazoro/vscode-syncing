@@ -69,7 +69,7 @@ class Gist
 
     /**
      * get gist.
-     * @param {string} p_id gist id.
+     * @param {String} p_id gist id.
      * @returns {Promise}
      */
     get(p_id)
@@ -101,7 +101,7 @@ class Gist
 
     /**
      * delete gist.
-     * @param {string} p_id gist id.
+     * @param {String} p_id gist id.
      * @returns {Promise}
      */
     delete(p_id)
@@ -121,7 +121,7 @@ class Gist
 
     /**
      * check if gist exists of the currently authenticated user.
-     * @param {string} p_id gist id.
+     * @param {String} p_id gist id.
      * @returns {Promise}
      */
     exists(p_id)
@@ -193,7 +193,7 @@ class Gist
     /**
      * create settings gist.
      * @param {Array} p_files settings files.
-     * @param {boolean} [p_public=false] default is false, gist is private.
+     * @param {Boolean} [p_public=false] default is false, gist is private.
      * @returns {Promise}
      */
     createSettings(p_files = {}, p_public = false)
@@ -207,9 +207,9 @@ class Gist
 
     /**
      * find and update gist.
-     * @param {string} p_id gist id.
+     * @param {String} p_id gist id.
      * @param {Object} p_uploads settings that will be uploaded.
-     * @param {boolean} [p_upsert=true] default is true, create new if gist not exists.
+     * @param {Boolean} [p_upsert=true] default is true, create new if gist not exists.
      * @returns {Promise}
      */
     findAndUpdate(p_id, p_uploads, p_upsert = true)
@@ -311,8 +311,8 @@ class Gist
 let _instance;
 /**
  * only create new instance when params are changed.
- * @param {string} p_token GitHub access token.
- * @param {string} [p_proxy] proxy url.
+ * @param {String} p_token GitHub access token.
+ * @param {String} [p_proxy] proxy url.
  * @returns {Gist}
  */
 function create(p_token, p_proxy)

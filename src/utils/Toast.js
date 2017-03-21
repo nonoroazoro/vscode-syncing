@@ -6,7 +6,7 @@ const vscode = require("vscode");
 
 /**
  * toast message in vscode status bar. auto-hide the message when `p_time` is set.
- * @param {string} p_message message to show.
+ * @param {String} p_message message to show.
  * @param {number} [p_time=2000] hide after time.
  */
 function status(p_message, p_time)
@@ -24,7 +24,7 @@ function status(p_message, p_time)
 
 /**
  * toast `info` message in vscode status bar (auto-hide).
- * @param {any} p_message
+ * @param {String} p_message
  */
 function statusInfo(p_message)
 {
@@ -33,7 +33,7 @@ function statusInfo(p_message)
 
 /**
  * toast `error` message in vscode status bar (auto-hide).
- * @param {any} p_message
+ * @param {String} p_message
  */
 function statusError(p_message)
 {
@@ -42,7 +42,7 @@ function statusError(p_message)
 
 /**
  * toast `fatal` message in vscode status bar (auto-hide).
- * @param {any} p_message
+ * @param {String} p_message
  */
 function statusFatal(p_message)
 {
@@ -51,7 +51,7 @@ function statusFatal(p_message)
 
 /**
  * show GitHub access token box.
- * @param {boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
+ * @param {Boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
  */
 function showGitHubTokenInputBox(p_forUpload = true)
@@ -76,7 +76,7 @@ function showGitHubTokenInputBox(p_forUpload = true)
 
 /**
  * show Gist id box.
- * @param {boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
+ * @param {Boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
  */
 function showGistInputBox(p_forUpload = true)
