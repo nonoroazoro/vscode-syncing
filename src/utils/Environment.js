@@ -133,7 +133,7 @@ class Environment
 
 let _instance;
 /**
- * only create one instance.
+ * create single instance.
  * @param {Object} p_context
  * @returns {Environment}
  */
