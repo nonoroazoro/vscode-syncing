@@ -22,7 +22,7 @@ class Gist
     }
 
     /**
-     * get GitHub access token.
+     * get GitHub Personal Access Token.
      */
     get token()
     {
@@ -311,7 +311,7 @@ class Gist
 let _instance;
 /**
  * only create new instance when params are changed.
- * @param {String} p_token GitHub access token.
+ * @param {String} p_token GitHub Personal Access Token.
  * @param {String} [p_proxy] proxy url.
  * @returns {Gist}
  */
