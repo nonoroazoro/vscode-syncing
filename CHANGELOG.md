@@ -1,12 +1,16 @@
 # Changelogs
 
+## April 7, 2017 (version 1.3.4)
+
+- FIX: Minor fixes to the Downloading and Uploading features.
+
 ## March 3, 2017 (version 1.3.3)
 
-- FIX: Add user validation when uploading settings.
+- FIX: Check the user's access privileges when uploading.
 
 ## March 2, 2017 (version 1.3.2)
 
-- ENHANCE: Update error message of `Settings File Not Found` (and `Setting File Invalid`) error.
+- ENHANCE: Update the messages of `Settings File Not Found` and `Setting File Invalid` errors.
 - ENHANCE: Upload an `empty array` (instead of `null`) when extension list is empty, to avoid potential error.
 
 ## February 21, 2017 (version 1.3.1)
