@@ -39,18 +39,15 @@
     "commands": [
       {
         "command": "syncing.uploadSettings",
-        "title": "Upload Settings",
-        "category": "Syncing"
+        "title": "Syncing: Upload Settings"
       },
       {
         "command": "syncing.downloadSettings",
-        "title": "Download Settings",
-        "category": "Syncing"
+        "title": "Syncing: Download Settings"
       },
       {
         "command": "syncing.openSettings",
-        "title": "Open Syncing Settings",
-        "category": "Syncing"
+        "title": "Syncing: Open Syncing Settings"
       }
     ],
     "keybindings": [
