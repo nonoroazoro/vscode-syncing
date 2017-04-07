@@ -2,7 +2,7 @@
   "name": "syncing",
   "displayName": "Syncing",
   "description": "Sync VSCode Settings to GitHub Gist.",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "publisher": "nonoroazoro",
   "author": {
     "email": "xiaochao.k@gmail.com",
