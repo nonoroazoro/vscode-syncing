@@ -50,7 +50,7 @@ function statusFatal(p_message)
 }
 
 /**
- * show GitHub access token box.
+ * show GitHub Personal Access Token box.
  * @param {Boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
  */
@@ -75,7 +75,7 @@ function showGitHubTokenInputBox(p_forUpload = true)
 }
 
 /**
- * show Gist id box.
+ * show Gist ID box.
  * @param {Boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
  */

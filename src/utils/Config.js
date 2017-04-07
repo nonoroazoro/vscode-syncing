@@ -549,7 +549,7 @@ class Config
                 {
                     if (err && p_toast)
                     {
-                        Toast.statusError(`Syncing: Cannot save Syncing settings: ${err}`);
+                        Toast.statusError(`Syncing: Cannot save Syncing's settings: ${err}`);
                     }
                     p_resolve();
                 });
@@ -558,7 +558,7 @@ class Config
             {
                 if (err && p_toast)
                 {
-                    Toast.statusError(`Syncing: Cannot save Syncing settings: ${err}`);
+                    Toast.statusError(`Syncing: Cannot save Syncing's settings: ${err}`);
                 }
                 p_resolve();
             }
@@ -568,7 +568,7 @@ class Config
 
 let _instance;
 /**
- * only create one instance.
+ * create single instance.
  * @param {Object} p_context
  * @returns {Config}
  */
