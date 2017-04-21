@@ -28,11 +28,6 @@ In order to keep this extension **as simple as possible**, there will be no othe
     * auto remove local files when they're removed in remote.
     * you can leave out the `GitHub Personal Access Token` blank to `download settings from a public Gist` (and don't forget to add your own GitHub token before uploading your settings :grimacing:).
 
-**Why there's no auto-upload or auto-download?**
-
-* when you're trying out some new extensions or settings, this automation is usually nothing but a nightmare.
-* all that really matters is that **everything is fully under your control**.
-
 
 ## Extension Commands
 
