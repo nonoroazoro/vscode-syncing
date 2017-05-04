@@ -1,5 +1,9 @@
 # Changelogs
 
+## May 4, 2017 (version 1.3.6)
+
+- FIX: Resize Keyboard-Shortcuts image.
+
 ## May 4, 2017 (version 1.3.5)
 
 - ENHANCE: Update guides.
