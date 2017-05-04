@@ -35,19 +35,19 @@ There're **`3 commands`** in this extension.
 
 * Type `upload/download` (or `syncing`) in `VSCode Command Palette` to:
 
-    * *`Syncing: Upload Settings`*
-    * *`Syncing: Download Settings`*
+    * ***`Syncing: Upload Settings`***
+    * ***`Syncing: Download Settings`***
 
 * Also, you can set your `GitHub Personal Access Token` and `Gist ID` at anytime by:
 
-    * *`Syncing: Open Syncing Settings`*
+    * ***`Syncing: Open Syncing Settings`***
 
 
 ## Extension Keybindings
 
 The keybindings **are disabled by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
 
-1. for VSCode versions >= 1.11 *(recommended)*:
+1. for VSCode versions >= 1.11 ***(recommended)***:
 
     ![keyboard-shortcuts](docs/gif/Keyboard-Shortcuts.gif)
 
