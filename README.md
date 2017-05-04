@@ -50,7 +50,7 @@ The keybindings **are disabled by default**, you can enable them by updating `VS
 1. for VSCode versions >= 1.11 (***recommended***):
 
     <img src="docs/gif/Keyboard-Shortcuts.gif" width="988" />
-    ![keyboard-shortcuts](docs/gif/Keyboard-Shortcuts.gif)
+
 
 1. for VSCode versions < 1.11, for example:
 
