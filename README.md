@@ -53,7 +53,7 @@ The keybindings **are disabled by default**, you can enable them by updating `VS
 
 1. for VSCode versions < 1.11, for example:
 
-    ```javascript
+    ```json
     {
         "key": "alt+cmd+u",
         "command": "syncing.uploadSettings"
