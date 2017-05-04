@@ -49,7 +49,7 @@ The keybindings are **not set by default**, but you can enable them by updating 
 
 1. for VSCode versions >= 1.11 (*recommended*):
 
-    ![keyboard-shortcuts](docs/gif/keyboard-shortcuts.gif)
+    ![keyboard-shortcuts](docs/gif/Keyboard-Shortcuts.gif)
 
 1. for VSCode versions < 1.11, for example:
 
