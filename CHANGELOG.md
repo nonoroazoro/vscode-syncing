@@ -1,5 +1,9 @@
 # Changelogs
 
+## May 4, 2017 (version 1.3.5)
+
+- ENHANCE: Update guides.
+
 ## April 7, 2017 (version 1.3.4)
 
 - FIX: Minor fixes to the Downloading and Uploading features.
