@@ -244,7 +244,7 @@ class Config
                             }
                             else
                             {
-                                // unknow files, do not process.
+                                // unknown files, do not process.
                             }
                         }
                     }
@@ -289,7 +289,7 @@ class Config
             }
             else
             {
-                p_resolve();
+                p_reject(new Error("Cannot save empty Gist files"));
             }
         });
     }
