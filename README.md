@@ -47,7 +47,7 @@ Also, you can change your `GitHub Token` or `Gist ID` by:
 
 The keybindings are **not set by default**, but you can enable them by updating VSCode's `Keyboard Shortcuts`:
 
-1. for VSCode versions >= 1.11 (*recommended*):
+1. for VSCode versions >= 1.11 (***recommended***):
 
     ![keyboard-shortcuts](docs/gif/Keyboard-Shortcuts.gif)
 
