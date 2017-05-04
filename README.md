@@ -47,20 +47,26 @@ Also, you can change your `GitHub Token` or `Gist ID` by:
 
 The keybindings are **not set by default**, but you can enable them by updating VSCode's `Keyboard Shortcuts`:
 
-```javascript
-    {
-        "key": "",
-        "command": "syncing.uploadSettings"
-    },
-    {
-        "key": "",
-        "command": "syncing.downloadSettings"
-    },
-    {
-        "key": "",
-        "command": "syncing.openSettings"
-    }
-```
+1. for VSCode versions >= 1.11 (*recommended*):
+
+    ![keyboard-shortcuts](docs/gif/keyboard-shortcuts.gif =988x600)
+
+1. for VSCode versions < 1.11, for example:
+
+    ```javascript
+        {
+            "key": "alt+cmd+u",
+            "command": "syncing.uploadSettings"
+        },
+        {
+            "key": "alt+cmd+d",
+            "command": "syncing.downloadSettings"
+        },
+        {
+            "key": "alt+cmd+s",
+            "command": "syncing.openSettings"
+        }
+    ```
 
 
 ## Extension Proxy Settings
@@ -74,24 +80,24 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 ```
 
 
-## Get Your Own GitHub Personal Access Token and Gist ID (4 Steps)
+## Get Your Own GitHub Personal Access Token and Gist ID
 
-1. **login to your `Settings` page**
+1. **Login to your `Settings` page.**
 
-    ![generate new token](docs/0.png?raw=true "settings page")
+    ![login to settings page](docs/0.png)
 
-1. **select `Personal access tokens` tab and generate new token**
+1. **Select `Personal access tokens` tab and click `Generate new token`.**
 
-    ![generate new token](docs/1.png?raw=true "generate new token")
+    ![generate new token](docs/1.png)
 
-1. **allow gist**
+1. **Allow gist.**
 
-    ![allow gist](docs/2.png?raw=true "allow gist")
+    ![allow gist](docs/2.png)
 
-1. **copy/backup your token**
+1. **Copy/backup your token.**
 
-    ![copy/backup token](docs/3.png?raw=true "copy/backup your token")
+    ![copy/backup token](docs/3.png)
 
-1. **after uploading, you can find the settings and the corresponding Gist ID in your GitHub Gist**
+1. **After uploading, you can find the `settings` and the corresponding `Gist ID` in your GitHub Gist.**
 
-    ![gist](docs/4.png?raw=true "gist")
+    ![gist](docs/4.png)
