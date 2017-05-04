@@ -47,7 +47,7 @@ There're **`3 commands`** in this extension.
 
 The keybindings **are disabled by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
 
-1. for VSCode versions >= 1.11 ***(recommended)***:
+1. for VSCode versions >= 1.11 (***recommended***):
 
     ![keyboard-shortcuts](docs/gif/Keyboard-Shortcuts.gif)
 
