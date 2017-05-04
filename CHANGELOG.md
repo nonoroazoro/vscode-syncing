@@ -1,5 +1,9 @@
 # Changelogs
 
+## May 4, 2017 (version 1.3.7)
+
+- FIX: Reset Keyboard-Shortcuts image size.
+
 ## May 4, 2017 (version 1.3.6)
 
 - FIX: Resize Keyboard-Shortcuts image.
