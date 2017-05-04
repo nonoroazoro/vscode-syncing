@@ -6,77 +6,75 @@
 
 **Syncing** is a VSCode extension, proposed to sync **all of the VSCode's settings** to GitHub Gist.
 
-> To keep the synchronization **simple & reliable**.
+> *Keep it simple & reliable*.
 
 
 ## Features
 
-In order to keep this extension **as simple as possible**, there will be no other features, **only these 2:**
+There will be only two features in order to **keep it as simple as possible**:
 
-1. **Upload** VSCode settings to Gist:
+1. **Upload**:
 
-    * **upload** `settings`, `locale`, `snippets`, `keybindings`, `extensions`.
-    * **auto separate Mac and non-Mac**'s `settings` and `keybindings` (in case you have multiple devices).
-    * auto create new Gist if it is not found in remote.
-    * auto remove remote files when they're removed in local.
-    * auto exclude unchanged settings (to speed up the synchronization).
+    * upload `settings, locale, snippets, keybindings, extensions`.
+    * auto separate `Mac` and `non-Mac`'s `settings` and `keybindings` in case you have multiple devices.
+    * auto create new Gist if it doesn't exist in remote.
+    * auto remove remote files if they've been removed in local.
+    * auto exclude unmodified settings to speed up the synchronization.
 
-1. **Download** VSCode settings from Gist.
+1. **Download**:
 
     * **always overwrite** local settings.
-    * auto `install`, `update`, `remove` extensions.
-    * auto remove local files when they're removed in remote.
-    * you can leave out the `GitHub Personal Access Token` blank to `download settings from a public Gist` (and don't forget to add your own GitHub token before uploading your settings :grimacing:).
+    * auto `install, update, remove` extensions (including the extensions version).
+    * auto remove local files if they've been removed in remote.
+    * you can download settings from a public Gist by leaving the `GitHub Personal Access Token` blank (but you still have to fill in your own token before uploading).
 
 
 ## Extension Commands
 
 There're **`3 commands`** in this extension.
 
-Type `syncing` (or just `upload/download`) in VSCode Command Palette to:
+* Type `upload/download` (or `syncing`) in `VSCode Command Palette` to:
 
-* **`Syncing: Upload Settings`**
-* **`Syncing: Download Settings`**
+    * ***`Syncing: Upload Settings`***
+    * ***`Syncing: Download Settings`***
 
-Also, you can change your `GitHub Token` or `Gist ID` by:
+* Also, you can set your `GitHub Personal Access Token` and `Gist ID` at anytime by:
 
-* **`Syncing: Open Syncing Settings`**
+    * ***`Syncing: Open Syncing Settings`***
 
 
 ## Extension Keybindings
 
-The keybindings are **not set by default**, but you can enable them by updating VSCode's `Keyboard Shortcuts`:
+The keybindings **are disabled by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
 
-1. for VSCode versions >= 1.11 (*recommended*):
+1. for VSCode versions >= 1.11 (***recommended***):
 
     ![keyboard-shortcuts](docs/gif/Keyboard-Shortcuts.gif)
 
 1. for VSCode versions < 1.11, for example:
 
     ```javascript
-        {
-            "key": "alt+cmd+u",
-            "command": "syncing.uploadSettings"
-        },
-        {
-            "key": "alt+cmd+d",
-            "command": "syncing.downloadSettings"
-        },
-        {
-            "key": "alt+cmd+s",
-            "command": "syncing.openSettings"
-        }
+    {
+        "key": "alt+cmd+u",
+        "command": "syncing.uploadSettings"
+    },
+    {
+        "key": "alt+cmd+d",
+        "command": "syncing.downloadSettings"
+    },
+    {
+        "key": "alt+cmd+s",
+        "command": "syncing.openSettings"
+    }
     ```
 
 
 ## Extension Proxy Settings
 
-You can add a proxy to accelerate the synchronization, find and set the `"http.proxy"` property in VSCode `User Settings` like:
+You can add a proxy to accelerate the synchronization, find and set the `"http.proxy"` property in `VSCode User Settings`, for example:
 
-```javascript
-    // HTTP
-    // The proxy setting to use. If not set will be taken from the http_proxy and https_proxy environment variables
-    "http.proxy": "http://127.0.0.1:1080"
+```json
+"http.proxy": "http://127.0.0.1:1080"
 ```
 
 
@@ -84,20 +82,20 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
 1. **Login to your `Settings` page.**
 
-    ![login to settings page](docs/0.png)
+    ![login to settings page](docs/png/0.png)
 
 1. **Select `Personal access tokens` tab and click `Generate new token`.**
 
-    ![generate new token](docs/1.png)
+    ![generate new token](docs/png/1.png)
 
-1. **Allow gist.**
+1. **Select `gist` and click `Generate token`.**
 
-    ![allow gist](docs/2.png)
+    ![allow gist](docs/png/2.png)
 
 1. **Copy/backup your token.**
 
-    ![copy/backup token](docs/3.png)
+    ![copy/backup token](docs/png/3.png)
 
-1. **After uploading, you can find the `settings` and the corresponding `Gist ID` in your GitHub Gist.**
+1. **After uploading, you can find the `VSCode Settings` and the corresponding `Gist ID` in your GitHub Gist.**
 
-    ![gist](docs/4.png)
+    ![settings and gist](docs/png/4.png)
