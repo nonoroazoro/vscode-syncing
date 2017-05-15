@@ -10,7 +10,7 @@ class Gist
     {
         this._token = p_token;
         this._proxy = p_proxy;
-        this._api = new GitHubAPI(Object.assign({ timeout: 5000 }, p_proxy ? { proxy: p_proxy } : {}));
+        this._api = new GitHubAPI(Object.assign({ timeout: 10000 }, p_proxy ? { proxy: p_proxy } : {}));
 
         if (p_token)
         {
