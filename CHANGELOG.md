@@ -1,60 +1,77 @@
 # Changelogs
 
-## May 4, 2017 (version 1.3.7)
+## 1.3.8 - May 15, 2017
 
-- FIX: Reset Keyboard-Shortcuts image size.
+- Changed: Tuning the timeout threshold to reduce the connection failures on slow networks.
 
-## May 4, 2017 (version 1.3.6)
 
-- FIX: Resize Keyboard-Shortcuts image.
+## 1.3.7 - May 4, 2017
 
-## May 4, 2017 (version 1.3.5)
+- Fixed: Reset Keyboard-Shortcuts image size.
 
-- ENHANCE: Update guides.
 
-## April 7, 2017 (version 1.3.4)
+## 1.3.6 - May 4, 2017
 
-- FIX: Minor fixes to the Downloading and Uploading features.
+- Changed: Resize Keyboard-Shortcuts image.
 
-## March 3, 2017 (version 1.3.3)
 
-- FIX: Check the user's access privileges when uploading.
+## 1.3.5 - May 4, 2017
 
-## March 2, 2017 (version 1.3.2)
+- Changed: Update guides.
 
-- ENHANCE: Update the messages of `Settings File Not Found` and `Setting File Invalid` errors.
-- ENHANCE: Upload an `empty array` (instead of `null`) when extension list is empty, to avoid potential error.
 
-## February 21, 2017 (version 1.3.1)
+## 1.3.4 - April 7, 2017
 
-- FIX: Message error of Download dialog.
+- Fixed: Minor fixes to the Downloading and Uploading features.
 
-## February 21, 2017 (version 1.3.0)
 
-- ENHANCE: Upload and Download dialogs.
-- ENHANCE: Separate error messages of invalid GitHub Personal Access Token and Gist ID.
-- ENHANCE: Update guides.
+## 1.3.3 - March 3, 2017
 
-## February 8, 2017 (version 1.2.9)
+- Fixed: Checking user access privileges when uploading.
 
-- ENHANCE: Clean up temporary files automatically.
-- ENHANCE: Pretty JSON files: `extensions.json`, `syncing.json`, make it a little more user-friendly (Thanks [@fengcen](https://github.com/fengcen) for the advice).
 
-## December 30, 2016 (version 1.2.8)
+## 1.3.2 March 2, 2017
 
-- ENHANCE: Update READMEs.
+- Changed: Update the messages of `Settings File Not Found` and `Setting File Invalid` errors.
+- Fixed: Upload an `empty array` (instead of `null`) when extension list is empty, to avoid potential error.
 
-## December 30, 2016 (version 1.2.7)
 
-- FIX: Ignore `null` content to avoid node-github error.
+## 1.3.1 - February 21, 2017
 
-## November 10, 2016 (version 1.2.6)
+- Fixed: Message error of Download dialog.
 
-- FIX: Don't show reload dialog when extensions aren't changed.
 
-## November 9, 2016 (version 1.2.5)
+## 1.3.0 - February 21, 2017
 
-- ADD: Hints of the synchronization.
-- ADD: Reload dialog when extensions are changed.
-- ADD: Support download settings from public Gist.
-- FIX: Synced extensions aren't managed by vscode.
+- Changed: Upload and Download dialogs.
+- Changed: Separate error messages of invalid GitHub Personal Access Token and Gist ID.
+- Changed: User Guide.
+
+
+## 1.2.9 - February 8, 2017
+
+- Added: Clean up temporary files automatically.
+- Changed: Pretty JSON files: `extensions.json`, `syncing.json`, make it a little more user-friendly (Thanks [@fengcen](https://github.com/fengcen) for the advice).
+
+
+## 1.2.8 - December 30, 2016
+
+- Changed: User Guide.
+
+
+## 1.2.7 - December 30, 2016
+
+- Fixed: Ignore `null` content to avoid node-github error.
+
+
+## 1.2.6 - November 10, 2016
+
+- Fixed: Reload dialog isn't shown when extensions are changed.
+
+
+## 1.2.5 - November 9, 2016
+
+- Added: Hints of the synchronization.
+- Added: Show reload dialog when extensions are changed.
+- Added: Support download settings from public Gist.
+- Fixed: Synced extensions aren't managed by vscode.
