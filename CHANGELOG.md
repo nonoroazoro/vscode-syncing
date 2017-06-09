@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.3.9 - June 9, 2017
+
+- Fixed: Using extension's local version to properly remove the old extensions.
+
+
 ## 1.3.8 - May 15, 2017
 
 - Changed: Tuning the timeout threshold to reduce the connection failures on slow networks.
