@@ -345,7 +345,9 @@ class Extension
                 Toast.status(`Syncing: removing extension: ${p_extension.id}`);
             }
 
-            fse.remove(path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`), (err) =>
+            const localExtension = vscode.extensions.getExtension(p_extension.id);
+            const version = localExtension ? localExtension.packageJSON.version : p_extension.version;
+            fse.remove(path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${version}`), (err) =>
             {
                 if (err)
                 {
