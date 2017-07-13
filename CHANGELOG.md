@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.4.1 - July 12, 2017
+
+- Changed: First attempt to change the logo.
+
+
 ## 1.4.0 - July 12, 2017
 
 - Fixed: Image URLs are now resolved to `https` URLs as required by VSCode-1.14.
