@@ -1,6 +1,7 @@
 const fs = require("fs");
 const vscode = require("vscode");
 
+const moment = require("moment");
 const Gist = require("./utils/Gist");
 const Toast = require("./utils/Toast");
 const Config = require("./utils/Config");
@@ -23,6 +24,9 @@ function _initGlobals(p_context)
 {
     _env = Environment.create(p_context);
     _config = Config.create(p_context);
+
+    // TODO: i18n, using vscode.env.language
+    moment.locale("en");
 }
 
 /**
