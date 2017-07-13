@@ -76,7 +76,7 @@ function showGitHubTokenInputBox(p_forUpload = true)
 }
 
 /**
- * show Gist Id box.
+ * show Gist ID box.
  * @param {Boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
  */
@@ -85,8 +85,8 @@ function showGistInputBox(p_forUpload = true)
     return new Promise((p_resolve, p_reject) =>
     {
         const placeHolder = p_forUpload ?
-            "Enter Gist Id (Leave blank to create a new Gist automatically)." :
-            "Enter Gist Id.";
+            "Enter Gist ID (Leave blank to create a new Gist automatically)." :
+            "Enter Gist ID.";
         const options = {
             placeHolder: placeHolder,
             password: false,
@@ -118,7 +118,7 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
                     data: gist.id
                 }));
                 items.unshift({
-                    label: `Enter Gist Id manually...`,
+                    label: `Enter Gist ID manually...`,
                     description: "Choose this if you wanna enter manually."
                 });
                 return items;
