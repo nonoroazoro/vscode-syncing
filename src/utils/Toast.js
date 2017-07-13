@@ -75,7 +75,7 @@ function showGitHubTokenInputBox(p_forUpload = true)
 }
 
 /**
- * show Gist ID box.
+ * show Gist Id box.
  * @param {Boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
  */
@@ -84,12 +84,12 @@ function showGistInputBox(p_forUpload = true)
     return new Promise((p_resolve, p_reject) =>
     {
         const placeHolder = p_forUpload ?
-            "Enter Your Gist ID (Leave it blank to create a new Gist automatically)." :
-            "Enter Your Gist ID.";
+            "Enter Gist Id (Leave blank to create a new Gist automatically)." :
+            "Enter Gist Id.";
         const options = {
             placeHolder: placeHolder,
             password: false,
-            prompt: "Used for synchronizing your settings to Gist.",
+            prompt: "Used for synchronizing your settings with Gist.",
             ignoreFocusOut: true
         };
         vscode.window.showInputBox(options).then((value) =>
