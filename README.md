@@ -4,14 +4,14 @@
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 
-**Syncing** is a VSCode extension, proposed to sync **all of the VSCode's settings** to GitHub Gist.
+*Syncing* is designed to **sync all of your VSCode settings** with GitHub Gist.
 
 > *Keep it simple & reliable*.
 
 
 ## Features
 
-There will be only two features in order to **keep it as simple as possible**:
+In order to **keep it as simple as possible**, there will be only two features:
 
 1. **Upload**:
 
@@ -31,7 +31,7 @@ There will be only two features in order to **keep it as simple as possible**:
 
 ## Extension Commands
 
-There're **`3 commands`** in this extension.
+There're **`3 commands`** in this extension:
 
 * Type `upload/download` (or `syncing`) in `VSCode Command Palette` to:
 
