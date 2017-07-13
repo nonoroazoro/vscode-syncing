@@ -3,6 +3,7 @@
  */
 
 const GitHubAPI = require("github");
+const GIST_DESCRIPTION = "VSCode's Settings - Syncing";
 
 class Gist
 {
@@ -68,7 +69,7 @@ class Gist
     }
 
     /**
-     * get gist.
+     * get gist of the authenticated user.
      * @param {String} p_id gist id.
      * @returns {Promise}
      */
@@ -79,6 +80,48 @@ class Gist
             this._api.gists.get({ id: p_id }).then((gist) =>
             {
                 p_resolve(gist);
+            }).catch((err) =>
+            {
+                if (err.code === 401)
+                {
+                    const error = new Error("Please check your GitHub Personal Access Token.");
+                    error.code = err.code;
+                    p_reject(error);
+                }
+                else if (err.code === 404)
+                {
+                    p_reject(new Error("Please check your Gist ID."));
+                }
+                else
+                {
+                    p_reject(new Error("Please check your Internet connection."));
+                }
+            });
+        });
+    }
+
+    /**
+     * get all gists of the authenticated user.
+     * @returns {Promise}
+     */
+    getAll()
+    {
+        return new Promise((p_resolve, p_reject) =>
+        {
+            this._api.gists.getAll({}).then((gists) =>
+            {
+                if (gists)
+                {
+                    // filter out the VSCode settings.
+                    p_resolve(gists
+                        .filter((gist) => (gist.description === GIST_DESCRIPTION || gist.files["extensions.json"]))
+                        .sort((a, b) => new Date(a.update_id) - new Date(b.update_id))
+                    );
+                }
+                else
+                {
+                    p_resolve([]);
+                }
             }).catch((err) =>
             {
                 if (err.code === 401)
@@ -199,7 +242,7 @@ class Gist
     createSettings(p_files = {}, p_public = false)
     {
         return this.create({
-            description: "VSCode's Settings - Syncing",
+            description: GIST_DESCRIPTION,
             public: p_public,
             files: p_files
         });
