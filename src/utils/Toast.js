@@ -2,6 +2,7 @@
  * vscode message utils.
  */
 
+const moment = require("moment");
 const vscode = require("vscode");
 
 /**
@@ -100,6 +101,52 @@ function showGistInputBox(p_forUpload = true)
 }
 
 /**
+ * show remote Gist list box.
+ * @param {Boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
+ * @returns {Promise}
+ */
+function showRemoteGistListBox(p_api, p_forUpload = true)
+{
+    return new Promise((p_resolve, p_reject) =>
+    {
+        p_api.getAll()
+            .then((gists) =>
+            {
+                const items = gists.map((gist) => ({
+                    label: `${gist.id}`,
+                    description: `Last uploaded ${moment.duration(new Date(gist.updated_at) - new Date()).humanize(true)}.`,
+                    data: gist.id
+                }));
+                items.unshift({
+                    label: `Enter Gist Id manually...`,
+                    description: "Choose this if you wanna enter manually."
+                });
+                return items;
+            })
+            .then((items) =>
+                vscode.window.showQuickPick(items, {
+                    matchOnDetail: true,
+                    placeHolder: `Choose a Gist to ${p_forUpload ? "upload" : "download"} your settings.`
+                })
+            )
+            .then((item) =>
+            {
+                let data;
+                let cancelled = true;
+                if (item)
+                {
+                    cancelled = false;
+                    if (item.data)
+                    {
+                        data = item.data;
+                    }
+                }
+                p_resolve({ cancelled, data });
+            });
+    });
+}
+
+/**
  * show a "reload vscode" prompt dialog.
  */
 function showReloadBox()
@@ -121,6 +168,7 @@ module.exports = {
     statusError,
     statusFatal,
     showGistInputBox,
+    showRemoteGistListBox,
     showGitHubTokenInputBox,
     showReloadBox
 };
