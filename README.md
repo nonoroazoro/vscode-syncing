@@ -130,4 +130,4 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. Done!
 
-    1. Example:
+    1. **Example**:
