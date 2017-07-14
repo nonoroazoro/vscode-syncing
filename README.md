@@ -15,35 +15,38 @@ In order to **keep it as simple as possible**, there will be only two features:
 
 1. **Upload**:
 
-    * upload `settings, locale, snippets, keybindings, extensions`.
-    * auto separate `Mac` and `non-Mac`'s `settings` and `keybindings` in case you have multiple devices.
-    * auto create new Gist if it doesn't exist in remote.
-    * auto remove remote files if they've been removed in local.
-    * auto exclude unmodified settings to speed up the synchronization.
+    * Upload `settings, locale, snippets, keybindings, extensions`.
+    * Auto separate `Mac` and `non-Mac`'s `settings` and `keybindings` in case you have multiple devices.
+    * Auto create new Gist if it doesn't exist in remote.
+    * Auto remove remote files if they've been removed in local.
+    * Auto exclude unmodified settings to speed up the synchronization.
 
 1. **Download**:
 
-    * **always overwrite** local settings.
-    * auto `install, update, remove` extensions (including the extensions version).
-    * auto remove local files if they've been removed in remote.
-    * you can download settings from a public Gist by leaving the `GitHub Personal Access Token` blank (but you still have to fill in your own token before uploading).
+    * **Always overwrite** local settings.
+    * Auto `install, update, remove` extensions.
+    * Auto remove local files if they've been removed in remote.
+    * Download settings from a public Gist by leaving the `GitHub Personal Access Token` blank (but you still have to fill in your own token before uploading).
 
 
-## Extension Commands
+## Commands
 
-There're **`3 commands`** in this extension:
+You can type `upload/download` (or `syncing`) in `VSCode Command Palette` to access the commands:
 
-* Type `upload/download` (or `syncing`) in `VSCode Command Palette` to:
+1. ***`Syncing: Upload Settings`***
 
-    * ***`Syncing: Upload Settings`***
-    * ***`Syncing: Download Settings`***
+    > Upload settings.
 
-* Also, you can set your `GitHub Personal Access Token` and `Gist ID` at anytime by:
+1. ***`Syncing: Download Settings`***
 
-    * ***`Syncing: Open Syncing Settings`***
+    > Download settings.
+
+1. ***`Syncing: Open Syncing Settings`***
+
+    > Set `GitHub Personal Access Token` and `Gist ID`.
 
 
-## Extension Keybindings
+## Keybindings
 
 The keybindings **are disabled by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
 
@@ -70,33 +73,61 @@ The keybindings **are disabled by default**, you can enable them by updating `VS
     ```
 
 
-## Extension Proxy Settings
+## Proxy Settings
 
 You can add a proxy to accelerate the synchronization, find and set the `"http.proxy"` property in `VSCode User Settings`, for example:
 
 ```json
-"http.proxy": "http://127.0.0.1:1080"
+    "http.proxy": "http://127.0.0.1:1080"
 ```
 
 
-## Get Your Own GitHub Personal Access Token and Gist ID
+## Getting Started
 
-1. **Login to your `Settings` page.**
+1. Get your own `GitHub Personal Access Token`:
 
-    ![login to settings page](docs/png/0.png)
+    1. **Login to your `Settings` page.**
 
-1. **Select `Personal access tokens` tab and click `Generate new token`.**
+        ![login to settings page](docs/png/0.png)
 
-    ![generate new token](docs/png/1.png)
+    1. **Select `Personal access tokens` tab and click `Generate new token`.**
 
-1. **Select `gist` and click `Generate token`.**
+        ![generate new token](docs/png/1.png)
 
-    ![allow gist](docs/png/2.png)
+    1. **Select `gist` and click `Generate token`.**
 
-1. **Copy/backup your token.**
+        ![allow gist](docs/png/2.png)
 
-    ![copy/backup token](docs/png/3.png)
+    1. **Copy and backup your token.**
 
-1. **After uploading, you can find the `VSCode Settings` and the corresponding `Gist ID` in your GitHub Gist.**
+        ![copy and backup token](docs/png/3.png)
 
-    ![settings and gist](docs/png/4.png)
+1. Sync your settings:
+
+    *`Syncing`* will ask for necessary information for the first time, and save in its own settings file.
+
+    1. Upload:
+
+        1. Type `upload` in `VSCode Command Palette`.
+
+        1. Enter your `GitHub Personal Access Token`.
+
+        1. Enter your `Gist ID` (or `leave it blank` to create automatically).
+
+        1. Done!
+
+        1. After uploading, you can find your settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com).
+
+            ![settings and gist](docs/png/4.png)
+
+    1. Download:
+
+        1. Type `download` in `VSCode Command Palette`.
+
+        1. Enter your `GitHub Personal Access Token` (or `leave it blank` if you want to download from a public Gist)
+
+        1. Enter your `Gist ID` (or a `public Gist ID`).
+
+        1. Done!
+
+    1. Example:
