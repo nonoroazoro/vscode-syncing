@@ -104,7 +104,7 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
 1. Sync your settings:
 
-    *`Syncing`* will ask for necessary information for the first time, and save in its own settings file.
+    *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
 
     1. **Upload**:
 
