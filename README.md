@@ -106,7 +106,7 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
     *`Syncing`* will ask for necessary information for the first time, and save in its own settings file.
 
-    1. Upload:
+    1. **Upload**:
 
         1. Type `upload` in `VSCode Command Palette`.
 
@@ -120,7 +120,7 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
             ![settings and gist](docs/png/4.png)
 
-    1. Download:
+    1. **Download**:
 
         1. Type `download` in `VSCode Command Palette`.
 
