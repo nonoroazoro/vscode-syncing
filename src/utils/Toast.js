@@ -125,7 +125,7 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
             })
             .then((items) =>
                 vscode.window.showQuickPick(items, {
-                    matchOnDetail: true,
+                    matchOnDescription: true,
                     placeHolder: `Choose a Gist to ${p_forUpload ? "upload" : "download"} your settings.`
                 })
             )
