@@ -83,7 +83,16 @@ function showGitHubTokenInputBox(p_forUpload = true)
                     // ignore empty string.
                     token = null;
                 }
-                p_resolve({ token });
+
+                if (p_forUpload && !token)
+                {
+                    // only reject when uploading.
+                    p_reject(new Error("the GitHub Personal Access Token is not set."));
+                }
+                else
+                {
+                    p_resolve({ token });
+                }
             }
         });
     });
@@ -122,7 +131,16 @@ function showGistInputBox(p_forUpload = true)
                     // ignore empty string.
                     id = null;
                 }
-                p_resolve({ id });
+
+                if (!p_forUpload && !id)
+                {
+                    // only reject when downloading.
+                    p_reject(new Error("the Gist ID is not set."));
+                }
+                else
+                {
+                    p_resolve({ id });
+                }
             }
         });
     });
@@ -148,7 +166,8 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
                     data: gist.id
                 }));
                 items.unshift({
-                    label: `Enter Gist ID manually...`
+                    label: `Enter Gist ID manually...`,
+                    data: "@@manual"
                 });
                 return vscode.window.showQuickPick(items, {
                     ignoreFocusOut: true,
@@ -161,7 +180,23 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
                 // reject if cancelled.
                 if (item)
                 {
-                    p_resolve({ id: item.data });
+                    const id = item.data;
+                    if (!p_forUpload && !id)
+                    {
+                        // only reject when downloading.
+                        p_reject(new Error("the Gist ID is not set."));
+                    }
+                    else
+                    {
+                        if (id === "@@manual")
+                        {
+                            p_resolve({ id: null });
+                        }
+                        else
+                        {
+                            p_resolve({ id });
+                        }
+                    }
                 }
                 else
                 {
