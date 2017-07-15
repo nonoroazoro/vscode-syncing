@@ -77,13 +77,7 @@ function showGitHubTokenInputBox(p_forUpload = true)
             }
             else
             {
-                let token = value.trim();
-                if (token === "")
-                {
-                    // ignore empty string.
-                    token = null;
-                }
-
+                const token = value.trim();
                 if (p_forUpload && !token)
                 {
                     // only reject when uploading.
@@ -125,13 +119,7 @@ function showGistInputBox(p_forUpload = true)
             }
             else
             {
-                let id = value.trim();
-                if (id === "")
-                {
-                    // ignore empty string.
-                    id = null;
-                }
-
+                const id = value.trim();
                 if (!p_forUpload && !id)
                 {
                     // only reject when downloading.
@@ -190,7 +178,7 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
                     {
                         if (id === "@@manual")
                         {
-                            p_resolve({ id: null });
+                            p_resolve({ id: "" });
                         }
                         else
                         {
