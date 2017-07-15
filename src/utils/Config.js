@@ -418,13 +418,24 @@ class Config
     }
 
     /**
-     * clear GitHub token and save to file.
+     * clear GitHub Personal Access Token and save to file.
      * @returns {Promise}
      */
     clearSyncingToken()
     {
         const settings = this.loadSyncingSettings();
         settings.token = "";
+        return this.saveSyncingSettings(settings, false);
+    }
+
+    /**
+     * clear Gist ID and save to file.
+     * @returns {Promise}
+     */
+    clearSyncingID()
+    {
+        const settings = this.loadSyncingSettings();
+        settings.id = "";
         return this.saveSyncingSettings(settings, false);
     }
 
