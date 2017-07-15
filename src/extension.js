@@ -61,7 +61,7 @@ function _uploadSettings()
         _config.getConfigs({ load: true }).then((configs) =>
         {
             Toast.status("Syncing: uploading settings...");
-            api.findAndUpdate(settings.id, configs).then((gist) =>
+            return api.findAndUpdate(settings.id, configs).then((gist) =>
             {
                 if (gist.id === settings.id)
                 {
@@ -73,19 +73,6 @@ function _uploadSettings()
                     {
                         Toast.statusInfo("Syncing: settings uploaded.");
                     });
-                }
-            }).catch((err) =>
-            {
-                if (err.code === 401)
-                {
-                    _config.clearSyncingToken().then(() =>
-                    {
-                        Toast.statusError(`Syncing: upload failed. ${err.message}`);
-                    });
-                }
-                else
-                {
-                    Toast.statusError(`Syncing: upload failed. ${err.message}`);
                 }
             });
         }).catch((err) =>
@@ -110,24 +97,27 @@ function _downloadSettings()
         api.get(settings.id).then((gist) =>
         {
             Toast.status("Syncing: downloading settings...");
-            _config.saveConfigs(gist.files).then((synced) =>
+            return _config.saveConfigs(gist.files).then((synced) =>
             {
                 // TODO: log synced files.
                 Toast.statusInfo("Syncing: settings downloaded.");
-
                 if (_isExtensionsSynced(synced))
                 {
                     Toast.showReloadBox();
                 }
-            }).catch((err) =>
-            {
-                Toast.statusError(`Syncing: download failed. ${err.message}`);
             });
         }).catch((err) =>
         {
             if (err.code === 401)
             {
                 _config.clearSyncingToken().then(() =>
+                {
+                    Toast.statusError(`Syncing: download failed. ${err.message}`);
+                });
+            }
+            else if (err.code === 404)
+            {
+                _config.clearSyncingID().then(() =>
                 {
                     Toast.statusError(`Syncing: download failed. ${err.message}`);
                 });
