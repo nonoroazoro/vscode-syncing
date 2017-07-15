@@ -4,7 +4,7 @@
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 
-*Syncing* is designed to **sync all of your VSCode settings** with GitHub Gist. [Getting started!](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing#getting-started)
+*Syncing* is designed to **sync all of your VSCode settings** with GitHub Gist. <a href="#getting-started">Getting started!</a>
 
 > *Keep it simple & reliable*.
 
