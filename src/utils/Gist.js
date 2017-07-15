@@ -90,7 +90,9 @@ class Gist
                 }
                 else if (err.code === 404)
                 {
-                    p_reject(new Error("Please check your Gist ID."));
+                    const error = new Error("Please check your Gist ID.");
+                    error.code = err.code;
+                    p_reject(error);
                 }
                 else
                 {
