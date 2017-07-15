@@ -6,6 +6,7 @@ const fs = require("fs");
 const path = require("path");
 const async = require("async");
 
+const Gist = require("./Gist");
 const Toast = require("./Toast");
 const Extension = require("./Extension");
 const Environment = require("./Environment");
@@ -444,7 +445,49 @@ class Config
     prepareDownloadSettings()
     {
         // GitHub token could be none, but Gist ID must exist.
-        return this.prepareSyncingSettings(false);
+        return new Promise((p_resolve, p_reject) =>
+        {
+            const settings = this.loadSyncingSettings();
+            if (settings.token && settings.id)
+            {
+                p_resolve(settings);
+            }
+            else
+            {
+                let task;
+                if (settings.token)
+                {
+                    task = this._requestGistID(settings.token, false);
+                }
+                else
+                {
+                    task = Toast.showGitHubTokenInputBox(false).then(({ token }) =>
+                    {
+                        settings.token = token;
+                        return this._requestGistID(token, false);
+                    });
+                }
+
+                task.then(({ id }) =>
+                {
+                    if (id)
+                    {
+                        settings.id = id;
+                        this.saveSyncingSettings(settings).then(() =>
+                        {
+                            p_resolve(settings);
+                        });
+                    }
+                    else
+                    {
+                        p_reject(new Error("the Gist ID is not set."));
+                    }
+                }).catch((err) =>
+                {
+                    p_reject(err);
+                });
+            }
+        });
     }
 
     /**
@@ -563,6 +606,37 @@ class Config
                 p_resolve();
             }
         });
+    }
+
+    /**
+     * ask user for Gist ID.
+     *
+     * @param {String} p_token GitHub Personal Access Token.
+     * @param {Boolean} [p_forUpload=true] default is true, GitHub token must exist, but Gist ID could be none, else, GitHub token could be none, but Gist ID must exist.
+     * @returns {Promise}
+     */
+    _requestGistID(p_token, p_forUpload = true)
+    {
+        if (p_token)
+        {
+            const api = Gist.create(p_token, this._env.getSyncingProxy());
+            return Toast.showRemoteGistListBox(api, p_forUpload).then((value) =>
+            {
+                if (value.id)
+                {
+                    return value;
+                }
+                else
+                {
+                    // show gist input box when id is still null.
+                    return Toast.showGistInputBox(p_forUpload);
+                }
+            });
+        }
+        else
+        {
+            return Toast.showGistInputBox(p_forUpload);
+        }
     }
 }
 
