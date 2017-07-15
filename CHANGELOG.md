@@ -1,5 +1,12 @@
 # Changelogs
 
+## 1.4.2 - July 15, 2017
+
+- Added: Show remote Gist list when uploading/downloading for the first time, makes it easier to use. But also, low speed network will make it suffer. Please use proxy (Thanks [@Henry Li](https://github.com/MagicCube) for the advice).
+- Added: Add `Getting Started` in `README`.
+- Changed: Tweak error handlers and toasts.
+
+
 ## 1.4.1 - July 12, 2017
 
 - Changed: First attempt to change the logo.
