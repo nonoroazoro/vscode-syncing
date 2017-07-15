@@ -454,21 +454,35 @@ class Config
             }
             else
             {
-                let task;
+                let gistIDTask;
                 if (settings.token)
                 {
-                    task = this._requestGistID(settings.token, false);
+                    if (settings.id)
+                    {
+                        gistIDTask = Promise.resolve(settings.id);
+                    }
+                    else
+                    {
+                        gistIDTask = this._requestGistID(settings.token, false);
+                    }
                 }
                 else
                 {
-                    task = Toast.showGitHubTokenInputBox(false).then(({ token }) =>
+                    gistIDTask = Toast.showGitHubTokenInputBox(false).then(({ token }) =>
                     {
                         settings.token = token;
-                        return this._requestGistID(token, false);
+                        if (settings.id)
+                        {
+                            return settings;
+                        }
+                        else
+                        {
+                            return this._requestGistID(token, false);
+                        }
                     });
                 }
 
-                task.then(({ id }) =>
+                gistIDTask.then(({ id }) =>
                 {
                     if (id)
                     {
