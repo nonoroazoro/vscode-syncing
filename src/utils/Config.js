@@ -435,7 +435,7 @@ class Config
     prepareUploadSettings()
     {
         // GitHub token must exist, but Gist ID could be none.
-        return this.prepareSyncingSettings(true);
+        return this.prepareSyncingSettings();
     }
 
     /**
@@ -443,6 +443,17 @@ class Config
      * @returns {Promise}
      */
     prepareDownloadSettings()
+    {
+        // GitHub token could be none, but Gist ID must exist.
+        return this.prepareSyncingSettings(false);
+    }
+
+    /**
+     * prepare Syncing's settings, will ask for settings if not exist.
+     * @param {Boolean} [p_forUpload=true] default is true, GitHub token must exist, but Gist ID could be none, else, GitHub token could be none, but Gist ID must exist.
+     * @returns {Promise}
+     */
+    prepareSyncingSettings(p_forUpload = true)
     {
         // GitHub token could be none, but Gist ID must exist.
         return new Promise((p_resolve, p_reject) =>
@@ -463,12 +474,12 @@ class Config
                     }
                     else
                     {
-                        gistIDTask = this._requestGistID(settings.token, false);
+                        gistIDTask = this._requestGistID(settings.token, p_forUpload);
                     }
                 }
                 else
                 {
-                    gistIDTask = Toast.showGitHubTokenInputBox(false).then(({ token }) =>
+                    gistIDTask = Toast.showGitHubTokenInputBox(p_forUpload).then(({ token }) =>
                     {
                         settings.token = token;
                         if (settings.id)
@@ -477,95 +488,22 @@ class Config
                         }
                         else
                         {
-                            return this._requestGistID(token, false);
+                            return this._requestGistID(token, p_forUpload);
                         }
                     });
                 }
 
                 gistIDTask.then(({ id }) =>
                 {
-                    if (id)
+                    settings.id = id;
+                    this.saveSyncingSettings(settings).then(() =>
                     {
-                        settings.id = id;
-                        this.saveSyncingSettings(settings).then(() =>
-                        {
-                            p_resolve(settings);
-                        });
-                    }
-                    else
-                    {
-                        p_reject(new Error("the Gist ID is not set."));
-                    }
+                        p_resolve(settings);
+                    });
                 }).catch((err) =>
                 {
                     p_reject(err);
                 });
-            }
-        });
-    }
-
-    /**
-     * prepare Syncing's settings, will ask for settings if not exist.
-     * @param {Boolean} [p_forUpload=true] default is true, GitHub token must exist, but Gist ID could be none, else, GitHub token could be none, but Gist ID must exist.
-     * @returns {Promise}
-     */
-    prepareSyncingSettings(p_forUpload = true)
-    {
-        return new Promise((p_resolve, p_reject) =>
-        {
-            const tasks = [];
-            const settings = this.loadSyncingSettings();
-            if (!settings.token)
-            {
-                tasks.push(Toast.showGitHubTokenInputBox.bind(this, p_forUpload));
-            }
-            if (!settings.id)
-            {
-                tasks.push(Toast.showGistInputBox.bind(this, p_forUpload));
-            }
-
-            if (tasks.length === 0)
-            {
-                p_resolve(settings);
-            }
-            else
-            {
-                async.eachSeries(
-                    tasks,
-                    (task, done) =>
-                    {
-                        task().then((value) =>
-                        {
-                            Object.assign(settings, value);
-                            done();
-                        });
-                    },
-                    (err) =>
-                    {
-                        const isTokenError = p_forUpload && settings.token === "";
-                        const isIDError = !p_forUpload && settings.id === "";
-                        if (err || isTokenError || isIDError)
-                        {
-                            const error = new Error();
-                            if (isTokenError)
-                            {
-                                error.message = "the GitHub Personal Access Token is not set.";
-                            }
-                            else if (isIDError)
-                            {
-                                error.message = "the Gist ID is not set.";
-                            }
-                            p_reject(error);
-                        }
-                        else
-                        {
-                            this.saveSyncingSettings(settings).then(() =>
-                            {
-                                p_resolve(settings);
-                            });
-                        }
-                    }
-                );
             }
         });
     }
