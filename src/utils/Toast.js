@@ -151,6 +151,7 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
                     label: `Enter Gist ID manually...`
                 });
                 return vscode.window.showQuickPick(items, {
+                    ignoreFocusOut: true,
                     matchOnDescription: true,
                     placeHolder: `Choose a Gist to ${p_forUpload ? "upload" : "download"} your settings.`
                 });
