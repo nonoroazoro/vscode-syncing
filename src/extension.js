@@ -94,7 +94,7 @@ function _uploadSettings()
         });
     }).catch((err) =>
     {
-        Toast.statusError(`Syncing: canceled because ${err.message}`);
+        Toast.statusError(`Syncing: canceled. ${err.message}`);
     });
 }
 
@@ -139,7 +139,7 @@ function _downloadSettings()
         });
     }).catch((err) =>
     {
-        Toast.statusError(`Syncing: canceled because ${err.message}`);
+        Toast.statusError(`Syncing: canceled. ${err.message}`);
     });
 }
 
