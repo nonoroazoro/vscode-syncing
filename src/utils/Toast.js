@@ -73,7 +73,7 @@ function showGitHubTokenInputBox(p_forUpload = true)
             if (value === undefined)
             {
                 // reject if cancelled.
-                p_reject(new Error("the GitHub Personal Access Token is not set."));
+                p_reject(new Error("you abort the synchronization."));
             }
             else
             {
@@ -112,7 +112,7 @@ function showGistInputBox(p_forUpload = true)
             if (value === undefined)
             {
                 // reject if cancelled.
-                p_reject(new Error("the Gist ID is not set."));
+                p_reject(new Error("you abort the synchronization."));
             }
             else
             {
@@ -164,7 +164,7 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
                 }
                 else
                 {
-                    p_reject(new Error("the Gist ID is not set."));
+                    p_reject(new Error("you abort the synchronization."));
                 }
             })
             .catch(p_reject);
