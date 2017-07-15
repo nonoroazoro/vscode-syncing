@@ -61,7 +61,7 @@ function showGitHubTokenInputBox(p_forUpload = true)
     {
         const placeHolder = p_forUpload ?
             "Enter GitHub Personal Access Token." :
-            "Enter GitHub Personal Access Token (Leave blank to download from a public Gist).";
+            "Enter GitHub Personal Access Token (Leave it blank to download from a public Gist).";
         const options = {
             placeHolder: placeHolder,
             password: false,
@@ -99,7 +99,7 @@ function showGistInputBox(p_forUpload = true)
     return new Promise((p_resolve, p_reject) =>
     {
         const placeHolder = p_forUpload ?
-            "Enter Gist ID (Leave blank to create a new Gist automatically)." :
+            "Enter Gist ID (Leave it blank to create a new Gist automatically)." :
             "Enter Gist ID.";
         const options = {
             placeHolder: placeHolder,
