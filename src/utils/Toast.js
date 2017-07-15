@@ -70,7 +70,21 @@ function showGitHubTokenInputBox(p_forUpload = true)
         };
         vscode.window.showInputBox(options).then((value) =>
         {
-            p_resolve({ token: value ? value.trim() : "" });
+            if (value === undefined)
+            {
+                // reject if cancelled.
+                p_reject(new Error("the GitHub Personal Access Token is not set."));
+            }
+            else
+            {
+                let token = value.trim();
+                if (token === "")
+                {
+                    // ignore empty string.
+                    token = null;
+                }
+                p_resolve({ token });
+            }
         });
     });
 }
@@ -95,13 +109,28 @@ function showGistInputBox(p_forUpload = true)
         };
         vscode.window.showInputBox(options).then((value) =>
         {
-            p_resolve({ id: value ? value.trim() : "" });
+            if (value === undefined)
+            {
+                // reject if cancelled.
+                p_reject(new Error("the Gist ID is not set."));
+            }
+            else
+            {
+                let id = value.trim();
+                if (id === "")
+                {
+                    // ignore empty string.
+                    id = null;
+                }
+                p_resolve({ id });
+            }
         });
     });
 }
 
 /**
  * show remote Gist list box.
+ * @param {Object} p_api
  * @param {Boolean} [p_forUpload=true] default is true, show uploading message, else show downloading message.
  * @returns {Promise}
  */
@@ -109,40 +138,36 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
 {
     return new Promise((p_resolve, p_reject) =>
     {
-        p_api.getAll()
+        this.status("Syncing: checking remote Gists...");
+        return p_api.getAll()
             .then((gists) =>
             {
                 const items = gists.map((gist) => ({
-                    label: `${gist.id}`,
+                    label: `Gist ID: ${gist.id}`,
                     description: `Last uploaded ${moment.duration(new Date(gist.updated_at) - new Date()).humanize(true)}.`,
                     data: gist.id
                 }));
                 items.unshift({
-                    label: `Enter Gist ID manually...`,
-                    description: "Choose this if you wanna enter manually."
+                    label: `Enter Gist ID manually...`
                 });
-                return items;
-            })
-            .then((items) =>
-                vscode.window.showQuickPick(items, {
+                return vscode.window.showQuickPick(items, {
                     matchOnDescription: true,
                     placeHolder: `Choose a Gist to ${p_forUpload ? "upload" : "download"} your settings.`
-                })
-            )
+                });
+            })
             .then((item) =>
             {
-                let data;
-                let cancelled = true;
+                // reject if cancelled.
                 if (item)
                 {
-                    cancelled = false;
-                    if (item.data)
-                    {
-                        data = item.data;
-                    }
+                    p_resolve({ id: item.data });
                 }
-                p_resolve({ cancelled, data });
-            });
+                else
+                {
+                    p_reject(new Error("the Gist ID is not set."));
+                }
+            })
+            .catch(p_reject);
     });
 }
 
