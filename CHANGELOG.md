@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.4.4 - July 17, 2017
+
+- Fixed: Getting Started link.
+
+
 ## 1.4.3 - July 15, 2017
 
 - Fixed: VSCode Marketplace Link.
