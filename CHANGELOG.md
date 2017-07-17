@@ -7,7 +7,7 @@
 
 ## 1.4.2 - July 15, 2017
 
-- Added: Show remote Gist list when uploading/downloading for the first time, makes it easier to use. But also, low speed network will make it suffer. Please use proxy (Thanks [@Henry Li](https://github.com/MagicCube) for the advice).
+- Added: Show remote Gist list when uploading/downloading for the first time, makes it easier to use. But also, low speed network will make it suffer. Please use proxy (Thank [@Henry Li](https://github.com/MagicCube) for the advice).
 - Added: Add `Getting Started` in `README`.
 - Changed: Tweak error handlers and toasts.
 
@@ -78,7 +78,7 @@
 ## 1.2.9 - February 8, 2017
 
 - Added: Clean up temporary files automatically.
-- Changed: Pretty JSON files: `extensions.json`, `syncing.json`, make it a little more user-friendly (Thanks [@fengcen](https://github.com/fengcen) for the advice).
+- Changed: Pretty JSON files: `extensions.json`, `syncing.json`, make it a little more user-friendly (Thank [@fengcen](https://github.com/fengcen) for the advice).
 
 
 ## 1.2.8 - December 30, 2016
