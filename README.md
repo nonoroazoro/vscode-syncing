@@ -110,6 +110,8 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. Type `upload` in `VSCode Command Palette`.
 
+            ![settings and gist](docs/png/5.png)
+
         1. Enter your `GitHub Personal Access Token`.
 
         1. Enter your `Gist ID` (or `leave it blank` to create automatically).
@@ -123,6 +125,8 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
     1. **Download**:
 
         1. Type `download` in `VSCode Command Palette`.
+
+            ![settings and gist](docs/png/6.png)
 
         1. Enter your `GitHub Personal Access Token` (or `leave it blank` if you want to download from a public Gist)
 
