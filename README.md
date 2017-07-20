@@ -133,3 +133,7 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
         1. Enter your `Gist ID` (or a `public Gist ID`).
 
         1. Done!
+
+    1. **Example**:
+        
+        ![upload example](docs/gif/Example-Upload.gif)
