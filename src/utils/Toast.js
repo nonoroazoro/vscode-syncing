@@ -148,20 +148,30 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
         return p_api.getAll()
             .then((gists) =>
             {
-                const items = gists.map((gist) => ({
-                    label: `Gist ID: ${gist.id}`,
-                    description: `Last uploaded ${moment.duration(new Date(gist.updated_at) - new Date()).humanize(true)}.`,
-                    data: gist.id
-                }));
-                items.unshift({
+                const manualItem = {
                     label: `Enter Gist ID manually...`,
                     data: "@@manual"
-                });
-                return vscode.window.showQuickPick(items, {
-                    ignoreFocusOut: true,
-                    matchOnDescription: true,
-                    placeHolder: `Choose a Gist to ${p_forUpload ? "upload" : "download"} your settings.`
-                });
+                };
+
+                // don't show quick pick dialog when gists is empty.
+                if (gists && gists.length > 0)
+                {
+                    const items = gists.map((gist) => ({
+                        label: `Gist ID: ${gist.id}`,
+                        description: `Last uploaded ${moment.duration(new Date(gist.updated_at) - new Date()).humanize(true)}.`,
+                        data: gist.id
+                    }));
+                    items.unshift(manualItem);
+                    return vscode.window.showQuickPick(items, {
+                        ignoreFocusOut: true,
+                        matchOnDescription: true,
+                        placeHolder: `Choose a Gist to ${p_forUpload ? "upload" : "download"} your settings.`
+                    });
+                }
+                else
+                {
+                    return manualItem;
+                }
             })
             .then((item) =>
             {
