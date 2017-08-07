@@ -114,9 +114,7 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. Enter your `GitHub Personal Access Token`.
 
-        1. Select a `Gist ID` (or select `Enter Gist ID manually`) from the list.
-
-        1. Enter your `Gist ID` (or `leave it blank` to create automatically).
+        1. Select or enter your `Gist ID` (or `leave it blank` to create automatically).
 
         1. Done!
 
@@ -132,10 +130,10 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. Enter your `GitHub Personal Access Token` (or `leave it blank` if you want to download from a public Gist)
 
-        1. Enter your `Gist ID` (or a `public Gist ID`).
+        1. Select or enter your `Gist ID` (or a `public Gist ID`).
 
         1. Done!
 
-    1. **Quick Example**:
+    1. **A Quick Example**:
 
         ![upload example](docs/gif/Example-Upload.gif)
