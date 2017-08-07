@@ -88,19 +88,19 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
     1. **Login to your `Settings` page.**
 
-        ![login to settings page](docs/png/0.png)
+        ![login to settings page](docs/png/Settings.png)
 
     1. **Select `Personal access tokens` tab and click `Generate new token`.**
 
-        ![generate new token](docs/png/1.png)
+        ![generate new token](docs/png/Generate-New-Token.png)
 
     1. **Select `gist` and click `Generate token`.**
 
-        ![allow gist](docs/png/2.png)
+        ![allow gist](docs/png/Allow-Gist.png)
 
     1. **Copy and backup your token.**
 
-        ![copy and backup token](docs/png/3.png)
+        ![copy and backup token](docs/png/Copy-Token.png)
 
 1. Sync your settings:
 
@@ -110,9 +110,11 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. Type `upload` in `VSCode Command Palette`.
 
-            ![settings and gist](docs/png/5.png)
+            ![upload settings](docs/png/Upload-Settings.png)
 
         1. Enter your `GitHub Personal Access Token`.
+
+        1. Select a `Gist ID` (or select `Enter Gist ID manually`) from the list.
 
         1. Enter your `Gist ID` (or `leave it blank` to create automatically).
 
@@ -120,13 +122,13 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. After uploading, you can find your settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com).
 
-            ![settings and gist](docs/png/4.png)
+            ![gist](docs/png/Gist.png)
 
     1. **Download**:
 
         1. Type `download` in `VSCode Command Palette`.
 
-            ![settings and gist](docs/png/6.png)
+            ![download settings](docs/png/Download-Settings.png)
 
         1. Enter your `GitHub Personal Access Token` (or `leave it blank` if you want to download from a public Gist)
 
@@ -134,6 +136,6 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. Done!
 
-    1. **Example**:
-        
+    1. **Quick Example**:
+
         ![upload example](docs/gif/Example-Upload.gif)
