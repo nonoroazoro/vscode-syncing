@@ -4,7 +4,7 @@
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 
-*Syncing* is designed to **sync all of your VSCode settings** with GitHub Gist. <a href="#getting-started">Getting started!</a>
+*Syncing* is designed to **sync all of your VSCode settings** with GitHub Gist. <a href="#getting-started">Getting started!</a> or <a href="#example">check out the example</a>.
 
 > *Keep it simple & reliable*.
 
@@ -84,7 +84,7 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
 ## Getting Started
 
-1. Get your own `GitHub Personal Access Token`:
+1. Get your own `GitHub Personal Access Token`
 
     1. **Login to your `Settings` page.**
 
@@ -102,11 +102,11 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         ![copy and backup token](docs/png/Copy-Token.png)
 
-1. Sync your settings:
+1. Sync your settings
 
     *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
 
-    1. **Upload**:
+    1. **Upload**
 
         1. Type `upload` in `VSCode Command Palette`.
 
@@ -122,7 +122,7 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
             ![gist](docs/png/Gist.png)
 
-    1. **Download**:
+    1. **Download**
 
         1. Type `download` in `VSCode Command Palette`.
 
@@ -134,6 +134,6 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. Done!
 
-    1. **A Quick Example**:
+## **Example**
 
-        ![upload example](docs/gif/Example-Upload.gif)
+![upload example](docs/gif/Example-Upload.gif)
