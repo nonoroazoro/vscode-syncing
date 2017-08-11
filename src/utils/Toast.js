@@ -8,7 +8,7 @@ const vscode = require("vscode");
 /**
  * toast message in vscode status bar. auto-hide the message when `p_time` is set.
  * @param {String} p_message message to show.
- * @param {number} [p_time=2000] hide after time.
+ * @param {number} p_time hide after time.
  */
 function status(p_message, p_time)
 {
