@@ -1,6 +1,7 @@
 ## Specifications
 
 * OS Version:
+
 * VSCode Version:
 
 ## Expected Behavior
@@ -12,5 +13,7 @@
 ## Steps to Reproduce
 
 1.
+
 1.
+
 1.
