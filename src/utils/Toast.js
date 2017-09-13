@@ -221,6 +221,65 @@ function showReloadBox()
     });
 }
 
+let spinnerTimer = null;
+const spinner = {
+    interval: 100,
+    frames: ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+};
+
+/**
+ * show a message with spinner and progress.
+ * @param {String} p_message message to display after spinner.
+ * @param {Number} p_progress current progress.
+ * @param {Number} p_total total progress.
+ */
+function showSpinner(p_message, p_progress, p_total)
+{
+    if (spinnerTimer)
+    {
+        clearInterval(spinnerTimer);
+    }
+
+    let text = "";
+    if (p_progress !== undefined && p_progress !== null && p_total !== undefined && p_total !== null)
+    {
+        text = `[${p_progress}/${p_total}]`;
+    }
+
+    if (p_message !== undefined && p_message !== null && p_message !== "")
+    {
+        text = text ? `${text} ${p_message}` : `${p_message}`;
+    }
+
+    if (text)
+    {
+        text = ` ${text}`;
+    }
+
+    let step = 0;
+    const frames = spinner.frames;
+    const length = frames.length;
+    spinnerTimer = setInterval(() =>
+    {
+        status(`${frames[step]}${text}`);
+        step = (step + 1) % length;
+    }, spinner.interval);
+}
+
+/**
+ * clear spinner and show message, do nothing if currently no spinner is exist, .
+ * @param {String} p_message
+ */
+function clearSpinner(p_message)
+{
+    if (spinnerTimer)
+    {
+        clearInterval(spinnerTimer);
+        spinnerTimer = null;
+        status(p_message);
+    }
+}
+
 module.exports = {
     status,
     statusInfo,
@@ -229,5 +288,7 @@ module.exports = {
     showGistInputBox,
     showRemoteGistListBox,
     showGitHubTokenInputBox,
-    showReloadBox
+    showReloadBox,
+    showSpinner,
+    clearSpinner
 };
