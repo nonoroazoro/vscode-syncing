@@ -75,7 +75,7 @@ function showGitHubTokenInputBox(p_forUpload = true)
             if (value === undefined)
             {
                 // reject if cancelled.
-                p_reject(new Error("you abort the synchronization."));
+                p_reject(new Error("You abort the synchronization."));
             }
             else
             {
@@ -83,7 +83,7 @@ function showGitHubTokenInputBox(p_forUpload = true)
                 if (p_forUpload && !token)
                 {
                     // only reject when uploading.
-                    p_reject(new Error("the GitHub Personal Access Token is not set."));
+                    p_reject(new Error("The GitHub Personal Access Token is not set."));
                 }
                 else
                 {
@@ -117,7 +117,7 @@ function showGistInputBox(p_forUpload = true)
             if (value === undefined)
             {
                 // reject if cancelled.
-                p_reject(new Error("you abort the synchronization."));
+                p_reject(new Error("You abort the synchronization."));
             }
             else
             {
@@ -125,7 +125,7 @@ function showGistInputBox(p_forUpload = true)
                 if (!p_forUpload && !id)
                 {
                     // only reject when downloading.
-                    p_reject(new Error("the Gist ID is not set."));
+                    p_reject(new Error("The Gist ID is not set."));
                 }
                 else
                 {
@@ -150,6 +150,8 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
         return p_api.getAll()
             .then((gists) =>
             {
+                this.clearSpinner("");
+
                 const manualItem = {
                     label: `Enter Gist ID manually...`,
                     data: "@@manual"
@@ -200,7 +202,7 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
                 }
                 else
                 {
-                    p_reject(new Error("you abort the synchronization."));
+                    p_reject(new Error("You abort the synchronization."));
                 }
             })
             .catch(p_reject);
