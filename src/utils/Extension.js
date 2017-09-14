@@ -160,10 +160,6 @@ class Extension
                 },
                 () =>
                 {
-                    if (showIndicator)
-                    {
-                        Toast.clearSpinner("");
-                    }
                     p_resolve(result);
                 }
             );
@@ -230,10 +226,6 @@ class Extension
                 },
                 () =>
                 {
-                    if (showIndicator)
-                    {
-                        Toast.clearSpinner("");
-                    }
                     p_resolve(result);
                 }
             );
@@ -278,10 +270,6 @@ class Extension
                 },
                 () =>
                 {
-                    if (showIndicator)
-                    {
-                        Toast.clearSpinner("");
-                    }
                     p_resolve(result);
                 }
             );
