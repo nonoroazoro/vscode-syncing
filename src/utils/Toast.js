@@ -12,6 +12,8 @@ const vscode = require("vscode");
  */
 function status(p_message, p_time)
 {
+    clearSpinner();
+
     if (p_time)
     {
         vscode.window.setStatusBarMessage("");
@@ -235,10 +237,7 @@ const spinner = {
  */
 function showSpinner(p_message, p_progress, p_total)
 {
-    if (spinnerTimer)
-    {
-        clearInterval(spinnerTimer);
-    }
+    clearSpinner();
 
     let text = "";
     if (p_progress !== undefined && p_progress !== null && p_total !== undefined && p_total !== null)
@@ -261,7 +260,7 @@ function showSpinner(p_message, p_progress, p_total)
     const length = frames.length;
     spinnerTimer = setInterval(() =>
     {
-        status(`${frames[step]}${text}`);
+        vscode.window.setStatusBarMessage(`${frames[step]}${text}`);
         step = (step + 1) % length;
     }, spinner.interval);
 }
@@ -276,7 +275,11 @@ function clearSpinner(p_message)
     {
         clearInterval(spinnerTimer);
         spinnerTimer = null;
-        status(p_message);
+
+        if (p_message !== undefined && p_message !== null)
+        {
+            vscode.window.setStatusBarMessage(p_message);
+        }
     }
 }
 
