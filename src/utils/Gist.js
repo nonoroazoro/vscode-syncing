@@ -73,33 +73,52 @@ class Gist
     /**
      * get gist of the authenticated user.
      * @param {String} p_id gist id.
+     * @param {Boolean} [p_showIndicator=false] default is false, don't show progress indicator.
      * @returns {Promise}
      */
-    get(p_id)
+    get(p_id, p_showIndicator = false)
     {
         return new Promise((p_resolve, p_reject) =>
         {
-            this._api.gists.get({ id: p_id }).then((gist) =>
+            function resolveWrap(p_value)
             {
-                p_resolve(gist);
-            }).catch((err) =>
+                if (p_showIndicator)
+                {
+                    Toast.clearSpinner("");
+                }
+                p_resolve(p_value);
+            }
+
+            function rejectWrap(p_error)
             {
+                if (p_showIndicator)
+                {
+                    Toast.statusError(`Syncing: Downloading failed. ${p_error.message}`);
+                }
+                p_reject(p_error);
+            }
+
+            if (p_showIndicator)
+            {
+                Toast.showSpinner("Syncing: Checking remote settings.");
+            }
+
+            this._api.gists.get({ id: p_id }).then(resolveWrap).catch((err) =>
+            {
+                let error = new Error("Please check your Internet connection.");
+                error.code = err.code;
+
                 if (err.code === 401)
                 {
-                    const error = new Error("Please check your GitHub Personal Access Token.");
+                    error = new Error("Please check your GitHub Personal Access Token.");
                     error.code = err.code;
-                    p_reject(error);
                 }
                 else if (err.code === 404)
                 {
-                    const error = new Error("Please check your Gist ID.");
+                    error = new Error("Please check your Gist ID.");
                     error.code = err.code;
-                    p_reject(error);
                 }
-                else
-                {
-                    p_reject(new Error("Please check your Internet connection."));
-                }
+                rejectWrap(error);
             });
         });
     }
