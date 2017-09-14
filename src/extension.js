@@ -74,7 +74,7 @@ function _uploadSettings()
                 }
             });
         });
-    }).catch(noop);
+    }).catch(_noop);
 }
 
 /**
@@ -82,17 +82,15 @@ function _uploadSettings()
  */
 function _downloadSettings()
 {
-    Toast.status("Syncing: checking remote settings...");
-    _config.prepareDownloadSettings().then((settings) =>
+    _config.prepareDownloadSettings(true).then((settings) =>
     {
         const api = Gist.create(settings.token, _env.getSyncingProxy());
-        api.get(settings.id).then((gist) =>
+        return api.get(settings.id, true).then((gist) =>
         {
-            Toast.status("Syncing: downloading settings...");
-            return _config.saveConfigs(gist.files).then((synced) =>
+            return _config.saveConfigs(gist.files, true).then((synced) =>
             {
                 // TODO: log synced files.
-                Toast.statusInfo("Syncing: settings downloaded.");
+                Toast.statusInfo("Syncing: Settings downloaded.");
                 if (_isExtensionsSynced(synced))
                 {
                     Toast.showReloadBox();
@@ -102,27 +100,14 @@ function _downloadSettings()
         {
             if (err.code === 401)
             {
-                _config.clearSyncingToken().then(() =>
-                {
-                    Toast.statusError(`Syncing: download failed. ${err.message}`);
-                });
+                _config.clearSyncingToken();
             }
             else if (err.code === 404)
             {
-                _config.clearSyncingID().then(() =>
-                {
-                    Toast.statusError(`Syncing: download failed. ${err.message}`);
-                });
-            }
-            else
-            {
-                Toast.statusError(`Syncing: download failed. ${err.message}`);
+                _config.clearSyncingID();
             }
         });
-    }).catch((err) =>
-    {
-        Toast.statusError(`Syncing: canceled. ${err.message}`);
-    });
+    }).catch(_noop);
 }
 
 /**
@@ -175,6 +160,6 @@ function _openFile(p_filepath)
 /**
  * do nothing.
  */
-function noop(e) { }
+function _noop() { }
 
 module.exports.activate = activate;
