@@ -268,7 +268,7 @@ function showSpinner(p_message, p_progress, p_total)
 
 /**
  * clear spinner and show message, do nothing if currently no spinner is exist, .
- * @param {String} p_message
+ * @param {String} p_message message to show.
  */
 function clearSpinner(p_message)
 {
