@@ -2,6 +2,7 @@
 
 ## 1.4.7 - September 14, 2017
 
+- Added: Disable upload and download commands when the synchronization is in progress.
 - Changed: Validation of Gist id.
 - Trying to fix shit: Getting Started and Example anchors aren't working in VSCode.
 
