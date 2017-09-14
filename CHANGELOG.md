@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.4.6 - September 14, 2017
+
+- Fixed: Getting Started link and Example link.
+
+
 ## 1.4.5 - September 14, 2017
 
 - Added: Progress indicator of synchronization.
