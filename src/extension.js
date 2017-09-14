@@ -9,6 +9,7 @@ const Environment = require("./utils/Environment");
 
 let _env;
 let _config;
+let _isSyncing;
 
 function activate(p_context)
 {
@@ -24,6 +25,7 @@ function _initGlobals(p_context)
 {
     _env = Environment.create(p_context);
     _config = Config.create(p_context);
+    _isSyncing = false;
 
     // TODO: i18n, using vscode.env.language
     moment.locale("en");
@@ -54,27 +56,36 @@ function _registerCommand(p_context, p_command, p_callback)
  */
 function _uploadSettings()
 {
-    _config.prepareUploadSettings(true).then((settings) =>
+    if (!_isSyncing)
     {
-        const api = Gist.create(settings.token, _env.getSyncingProxy());
-        return _config.getConfigs({ load: true, showIndicator: true }).then((configs) =>
+        _isSyncing = true;
+        _config.prepareUploadSettings(true).then((settings) =>
         {
-            return api.findAndUpdate({ id: settings.id, uploads: configs, showIndicator: true }).then((gist) =>
+            const api = Gist.create(settings.token, _env.getSyncingProxy());
+            return _config.getConfigs({ load: true, showIndicator: true }).then((configs) =>
             {
-                if (gist.id === settings.id)
+                return api.findAndUpdate({ id: settings.id, uploads: configs, showIndicator: true }).then((gist) =>
                 {
-                    Toast.statusInfo("Syncing: Settings uploaded.");
-                }
-                else
-                {
-                    _config.saveSyncingSettings(Object.assign({}, settings, { id: gist.id })).then(() =>
+                    if (gist.id === settings.id)
                     {
                         Toast.statusInfo("Syncing: Settings uploaded.");
-                    });
-                }
+                    }
+                    else
+                    {
+                        _config.saveSyncingSettings(Object.assign({}, settings, { id: gist.id })).then(() =>
+                        {
+                            Toast.statusInfo("Syncing: Settings uploaded.");
+                        });
+                    }
+
+                    _isSyncing = false;
+                });
             });
+        }).catch(() =>
+        {
+            _isSyncing = false;
         });
-    }).catch(_noop);
+    }
 }
 
 /**
@@ -82,32 +93,43 @@ function _uploadSettings()
  */
 function _downloadSettings()
 {
-    _config.prepareDownloadSettings(true).then((settings) =>
+    if (!_isSyncing)
     {
-        const api = Gist.create(settings.token, _env.getSyncingProxy());
-        return api.get(settings.id, true).then((gist) =>
+        _isSyncing = true;
+        _config.prepareDownloadSettings(true).then((settings) =>
         {
-            return _config.saveConfigs(gist.files, true).then((synced) =>
+            const api = Gist.create(settings.token, _env.getSyncingProxy());
+            return api.get(settings.id, true).then((gist) =>
             {
-                // TODO: log synced files.
-                Toast.statusInfo("Syncing: Settings downloaded.");
-                if (_isExtensionsSynced(synced))
+                return _config.saveConfigs(gist.files, true).then((synced) =>
                 {
-                    Toast.showReloadBox();
+                    // TODO: log synced files.
+                    Toast.statusInfo("Syncing: Settings downloaded.");
+                    if (_isExtensionsSynced(synced))
+                    {
+                        Toast.showReloadBox();
+                    }
+
+                    _isSyncing = false;
+                });
+            }).catch((err) =>
+            {
+                if (err.code === 401)
+                {
+                    _config.clearSyncingToken();
                 }
+                else if (err.code === 404)
+                {
+                    _config.clearSyncingID();
+                }
+
+                _isSyncing = false;
             });
-        }).catch((err) =>
+        }).catch(() =>
         {
-            if (err.code === 401)
-            {
-                _config.clearSyncingToken();
-            }
-            else if (err.code === 404)
-            {
-                _config.clearSyncingID();
-            }
+            _isSyncing = false;
         });
-    }).catch(_noop);
+    }
 }
 
 /**
@@ -156,10 +178,5 @@ function _openFile(p_filepath)
 {
     vscode.commands.executeCommand("vscode.open", vscode.Uri.file(p_filepath));
 }
-
-/**
- * do nothing.
- */
-function _noop() { }
 
 module.exports.activate = activate;
