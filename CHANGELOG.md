@@ -1,5 +1,12 @@
 # Changelogs
 
+## 1.4.5 - September 14, 2017
+
+- Added: Progress indicator of synchronization.
+- Changed: Enhance user guides.
+- Changed: Various other tweaks.
+
+
 ## 1.4.4 - July 17, 2017
 
 - Fixed: Getting Started link.
@@ -77,7 +84,7 @@
 
 - Changed: Upload and Download dialogs.
 - Changed: Separate error messages of invalid GitHub Personal Access Token and Gist ID.
-- Changed: User Guide.
+- Changed: Enhance user guides.
 
 
 ## 1.2.9 - February 8, 2017
@@ -88,7 +95,7 @@
 
 ## 1.2.8 - December 30, 2016
 
-- Changed: User Guide.
+- Changed: Enhance user guides.
 
 
 ## 1.2.7 - December 30, 2016

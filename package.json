@@ -2,7 +2,7 @@
   "name": "syncing",
   "displayName": "Syncing",
   "description": "Sync every settings with your own GitHub Gist.",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "publisher": "nonoroazoro",
   "author": {
     "email": "xiaochao.k@gmail.com",
