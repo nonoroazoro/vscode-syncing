@@ -337,35 +337,41 @@ class Extension
     {
         return new Promise((p_resolve, p_reject) =>
         {
-            try
+            temp.mkdir("syncing-", (err1, dirPath) =>
             {
-                temp.mkdir("syncing-", (err, res) =>
+                if (err1)
                 {
-                    if (err)
+                    p_reject(`Cannot extract extension: ${p_extension.name}. Access temp folder denied.`);
+                }
+                else
+                {
+                    const zip = new AdmZip(p_extension.zip);
+                    zip.extractAllToAsync(dirPath, true, (err2) =>
                     {
-                        throw err;
-                    }
-                    else
-                    {
-                        const zip = new AdmZip(p_extension.zip);
-                        zip.extractAllTo(res, true);
-                        const extPath = path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`);
-                        fse.copySync(
-                            path.join(res, "extension"),
-                            extPath
-                        );
-
-                        // clear temp file (async).
-                        fse.remove(p_extension.zip);
-
-                        p_resolve(Object.assign({}, p_extension, { path: extPath }));
-                    }
-                });
-            }
-            catch (err)
-            {
-                p_reject(`Cannot extract extension: ${p_extension.name}.`);
-            }
+                        if (err2)
+                        {
+                            p_reject(`Cannot extract extension: ${p_extension.name}. ${err2.message}`);
+                        }
+                        else
+                        {
+                            const extPath = path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`);
+                            fse.copy(path.join(dirPath, "extension"), extPath, (err3) =>
+                            {
+                                if (err3)
+                                {
+                                    p_reject(`Cannot extract extension: ${p_extension.name}. ${err3.message}`);
+                                }
+                                else
+                                {
+                                    // clear temp file (asynchronization and don't wait).
+                                    fse.remove(p_extension.zip);
+                                    p_resolve(Object.assign({}, p_extension, { path: extPath }));
+                                }
+                            });
+                        }
+                    });
+                }
+            });
         });
     }
 
