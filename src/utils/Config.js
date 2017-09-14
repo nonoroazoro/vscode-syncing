@@ -462,13 +462,19 @@ class Config
     /**
      * prepare Syncing's settings, will ask for settings if not exist.
      * @param {Boolean} [p_forUpload=true] default is true, GitHub token must exist, but Gist ID could be none, else, GitHub token could be none, but Gist ID must exist.
+     * @param {Boolean} [p_showIndicator=true] default is true, show progress indicator.
      * @returns {Promise}
      */
-    prepareSyncingSettings(p_forUpload = true)
+    prepareSyncingSettings(p_forUpload = true, p_showIndicator = true)
     {
         // GitHub token could be none, but Gist ID must exist.
         return new Promise((p_resolve, p_reject) =>
         {
+            if (p_showIndicator)
+            {
+                Toast.showSpinner("Syncing: Checking Syncing's settings.");
+            }
+
             const settings = this.loadSyncingSettings();
             if (settings.token && settings.id)
             {
