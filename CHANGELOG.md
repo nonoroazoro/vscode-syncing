@@ -1,5 +1,11 @@
 # Changelogs
 
+## 1.4.7 - September 14, 2017
+
+- Changed: Validation of Gist id.
+- Trying to fix shit: Getting Started and Example anchors aren't working in VSCode.
+
+
 ## 1.4.6 - September 14, 2017
 
 - Fixed: Getting Started link and Example link.
