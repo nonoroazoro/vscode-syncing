@@ -195,13 +195,37 @@ class Config
 
     /**
      * save vscode configs to files.
-     * @param  {Object} vscode configs from Gist.
+     * @param {Object} vscode configs from Gist.
+     * @param {Boolean} [p_showIndicator=false] default is false, don't show progress indicator.
      * @returns {Promise}
      */
-    saveConfigs(p_files)
+    saveConfigs(p_files, p_showIndicator)
     {
         return new Promise((p_resolve, p_reject) =>
         {
+            function resolveWrap(p_value)
+            {
+                if (p_showIndicator)
+                {
+                    Toast.clearSpinner("");
+                }
+                p_resolve(p_value);
+            }
+
+            function rejectWrap(p_error)
+            {
+                if (p_showIndicator)
+                {
+                    Toast.statusError(`Syncing: Downloading failed. ${p_error.message}`);
+                }
+                p_reject(p_error);
+            }
+
+            if (p_showIndicator)
+            {
+                Toast.showSpinner("Syncing: Downloading settings.");
+            }
+
             if (p_files)
             {
                 let extensionsFile;
@@ -290,15 +314,15 @@ class Config
                         {
                             if (err)
                             {
-                                p_reject(err);
+                                rejectWrap(err);
                             }
                             else
                             {
                                 this.removeConfigs(removeFiles).then((removed) =>
                                 {
                                     syncedFiles.removed = removed;
-                                    p_resolve(syncedFiles);
-                                }).catch(p_reject);
+                                    resolveWrap(syncedFiles);
+                                }).catch(rejectWrap);
                             }
                         }
                     );
@@ -306,7 +330,7 @@ class Config
             }
             else
             {
-                p_reject(new Error("Cannot save empty Gist files"));
+                rejectWrap(new Error("Cannot save empty Gist files."));
             }
         });
     }
@@ -357,7 +381,7 @@ class Config
             {
                 try
                 {
-                    this._extension.sync(JSON.parse(p_item.content))
+                    this._extension.sync(JSON.parse(p_item.content), true)
                         .then(p_resolve).catch(p_reject);
                 }
                 catch (err)
@@ -502,7 +526,7 @@ class Config
             {
                 if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: ${forUpload ? "Uploading" : "Downloading"} Canceled. ${p_error.message}`);
+                    Toast.statusError(`Syncing: ${forUpload ? "Uploading" : "Downloading"} canceled. ${p_error.message}`);
                 }
                 p_reject(p_error);
             }
