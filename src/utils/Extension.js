@@ -131,7 +131,7 @@ class Extension
 
                     if (showIndicator)
                     {
-                        Toast.showSpinner(`Syncing: Downloading extension: ${item.name}`, steps, total);
+                        Toast.showSpinner(`Syncing: Downloading extension: ${item.id}`, steps, total);
                     }
 
                     this.downloadExtension(item)
@@ -139,7 +139,7 @@ class Extension
                         {
                             if (showIndicator)
                             {
-                                Toast.showSpinner(`Syncing: Installing extension: ${item.name}`, steps, total);
+                                Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
                             }
                             return this.extractExtension(extension);
                         })
@@ -189,7 +189,7 @@ class Extension
 
                     if (showIndicator)
                     {
-                        Toast.showSpinner(`Syncing: Downloading extension: ${item.name}`, steps, total);
+                        Toast.showSpinner(`Syncing: Downloading extension: ${item.id}`, steps, total);
                     }
 
                     this.downloadExtension(item)
@@ -197,7 +197,7 @@ class Extension
                         {
                             if (showIndicator)
                             {
-                                Toast.showSpinner(`Syncing: Removing outdated extension: ${item.name}`, steps, total);
+                                Toast.showSpinner(`Syncing: Removing outdated extension: ${item.id}`, steps, total);
                             }
                             return this.uninstallExtension(extension);
                         })
@@ -205,7 +205,7 @@ class Extension
                         {
                             if (showIndicator)
                             {
-                                Toast.showSpinner(`Syncing: Installing extension: ${item.name}`, steps, total);
+                                Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
                             }
                             return this.extractExtension(extension);
                         })
@@ -255,7 +255,7 @@ class Extension
 
                     if (showIndicator)
                     {
-                        Toast.showSpinner(`Syncing: Uninstalling extension: ${item.name}`, steps, total);
+                        Toast.showSpinner(`Syncing: Uninstalling extension: ${item.id}`, steps, total);
                     }
 
                     this.uninstallExtension(item).then(() =>
@@ -329,7 +329,7 @@ class Extension
             {
                 if (err1)
                 {
-                    p_reject(`Cannot extract extension: ${p_extension.name}. Access temp folder denied.`);
+                    p_reject(`Cannot extract extension: ${p_extension.id}. Access temp folder denied.`);
                 }
                 else
                 {
@@ -338,7 +338,7 @@ class Extension
                     {
                         if (err2)
                         {
-                            p_reject(`Cannot extract extension: ${p_extension.name}. ${err2.message}`);
+                            p_reject(`Cannot extract extension: ${p_extension.id}. ${err2.message}`);
                         }
                         else
                         {
@@ -347,7 +347,7 @@ class Extension
                             {
                                 if (err3)
                                 {
-                                    p_reject(`Cannot extract extension: ${p_extension.name}. ${err3.message}`);
+                                    p_reject(`Cannot extract extension: ${p_extension.id}. ${err3.message}`);
                                 }
                                 else
                                 {
