@@ -269,7 +269,6 @@ class Gist
             {
                 if (showIndicator)
                 {
-                    Toast.showSpinner("Syncing: Uploading settings.", 3, 3);
                     Toast.clearSpinner("");
                 }
                 p_resolve(p_value);
@@ -286,16 +285,11 @@ class Gist
 
             if (showIndicator)
             {
-                Toast.showSpinner("Syncing: Uploading settings.", 1, 3);
+                Toast.showSpinner("Syncing: Uploading settings.");
             }
 
             this.exists(id).then((exists) =>
             {
-                if (showIndicator)
-                {
-                    Toast.showSpinner("Syncing: Uploading settings.", 2, 3);
-                }
-
                 const gist = { id: id, files: {} };
                 for (const item of uploads)
                 {
