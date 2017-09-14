@@ -50,6 +50,15 @@ class Config
     {
         return new Promise((p_resolve) =>
         {
+            function resolveWrap(p_value)
+            {
+                if (showIndicator)
+                {
+                    Toast.clearSpinner("");
+                }
+                p_resolve(p_value);
+            }
+
             if (showIndicator)
             {
                 Toast.showSpinner("Syncing: Gathering local settings.");
@@ -151,11 +160,7 @@ class Config
                     {
                         console.log(`Some of the VSCode's settings are invalid (will be ignored): ${errors.join(" ")}`);
                     }
-                    if (showIndicator)
-                    {
-                        Toast.clearSpinner("");
-                    }
-                    p_resolve(results);
+                    resolveWrap(results);
                 }
             );
         });
