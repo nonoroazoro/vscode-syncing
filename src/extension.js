@@ -54,35 +54,27 @@ function _registerCommand(p_context, p_command, p_callback)
  */
 function _uploadSettings()
 {
-    Toast.status("Syncing: gathering local settings...");
-    _config.prepareUploadSettings().then((settings) =>
+    _config.prepareUploadSettings(true).then((settings) =>
     {
         const api = Gist.create(settings.token, _env.getSyncingProxy());
-        _config.getConfigs({ load: true }).then((configs) =>
+        return _config.getConfigs({ load: true, showIndicator: true }).then((configs) =>
         {
-            Toast.status("Syncing: uploading settings...");
-            return api.findAndUpdate(settings.id, configs).then((gist) =>
+            return api.findAndUpdate({ id: settings.id, uploads: configs, showIndicator: true }).then((gist) =>
             {
                 if (gist.id === settings.id)
                 {
-                    Toast.statusInfo("Syncing: settings uploaded.");
+                    Toast.statusInfo("Syncing: Settings uploaded.");
                 }
                 else
                 {
                     _config.saveSyncingSettings(Object.assign({}, settings, { id: gist.id })).then(() =>
                     {
-                        Toast.statusInfo("Syncing: settings uploaded.");
+                        Toast.statusInfo("Syncing: Settings uploaded.");
                     });
                 }
             });
-        }).catch((err) =>
-        {
-            Toast.statusError(`Syncing: upload failed. ${err.message}`);
         });
-    }).catch((err) =>
-    {
-        Toast.statusError(`Syncing: canceled. ${err.message}`);
-    });
+    }).catch(noop);
 }
 
 /**
@@ -179,5 +171,10 @@ function _openFile(p_filepath)
 {
     vscode.commands.executeCommand("vscode.open", vscode.Uri.file(p_filepath));
 }
+
+/**
+ * do nothing.
+ */
+function noop(e) { }
 
 module.exports.activate = activate;
