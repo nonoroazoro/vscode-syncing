@@ -30,8 +30,10 @@ class Config
 
     /**
      * get vscode configs list (will be uploaded or downloaded, anyway).
-     * @param  {Object} [{ full = false, load = false }={}] full: default is false, the result is corresponding to current OS.
-     * load: default is false, do not load file contens.
+     * @param {Object} [{ full = false, load = false }={}]
+     *     full: default is false, the result is corresponding to current OS.
+     *     load: default is false, do not load file contents.
+     *     showIndicator: default is false, don't show progress indicator.
      * @returns {Promise}
      * for example:
      *    [
@@ -44,10 +46,15 @@ class Config
      *        ...
      *    ]
      */
-    getConfigs({ full = false, load = false } = {})
+    getConfigs({ full = false, load = false, showIndicator = false } = {})
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((p_resolve) =>
         {
+            if (showIndicator)
+            {
+                Toast.showSpinner("Syncing: Gathering local settings.");
+            }
+
             // the item order is very important to ensure that the small files are synced first.
             // thus, the extensions will be the last one to sync.
             const list = [
@@ -143,6 +150,10 @@ class Config
                     if (errors.length > 0)
                     {
                         console.log(`Some of the VSCode's settings are invalid (will be ignored): ${errors.join(" ")}`);
+                    }
+                    if (showIndicator)
+                    {
+                        Toast.clearSpinner();
                     }
                     p_resolve(results);
                 }
@@ -441,36 +452,58 @@ class Config
 
     /**
      * prepare Syncing's settings for upload.
+     * @param {Boolean} [p_showIndicator=false] default is false, don't show progress indicator.
      * @returns {Promise}
      */
-    prepareUploadSettings()
+    prepareUploadSettings(p_showIndicator = false)
     {
         // GitHub token must exist, but Gist ID could be none.
-        return this.prepareSyncingSettings();
+        return this.prepareSyncingSettings({ showIndicator: p_showIndicator });
     }
 
     /**
      * prepare Syncing's settings for download.
+     * @param {Boolean} [p_showIndicator=false] default is false, don't show progress indicator.
      * @returns {Promise}
      */
-    prepareDownloadSettings()
+    prepareDownloadSettings(p_showIndicator = false)
     {
         // GitHub token could be none, but Gist ID must exist.
-        return this.prepareSyncingSettings(false);
+        return this.prepareSyncingSettings({ forUpload: false, showIndicator: p_showIndicator });
     }
 
     /**
      * prepare Syncing's settings, will ask for settings if not exist.
-     * @param {Boolean} [p_forUpload=true] default is true, GitHub token must exist, but Gist ID could be none, else, GitHub token could be none, but Gist ID must exist.
-     * @param {Boolean} [p_showIndicator=true] default is true, show progress indicator.
+     * @param {Object} [{ forUpload = true, showIndicator = false }={}]
+     *     [forUpload=true]: default is true, GitHub token must exist, but Gist ID could be none when uploading, else, GitHub token could be none, but Gist ID must exist.
+     *     [showIndicator=false]: default is false, don't show progress indicator.
      * @returns {Promise}
      */
-    prepareSyncingSettings(p_forUpload = true, p_showIndicator = true)
+    prepareSyncingSettings({ forUpload = true, showIndicator = false } = {})
     {
         // GitHub token could be none, but Gist ID must exist.
         return new Promise((p_resolve, p_reject) =>
         {
-            if (p_showIndicator)
+            function resolveWrap(p_value)
+            {
+                if (showIndicator)
+                {
+                    Toast.clearSpinner();
+                }
+                p_resolve(p_value);
+            }
+
+            function rejectWrap(p_error)
+            {
+                if (showIndicator)
+                {
+                    Toast.clearSpinner();
+                    Toast.statusError(`Syncing: Canceled. ${p_error.message}`);
+                }
+                p_reject(p_error);
+            }
+
+            if (showIndicator)
             {
                 Toast.showSpinner("Syncing: Checking Syncing's settings.");
             }
@@ -478,7 +511,7 @@ class Config
             const settings = this.loadSyncingSettings();
             if (settings.token && settings.id)
             {
-                p_resolve(settings);
+                resolveWrap(settings);
             }
             else
             {
@@ -491,12 +524,12 @@ class Config
                     }
                     else
                     {
-                        gistIDTask = this._requestGistID(settings.token, p_forUpload);
+                        gistIDTask = this._requestGistID(settings.token, forUpload);
                     }
                 }
                 else
                 {
-                    gistIDTask = Toast.showGitHubTokenInputBox(p_forUpload).then(({ token }) =>
+                    gistIDTask = Toast.showGitHubTokenInputBox(forUpload).then(({ token }) =>
                     {
                         settings.token = token;
                         if (settings.id)
@@ -505,7 +538,7 @@ class Config
                         }
                         else
                         {
-                            return this._requestGistID(token, p_forUpload);
+                            return this._requestGistID(token, forUpload);
                         }
                     });
                 }
@@ -513,14 +546,8 @@ class Config
                 gistIDTask.then(({ id }) =>
                 {
                     settings.id = id;
-                    this.saveSyncingSettings(settings).then(() =>
-                    {
-                        p_resolve(settings);
-                    });
-                }).catch((err) =>
-                {
-                    p_reject(err);
-                });
+                    this.saveSyncingSettings(settings).then(() => resolveWrap(settings));
+                }).catch(rejectWrap);
             }
         });
     }
