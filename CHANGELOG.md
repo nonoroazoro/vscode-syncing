@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.4.8 - September 14, 2017
+
+- Revert shit: Getting Started and Example anchors aren't working in VSCode.
+
+
 ## 1.4.7 - September 14, 2017
 
 - Added: Disable upload and download commands when the synchronization is in progress.
