@@ -270,6 +270,7 @@ class Gist
                 if (showIndicator)
                 {
                     Toast.showSpinner("Syncing: Uploading settings.", 3, 3);
+                    Toast.clearSpinner("");
                 }
                 p_resolve(p_value);
             }
@@ -278,7 +279,6 @@ class Gist
             {
                 if (showIndicator)
                 {
-                    Toast.clearSpinner();
                     Toast.statusError(`Syncing: Uploading failed. ${p_error.message}`);
                 }
                 p_reject(p_error);
