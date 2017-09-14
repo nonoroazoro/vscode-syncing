@@ -4,7 +4,7 @@
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 
-*Syncing* is designed to **sync all of your VSCode settings** with GitHub Gist. <a href="#getting-started">Getting started!</a> or <a href="#example">check out the example</a>.
+*Syncing* is designed to **sync all of your VSCode settings** with GitHub Gist. <a href="#user-content-getting-started">Getting started!</a> or <a href="#user-content-example">check out the example</a>.
 
 > *Keep it simple & reliable*.
 
@@ -134,6 +134,6 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. Done!
 
-## **Example**
+## Example
 
 ![upload example](docs/gif/Example-Upload.gif)
