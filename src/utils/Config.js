@@ -153,7 +153,7 @@ class Config
                     }
                     if (showIndicator)
                     {
-                        Toast.clearSpinner();
+                        Toast.clearSpinner("");
                     }
                     p_resolve(results);
                 }
@@ -488,7 +488,7 @@ class Config
             {
                 if (showIndicator)
                 {
-                    Toast.clearSpinner();
+                    Toast.clearSpinner("");
                 }
                 p_resolve(p_value);
             }
@@ -497,7 +497,6 @@ class Config
             {
                 if (showIndicator)
                 {
-                    Toast.clearSpinner();
                     Toast.statusError(`Syncing: Canceled. ${p_error.message}`);
                 }
                 p_reject(p_error);
