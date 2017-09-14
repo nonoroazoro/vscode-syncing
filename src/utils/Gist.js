@@ -194,7 +194,7 @@ class Gist
     {
         return new Promise((p_resolve) =>
         {
-            if (p_id)
+            if (p_id && p_id.trim() !== "")
             {
                 this.get(p_id)
                     .then((gist) =>
