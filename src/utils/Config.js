@@ -502,7 +502,7 @@ class Config
             {
                 if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: Canceled. ${p_error.message}`);
+                    Toast.statusError(`Syncing: ${forUpload ? "Uploading" : "Downloading"} Canceled. ${p_error.message}`);
                 }
                 p_reject(p_error);
             }
