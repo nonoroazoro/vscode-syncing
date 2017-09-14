@@ -146,7 +146,7 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
 {
     return new Promise((p_resolve, p_reject) =>
     {
-        this.status("Syncing: checking remote Gists...");
+        this.showSpinner("Syncing: Checking remote Gists.");
         return p_api.getAll()
             .then((gists) =>
             {
@@ -213,7 +213,7 @@ function showRemoteGistListBox(p_api, p_forUpload = true)
 function showReloadBox()
 {
     const title = "Reload";
-    const message = "Syncing: Extensions are successfully synced. Reload VSCode to take effect.";
+    const message = "Syncing: Settings are successfully synced. Reload VSCode to take effect.";
     vscode.window.showInformationMessage(message, { title: title }).then((btn) =>
     {
         if (btn && btn.title === title)
