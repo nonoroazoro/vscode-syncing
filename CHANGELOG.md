@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.4.9 - September 15, 2017
+
+- Changed: Enhance user guides.
+
+
 ## 1.4.8 - September 14, 2017
 
 - Revert shit: Getting Started and Example anchors aren't working in VSCode.
