@@ -4,29 +4,27 @@
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 
-*Syncing ([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is designed to **sync all of your VSCode settings** with GitHub Gist. [Getting started!](#getting-started) or [check out the example](#example)
+*Syncing ([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **sync every settings of VSCode across multiple devices** with GitHub Gist. [Getting started!](#getting-started) or [check out the example](#example).
 
 > *Keep it simple & reliable*.
 
 
 ## Features
 
-In order to **keep it as simple as possible**, there will be only two features:
+*Syncing* will `keep the consistency of your VSCode settings between local and remote`, and let you:
 
-1. **Upload**:
+1. **Upload Settings**:
 
-    * Upload `settings, locale, snippets, keybindings, extensions`.
-    * Auto separate `Mac` and `non-Mac`'s `settings` and `keybindings` in case you have multiple devices.
-    * Auto create new Gist if it doesn't exist in remote.
-    * Auto remove remote files if they've been removed in local.
-    * Auto exclude unmodified settings to speed up the synchronization.
+    * Include `settings, keybindings, extensions, locales` and `snippets`.
+    * The `settings` and `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
+    * Automatically create new Gist if you leave it blank or it doesn't exist in your GitHub Gist.
+    * Use an incremental algorithm to boost the synchronization.
 
-1. **Download**:
+1. **Download Settings**:
 
     * **Always overwrite** local settings.
-    * Auto `install, update, remove` extensions.
-    * Auto remove local files if they've been removed in remote.
-    * Download settings from a public Gist by leaving the `GitHub Personal Access Token` blank (but you still have to fill in your own token before uploading).
+    * Automatically `install, update` and `remove` extensions.
+    * You can leave the `GitHub Personal Access Token` blank to download from `a public Gist`.
 
 
 ## Commands
@@ -35,11 +33,11 @@ You can type `upload/download` (or `syncing`) in `VSCode Command Palette` to acc
 
 1. ***`Syncing: Upload Settings`***
 
-    > Upload settings.
+    > Upload settings to GitHub Gist.
 
 1. ***`Syncing: Download Settings`***
 
-    > Download settings.
+    > Download settings from GitHub Gist.
 
 1. ***`Syncing: Open Syncing Settings`***
 
@@ -75,10 +73,10 @@ The keybindings **are disabled by default**, you can enable them by updating `VS
 
 ## Proxy Settings
 
-You can add a proxy to accelerate the synchronization, find and set the `"http.proxy"` property in `VSCode User Settings`, for example:
+You can use a proxy to accelerate the synchronization, find and set the `"http.proxy"` property in `VSCode User Settings`. For example:
 
 ```json
-    "http.proxy": "http://127.0.0.1:1080"
+"http.proxy": "http://127.0.0.1:1080"
 ```
 
 
@@ -86,11 +84,11 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
 1. Get your own `GitHub Personal Access Token`
 
-    1. **Login to your `Settings` page.**
+    1. **Login to your `GitHub Settings` page.**
 
         ![login to settings page](docs/png/Settings.png)
 
-    1. **Select `Personal access tokens` tab and click `Generate new token`.**
+    1. **From the list on the left, select `Personal access tokens` and click `Generate new token`.**
 
         ![generate new token](docs/png/Generate-New-Token.png)
 
@@ -102,11 +100,11 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         ![copy and backup token](docs/png/Copy-Token.png)
 
-1. Sync your settings
+1. Sync your VSCode settings
 
     *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
 
-    1. **Upload**
+    1. **Upload Settings**
 
         1. Type `upload` in `VSCode Command Palette`.
 
@@ -118,21 +116,20 @@ You can add a proxy to accelerate the synchronization, find and set the `"http.p
 
         1. Done!
 
-        1. After uploading, you can find your settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com).
+        1. *After uploading, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com).*
 
-            ![gist](docs/png/Gist.png)
-
-    1. **Download**
+    1. **Download Settings**
 
         1. Type `download` in `VSCode Command Palette`.
 
             ![download settings](docs/png/Download-Settings.png)
 
-        1. Enter your `GitHub Personal Access Token` (or `leave it blank` if you want to download from a public Gist)
+        1. Enter your `GitHub Personal Access Token` (or `leave it blank` if you want to download from a `public Gist`).
 
-        1. Select or enter your `Gist ID` (or a `public Gist ID`).
+        1. Select or enter your own `Gist ID` (or a `public Gist ID`).
 
         1. Done!
+
 
 ## Example
 
