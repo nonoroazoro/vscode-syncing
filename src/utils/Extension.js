@@ -343,19 +343,21 @@ class Extension
                         else
                         {
                             const extPath = path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`);
-                            fse.copy(path.join(dirPath, "extension"), extPath, (err3) =>
-                            {
-                                if (err3)
+                            fse.emptyDir(extPath)
+                                .then(() =>
                                 {
-                                    p_reject(`Cannot extract extension: ${p_extension.id}. ${err3.message}`);
-                                }
-                                else
+                                    return fse.copy(path.join(dirPath, "extension"), extPath);
+                                })
+                                .then(() =>
                                 {
                                     // clear temp file (asynchronization and don't wait).
-                                    fse.remove(p_extension.zip);
+                                    fse.remove(p_extension.zip).catch(() => { });
                                     p_resolve(Object.assign({}, p_extension, { path: extPath }));
-                                }
-                            });
+                                })
+                                .catch((err3) =>
+                                {
+                                    p_reject(`Cannot extract extension: ${p_extension.id}. ${err3.message}`);
+                                });
                         }
                     });
                 }
