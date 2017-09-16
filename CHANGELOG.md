@@ -1,8 +1,9 @@
 # Changelogs
 
-## 1.4.9 - September 15, 2017
+## 1.4.9 - September 16, 2017
 
 - Changed: Enhance user guides.
+- Added: Empty extension's directory before installation.
 
 
 ## 1.4.8 - September 14, 2017
