@@ -1,0 +1,39 @@
+{
+    "defaultSeverity": "error",
+    "extends": [
+        "tslint:recommended"
+    ],
+    "rules": {
+        "indent": [
+            true,
+            "spaces",
+            4
+        ],
+        "max-classes-per-file": false,
+        "member-access": false,
+        "no-consecutive-blank-lines": {
+            "severity": "warn",
+            "options": 1
+        },
+        "no-console": {
+            "severity": "warn"
+        },
+        "no-empty": false,
+        "no-var-keyword": true,
+        "one-line": false,
+        "only-arrow-functions": false,
+        "prefer-const": true,
+        "space-before-function-paren": false,
+        "trailing-comma": [
+            true,
+            {
+                "multiline": "never",
+                "singleline": "never"
+            }
+        ],
+        "variable-name": [
+            true,
+            "allow-leading-underscore"
+        ]
+    }
+}
