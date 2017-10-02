@@ -1,6 +1,7 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
+        "allowJs": true,
         "allowSyntheticDefaultImports": true,
         "allowUnreachableCode": true,
         "allowUnusedLabels": false,
@@ -13,7 +14,10 @@
         "noUnusedParameters": false,
         "outDir": "./dist",
         "pretty": true,
-        "rootDir": "./src",
+        "rootDirs": [
+            "./src",
+            "./test"
+        ],
         "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,
@@ -25,6 +29,7 @@
         ]
     },
     "exclude": [
+        "dist",
         "node_modules"
     ]
 }
