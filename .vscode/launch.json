@@ -6,8 +6,12 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
+            "preLaunchTask": "tsc-watch",
             "args": [
                 "--extensionDevelopmentPath=${workspaceRoot}"
+            ],
+            "outFiles": [
+                "${workspaceRoot}/dist/**/*.js"
             ],
             "stopOnEntry": false,
             "sourceMaps": true
