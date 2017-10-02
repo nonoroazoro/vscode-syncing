@@ -20,3 +20,6 @@ Thumbs.db
 
 # Node files
 node_modules
+
+# Project specific stuff
+dist
