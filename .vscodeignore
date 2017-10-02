@@ -22,6 +22,6 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific stuff
-test
-.eslintrc
 .gitignore
+src
+test
