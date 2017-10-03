@@ -13,7 +13,8 @@ const vscode = require("vscode");
 const HttpsProxyAgent = require("https-proxy-agent");
 
 const Toast = require("./Toast");
-const Environment = require("./Environment");
+
+import Environment from "./Environment";
 
 class Extension
 {

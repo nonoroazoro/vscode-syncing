@@ -5,7 +5,8 @@ const moment = require("moment");
 const Gist = require("./utils/Gist");
 const Toast = require("./utils/Toast");
 const Config = require("./utils/Config");
-const Environment = require("./utils/Environment");
+
+import Environment from "./utils/Environment";
 
 let _env;
 let _config;
