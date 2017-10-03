@@ -19,6 +19,7 @@
             "severity": "warn"
         },
         "no-empty": false,
+        "no-string-literal": false,
         "no-var-keyword": true,
         "one-line": false,
         "only-arrow-functions": false,
