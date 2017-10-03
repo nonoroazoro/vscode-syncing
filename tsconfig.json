@@ -2,7 +2,6 @@
     "compileOnSave": true,
     "compilerOptions": {
         "allowJs": true,
-        "allowSyntheticDefaultImports": true,
         "allowUnreachableCode": true,
         "allowUnusedLabels": false,
         "experimentalDecorators": true,
