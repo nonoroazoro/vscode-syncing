@@ -2,16 +2,26 @@
  * vscode's environment.
  */
 
-const os = require("os");
-const path = require("path");
-const vscode = require("vscode");
+import * as os from "os";
+import * as path from "path";
+import * as vscode from "vscode";
 
-class Environment
+export default class Environment
 {
-    constructor(p_context)
+    private static _instance: Environment;
+
+    private _codeBasePath: string;
+    private _codeUserPath: string;
+    private _extensionsPath: string;
+    private _isInsiders: boolean;
+    private _isMac: boolean;
+    private _snippetsPath: string;
+    private _syncingSettingsPath: string;
+
+    private constructor(context: vscode.ExtensionContext)
     {
         this._isMac = process.platform === "darwin";
-        this._isInsiders = p_context.extensionPath.includes("insider");
+        this._isInsiders = context.extensionPath.includes("insider");
         this._extensionsPath = path.join(
             os.homedir(),
             this._isInsiders ? ".vscode-insiders" : ".vscode",
@@ -24,9 +34,21 @@ class Environment
     }
 
     /**
+     * create instance of Singleton class `Environment`.
+     */
+    static create(context: vscode.ExtensionContext): Environment
+    {
+        if (!Environment._instance)
+        {
+            Environment._instance = new Environment(context);
+        }
+        return Environment._instance;
+    }
+
+    /**
      * check if mac.
-    */
-    get isMac()
+     */
+    get isMac(): boolean
     {
         return this._isMac;
     }
@@ -34,7 +56,7 @@ class Environment
     /**
      * check if vscode is an insiders version.
      */
-    get isInsiders()
+    get isInsiders(): boolean
     {
         return this._isInsiders;
     }
@@ -42,7 +64,7 @@ class Environment
     /**
      * get vscode's extensions base path.
      */
-    get extensionsPath()
+    get extensionsPath(): string
     {
         return this._extensionsPath;
     }
@@ -50,22 +72,22 @@ class Environment
     /**
      * get vscode's config base path.
      */
-    get codeBasePath()
+    get codeBasePath(): string
     {
         return this._codeBasePath;
     }
 
-    _getCodeBasePath(p_isInsiders)
+    _getCodeBasePath(isInsiders: boolean): string
     {
-        let basePath;
+        let basePath: string;
         switch (process.platform)
         {
             case "win32":
-                basePath = process.env.APPDATA;
+                basePath = process.env.APPDATA!;
                 break;
 
             case "darwin":
-                basePath = path.join(process.env.HOME, "Library/Application Support");
+                basePath = path.join(process.env.HOME!, "Library/Application Support");
                 break;
 
             case "linux":
@@ -75,13 +97,13 @@ class Environment
             default:
                 basePath = "/var/local";
         }
-        return path.join(basePath, p_isInsiders ? "Code - Insiders" : "Code");
+        return path.join(basePath, isInsiders ? "Code - Insiders" : "Code");
     }
 
     /**
      * get vscode's config `User` path.
      */
-    get codeUserPath()
+    get codeUserPath(): string
     {
         return this._codeUserPath;
     }
@@ -89,7 +111,7 @@ class Environment
     /**
      * get vscode's config `snippets` path.
      */
-    get snippetsPath()
+    get snippetsPath(): string
     {
         return this._snippetsPath;
     }
@@ -97,55 +119,25 @@ class Environment
     /**
      * get Syncing's config file path.
      */
-    get syncingSettingPath()
+    get syncingSettingPath(): string
     {
         return this._syncingSettingsPath;
     }
 
     /**
      * get local snippet filepath from filename.
-     * @param {String} p_filename snippet filename.
-     * @returns {String}
+     * @param {string} filename snippet filename.
      */
-    getSnippetFilePath(p_filename)
+    getSnippetFilePath(filename: string): string
     {
-        return path.join(this.snippetsPath, p_filename);
+        return path.join(this.snippetsPath, filename);
     }
 
     /**
-     * get proxy settings of Syncing, using vscode's `http.proxy`.
-     * @returns {String} or `undefined`.
+     * get proxy settings for Syncing, using vscode's `http.proxy`.
      */
-    getSyncingProxy()
+    getSyncingProxy(): string
     {
-        let proxy = vscode.workspace.getConfiguration("http")["proxy"];
-        if (typeof proxy === "string")
-        {
-            proxy = proxy.trim();
-            if (proxy !== "")
-            {
-                return proxy;
-            }
-        }
-        return undefined;
+        return vscode.workspace.getConfiguration("http")["proxy"];
     }
 }
-
-let _instance;
-/**
- * create single instance.
- * @param {Object} p_context
- * @returns {Environment}
- */
-function create(p_context)
-{
-    if (_instance === undefined)
-    {
-        _instance = new Environment(p_context);
-    }
-    return _instance;
-}
-
-module.exports = {
-    create
-};

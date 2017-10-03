@@ -9,7 +9,8 @@ const async = require("async");
 const Gist = require("./Gist");
 const Toast = require("./Toast");
 const Extension = require("./Extension");
-const Environment = require("./Environment");
+
+import Environment from "./Environment";
 
 // the default Syncing's settings.
 const defaultSyncingSettings = {
