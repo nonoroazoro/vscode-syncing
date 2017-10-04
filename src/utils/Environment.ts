@@ -36,7 +36,7 @@ export default class Environment
     /**
      * create instance of Singleton class `Environment`.
      */
-    static create(context: vscode.ExtensionContext): Environment
+    public static create(context: vscode.ExtensionContext): Environment
     {
         if (!Environment._instance)
         {
