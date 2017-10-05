@@ -48,7 +48,7 @@ export default class Environment
     /**
      * check if mac.
      */
-    get isMac(): boolean
+    public get isMac(): boolean
     {
         return this._isMac;
     }
@@ -56,7 +56,7 @@ export default class Environment
     /**
      * check if vscode is an insiders version.
      */
-    get isInsiders(): boolean
+    public get isInsiders(): boolean
     {
         return this._isInsiders;
     }
@@ -64,7 +64,7 @@ export default class Environment
     /**
      * get vscode's extensions base path.
      */
-    get extensionsPath(): string
+    public get extensionsPath(): string
     {
         return this._extensionsPath;
     }
@@ -72,12 +72,53 @@ export default class Environment
     /**
      * get vscode's config base path.
      */
-    get codeBasePath(): string
+    public get codeBasePath(): string
     {
         return this._codeBasePath;
     }
 
-    _getCodeBasePath(isInsiders: boolean): string
+    /**
+     * get vscode's config `User` path.
+     */
+    public get codeUserPath(): string
+    {
+        return this._codeUserPath;
+    }
+
+    /**
+     * get vscode's config `snippets` path.
+     */
+    public get snippetsPath(): string
+    {
+        return this._snippetsPath;
+    }
+
+    /**
+     * get Syncing's config file path.
+     */
+    public get syncingSettingPath(): string
+    {
+        return this._syncingSettingsPath;
+    }
+
+    /**
+     * get local snippet filepath from filename.
+     * @param {string} filename snippet filename.
+     */
+    public getSnippetFilePath(filename: string): string
+    {
+        return path.join(this.snippetsPath, filename);
+    }
+
+    /**
+     * get proxy settings for Syncing, using vscode's `http.proxy`.
+     */
+    public getSyncingProxy(): string
+    {
+        return vscode.workspace.getConfiguration("http")["proxy"];
+    }
+
+    private _getCodeBasePath(isInsiders: boolean): string
     {
         let basePath: string;
         switch (process.platform)
@@ -98,46 +139,5 @@ export default class Environment
                 basePath = "/var/local";
         }
         return path.join(basePath, isInsiders ? "Code - Insiders" : "Code");
-    }
-
-    /**
-     * get vscode's config `User` path.
-     */
-    get codeUserPath(): string
-    {
-        return this._codeUserPath;
-    }
-
-    /**
-     * get vscode's config `snippets` path.
-     */
-    get snippetsPath(): string
-    {
-        return this._snippetsPath;
-    }
-
-    /**
-     * get Syncing's config file path.
-     */
-    get syncingSettingPath(): string
-    {
-        return this._syncingSettingsPath;
-    }
-
-    /**
-     * get local snippet filepath from filename.
-     * @param {string} filename snippet filename.
-     */
-    getSnippetFilePath(filename: string): string
-    {
-        return path.join(this.snippetsPath, filename);
-    }
-
-    /**
-     * get proxy settings for Syncing, using vscode's `http.proxy`.
-     */
-    getSyncingProxy(): string
-    {
-        return vscode.workspace.getConfiguration("http")["proxy"];
     }
 }
