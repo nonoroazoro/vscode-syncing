@@ -13,10 +13,7 @@
         "noUnusedParameters": false,
         "outDir": "./dist",
         "pretty": true,
-        "rootDirs": [
-            "./src",
-            "./test"
-        ],
+        "rootDir": ".",
         "skipLibCheck": true,
         "sourceMap": true,
         "strict": true,
