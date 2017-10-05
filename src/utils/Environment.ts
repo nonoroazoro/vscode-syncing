@@ -1,11 +1,10 @@
-/**
- * vscode's environment.
- */
-
 import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
+/**
+ * vscode's environment.
+ */
 export default class Environment
 {
     private static _instance: Environment;
