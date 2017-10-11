@@ -127,7 +127,7 @@ export default class Environment
                 break;
 
             case "darwin":
-                basePath = path.join(process.env.HOME!, "Library/Application Support");
+                basePath = path.join(os.homedir(), "Library/Application Support");
                 break;
 
             case "linux":
