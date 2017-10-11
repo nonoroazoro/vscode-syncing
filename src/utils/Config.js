@@ -592,7 +592,7 @@ class Config
         {
             Object.assign(
                 settings,
-                JSON.parse(fs.readFileSync(this._env.syncingSettingPath, "utf8"))
+                JSON.parse(fs.readFileSync(this._env.syncingSettingsPath, "utf8"))
             );
         }
         catch (err)
@@ -613,7 +613,7 @@ class Config
         {
             try
             {
-                fs.writeFile(this._env.syncingSettingPath, JSON.stringify(p_json, null, 4) || "{}", (err) =>
+                fs.writeFile(this._env.syncingSettingsPath, JSON.stringify(p_json, null, 4) || "{}", (err) =>
                 {
                     if (err && p_toast)
                     {

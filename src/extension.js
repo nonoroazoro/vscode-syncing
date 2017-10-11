@@ -138,15 +138,15 @@ function _downloadSettings()
  */
 function _openSettings()
 {
-    if (fs.existsSync(_env.syncingSettingPath))
+    if (fs.existsSync(_env.syncingSettingsPath))
     {
-        _openFile(_env.syncingSettingPath);
+        _openFile(_env.syncingSettingsPath);
     }
     else
     {
         _config.initSyncingSettings().then(() =>
         {
-            _openFile(_env.syncingSettingPath);
+            _openFile(_env.syncingSettingsPath);
         });
     }
 }

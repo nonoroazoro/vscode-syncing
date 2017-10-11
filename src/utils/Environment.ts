@@ -3,7 +3,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 /**
- * vscode's environment.
+ * VSCode environment wrapper.
  */
 export default class Environment
 {
@@ -33,7 +33,7 @@ export default class Environment
     }
 
     /**
-     * create instance of Singleton class `Environment`.
+     * Create an instance of singleton class `Environment`.
      */
     public static create(context: vscode.ExtensionContext): Environment
     {
@@ -45,7 +45,7 @@ export default class Environment
     }
 
     /**
-     * check if mac.
+     * Check if `Macintosh`.
      */
     public get isMac(): boolean
     {
@@ -53,7 +53,7 @@ export default class Environment
     }
 
     /**
-     * check if vscode is an insiders version.
+     * Check if VSCode is an `Insiders` version.
      */
     public get isInsiders(): boolean
     {
@@ -61,7 +61,7 @@ export default class Environment
     }
 
     /**
-     * get vscode's extensions base path.
+     * Get VSCode extensions base path.
      */
     public get extensionsPath(): string
     {
@@ -69,7 +69,7 @@ export default class Environment
     }
 
     /**
-     * get vscode's config base path.
+     * Get VSCode settings base path.
      */
     public get codeBasePath(): string
     {
@@ -77,7 +77,7 @@ export default class Environment
     }
 
     /**
-     * get vscode's config `User` path.
+     * Get VSCode settings `User` path.
      */
     public get codeUserPath(): string
     {
@@ -85,7 +85,7 @@ export default class Environment
     }
 
     /**
-     * get vscode's config `snippets` path.
+     * Get VSCode settings `snippets` path.
      */
     public get snippetsPath(): string
     {
@@ -93,16 +93,16 @@ export default class Environment
     }
 
     /**
-     * get Syncing's config file path.
+     * Get Syncing settings file path.
      */
-    public get syncingSettingPath(): string
+    public get syncingSettingsPath(): string
     {
         return this._syncingSettingsPath;
     }
 
     /**
-     * get local snippet filepath from filename.
-     * @param {string} filename snippet filename.
+     * Get local snippet filepath from filename.
+     * @param filename Snippet filename.
      */
     public getSnippetFilePath(filename: string): string
     {
@@ -110,7 +110,7 @@ export default class Environment
     }
 
     /**
-     * get proxy settings for Syncing, using vscode's `http.proxy`.
+     * Get proxy settings for Syncing, using VSCode `http.proxy` settings.
      */
     public getSyncingProxy(): string
     {
