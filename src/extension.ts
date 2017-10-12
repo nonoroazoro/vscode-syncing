@@ -1,31 +1,29 @@
-const fs = require("fs");
-const vscode = require("vscode");
+import * as fs from "fs";
+import * as moment from "moment";
+import * as vscode from "vscode";
 
-const moment = require("moment");
-const Gist = require("./utils/Gist");
-const Toast = require("./utils/Toast");
-const Config = require("./utils/Config");
-
+import * as Config from "./utils/Config";
 import Environment from "./utils/Environment";
+import * as Gist from "./utils/Gist";
+import * as Toast from "./utils/Toast";
 
-let _env;
 let _config;
-let _isSyncing;
+let _env: Environment;
+let _isSyncing: boolean;
 
-function activate(p_context)
+function activate(context: vscode.ExtensionContext)
 {
-    _initGlobals(p_context);
-    _initCommands(p_context);
+    _initGlobals(context);
+    _initCommands(context);
 }
 
 /**
- * init global variables.
- * @param {Object} p_context
+ * Init global variables.
  */
-function _initGlobals(p_context)
+function _initGlobals(context: vscode.ExtensionContext)
 {
-    _env = Environment.create(p_context);
-    _config = Config.create(p_context);
+    _config = Config.create(context);
+    _env = Environment.create(context);
     _isSyncing = false;
 
     // TODO: i18n, using vscode.env.language
@@ -33,27 +31,26 @@ function _initGlobals(p_context)
 }
 
 /**
- * init Syncing's commands.
- * @param {Object} p_context
+ * Init Syncing's commands.
  */
-function _initCommands(p_context)
+function _initCommands(context: vscode.ExtensionContext)
 {
-    _registerCommand(p_context, "syncing.uploadSettings", _uploadSettings);
-    _registerCommand(p_context, "syncing.downloadSettings", _downloadSettings);
-    _registerCommand(p_context, "syncing.openSettings", _openSettings);
+    _registerCommand(context, "syncing.uploadSettings", _uploadSettings);
+    _registerCommand(context, "syncing.downloadSettings", _downloadSettings);
+    _registerCommand(context, "syncing.openSettings", _openSettings);
 }
 
 /**
- * vscode's registerCommand wrapper.
+ * VSCode's registerCommand wrapper.
  */
-function _registerCommand(p_context, p_command, p_callback)
+function _registerCommand(context: vscode.ExtensionContext, command: string, callback: (...args: any[]) => any)
 {
-    // add to a list of disposables which are disposed when this extension is deactivated.
-    p_context.subscriptions.push(vscode.commands.registerCommand(p_command, p_callback));
+    // Add to a list of disposables which are disposed when this extension is deactivated.
+    context.subscriptions.push(vscode.commands.registerCommand(command, callback));
 }
 
 /**
- * upload settings.
+ * Upload settings.
  */
 function _uploadSettings()
 {
@@ -152,12 +149,13 @@ function _openSettings()
 }
 
 /**
- * check if extensions are actually synced.
- * @returns {Boolean}
+ * Check if extensions are actually synced.
  */
-function _isExtensionsSynced(p_synced)
+function _isExtensionsSynced(
+    items: { updated: [{ extension: { added: [object], removed: [object], updated: [object] } }] }
+): boolean
 {
-    for (const item of p_synced.updated)
+    for (const item of items.updated)
     {
         if (item.extension && (
             item.extension.added.length > 0
@@ -172,12 +170,12 @@ function _isExtensionsSynced(p_synced)
 }
 
 /**
- * open file in vscode.
- * @param {String} p_filepath
+ * Open file with VSCode.
+ * @param filepath Full path of file.
  */
-function _openFile(p_filepath)
+function _openFile(filepath: string)
 {
-    vscode.commands.executeCommand("vscode.open", vscode.Uri.file(p_filepath));
+    vscode.commands.executeCommand("vscode.open", vscode.Uri.file(filepath));
 }
 
 module.exports.activate = activate;
