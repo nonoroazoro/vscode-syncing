@@ -74,6 +74,7 @@
     "postinstall": "node ./node_modules/vscode/bin/install"
   },
   "devDependencies": {
+    "@types/async": "^2.0.44",
     "@types/node": "^8.0.33",
     "husky": "^0.14.3",
     "lint-staged": "^4.2.3",
