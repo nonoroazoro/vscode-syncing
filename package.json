@@ -75,14 +75,14 @@
   },
   "devDependencies": {
     "@types/async": "^2.0.44",
-    "@types/node": "^8.0.33",
+    "@types/node": "^8.0.34",
     "husky": "^0.14.3",
     "lint-staged": "^4.2.3",
     "mocha": "^4.0.1",
-    "should": "^13.1.1",
+    "should": "^13.1.2",
     "tslint": "^5.7.0",
     "typescript": "^2.5.3",
-    "vscode": "^1.1.5"
+    "vscode": "^1.1.6"
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
@@ -90,7 +90,7 @@
     "fs-extra": "^4.0.2",
     "github": "^8.1.1",
     "https-proxy-agent": "^2.1.0",
-    "moment": "^2.18.1",
+    "moment": "^2.19.1",
     "temp": "^0.8.3"
   },
   "lint-staged": {
