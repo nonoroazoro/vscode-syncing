@@ -2,45 +2,67 @@
  * vscode extension utils.
  */
 
-const fs = require("fs");
-const fse = require("fs-extra");
-const temp = require("temp").track();
-const path = require("path");
-const async = require("async");
-const AdmZip = require("adm-zip");
-const https = require("https");
-const vscode = require("vscode");
-const HttpsProxyAgent = require("https-proxy-agent");
-
-const Toast = require("./Toast");
+import * as AdmZip from "adm-zip";
+import * as async from "async";
+import * as fs from "fs";
+import * as fse from "fs-extra";
+import * as https from "https";
+import * as HttpsProxyAgent from "https-proxy-agent";
+import * as path from "path";
+import * as temp from "temp";
+import * as vscode from "vscode";
 
 import Environment from "./Environment";
+import Toast from "./Toast";
 
-class Extension
+temp.track();
+
+export default class Extension
 {
-    constructor(p_context)
+    private static _instance: Extension;
+
+    private _env: Environment;
+
+    constructor(context: vscode.ExtensionContext)
     {
-        this._env = Environment.create(p_context);
+        this._env = Environment.create(context);
     }
 
     /**
-     * get all installed extensions.
-     * @param {Boolean} [p_includeBuiltin=false] default is false, builtin extensions are not included.
-     * @returns {Array} or `[]`.
+     * Create an instance of singleton class `Extension`.
      */
-    getAll(p_includeBuiltin = false)
+    public static create(context: vscode.ExtensionContext): Extension
     {
-        let item;
+        if (!Extension._instance)
+        {
+            Extension._instance = new Extension(context);
+        }
+        return Extension._instance;
+    }
+
+    /**
+     * Get all installed extensions.
+     * @param includeBuiltin Default is `false`, excludes builtin extensions.
+     */
+    public getAll(includeBuiltin = false): any[]
+    {
+        let item: {
+            id?: string,
+            name?: string,
+            publisher?: string,
+            version?: string,
+            __metadata?: string
+        };
         const result = [];
         for (const ext of vscode.extensions.all)
         {
-            if (p_includeBuiltin || !ext.packageJSON.isBuiltin)
+            if (includeBuiltin || !ext.packageJSON.isBuiltin)
             {
                 item = {
+                    id: `${ext.packageJSON.publisher}.${ext.packageJSON.name}`,
                     name: ext.packageJSON.name,
                     publisher: ext.packageJSON.publisher,
-                    version: ext.packageJSON.version,
-                    id: `${ext.packageJSON.publisher}.${ext.packageJSON.name}`
+                    version: ext.packageJSON.version
                 };
                 if (ext.packageJSON.__metadata)
                 {
@@ -478,22 +500,3 @@ class Extension
         });
     }
 }
-
-let _instance;
-/**
- * create single instance.
- * @param {Object} p_context
- * @returns {Extension}
- */
-function create(p_context)
-{
-    if (_instance === undefined)
-    {
-        _instance = new Extension(p_context);
-    }
-    return _instance;
-}
-
-module.exports = {
-    create
-};
