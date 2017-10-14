@@ -5,6 +5,9 @@
         "allowUnreachableCode": true,
         "allowUnusedLabels": false,
         "experimentalDecorators": true,
+        "lib": [
+            "es2015"
+        ],
         "module": "commonjs",
         "noImplicitAny": true,
         "noImplicitReturns": true,
@@ -20,8 +23,9 @@
         "strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": true,
         "target": "es2015",
-        "lib": [
-            "es2015"
+        "typeRoots": [
+            "node_modules/@types",
+            "@types"
         ]
     },
     "exclude": [
