@@ -2,12 +2,12 @@ import * as fs from "fs";
 import * as moment from "moment";
 import * as vscode from "vscode";
 
-import * as Config from "./utils/Config";
+import Config from "./utils/Config";
 import Environment from "./utils/Environment";
-import * as Gist from "./utils/Gist";
-import * as Toast from "./utils/Toast";
+import Gist from "./utils/Gist";
+import Toast from "./utils/Toast";
 
-let _config;
+let _config: Config;
 let _env: Environment;
 let _isSyncing: boolean;
 
@@ -62,7 +62,7 @@ function _uploadSettings()
             const api = Gist.create(settings.token, _env.getSyncingProxy());
             return _config.getConfigs({ load: true, showIndicator: true }).then((configs) =>
             {
-                return api.findAndUpdate({ id: settings.id, uploads: configs, showIndicator: true }).then((gist) =>
+                return api.findAndUpdate(settings.id, configs, true, true).then((gist: any) =>
                 {
                     if (gist.id === settings.id)
                     {

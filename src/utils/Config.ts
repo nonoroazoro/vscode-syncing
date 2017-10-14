@@ -1,32 +1,86 @@
-/**
- * Syncing's config.
- */
-
-const fs = require("fs");
-const path = require("path");
-const async = require("async");
-
-const Gist = require("./Gist");
-const Toast = require("./Toast");
-const Extension = require("./Extension");
+import * as async from "async";
+import * as fs from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
 
 import Environment from "./Environment";
+import Extension from "./Extension";
+import Gist from "./Gist";
+import Toast from "./Toast";
 
-// the default Syncing's settings.
-const defaultSyncingSettings = {
-    "token": "",
-    "id": ""
-};
-
-// the remote snippet file prefix;
-const snippetPrefix = "snippet-";
-
-class Config
+/**
+ * Represent the content of snippet.
+ */
+interface ISnippet
 {
-    constructor(p_context)
+    /**
+     * Snippet file name.
+     */
+    name: string;
+
+    /**
+     * Snippet file path in local.
+     */
+    path: string;
+
+    /**
+     * Snippet file name in remote.
+     */
+    remote: string;
+}
+
+/**
+ * Represent the settings of Syncing.
+ */
+export interface ISyncingSettings
+{
+    /**
+     * Store GitHub Gist ID.
+     */
+    id: string;
+
+    /**
+     * Store GitHub Personal Access Token.
+     */
+    token: string;
+}
+
+/**
+ * Syncing and VSCode configs wrapper.
+ */
+export default class Config
+{
+    private static _instance: Config;
+
+    /**
+     * Default settings of Syncing.
+     */
+    private static readonly defaultSettings: ISyncingSettings = { id: "", token: "" };
+
+    /**
+     * Prefix of remote snippet files.
+     */
+    private static readonly SNIPPET_PREFIX: string = "snippet-";
+
+    private _env: Environment;
+    private _extension: Extension;
+
+    private constructor(context: vscode.ExtensionContext)
     {
-        this._env = Environment.create(p_context);
-        this._extension = Extension.create(p_context);
+        this._env = Environment.create(context);
+        this._extension = Extension.create(context);
+    }
+
+    /**
+     * Create an instance of singleton class `Config`.
+     */
+    public static create(context: vscode.ExtensionContext): Config
+    {
+        if (!Config._instance)
+        {
+            Config._instance = new Config(context);
+        }
+        return Config._instance;
     }
 
     /**
@@ -47,17 +101,17 @@ class Config
      *        ...
      *    ]
      */
-    getConfigs({ full = false, load = false, showIndicator = false } = {})
+    public getConfigs({ full = false, load = false, showIndicator = false } = {})
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
-            function resolveWrap(p_value)
+            function resolveWrap(value: any)
             {
                 if (showIndicator)
                 {
                     Toast.clearSpinner("");
                 }
-                p_resolve(p_value);
+                resolve(value);
             }
 
             if (showIndicator)
@@ -94,10 +148,10 @@ class Config
                 );
             }
 
-            let temp;
-            let localFilename;
-            const results = [];
-            const errors = [];
+            let temp: ISnippet[];
+            let localFilename: string;
+            const results: any[] = [];
+            const errors: string[] = [];
             async.eachSeries(
                 list,
                 (item, done) =>
@@ -121,12 +175,12 @@ class Config
 
                         temp = [
                             {
-                                "name": item.name,
-                                "path": path.join(
+                                name: item.name,
+                                path: path.join(
                                     this._env.codeUserPath,
                                     localFilename
                                 ),
-                                "remote": `${item.name}.json`
+                                remote: `${item.name}.json`
                             }
                         ];
                     }
@@ -168,39 +222,38 @@ class Config
     }
 
     /**
-     * get all snippet files.
-     * @param {String} p_folderpath snippets path.
-     * @returns {Array} or `[]`.
+     * Get all snippet files.
+     * @param snippetsDir Snippets dir.
      */
-    _getSnippets(p_folderpath)
+    _getSnippets(snippetsDir: string): ISnippet[]
     {
-        const result = [];
+        const results: ISnippet[] = [];
         try
         {
-            const filenames = fs.readdirSync(p_folderpath);
-            filenames.forEach((filename) =>
+            const filenames: string[] = fs.readdirSync(snippetsDir);
+            filenames.forEach((filename: string) =>
             {
-                // add prefix `snippet-` for all snippets.
-                result.push({
+                // Add prefix `snippet-` to all snippets.
+                results.push({
                     name: filename,
-                    path: path.join(p_folderpath, filename),
-                    remote: `${snippetPrefix}${filename}`
+                    path: path.join(snippetsDir, filename),
+                    remote: `${Config.SNIPPET_PREFIX}${filename}`
                 });
             });
         }
         catch (err)
         {
         }
-        return result;
+        return results;
     }
 
     /**
-     * save vscode configs to files.
-     * @param {Object} vscode configs from Gist.
-     * @param {Boolean} [p_showIndicator=false] default is false, don't show progress indicator.
+     * Save VSCode configs to files.
+     * @param {Object} VSCode Configs from Gist.
+     * @param p_showIndicator Default is false, don't show progress indicator.
      * @returns {Promise}
      */
-    saveConfigs(p_files, p_showIndicator)
+    saveConfigs(p_files, p_showIndicator: boolean = false): Promise<>
     {
         return new Promise((p_resolve, p_reject) =>
         {
@@ -258,7 +311,7 @@ class Config
                         {
                             // file exists in remote, but not exists in local.
                             // and delete it if it's a snippet file.
-                            if (item.remote.startsWith(snippetPrefix))
+                            if (item.remote.startsWith(Config.SNIPPET_PREFIX))
                             {
                                 removeFiles.push(item);
                             }
@@ -271,9 +324,9 @@ class Config
                         if (!existsFileKeys.includes(key))
                         {
                             file = p_files[key];
-                            if (file.filename.startsWith(snippetPrefix))
+                            if (file.filename.startsWith(Config.SNIPPET_PREFIX))
                             {
-                                filename = file.filename.slice(snippetPrefix.length);
+                                filename = file.filename.slice(Config.SNIPPET_PREFIX.length);
                                 if (filename)
                                 {
                                     saveFiles.push({
@@ -455,7 +508,7 @@ class Config
      */
     initSyncingSettings()
     {
-        return this.saveSyncingSettings(defaultSyncingSettings, false);
+        return this.saveSyncingSettings(Config.defaultSettings, false);
     }
 
     /**
@@ -481,25 +534,23 @@ class Config
     }
 
     /**
-     * prepare Syncing's settings for upload.
-     * @param {Boolean} [p_showIndicator=false] default is false, don't show progress indicator.
-     * @returns {Promise}
+     * prepare Syncing's settings for uploading.
+     * @param showIndicator Default is `false`, don't show progress indicator.
      */
-    prepareUploadSettings(p_showIndicator = false)
+    prepareUploadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
     {
         // GitHub token must exist, but Gist ID could be none.
-        return this.prepareSyncingSettings({ showIndicator: p_showIndicator });
+        return this.prepareSyncingSettings({ showIndicator });
     }
 
     /**
-     * prepare Syncing's settings for download.
-     * @param {Boolean} [p_showIndicator=false] default is false, don't show progress indicator.
-     * @returns {Promise}
+     * Prepare Syncing's settings for downloading.
+     * @param showIndicator Default is `false`, don't show progress indicator.
      */
-    prepareDownloadSettings(p_showIndicator = false)
+    prepareDownloadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
     {
         // GitHub token could be none, but Gist ID must exist.
-        return this.prepareSyncingSettings({ forUpload: false, showIndicator: p_showIndicator });
+        return this.prepareSyncingSettings({ forUpload: false, showIndicator });
     }
 
     /**
@@ -509,27 +560,27 @@ class Config
      *     [showIndicator=false]: default is false, don't show progress indicator.
      * @returns {Promise}
      */
-    prepareSyncingSettings({ forUpload = true, showIndicator = false } = {})
+    prepareSyncingSettings({ forUpload = true, showIndicator = false } = {}): Promise<ISyncingSettings>
     {
         // GitHub token could be none, but Gist ID must exist.
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
-            function resolveWrap(p_value)
+            function resolveWrap(value: ISyncingSettings)
             {
                 if (showIndicator)
                 {
                     Toast.clearSpinner("");
                 }
-                p_resolve(p_value);
+                resolve(value);
             }
 
-            function rejectWrap(p_error)
+            function rejectWrap(error: Error)
             {
                 if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: ${forUpload ? "Uploading" : "Downloading"} canceled. ${p_error.message}`);
+                    Toast.statusError(`Syncing: ${forUpload ? "Uploading" : "Downloading"} canceled. ${error.message}`);
                 }
-                p_reject(p_error);
+                reject(error);
             }
 
             if (showIndicator)
@@ -587,7 +638,7 @@ class Config
      */
     loadSyncingSettings()
     {
-        const settings = Object.assign({}, defaultSyncingSettings);
+        const settings = Object.assign({}, Config.defaultSettings);
         try
         {
             Object.assign(
@@ -602,33 +653,32 @@ class Config
     }
 
     /**
-     * save Syncing's settings (to settings file: `syncing.json`).
-     * @param {Object} p_json settings.
-     * @param {Boolean} [p_toast=true] default is true, toast error.
-     * @returns {Promise}
+     * Save Syncing's settings to file: `syncing.json`.
+     * @param settings Syncing's Settings.
+     * @param showToast Show error toast.
      */
-    saveSyncingSettings(p_json, p_toast = true)
+    saveSyncingSettings(settings: ISyncingSettings, showToast = true): Promise<void>
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
             try
             {
-                fs.writeFile(this._env.syncingSettingsPath, JSON.stringify(p_json, null, 4) || "{}", (err) =>
+                fs.writeFile(this._env.syncingSettingsPath, JSON.stringify(settings, null, 4) || "{}", (err) =>
                 {
-                    if (err && p_toast)
+                    if (err && showToast)
                     {
                         Toast.statusError(`Syncing: Cannot save Syncing's settings: ${err}`);
                     }
-                    p_resolve();
+                    resolve();
                 });
             }
             catch (err)
             {
-                if (err && p_toast)
+                if (err && showToast)
                 {
                     Toast.statusError(`Syncing: Cannot save Syncing's settings: ${err}`);
                 }
-                p_resolve();
+                resolve();
             }
         });
     }
@@ -664,22 +714,3 @@ class Config
         }
     }
 }
-
-let _instance;
-/**
- * create single instance.
- * @param {Object} p_context
- * @returns {Config}
- */
-function create(p_context)
-{
-    if (_instance === undefined)
-    {
-        _instance = new Config(p_context);
-    }
-    return _instance;
-}
-
-module.exports = {
-    create
-};

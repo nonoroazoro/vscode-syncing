@@ -1,202 +1,219 @@
+import * as Github from "github";
+import * as vscode from "vscode";
+
+import Toast from "./Toast";
+
 /**
  * GitHub Gist utils.
  */
-
-const GitHubAPI = require("github");
-const GIST_DESCRIPTION = "VSCode's Settings - Syncing";
-
-const Toast = require("./Toast");
-
-class Gist
+export default class Gist
 {
-    constructor(p_token, p_proxy)
-    {
-        this._token = p_token;
-        this._proxy = p_proxy;
-        this._api = new GitHubAPI(Object.assign({ timeout: 10000 }, p_proxy ? { proxy: p_proxy } : {}));
+    private static _instance: Gist;
 
-        if (p_token)
+    /**
+     * Description of Gists.
+     */
+    private static readonly GIST_DESCRIPTION: string = "VSCode's Settings - Syncing";
+
+    private _api: Github;
+    private _proxy?: string;
+    private _token: string;
+    private _user: { name: string, id: string } | null;
+
+    private constructor(token: string, proxy?: string)
+    {
+        this._proxy = proxy;
+        this._api = new Github(Object.assign({ timeout: 10000 }, proxy ? { proxy } : {}));
+        this._token = token;
+        if (token)
         {
             this._api.authenticate({
-                type: "oauth",
-                token: p_token
+                token,
+                type: "oauth"
             });
         }
     }
 
     /**
-     * get GitHub Personal Access Token.
+     * Create an instance of class `Gist`, only create new when params are changed.
+     * @param token GitHub Personal Access Token.
+     * @param proxy Proxy url.
      */
-    get token()
+    public static create(token: string, proxy?: string): Gist
+    {
+        if (!Gist._instance || Gist._instance.token !== token || Gist._instance.proxy !== proxy)
+        {
+            Gist._instance = new Gist(token, proxy);
+        }
+        return Gist._instance;
+    }
+
+    /**
+     * Get GitHub Personal Access Token.
+     */
+    public get token()
     {
         return this._token;
     }
 
     /**
-     * get proxy url.
+     * Get proxy url.
      */
-    get proxy()
+    public get proxy()
     {
         return this._proxy;
     }
 
     /**
-     * get the currently authenticated GitHub user.
-     * @returns {Promise}
+     * Get the currently authenticated GitHub user.
      */
-    user()
+    public user(): Promise<{ name: string, id: string } | null>
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
             if (this._user)
             {
-                p_resolve(this._user);
+                resolve(this._user);
             }
             else
             {
+                // TODO: 测试一下 get({}) 不传参数是否正确。
                 this._api.users
-                    .get({})
-                    .then((p_value) =>
+                    .get()
+                    .then((value) =>
                     {
-                        this._user = { name: p_value.login, id: p_value.id };
-                        p_resolve(this._user);
+                        this._user = { name: value.login, id: value.id };
+                        resolve(this._user);
                     })
-                    .catch((err) =>
+                    .catch(() =>
                     {
                         this._user = null;
-                        p_resolve(null);
+                        resolve();
                     });
             }
         });
     }
 
     /**
-     * get gist of the authenticated user.
-     * @param {String} p_id gist id.
-     * @param {Boolean} [p_showIndicator=false] default is false, don't show progress indicator.
-     * @returns {Promise}
+     * Get gist of the authenticated user.
+     * @param id Gist id.
+     * @param showIndicator Default is `false`, don't show progress indicator.
      */
-    get(p_id, p_showIndicator = false)
+    public get(id: string, showIndicator: boolean = false): Promise<any>
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
-            function resolveWrap(p_value)
+            function resolveWrap(value: any)
             {
-                if (p_showIndicator)
+                if (showIndicator)
                 {
                     Toast.clearSpinner("");
                 }
-                p_resolve(p_value);
+                resolve(value);
             }
 
-            function rejectWrap(p_error)
+            function rejectWrap(error: Error)
             {
-                if (p_showIndicator)
+                if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: Downloading failed. ${p_error.message}`);
+                    Toast.statusError(`Syncing: Downloading failed. ${error.message}`);
                 }
-                p_reject(p_error);
+                reject(error);
             }
 
-            if (p_showIndicator)
+            if (showIndicator)
             {
                 Toast.showSpinner("Syncing: Checking remote settings.");
             }
 
-            this._api.gists.get({ id: p_id }).then(resolveWrap).catch((err) =>
+            this._api.gists.get({ id }).then(resolveWrap).catch((err) =>
             {
                 let error = new Error("Please check your Internet connection.");
-                error.code = err.code;
-
-                if (err.code === 401)
+                const code: number = err.code;
+                if (code === 401)
                 {
                     error = new Error("Please check your GitHub Personal Access Token.");
-                    error.code = err.code;
                 }
-                else if (err.code === 404)
+                else if (code === 404)
                 {
                     error = new Error("Please check your Gist ID.");
-                    error.code = err.code;
                 }
+                Object.assign(error, { code });
                 rejectWrap(error);
             });
         });
     }
 
     /**
-     * get all gists of the authenticated user.
-     * @returns {Promise}
+     * Get all gists of the authenticated user.
      */
-    getAll()
+    public getAll(): Promise<any>
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
-            this._api.gists.getAll({}).then((gists) =>
+            this._api.gists.getAll({}).then((gists: any[]) =>
             {
                 if (gists)
                 {
                     // filter out the VSCode settings.
-                    p_resolve(gists
-                        .filter((gist) => (gist.description === GIST_DESCRIPTION || gist.files["extensions.json"]))
-                        .sort((a, b) => new Date(a.update_id) - new Date(b.update_id))
+                    resolve(gists
+                        .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files["extensions.json"]))
+                        .sort((a, b) => new Date(a.update_id).getTime() - new Date(b.update_id).getTime())
                     );
                 }
                 else
                 {
-                    p_resolve([]);
+                    resolve([]);
                 }
             }).catch((err) =>
             {
                 if (err.code === 401)
                 {
                     const error = new Error("Please check your GitHub Personal Access Token.");
-                    error.code = err.code;
-                    p_reject(error);
+                    Object.assign(error, { code: err.code });
+                    reject(error);
                 }
                 else if (err.code === 404)
                 {
-                    p_reject(new Error("Please check your Gist ID."));
+                    reject(new Error("Please check your Gist ID."));
                 }
                 else
                 {
-                    p_reject(new Error("Please check your Internet connection."));
+                    reject(new Error("Please check your Internet connection."));
                 }
             });
         });
     }
 
     /**
-     * delete gist.
-     * @param {String} p_id gist id.
-     * @returns {Promise}
+     * Delete gist.
+     * @param id Gist id.
      */
-    delete(p_id)
+    public delete(id: string): Promise<any>
     {
-        return this._api.gists.delete({ id: p_id });
+        return this._api.gists.delete({ id });
     }
 
     /**
-     * update gist.
-     * @param {Object} p_json gist content.
-     * @returns {Promise}
+     * Update gist.
+     * @param content Gist content.
      */
-    update(p_json)
+    public update(content: any): Promise<any>
     {
-        return this._api.gists.edit(p_json);
+        return this._api.gists.edit(content);
     }
 
     /**
-     * check if gist exists of the currently authenticated user.
-     * @param {String} p_id gist id.
-     * @returns {Promise}
+     * Check if gist exists of the currently authenticated user.
+     * @param id Gist id.
      */
-    exists(p_id)
+    public exists(id: string): Promise<boolean | any>
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
-            if (p_id && p_id.trim() !== "")
+            if (id && id.trim() !== "")
             {
-                this.get(p_id)
+                this.get(id)
                     .then((gist) =>
                     {
                         if (this.token)
@@ -206,100 +223,96 @@ class Gist
                                 // check if the Gist's owner is the currently authenticated user.
                                 if (value && value.id === gist.owner.id)
                                 {
-                                    p_resolve(gist);
+                                    resolve(gist);
                                 }
                                 else
                                 {
-                                    p_resolve(false);
+                                    resolve(false);
                                 }
                             });
                         }
                         else
                         {
-                            p_resolve(gist);
+                            resolve(gist);
                         }
                     })
-                    .catch(() => p_resolve(false));
+                    .catch(() => resolve(false));
             }
             else
             {
-                p_resolve(false);
+                resolve(false);
             }
         });
     }
 
     /**
-     * create gist.
-     * @param {Object} p_json gist content.
-     * @returns {Promise}
+     * Create gist.
+     * @param content Gist content.
      */
-    create(p_json)
+    public create(content: any): Promise<any>
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
-            this._api.gists.create(p_json).then((gist) =>
+            this._api.gists.create(content).then((gist) =>
             {
-                p_resolve(gist);
+                resolve(gist);
             }).catch((err) =>
             {
                 if (err.code === 401)
                 {
                     const error = new Error("Please check your GitHub Personal Access Token.");
-                    error.code = err.code;
-                    p_reject(error);
+                    Object.assign(error, { code: err.code });
+                    reject(error);
                 }
                 else
                 {
-                    p_reject(new Error("Please check your Internet connection."));
+                    reject(new Error("Please check your Internet connection."));
                 }
             });
         });
     }
 
     /**
-     * create settings gist.
-     * @param {Array} p_files settings files.
-     * @param {Boolean} [p_public=false] default is false, gist is private.
-     * @returns {Promise}
+     * Create settings gist.
+     * @param files Settings files.
+     * @param isPublic Default is `false`, gist is set to private.
      */
-    createSettings(p_files = {}, p_public = false)
+    public createSettings(files = {}, isPublic = false): Promise<any>
     {
         return this.create({
-            description: GIST_DESCRIPTION,
-            public: p_public,
-            files: p_files
+            description: Gist.GIST_DESCRIPTION,
+            files,
+            public: isPublic
         });
     }
 
     /**
-     * find and update gist.
-     * @param  {Object} [{ id, uploads, upsert = true, showIndicator = false }={}]
-     *     id: gist id.
-     *     uploads: settings that will be uploaded.
-     *     upsert: default is true, create new if gist not exists.
-     *     showIndicator: default is false, don't show progress indicator.
-     * @returns {Promise}
+     * Find and update gist.
+     * @param id Gist id.
+     * @param uploads Settings that will be uploaded.
+     * @param upsert Default is `true`, create new if gist not exists.
+     * @param showIndicator Default is `false`, don't show progress indicator.
      */
-    findAndUpdate({ id, uploads, upsert = true, showIndicator = false } = {})
+    public findAndUpdate(id: string, uploads: any, upsert = true, showIndicator = false): Promise<any>
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
-            function resolveWrap(p_value)
+            function resolveWrap(value: any)
             {
                 if (showIndicator)
                 {
                     Toast.clearSpinner("");
                 }
-                p_resolve(p_value);
+                resolve(value);
             }
 
-            function rejectWrap(p_error)
+            function rejectWrap(error: Error)
             {
                 if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: Uploading failed. ${p_error.message}`);
+                    Toast.statusError(`Syncing: Uploading failed. ${error.message}`);
                 }
-                p_reject(p_error);
+                reject(error);
             }
 
             if (showIndicator)
@@ -309,7 +322,7 @@ class Gist
 
             this.exists(id).then((exists) =>
             {
-                const gist = { id: id, files: {} };
+                const gist: { id: string, files: any } = { id, files: {} };
                 for (const item of uploads)
                 {
                     // any `null` content will be filtered out, just in case.
@@ -349,19 +362,19 @@ class Gist
     }
 
     /**
-     * get modified files list.
+     * Get modified files list.
      * @returns {} or `undefined`.
      */
-    _getModifiedFiles(p_localFiles, p_remoteFiles)
+    _getModifiedFiles(localFiles: any, remoteFiles: any): any
     {
         let localFile;
         let remoteFile;
         const result = {};
         const recordedKeys = [];
-        for (const key of Object.keys(p_remoteFiles))
+        for (const key of Object.keys(remoteFiles))
         {
-            localFile = p_localFiles[key];
-            remoteFile = p_remoteFiles[key];
+            localFile = localFiles[key];
+            remoteFile = remoteFiles[key];
             if (localFile)
             {
                 // ignore null local file.
@@ -382,12 +395,12 @@ class Gist
         }
 
         // add rest local files.
-        for (const key of Object.keys(p_localFiles))
+        for (const key of Object.keys(localFiles))
         {
-            if (!recordedKeys.includes(key))
+            if (recordedKeys.indexOf(key) === -1)
             {
                 // ignore null local file.
-                localFile = p_localFiles[key];
+                localFile = localFiles[key];
                 if (localFile.content)
                 {
                     result[key] = localFile;
@@ -398,23 +411,3 @@ class Gist
         return (Object.keys(result).length === 0) ? undefined : result;
     }
 }
-
-let _instance;
-/**
- * only create new instance when params are changed.
- * @param {String} p_token GitHub Personal Access Token.
- * @param {String} [p_proxy] proxy url.
- * @returns {Gist}
- */
-function create(p_token, p_proxy)
-{
-    if (_instance === undefined || _instance.token !== p_token || _instance.proxy !== p_proxy)
-    {
-        _instance = new Gist(p_token, p_proxy);
-    }
-    return _instance;
-}
-
-module.exports = {
-    create
-};
