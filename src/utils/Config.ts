@@ -25,7 +25,7 @@ export enum ConfigTypes
 }
 
 /**
- * Represent the content of VSCode config.
+ * Represent a VSCode config.
  */
 export interface IConfig
 {
@@ -443,7 +443,7 @@ export default class Config
                 {
                     if (item.name === "extensions")
                     {
-                        content = JSON.stringify(this._ext.getAll() || [], null, 4);
+                        content = JSON.stringify(this._ext.getAll(), null, 4);
                     }
                     else
                     {
