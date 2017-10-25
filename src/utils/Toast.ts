@@ -1,6 +1,8 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
+import Gist from "./Gist";
+
 /**
  * Set a message to the VSCode status bar.
  * @param message The message to show.
@@ -50,7 +52,7 @@ function statusFatal(message: string): void
 
 /**
  * Show GitHub Personal Access Token input box.
- * @param forUpload `true` to show input box for uploading, else show downloading message.
+ * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
 function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: string }>
 {
@@ -91,7 +93,7 @@ function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: st
 
 /**
  * Show Gist ID input box.
- * @param forUpload `true` to show input box for uploading, else show downloading message.
+ * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
 function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
 {
@@ -132,10 +134,10 @@ function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
 
 /**
  * Show remote Gist list box.
- * @param {Object} api
- * @param forUpload `true` to show input box for uploading, else show downloading message.
+ * @param api GitHub Gist utils.
+ * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-function showRemoteGistListBox(api: any, forUpload: boolean = true): Promise<{ id: string }>
+function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ id: string }>
 {
     return new Promise((resolve, reject) =>
     {
