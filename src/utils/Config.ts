@@ -4,7 +4,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import Environment from "./Environment";
-import Extension from "./Extension";
+import Extension, { ISyncStatus } from "./Extension";
 import Gist from "./Gist";
 import Toast from "./Toast";
 
@@ -289,7 +289,10 @@ export default class Config
      * @param files VSCode Configs from Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    saveConfigs(files: any, showIndicator: boolean = false): Promise<any>
+    saveConfigs(files: any, showIndicator: boolean = false): Promise<{
+        updated: ISyncStatus[],
+        removed: ISyncStatus[]
+    }>
     {
         // TODO: files type isn't explicit.
         return new Promise((resolve, reject) =>
@@ -387,8 +390,10 @@ export default class Config
                         saveFiles.push(extensionsFile);
                     }
 
-                    const syncedFiles: { updated: Array<{ file: IConfig }>, removed: Array<{ file: IConfig }> }
-                        = { updated: [], removed: [] };
+                    const syncedFiles: {
+                        updated: ISyncStatus[],
+                        removed: ISyncStatus[]
+                    } = { updated: [], removed: [] };
                     async.eachSeries(
                         saveFiles,
                         (item, done) =>
@@ -465,7 +470,7 @@ export default class Config
      * Save item content to file or sync extensions.
      * @param item Item of configs.
      */
-    _saveItemContent(item: IConfig): Promise<any>
+    _saveItemContent(item: IConfig): Promise<ISyncStatus>
     {
         return new Promise((resolve, reject) =>
         {
@@ -510,11 +515,11 @@ export default class Config
      * Delete the physical files.
      * @param files Files list.
      */
-    removeConfigs(files: IConfig[]): Promise<Array<{ file: IConfig }>>
+    removeConfigs(files: IConfig[]): Promise<ISyncStatus[]>
     {
         return new Promise((resolve, reject) =>
         {
-            const removed: Array<{ file: IConfig }> = [];
+            const removed: ISyncStatus[] = [];
             async.eachSeries(
                 files,
                 (item, done) =>
