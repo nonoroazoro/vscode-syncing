@@ -21,27 +21,64 @@ export interface IExtension
     /**
      * The extension's identifier in the form of: `publisher.name`.
      */
-    id?: string;
+    id: string;
 
     /**
      * The extension's name.
      */
-    name?: string;
+    name: string;
 
     /**
      * The extension's publisher.
      */
-    publisher?: string;
+    publisher: string;
 
     /**
      * The extension's version.
      */
-    version?: string;
+    version: string;
 
     /**
      * The extension's metadata.
      */
     __metadata?: string;
+
+    /**
+     * The downloaded extension's zip file path.
+     */
+    zip?: string;
+
+    /**
+     * The installed extension's folder path.
+     */
+    path?: string;
+}
+
+/**
+ * Represent the options of [_addExtensions](#Extension._addExtensions),
+ * [_updateExtensions](#Extension._updateExtensions) and [_removeExtensions](#Extension._removeExtensions).
+ */
+interface ISyncOptions
+{
+    /**
+     * Extensions to add/update/remove.
+     */
+    extensions: IExtension[];
+
+    /**
+     * Progress of the synchronization of all extensions.
+     */
+    progress: number;
+
+    /**
+     * Total progress of the synchronization of all extensions.
+     */
+    total: number;
+
+    /**
+     * Whether to show the progress indicator. Defaults to `false`.
+     */
+    showIndicator?: boolean;
 }
 
 /**
@@ -99,17 +136,17 @@ export default class Extension
     }
 
     /**
-     * sync extensions (add/update/remove).
-     * @param {Array} p_extensions extensions list.
-     * @param {Boolean} [p_showIndicator=false] Defaults to `false`, don't show progress indicator.
+     * Sync extensions (add/update/remove).
+     * @param extensions Extensions list.
+     * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    sync(p_extensions, p_showIndicator = false)
+    sync(extensions: IExtension[], showIndicator: boolean = false)
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
-            this._getDifferentExtensions(p_extensions).then((diff) =>
+            this._getDifferentExtensions(extensions).then((diff) =>
             {
-                // add/update/remove extensions.
+                // Add/update/remove extensions.
                 const { added, updated, removed, total } = diff;
                 const result = { extension: {} };
                 const tasks = [
@@ -117,38 +154,39 @@ export default class Extension
                         extensions: added,
                         progress: 0,
                         total,
-                        showIndicator: p_showIndicator
+                        showIndicator
                     }),
                     this._updateExtensions.bind(this, {
                         extensions: updated,
                         progress: added.length,
                         total,
-                        showIndicator: p_showIndicator
+                        showIndicator
                     }),
                     this._removeExtensions.bind(this, {
                         extensions: removed,
                         progress: added.length + updated.length,
                         total,
-                        showIndicator: p_showIndicator
+                        showIndicator
                     })
                 ];
                 async.eachSeries(
                     tasks,
                     (task, done) =>
                     {
-                        task().then((value) =>
+                        task().then((value: any) =>
                         {
+                            // TODO: 检查结果是否正确。
                             Object.assign(result.extension, value);
                             done();
                         });
                     },
                     () =>
                     {
-                        if (p_showIndicator)
+                        if (showIndicator)
                         {
                             Toast.clearSpinner("");
                         }
-                        p_resolve(result);
+                        resolve(result);
                     }
                 );
             });
@@ -156,20 +194,16 @@ export default class Extension
     }
 
     /**
-     * add extensions.
-     * @param {Object} [{ extensions, progress, total, showIndicator = false }={}]
-     *     extensions: extensions to add.
-     *     progress: progress of the synchronization of all extensions.
-     *     total: total progress of the synchronization of all extensions.
-     *     [showIndicator=false]: Defaults to `false`, don't show progress indicator.
-     * @returns {Promise}
+     * Add extensions.
      */
-    _addExtensions({ extensions, progress, total, showIndicator = false } = {})
+    _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
-            let steps = progress;
-            const result = { added: [], addedErrors: [] };
+            const { extensions, progress, total, showIndicator = false } = options;
+
+            let steps: number = progress;
+            const result = { added: [] as IExtension[], addedErrors: [] as IExtension[] };
             async.eachSeries(
                 extensions,
                 (item, done) =>
@@ -207,27 +241,23 @@ export default class Extension
                 },
                 () =>
                 {
-                    p_resolve(result);
+                    resolve(result);
                 }
             );
         });
     }
 
     /**
-     * update extensions.
-     * @param {Object} [{ extensions, progress, total, showIndicator = false }={}]
-     *     extensions: extensions to update.
-     *     progress: progress of the synchronization of all extensions.
-     *     total: total progress of the synchronization of all extensions.
-     *     [showIndicator=false]: Defaults to `false`, don't show progress indicator.
-     * @returns {Promise}
+     * Update extensions.
      */
-    _updateExtensions({ extensions, progress, total, showIndicator = false } = {})
+    _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
-            let steps = progress;
-            const result = { updated: [], updatedErrors: [] };
+            const { extensions, progress, total, showIndicator = false } = options;
+
+            let steps: number = progress;
+            const result = { updated: [] as IExtension[], updatedErrors: [] as IExtension[] };
             async.eachSeries(
                 extensions,
                 (item, done) =>
@@ -273,27 +303,23 @@ export default class Extension
                 },
                 () =>
                 {
-                    p_resolve(result);
+                    resolve(result);
                 }
             );
         });
     }
 
     /**
-     * remove extensions.
-     * @param {Object} [{ extensions, progress, total, showIndicator = false }={}]
-     *     extensions: extensions to remove.
-     *     progress: progress of the synchronization of all extensions.
-     *     total: total progress of the synchronization of all extensions.
-     *     [showIndicator=false]: Defaults to `false`, don't show progress indicator.
-     * @returns {Promise}
+     * Remove extensions.
      */
-    _removeExtensions({ extensions, progress, total, showIndicator = false } = {})
+    _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
-            let steps = progress;
-            const result = { removed: [], removedErrors: [] };
+            const { extensions, progress, total, showIndicator = false } = options;
+
+            let steps: number = progress;
+            const result = { removed: [] as IExtension[], removedErrors: [] as IExtension[] };
             async.eachSeries(
                 extensions,
                 (item, done) =>
@@ -317,31 +343,29 @@ export default class Extension
                 },
                 () =>
                 {
-                    p_resolve(result);
+                    resolve(result);
                 }
             );
         });
     }
 
     /**
-     * download extension from vscode Marketplace.
-     * @param {Object} p_extension
-     * @returns {Promise}
+     * Download extension from VSCode marketplace.
      */
-    downloadExtension(p_extension)
+    downloadExtension(extension: IExtension): Promise<IExtension>
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
-            const filepath = temp.path({ suffix: `.${p_extension.id}.zip` });
+            const filepath = temp.path({ suffix: `.${extension.id}.zip` });
             const file = fs.createWriteStream(filepath);
             file.on("finish", () =>
             {
-                p_resolve(Object.assign({}, p_extension, { zip: filepath }));
-            }).on("error", p_reject);
+                resolve(Object.assign({}, extension, { zip: filepath }));
+            }).on("error", reject);
 
-            const options = {
-                host: `${p_extension.publisher}.gallery.vsassets.io`,
-                path: `/_apis/public/gallery/publisher/${p_extension.publisher}/extension/${p_extension.name}/${p_extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
+            const options: https.RequestOptions = {
+                host: `${extension.publisher}.gallery.vsassets.io`,
+                path: `/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
             };
             const proxy = this._env.getSyncingProxy();
             if (proxy)
@@ -357,39 +381,41 @@ export default class Extension
                 }
                 else
                 {
-                    p_reject();
+                    reject();
                 }
-            }).on("error", p_reject);
+            }).on("error", reject);
         });
     }
 
     /**
-     * extract extension to vscode extensions folder.
-     * @param {Object} p_extension
-     * returns {Promise}
+     * Extract extension zip file to VSCode extensions folder.
      */
-    extractExtension(p_extension)
+    extractExtension(extension: IExtension): Promise<IExtension>
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
             temp.mkdir("syncing-", (err1, dirPath) =>
             {
                 if (err1)
                 {
-                    p_reject(`Cannot extract extension: ${p_extension.id}. Access temp folder denied.`);
+                    reject(`Cannot extract extension: ${extension.id}. Access temp folder denied.`);
+                }
+                else if (!extension.zip)
+                {
+                    reject(`Cannot extract extension: ${extension.id}. Zip file not found.`);
                 }
                 else
                 {
-                    const zip = new AdmZip(p_extension.zip);
+                    const zip: AdmZip = new AdmZip(extension.zip);
                     zip.extractAllToAsync(dirPath, true, (err2) =>
                     {
                         if (err2)
                         {
-                            p_reject(`Cannot extract extension: ${p_extension.id}. ${err2.message}`);
+                            reject(`Cannot extract extension: ${extension.id}. ${err2.message}`);
                         }
                         else
                         {
-                            const extPath = path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${p_extension.version}`);
+                            const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
                             fse.emptyDir(extPath)
                                 .then(() =>
                                 {
@@ -397,13 +423,13 @@ export default class Extension
                                 })
                                 .then(() =>
                                 {
-                                    // clear temp file (asynchronization and don't wait).
-                                    fse.remove(p_extension.zip).catch(() => { });
-                                    p_resolve(Object.assign({}, p_extension, { path: extPath }));
+                                    // Clear temp file (background and don't wait).
+                                    fse.remove(extension.zip!).catch(() => { });
+                                    resolve(Object.assign({}, extension, { path: extPath }));
                                 })
                                 .catch((err3) =>
                                 {
-                                    p_reject(`Cannot extract extension: ${p_extension.id}. ${err3.message}`);
+                                    reject(`Cannot extract extension: ${extension.id}. ${err3.message}`);
                                 });
                         }
                     });
@@ -413,114 +439,119 @@ export default class Extension
     }
 
     /**
-     * update extension's __metadata.
-     * @param {Object} p_extension
-     * returns {Promise}
+     * Update extension's __metadata (post-process).
      */
-    updateMetadata(p_extension)
+    updateMetadata(extension: IExtension): Promise<IExtension>
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
-            if (p_extension && p_extension.__metadata)
+            if (extension && extension.__metadata && extension.path)
             {
                 try
                 {
-                    const filepath = path.join(p_extension.path, "package.json");
+                    const filepath = path.join(extension.path, "package.json");
                     const packageJSON = JSON.parse(fs.readFileSync(filepath, "utf8"));
-                    packageJSON.__metadata = p_extension.__metadata;
+                    packageJSON.__metadata = extension.__metadata;
                     fs.writeFileSync(filepath, JSON.stringify(packageJSON), "utf8");
-                    p_resolve(p_extension);
+                    resolve(extension);
                 }
                 catch (err)
                 {
-                    p_reject(`Cannot update extension's metadata: ${p_extension.id}.`);
+                    reject(`Cannot update extension's metadata: ${extension.id}.`);
                 }
             }
             else
             {
-                p_resolve(p_extension);
+                resolve(extension);
             }
         });
     }
 
     /**
-     * uninstall vscode extension.
-     * @param {Object} p_extension
-     * returns {Promise}
+     * Uninstall extension.
      */
-    uninstallExtension(p_extension)
+    uninstallExtension(extension: IExtension): Promise<IExtension>
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
-            const localExtension = vscode.extensions.getExtension(p_extension.id);
-            const version = localExtension ? localExtension.packageJSON.version : p_extension.version;
-            fse.remove(path.join(this._env.extensionsPath, `${p_extension.publisher}.${p_extension.name}-${version}`), (err) =>
+            const localExtension = vscode.extensions.getExtension(extension.id);
+            const version = localExtension ? localExtension.packageJSON.version : extension.version;
+            fse.remove(path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${version}`), (err) =>
             {
                 if (err)
                 {
-                    p_reject(new Error(`Cannot uninstall extension: ${p_extension.id}`));
+                    reject(new Error(`Cannot uninstall extension: ${extension.id}`));
                 }
                 else
                 {
-                    p_resolve(p_extension);
+                    resolve(extension);
                 }
             });
         });
     }
 
     /**
-     * get extensions that are added/updated/removed.
-     * @param {Array} p_extensions
-     * @returns {Promise}
+     * Get extensions that are added/updated/removed.
      */
-    _getDifferentExtensions(p_extensions)
+    _getDifferentExtensions(extensions: IExtension[]): Promise<{
+        added: IExtension[],
+        removed: IExtension[],
+        updated: IExtension[],
+        total: number
+    }>
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
-            const extensions = { added: [], updated: [], removed: [], total: 0 };
-            if (p_extensions)
+            const result = {
+                added: [] as IExtension[],
+                removed: [] as IExtension[],
+                updated: [] as IExtension[],
+                get total()
+                {
+                    // TODO: 检查 total 是否正确。
+                    return this.added.length + this.removed.length + this.updated.length;
+                }
+            };
+            if (extensions)
             {
-                let localExtension;
-                const reservedExtensionIDs = [];
+                let localExtension: vscode.Extension<any>;
+                const reservedExtensionIDs: string[] = [];
 
-                // find added & updated extensions.
-                for (const ext of p_extensions)
+                // Find added & updated extensions.
+                for (const ext of extensions)
                 {
                     localExtension = vscode.extensions.getExtension(ext.id);
                     if (localExtension)
                     {
                         if (localExtension.packageJSON.version === ext.version)
                         {
-                            // reserved.
+                            // Reserved.
                             reservedExtensionIDs.push(ext.id);
                         }
                         else
                         {
-                            // updated.
-                            extensions.updated.push(ext);
-                            extensions.total = extensions.total + 1;
+                            // Updated.
+                            result.updated.push(ext);
                         }
                     }
                     else
                     {
-                        // added.
-                        extensions.added.push(ext);
-                        extensions.total = extensions.total + 1;
+                        // Added.
+                        result.added.push(ext);
                     }
                 }
 
-                const localExtensions = this.getAll();
+                const localExtensions: IExtension[] = this.getAll();
                 for (const ext of localExtensions)
                 {
-                    if (!reservedExtensionIDs.includes(ext.id))
+                    if (reservedExtensionIDs.indexOf(ext.id) === -1)
                     {
-                        // removed.
-                        extensions.removed.push(ext);
-                        extensions.total = extensions.total + 1;
+                        // Removed.
+                        result.removed.push(ext);
                     }
                 }
             }
-            p_resolve(extensions);
+            resolve(result);
         });
     }
 }
