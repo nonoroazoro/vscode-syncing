@@ -9,24 +9,66 @@ import Gist from "./Gist";
 import Toast from "./Toast";
 
 /**
- * Represent the content of snippet.
+ * Represent the type of VSCode configs.
  */
-interface ISnippet
+export enum ConfigTypes
 {
     /**
-     * Snippet file name.
+     * Files.
+     */
+    File,
+
+    /**
+     * Folders.
+     */
+    Folder
+}
+
+/**
+ * Represent the content of VSCode config.
+ */
+export interface IConfig
+{
+    /**
+     * Config file name.
      */
     name: string;
 
     /**
-     * Snippet file path in local.
+     * Config file path in local.
      */
     path: string;
 
     /**
-     * Snippet file name in remote.
+     * Config file name in remote.
      */
     remote: string;
+
+    /**
+     * Config file content.
+     */
+    content?: string;
+}
+
+/**
+ * Represent the options of [getConfigs](#Config.getConfigs).
+ */
+export interface IGetConfigOptions
+{
+    /**
+     * Whether to load the full list of VSCode settings. Defaults to `false`.
+     */
+    full?: boolean;
+
+    /**
+     * Whether to load the content of VSCode settings files. Defaults to `false`.
+     */
+    load?: boolean;
+
+    /**
+     * Whether to show the progress indicator. Defaults to `false`.
+     */
+    showIndicator?: boolean;
 }
 
 /**
@@ -55,7 +97,7 @@ export default class Config
     /**
      * Default settings of Syncing.
      */
-    private static readonly defaultSettings: ISyncingSettings = { id: "", token: "" };
+    private static readonly DEFAULT_SETTINGS: ISyncingSettings = { id: "", token: "" };
 
     /**
      * Prefix of remote snippet files.
@@ -63,12 +105,12 @@ export default class Config
     private static readonly SNIPPET_PREFIX: string = "snippet-";
 
     private _env: Environment;
-    private _extension: Extension;
+    private _ext: Extension;
 
     private constructor(context: vscode.ExtensionContext)
     {
         this._env = Environment.create(context);
-        this._extension = Extension.create(context);
+        this._ext = Extension.create(context);
     }
 
     /**
@@ -84,13 +126,8 @@ export default class Config
     }
 
     /**
-     * get vscode configs list (will be uploaded or downloaded, anyway).
-     * @param {Object} [{ full = false, load = false }={}]
-     *     full: default is false, the result is corresponding to current OS.
-     *     load: default is false, do not load file contents.
-     *     showIndicator: default is false, don't show progress indicator.
-     * @returns {Promise}
-     * for example:
+     * Get VSCode settings list (will be uploaded or downloaded, anyway).
+     * For example:
      *    [
      *        {
      *            name: "extensions",
@@ -101,11 +138,11 @@ export default class Config
      *        ...
      *    ]
      */
-    public getConfigs({ full = false, load = false, showIndicator = false } = {})
+    public getConfigs({ full = false, load = false, showIndicator = false }: IGetConfigOptions = {}): Promise<IConfig[]>
     {
         return new Promise((resolve) =>
         {
-            function resolveWrap(value: any)
+            function resolveWrap(value: IConfig[])
             {
                 if (showIndicator)
                 {
@@ -119,46 +156,44 @@ export default class Config
                 Toast.showSpinner("Syncing: Gathering local settings.");
             }
 
-            // the item order is very important to ensure that the small files are synced first.
-            // thus, the extensions will be the last one to sync.
-            const list = [
-                { name: "locale", type: "file" },
-                { name: "snippets", type: "folder" },
-                { name: "extensions", type: "file" }
+            // The item order is very important to ensure that the small files are synced first.
+            // Thus, the extensions will be the last one to sync.
+            const list: Array<{ name: string, type: ConfigTypes }> = [
+                { name: "locale", type: ConfigTypes.File },
+                { name: "snippets", type: ConfigTypes.Folder },
+                { name: "extensions", type: ConfigTypes.File }
             ];
 
             if (full)
             {
                 list.unshift(
-                    { name: "settings-mac", type: "file" },
-                    { name: "settings", type: "file" },
-                    { name: "keybindings-mac", type: "file" },
-                    { name: "keybindings", type: "file" }
+                    { name: "settings-mac", type: ConfigTypes.File },
+                    { name: "settings", type: ConfigTypes.File },
+                    { name: "keybindings-mac", type: ConfigTypes.File },
+                    { name: "keybindings", type: ConfigTypes.File }
                 );
             }
             else
             {
                 list.unshift(
-                    this._env.isMac ?
-                        { name: "settings-mac", type: "file" }
-                        : { name: "settings", type: "file" },
-                    this._env.isMac ?
-                        { name: "keybindings-mac", type: "file" }
-                        : { name: "keybindings", type: "file" }
+                    this._env.isMac ? { name: "settings-mac", type: ConfigTypes.File }
+                        : { name: "settings", type: ConfigTypes.File },
+                    this._env.isMac ? { name: "keybindings-mac", type: ConfigTypes.File }
+                        : { name: "keybindings", type: ConfigTypes.File }
                 );
             }
 
-            let temp: ISnippet[];
+            let temp: IConfig[];
             let localFilename: string;
-            const results: any[] = [];
-            const errors: string[] = [];
+            const results: IConfig[] = [];
+            const errorFiles: string[] = [];
             async.eachSeries(
                 list,
                 (item, done) =>
                 {
-                    if (item.type === "folder")
+                    if (item.type === ConfigTypes.Folder)
                     {
-                        // attention: snippets may be empty.
+                        // Attention: Snippets may be empty.
                         temp = this._getSnippets(this._env.snippetsPath);
                     }
                     else
@@ -187,17 +222,18 @@ export default class Config
 
                     if (load)
                     {
-                        this._loadItemContent(temp).then((values) =>
+                        this._loadContent(temp).then((values: IConfig[]) =>
                         {
-                            values.forEach((value) =>
+                            values.forEach((value: IConfig) =>
                             {
+                                // Check for success.
                                 if (value.content)
                                 {
                                     results.push(value);
                                 }
                                 else
                                 {
-                                    errors.push(value.remote);
+                                    errorFiles.push(value.remote);
                                 }
                             });
                             done();
@@ -211,9 +247,9 @@ export default class Config
                 },
                 () =>
                 {
-                    if (errors.length > 0)
+                    if (errorFiles.length > 0)
                     {
-                        console.log(`Some of the VSCode's settings are invalid (will be ignored): ${errors.join(" ")}`);
+                        console.error(`Some of VSCode settings are invalid, which will be ignored: ${errorFiles.join(" ")}`);
                     }
                     resolveWrap(results);
                 }
@@ -225,9 +261,9 @@ export default class Config
      * Get all snippet files.
      * @param snippetsDir Snippets dir.
      */
-    _getSnippets(snippetsDir: string): ISnippet[]
+    _getSnippets(snippetsDir: string): IConfig[]
     {
-        const results: ISnippet[] = [];
+        const results: IConfig[] = [];
         try
         {
             const filenames: string[] = fs.readdirSync(snippetsDir);
@@ -243,87 +279,88 @@ export default class Config
         }
         catch (err)
         {
+            console.error("Syncing: Error loading snippets.");
         }
         return results;
     }
 
     /**
-     * Save VSCode configs to files.
-     * @param {Object} VSCode Configs from Gist.
-     * @param p_showIndicator Default is false, don't show progress indicator.
-     * @returns {Promise}
+     * Save VSCode settings to files.
+     * @param files VSCode Configs from Gist.
+     * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    saveConfigs(p_files, p_showIndicator: boolean = false): Promise<>
+    saveConfigs(files: any, showIndicator: boolean = false): Promise<any>
     {
-        return new Promise((p_resolve, p_reject) =>
+        // TODO: files type isn't explicit.
+        return new Promise((resolve, reject) =>
         {
-            function resolveWrap(p_value)
+            function resolveWrap(value: any)
             {
-                if (p_showIndicator)
+                if (showIndicator)
                 {
                     Toast.clearSpinner("");
                 }
-                p_resolve(p_value);
+                resolve(value);
             }
 
-            function rejectWrap(p_error)
+            function rejectWrap(error: Error)
             {
-                if (p_showIndicator)
+                if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: Downloading failed. ${p_error.message}`);
+                    Toast.statusError(`Syncing: Downloading failed. ${error.message}`);
                 }
-                p_reject(p_error);
+                reject(error);
             }
 
-            if (p_showIndicator)
+            if (showIndicator)
             {
                 Toast.showSpinner("Syncing: Downloading settings.");
             }
 
-            if (p_files)
+            if (files)
             {
-                let extensionsFile;
-                const saveFiles = [];
-                const removeFiles = [];
-                const existsFileKeys = [];
-                this.getConfigs().then((configs) =>
+                let extensionsFile: IConfig;
+                const saveFiles: IConfig[] = [];
+                const removeFiles: IConfig[] = [];
+                const existsFileKeys: string[] = [];
+                this.getConfigs().then((configs: IConfig[]) =>
                 {
-                    let file;
-                    for (const item of configs)
+                    let file: any;
+                    for (const config of configs)
                     {
-                        file = p_files[item.remote];
+                        file = files[config.remote];
                         if (file)
                         {
-                            // file exists in remote and local, sync it.
-                            if (item.name === "extensions")
+                            // File exists in remote and local, sync it.
+                            if (config.name === "extensions")
                             {
-                                // temp extensions file.
-                                extensionsFile = Object.assign({}, item, { content: file.content });
+                                // Temp extensions file.
+                                extensionsFile = Object.assign({}, config, { content: file.content });
                             }
                             else
                             {
-                                // temp other file.
-                                saveFiles.push(Object.assign({}, item, { content: file.content }));
+                                // Temp other file.
+                                saveFiles.push(Object.assign({}, config, { content: file.content }));
                             }
-                            existsFileKeys.push(item.remote);
+                            existsFileKeys.push(config.remote);
                         }
                         else
                         {
-                            // file exists in remote, but not exists in local.
-                            // and delete it if it's a snippet file.
-                            if (item.remote.startsWith(Config.SNIPPET_PREFIX))
+                            // File exists in remote, but not exists in local.
+                            // Delete if it's a snippet file.
+                            if (config.remote.startsWith(Config.SNIPPET_PREFIX))
                             {
-                                removeFiles.push(item);
+                                removeFiles.push(config);
                             }
                         }
                     }
 
-                    let filename;
-                    for (const key of Object.keys(p_files))
+                    let filename: string;
+                    for (const key of Object.keys(files))
                     {
-                        if (!existsFileKeys.includes(key))
+                        if (existsFileKeys.indexOf(key) === -1)
                         {
-                            file = p_files[key];
+                            file = files[key];
                             if (file.filename.startsWith(Config.SNIPPET_PREFIX))
                             {
                                 filename = file.filename.slice(Config.SNIPPET_PREFIX.length);
@@ -339,18 +376,19 @@ export default class Config
                             }
                             else
                             {
-                                // unknown files, do not process.
+                                // Unknown files, do not process.
                             }
                         }
                     }
 
-                    // put extensions file to the last.
+                    // Put extensions file to the last.
                     if (extensionsFile)
                     {
                         saveFiles.push(extensionsFile);
                     }
 
-                    const syncedFiles = { updated: [], removed: [] };
+                    const syncedFiles: { updated: Array<{ file: IConfig }>, removed: Array<{ file: IConfig }> }
+                        = { updated: [], removed: [] };
                     async.eachSeries(
                         saveFiles,
                         (item, done) =>
@@ -364,7 +402,7 @@ export default class Config
                                 done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
                             });
                         },
-                        (err) =>
+                        (err: Error) =>
                         {
                             if (err)
                             {
@@ -390,70 +428,78 @@ export default class Config
     }
 
     /**
-     * load items content. if load failed, the content will exactly be `null`.
-     * @param {Array} p_items items of configs.
-     * @returns {Promise}
+     * Load file content of configs.
+     * The content will exactly be `undefined` when failure happens.
+     * @param configs VSCode configs.
      */
-    _loadItemContent(p_items)
+    _loadContent(configs: IConfig[]): Promise<IConfig[]>
     {
-        return new Promise((p_resolve) =>
+        return new Promise((resolve) =>
         {
-            let content;
-            const result = p_items.map((item) =>
+            let content: string | undefined;
+            const results: IConfig[] = configs.map((item: IConfig) =>
             {
                 try
                 {
                     if (item.name === "extensions")
                     {
-                        content = JSON.stringify(this._extension.getAll() || [], null, 4);
+                        content = JSON.stringify(this._ext.getAll() || [], null, 4);
                     }
                     else
                     {
                         content = fs.readFileSync(item.path, "utf8");
                     }
                 }
-                catch (err)
+                catch (e)
                 {
-                    content = null;
+                    content = undefined;
+                    console.error(`Syncing: Error loading config file: ${item.name}.\n${e}`);
                 }
                 return Object.assign({}, item, { content });
             });
-            p_resolve(result);
+            resolve(results);
         });
     }
 
     /**
-     * save item content to file or install extensions.
-     * @param {Object} p_item item of configs.
-     * @returns {Promise}
+     * Save item content to file or sync extensions.
+     * @param item Item of configs.
      */
-    _saveItemContent(p_item)
+    _saveItemContent(item: IConfig): Promise<any>
     {
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
-            if (p_item.name === "extensions")
+            if (item.name === "extensions")
             {
-                try
+                if (item.content)
                 {
-                    this._extension.sync(JSON.parse(p_item.content), true)
-                        .then(p_resolve).catch(p_reject);
+                    try
+                    {
+                        // Sync extensions.
+                        this._ext.sync(JSON.parse(item.content), true).then(resolve).catch(reject);
+                    }
+                    catch (err)
+                    {
+                        reject(err);
+                    }
                 }
-                catch (err)
+                else
                 {
-                    p_reject(err);
+                    reject(new Error("Invalid config content."));
                 }
             }
             else
             {
-                fs.writeFile(p_item.path, p_item.content || "{}", (err) =>
+                // Save files.
+                fs.writeFile(item.path, item.content || "{}", (err) =>
                 {
                     if (err)
                     {
-                        p_reject(err);
+                        reject(err);
                     }
                     else
                     {
-                        p_resolve({ file: p_item });
+                        resolve({ file: item });
                     }
                 });
             }
@@ -461,17 +507,16 @@ export default class Config
     }
 
     /**
-     * delete the physical files.
-     * @param {Array} p_files files list.
-     * @returns {Promise}
+     * Delete the physical files.
+     * @param files Files list.
      */
-    removeConfigs(p_files)
+    removeConfigs(files: IConfig[]): Promise<Array<{ file: IConfig }>>
     {
-        const removed = [];
-        return new Promise((p_resolve, p_reject) =>
+        return new Promise((resolve, reject) =>
         {
+            const removed: Array<{ file: IConfig }> = [];
             async.eachSeries(
-                p_files,
+                files,
                 (item, done) =>
                 {
                     fs.unlink(item.path, (err) =>
@@ -491,11 +536,11 @@ export default class Config
                 {
                     if (err)
                     {
-                        p_reject(err);
+                        reject(err);
                     }
                     else
                     {
-                        p_resolve(removed);
+                        resolve(removed);
                     }
                 }
             );
@@ -503,66 +548,60 @@ export default class Config
     }
 
     /**
-     * init Syncing settings file.
-     * @returns {Promise}
+     * Init Syncing settings file.
      */
-    initSyncingSettings()
+    initSyncingSettings(): Promise<void>
     {
-        return this.saveSyncingSettings(Config.defaultSettings, false);
+        return this.saveSyncingSettings(Config.DEFAULT_SETTINGS);
     }
 
     /**
-     * clear GitHub Personal Access Token and save to file.
-     * @returns {Promise}
+     * Clear GitHub Personal Access Token and save to file.
      */
-    clearSyncingToken()
+    clearSyncingToken(): Promise<void>
     {
-        const settings = this.loadSyncingSettings();
+        const settings: ISyncingSettings = this.loadSyncingSettings();
         settings.token = "";
-        return this.saveSyncingSettings(settings, false);
+        return this.saveSyncingSettings(settings);
     }
 
     /**
-     * clear Gist ID and save to file.
-     * @returns {Promise}
+     * Clear Gist ID and save to file.
      */
-    clearSyncingID()
+    clearSyncingID(): Promise<void>
     {
-        const settings = this.loadSyncingSettings();
+        const settings: ISyncingSettings = this.loadSyncingSettings();
         settings.id = "";
-        return this.saveSyncingSettings(settings, false);
+        return this.saveSyncingSettings(settings);
     }
 
     /**
-     * prepare Syncing's settings for uploading.
-     * @param showIndicator Default is `false`, don't show progress indicator.
+     * Prepare Syncing's settings for uploading.
+     * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
     prepareUploadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
     {
-        // GitHub token must exist, but Gist ID could be none.
-        return this.prepareSyncingSettings({ showIndicator });
+        // GitHub Token must exist, but Gist ID could be none.
+        return this.prepareSyncingSettings(true, showIndicator);
     }
 
     /**
      * Prepare Syncing's settings for downloading.
-     * @param showIndicator Default is `false`, don't show progress indicator.
+     * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
     prepareDownloadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
     {
-        // GitHub token could be none, but Gist ID must exist.
-        return this.prepareSyncingSettings({ forUpload: false, showIndicator });
+        // GitHub Token could be none, but Gist ID must exist.
+        return this.prepareSyncingSettings(false, showIndicator);
     }
 
     /**
-     * prepare Syncing's settings, will ask for settings if not exist.
-     * @param {Object} [{ forUpload = true, showIndicator = false }={}]
-     *     [forUpload=true]: default is true, GitHub token must exist, but Gist ID could be none when uploading, else, GitHub token could be none, but Gist ID must exist.
-     *     [showIndicator=false]: default is false, don't show progress indicator.
-     * @returns {Promise}
+     * Prepare Syncing's settings, will ask for settings if not exist.
+     * @param forUpload Whether to show messages for upload. Defaults to `true`.
+     * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    prepareSyncingSettings({ forUpload = true, showIndicator = false } = {}): Promise<ISyncingSettings>
+    prepareSyncingSettings(forUpload: boolean = true, showIndicator: boolean = false): Promise<ISyncingSettings>
     {
-        // GitHub token could be none, but Gist ID must exist.
         return new Promise((resolve, reject) =>
         {
             function resolveWrap(value: ISyncingSettings)
@@ -588,19 +627,20 @@ export default class Config
                 Toast.showSpinner("Syncing: Checking Syncing's settings.");
             }
 
-            const settings = this.loadSyncingSettings();
+            const settings: ISyncingSettings = this.loadSyncingSettings();
             if (settings.token && settings.id)
             {
                 resolveWrap(settings);
             }
             else
             {
-                let gistIDTask;
+                let gistIDTask: Promise<{ id: string }>;
                 if (settings.token)
                 {
                     if (settings.id)
                     {
-                        gistIDTask = Promise.resolve(settings.id);
+                        // TODO: 测试这里返回值是否正确。
+                        gistIDTask = Promise.resolve({ id: settings.id });
                     }
                     else
                     {
@@ -626,19 +666,18 @@ export default class Config
                 gistIDTask.then(({ id }) =>
                 {
                     settings.id = id;
-                    this.saveSyncingSettings(settings).then(() => resolveWrap(settings));
+                    this.saveSyncingSettings(settings, true).then(() => resolveWrap(settings));
                 }).catch(rejectWrap);
             }
         });
     }
 
     /**
-     * load Syncing's settings (load from settings file: `syncing.json`).
-     * @returns {Object} or `{}`.
+     * Load Syncing's settings (load from settings file: `syncing.json`).
      */
-    loadSyncingSettings()
+    loadSyncingSettings(): ISyncingSettings
     {
-        const settings = Object.assign({}, Config.defaultSettings);
+        const settings: ISyncingSettings = Object.assign({}, Config.DEFAULT_SETTINGS);
         try
         {
             Object.assign(
@@ -648,6 +687,7 @@ export default class Config
         }
         catch (err)
         {
+            console.error(`Syncing: Error loading Syncing's settings: ${err}`);
         }
         return settings;
     }
@@ -655,62 +695,52 @@ export default class Config
     /**
      * Save Syncing's settings to file: `syncing.json`.
      * @param settings Syncing's Settings.
-     * @param showToast Show error toast.
+     * @param showToast Whether to show error toast. Defaults to `false`.
      */
-    saveSyncingSettings(settings: ISyncingSettings, showToast = true): Promise<void>
+    saveSyncingSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
     {
         return new Promise((resolve) =>
         {
-            try
-            {
-                fs.writeFile(this._env.syncingSettingsPath, JSON.stringify(settings, null, 4) || "{}", (err) =>
-                {
-                    if (err && showToast)
-                    {
-                        Toast.statusError(`Syncing: Cannot save Syncing's settings: ${err}`);
-                    }
-                    resolve();
-                });
-            }
-            catch (err)
+            const content = JSON.stringify(settings, null, 4) || "{}";
+            fs.writeFile(this._env.syncingSettingsPath, content, (err) =>
             {
                 if (err && showToast)
                 {
                     Toast.statusError(`Syncing: Cannot save Syncing's settings: ${err}`);
                 }
                 resolve();
-            }
+            });
         });
     }
 
     /**
-     * ask user for Gist ID.
+     * Ask user for Gist ID.
      *
-     * @param {String} p_token GitHub Personal Access Token.
-     * @param {Boolean} [p_forUpload=true] default is true, GitHub token must exist, but Gist ID could be none, else, GitHub token could be none, but Gist ID must exist.
-     * @returns {Promise}
+     * @param token GitHub Personal Access Token.
+     * @param forUpload Whether to show messages for upload. Defaults to `true`.
      */
-    _requestGistID(p_token, p_forUpload = true)
+    _requestGistID(token: string, forUpload: boolean = true): Promise<{ id: string }>
     {
-        if (p_token)
+        if (token)
         {
-            const api = Gist.create(p_token, this._env.getSyncingProxy());
-            return Toast.showRemoteGistListBox(api, p_forUpload).then((value) =>
+            const api: Gist = Gist.create(token, this._env.getSyncingProxy());
+            return Toast.showRemoteGistListBox(api, forUpload).then((value) =>
             {
-                if (value.id)
+                // TODO: 测试这里返回值是否正确。
+                if (value.id === "")
                 {
-                    return value;
+                    // Show gist input box when id is still null.
+                    return Toast.showGistInputBox(forUpload);
                 }
                 else
                 {
-                    // show gist input box when id is still null.
-                    return Toast.showGistInputBox(p_forUpload);
+                    return value;
                 }
             });
         }
         else
         {
-            return Toast.showGistInputBox(p_forUpload);
+            return Toast.showGistInputBox(forUpload);
         }
     }
 }
