@@ -97,7 +97,7 @@ export default class Gist
     /**
      * Get gist of the authenticated user.
      * @param id Gist id.
-     * @param showIndicator Default is `false`, don't show progress indicator.
+     * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
     public get(id: string, showIndicator: boolean = false): Promise<any>
     {
@@ -147,7 +147,7 @@ export default class Gist
     /**
      * Get all gists of the authenticated user.
      */
-    public getAll(): Promise<any>
+    public getAll(): Promise<any[]>
     {
         return new Promise((resolve, reject) =>
         {
@@ -275,7 +275,7 @@ export default class Gist
     /**
      * Create settings gist.
      * @param files Settings files.
-     * @param isPublic Default is `false`, gist is set to private.
+     * @param isPublic Defaults to `false`, gist is set to private.
      */
     public createSettings(files = {}, isPublic = false): Promise<any>
     {
@@ -291,7 +291,7 @@ export default class Gist
      * @param id Gist id.
      * @param uploads Settings that will be uploaded.
      * @param upsert Default is `true`, create new if gist not exists.
-     * @param showIndicator Default is `false`, don't show progress indicator.
+     * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
     public findAndUpdate(id: string, uploads: any, upsert = true, showIndicator = false): Promise<any>
     {
