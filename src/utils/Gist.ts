@@ -1,5 +1,4 @@
 import * as Github from "github";
-import * as vscode from "vscode";
 
 import Toast from "./Toast";
 
