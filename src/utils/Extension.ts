@@ -8,6 +8,7 @@ import * as path from "path";
 import * as temp from "temp";
 import * as vscode from "vscode";
 
+import { IConfig } from "./Config";
 import Environment from "./Environment";
 import Toast from "./Toast";
 
@@ -58,7 +59,7 @@ export interface IExtension
  * Represent the options of [_addExtensions](#Extension._addExtensions),
  * [_updateExtensions](#Extension._updateExtensions) and [_removeExtensions](#Extension._removeExtensions).
  */
-interface ISyncOptions
+export interface ISyncOptions
 {
     /**
      * Extensions to add/update/remove.
@@ -79,6 +80,29 @@ interface ISyncOptions
      * Whether to show the progress indicator. Defaults to `false`.
      */
     showIndicator?: boolean;
+}
+
+/**
+ * Represent the status of synchronization.
+ */
+export interface ISyncStatus
+{
+    /**
+     * Extensions that have been added, updated or removed.
+     */
+    extension?: {
+        added: IExtension[],
+        addedErrors: IExtension[],
+        updated: IExtension[],
+        updatedErrors: IExtension[],
+        removed: IExtension[],
+        removedErrors: IExtension[]
+    };
+
+    /**
+     * Files that have been added, updated or removed.
+     */
+    file?: IConfig;
 }
 
 /**
@@ -140,7 +164,7 @@ export default class Extension
      * @param extensions Extensions list.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    sync(extensions: IExtension[], showIndicator: boolean = false)
+    sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncStatus>
     {
         return new Promise((resolve) =>
         {
@@ -148,7 +172,7 @@ export default class Extension
             {
                 // Add/update/remove extensions.
                 const { added, updated, removed, total } = diff;
-                const result = { extension: {} };
+                const result = { extension: {} } as ISyncStatus;
                 const tasks = [
                     this._addExtensions.bind(this, {
                         extensions: added,
