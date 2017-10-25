@@ -1,7 +1,3 @@
-/**
- * vscode extension utils.
- */
-
 import * as AdmZip from "adm-zip";
 import * as async from "async";
 import * as fs from "fs";
@@ -17,13 +13,47 @@ import Toast from "./Toast";
 
 temp.track();
 
+/**
+ * Represent a VSCode extension.
+ */
+export interface IExtension
+{
+    /**
+     * The extension's identifier in the form of: `publisher.name`.
+     */
+    id?: string;
+
+    /**
+     * The extension's name.
+     */
+    name?: string;
+
+    /**
+     * The extension's publisher.
+     */
+    publisher?: string;
+
+    /**
+     * The extension's version.
+     */
+    version?: string;
+
+    /**
+     * The extension's metadata.
+     */
+    __metadata?: string;
+}
+
+/**
+ * VSCode extension wrapper.
+ */
 export default class Extension
 {
     private static _instance: Extension;
 
     private _env: Environment;
 
-    constructor(context: vscode.ExtensionContext)
+    private constructor(context: vscode.ExtensionContext)
     {
         this._env = Environment.create(context);
     }
@@ -41,19 +71,13 @@ export default class Extension
     }
 
     /**
-     * Get all installed extensions.
-     * @param includeBuiltin Default is `false`, excludes builtin extensions.
+     * Get all installed extensions (Disabled extensions aren't included).
+     * @param includeBuiltin Whether to include builtin extensions. Defaults to `false`.
      */
-    public getAll(includeBuiltin = false): any[]
+    public getAll(includeBuiltin = false): IExtension[]
     {
-        let item: {
-            id?: string,
-            name?: string,
-            publisher?: string,
-            version?: string,
-            __metadata?: string
-        };
-        const result = [];
+        let item: IExtension;
+        const result: IExtension[] = [];
         for (const ext of vscode.extensions.all)
         {
             if (includeBuiltin || !ext.packageJSON.isBuiltin)
@@ -77,7 +101,7 @@ export default class Extension
     /**
      * sync extensions (add/update/remove).
      * @param {Array} p_extensions extensions list.
-     * @param {Boolean} [p_showIndicator=false] default is false, don't show progress indicator.
+     * @param {Boolean} [p_showIndicator=false] Defaults to `false`, don't show progress indicator.
      */
     sync(p_extensions, p_showIndicator = false)
     {
@@ -137,7 +161,7 @@ export default class Extension
      *     extensions: extensions to add.
      *     progress: progress of the synchronization of all extensions.
      *     total: total progress of the synchronization of all extensions.
-     *     [showIndicator=false]: default is false, don't show progress indicator.
+     *     [showIndicator=false]: Defaults to `false`, don't show progress indicator.
      * @returns {Promise}
      */
     _addExtensions({ extensions, progress, total, showIndicator = false } = {})
@@ -195,7 +219,7 @@ export default class Extension
      *     extensions: extensions to update.
      *     progress: progress of the synchronization of all extensions.
      *     total: total progress of the synchronization of all extensions.
-     *     [showIndicator=false]: default is false, don't show progress indicator.
+     *     [showIndicator=false]: Defaults to `false`, don't show progress indicator.
      * @returns {Promise}
      */
     _updateExtensions({ extensions, progress, total, showIndicator = false } = {})
@@ -261,7 +285,7 @@ export default class Extension
      *     extensions: extensions to remove.
      *     progress: progress of the synchronization of all extensions.
      *     total: total progress of the synchronization of all extensions.
-     *     [showIndicator=false]: default is false, don't show progress indicator.
+     *     [showIndicator=false]: Defaults to `false`, don't show progress indicator.
      * @returns {Promise}
      */
     _removeExtensions({ extensions, progress, total, showIndicator = false } = {})
