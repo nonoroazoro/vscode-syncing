@@ -152,7 +152,7 @@ function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ 
                     label: `Enter Gist ID manually...`
                 };
 
-                // don't show quick pick dialog when gists is empty.
+                // Don't show quick pick dialog when gists is empty.
                 if (gists && gists.length > 0)
                 {
                     const items: any[] = gists.map((gist) => ({
