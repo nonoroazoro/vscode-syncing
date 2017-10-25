@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 
 import Config from "./utils/Config";
 import Environment from "./utils/Environment";
+import { ISyncStatus } from "./utils/Extension";
 import Gist from "./utils/Gist";
 import Toast from "./utils/Toast";
 
@@ -11,7 +12,7 @@ let _config: Config;
 let _env: Environment;
 let _isSyncing: boolean;
 
-function activate(context: vscode.ExtensionContext)
+export function activate(context: vscode.ExtensionContext): void
 {
     _initGlobals(context);
     _initCommands(context);
@@ -20,7 +21,7 @@ function activate(context: vscode.ExtensionContext)
 /**
  * Init global variables.
  */
-function _initGlobals(context: vscode.ExtensionContext)
+function _initGlobals(context: vscode.ExtensionContext): void
 {
     _config = Config.create(context);
     _env = Environment.create(context);
@@ -33,7 +34,7 @@ function _initGlobals(context: vscode.ExtensionContext)
 /**
  * Init Syncing's commands.
  */
-function _initCommands(context: vscode.ExtensionContext)
+function _initCommands(context: vscode.ExtensionContext): void
 {
     _registerCommand(context, "syncing.uploadSettings", _uploadSettings);
     _registerCommand(context, "syncing.downloadSettings", _downloadSettings);
@@ -43,7 +44,7 @@ function _initCommands(context: vscode.ExtensionContext)
 /**
  * VSCode's registerCommand wrapper.
  */
-function _registerCommand(context: vscode.ExtensionContext, command: string, callback: (...args: any[]) => any)
+function _registerCommand(context: vscode.ExtensionContext, command: string, callback: (...args: any[]) => any): void
 {
     // Add to a list of disposables which are disposed when this extension is deactivated.
     context.subscriptions.push(vscode.commands.registerCommand(command, callback));
@@ -52,7 +53,7 @@ function _registerCommand(context: vscode.ExtensionContext, command: string, cal
 /**
  * Upload settings.
  */
-function _uploadSettings()
+function _uploadSettings(): void
 {
     if (!_isSyncing)
     {
@@ -89,7 +90,7 @@ function _uploadSettings()
 /**
  * download settings.
  */
-function _downloadSettings()
+function _downloadSettings(): void
 {
     if (!_isSyncing)
     {
@@ -131,9 +132,9 @@ function _downloadSettings()
 }
 
 /**
- * open Syncing's settings.
+ * Open Syncing's settings.
  */
-function _openSettings()
+function _openSettings(): void
 {
     if (fs.existsSync(_env.syncingSettingsPath))
     {
@@ -151,9 +152,7 @@ function _openSettings()
 /**
  * Check if extensions are actually synced.
  */
-function _isExtensionsSynced(
-    items: { updated: [{ extension: { added: [object], removed: [object], updated: [object] } }] }
-): boolean
+function _isExtensionsSynced(items: { updated: ISyncStatus[], removed: ISyncStatus[] }): boolean
 {
     for (const item of items.updated)
     {
@@ -177,5 +176,3 @@ function _openFile(filepath: string)
 {
     vscode.commands.executeCommand("vscode.open", vscode.Uri.file(filepath));
 }
-
-module.exports.activate = activate;
