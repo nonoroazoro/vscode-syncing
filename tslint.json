@@ -12,7 +12,7 @@
         "max-classes-per-file": false,
         "max-line-length": [
             true,
-            180
+            200
         ],
         "member-access": false,
         "member-ordering": [
@@ -47,6 +47,7 @@
         "no-empty": false,
         "no-string-literal": false,
         "no-var-keyword": true,
+        "object-literal-sort-keys": false,
         "one-line": false,
         "only-arrow-functions": false,
         "prefer-const": true,
