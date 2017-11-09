@@ -127,7 +127,7 @@ export default class Gist
 
             this._api.gists.get({ id }).then(resolveWrap).catch((err) =>
             {
-                let error = new Error("Please check your Internet connection.");
+                let error = new Error("Please check your Internet connection or proxy settings.");
                 const code: number = err.code;
                 if (code === 401)
                 {
@@ -178,7 +178,7 @@ export default class Gist
                 }
                 else
                 {
-                    reject(new Error("Please check your Internet connection."));
+                    reject(new Error("Please check your Internet connection or proxy settings."));
                 }
             });
         });
@@ -265,7 +265,7 @@ export default class Gist
                 }
                 else
                 {
-                    reject(new Error("Please check your Internet connection."));
+                    reject(new Error("Please check your Internet connection or proxy settings."));
                 }
             });
         });
