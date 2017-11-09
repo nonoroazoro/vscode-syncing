@@ -78,7 +78,7 @@ export default class Gist
             {
                 // TODO: 测试一下 get({}) 不传参数是否正确。
                 this._api.users
-                    .get()
+                    .get({} as any)
                     .then((value) =>
                     {
                         this._user = { name: value.login, id: value.id };
