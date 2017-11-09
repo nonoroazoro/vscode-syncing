@@ -58,9 +58,10 @@ function _uploadSettings(): void
     if (!_isSyncing)
     {
         _isSyncing = true;
+        _env.reloadSyncingProxy();
         _config.prepareUploadSettings(true).then((settings) =>
         {
-            const api = Gist.create(settings.token, _env.getSyncingProxy());
+            const api = Gist.create(settings.token, _env.syncingProxy);
             return _config.getConfigs({ load: true, showIndicator: true }).then((configs) =>
             {
                 return api.findAndUpdate(settings.id, configs, true, true).then((gist: any) =>
@@ -95,9 +96,10 @@ function _downloadSettings(): void
     if (!_isSyncing)
     {
         _isSyncing = true;
+        _env.reloadSyncingProxy();
         _config.prepareDownloadSettings(true).then((settings) =>
         {
-            const api = Gist.create(settings.token, _env.getSyncingProxy());
+            const api = Gist.create(settings.token, _env.syncingProxy);
             return api.get(settings.id, true).then((gist) =>
             {
                 return _config.saveConfigs(gist.files, true).then((synced) =>

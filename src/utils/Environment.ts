@@ -14,11 +14,13 @@ export default class Environment
     private _extensionsPath: string;
     private _isInsiders: boolean;
     private _isMac: boolean;
+    private _proxy: string | undefined;
     private _snippetsPath: string;
     private _syncingSettingsPath: string;
 
     private constructor(context: vscode.ExtensionContext)
     {
+        this.reloadSyncingProxy();
         this._isMac = process.platform === "darwin";
         this._isInsiders = context.extensionPath.includes("insider");
         this._extensionsPath = path.join(
@@ -101,20 +103,35 @@ export default class Environment
     }
 
     /**
+     * Get proxy settings for Syncing.
+     */
+    public get syncingProxy(): string | undefined
+    {
+        return this._proxy;
+    }
+
+    /**
+     * Reload proxy settings from VSCode `http.proxy` settings or from `http_proxy` and `https_proxy` of system environment variables.
+     * This function is designed to persist the proxy settings during the synchronization.
+     * Make sure to call it before downloading and uploading.
+     */
+    public reloadSyncingProxy(): void
+    {
+        let proxy: string | undefined = vscode.workspace.getConfiguration("http")["proxy"];
+        if (!proxy)
+        {
+            proxy = process.env["http_proxy"] || process.env["https_proxy"];
+        }
+        this._proxy = proxy;
+    }
+
+    /**
      * Get local snippet filepath from filename.
      * @param filename Snippet filename.
      */
     public getSnippetFilePath(filename: string): string
     {
         return path.join(this.snippetsPath, filename);
-    }
-
-    /**
-     * Get proxy settings for Syncing, using VSCode `http.proxy` settings.
-     */
-    public getSyncingProxy(): string
-    {
-        return vscode.workspace.getConfiguration("http")["proxy"];
     }
 
     private _getCodeBasePath(isInsiders: boolean): string
