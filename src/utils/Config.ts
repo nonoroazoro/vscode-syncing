@@ -394,6 +394,7 @@ export default class Config
                         updated: ISyncStatus[],
                         removed: ISyncStatus[]
                     } = { updated: [], removed: [] };
+                    // TODO: TypeScript error.
                     async.eachSeries(
                         saveFiles,
                         (item, done) =>
