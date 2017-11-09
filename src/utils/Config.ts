@@ -394,10 +394,9 @@ export default class Config
                         updated: ISyncStatus[],
                         removed: ISyncStatus[]
                     } = { updated: [], removed: [] };
-                    // TODO: TypeScript error.
                     async.eachSeries(
                         saveFiles,
-                        (item, done) =>
+                        (item: IConfig, done: async.ErrorCallback<Error>) =>
                         {
                             this._saveItemContent(item).then((saved) =>
                             {
@@ -408,7 +407,7 @@ export default class Config
                                 done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
                             });
                         },
-                        (err: Error) =>
+                        (err) =>
                         {
                             if (err)
                             {
