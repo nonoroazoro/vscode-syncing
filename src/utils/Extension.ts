@@ -391,7 +391,7 @@ export default class Extension
                 host: `${extension.publisher}.gallery.vsassets.io`,
                 path: `/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
             };
-            const proxy = this._env.getSyncingProxy();
+            const proxy = this._env.syncingProxy;
             if (proxy)
             {
                 options.agent = new HttpsProxyAgent(proxy);

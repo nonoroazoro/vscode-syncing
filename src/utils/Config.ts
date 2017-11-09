@@ -728,7 +728,7 @@ export default class Config
     {
         if (token)
         {
-            const api: Gist = Gist.create(token, this._env.getSyncingProxy());
+            const api: Gist = Gist.create(token, this._env.syncingProxy);
             return Toast.showRemoteGistListBox(api, forUpload).then((value) =>
             {
                 // TODO: 测试这里返回值是否正确。
