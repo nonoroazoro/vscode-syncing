@@ -1,5 +1,5 @@
 # Editor files
-.vscode
+.vscode/**
 
 # Compiled source
 *.dat
@@ -9,7 +9,7 @@
 *.suo
 *.tmp
 *.user
-obj
+obj/**
 
 # OS generated files
 .DS_Store
@@ -22,6 +22,8 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific stuff
+.github/**
 .gitignore
-src
-test
+@types/**
+src/**
+test/**
