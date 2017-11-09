@@ -46,7 +46,7 @@ You can type `upload/download` (or `syncing`) in `VSCode Command Palette` to acc
 
 ## Keybindings
 
-The keybindings **are disabled by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
+The keybindings **are unassigned by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
 
 1. for VSCode versions >= 1.11 (***recommended***):
 
