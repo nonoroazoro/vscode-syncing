@@ -76,7 +76,6 @@ export default class Gist
             }
             else
             {
-                // TODO: 测试一下 get({}) 不传参数是否正确。
                 this._api.users
                     .get({} as any)
                     .then((value) =>
