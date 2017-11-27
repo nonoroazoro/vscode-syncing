@@ -294,7 +294,6 @@ export default class Config
         removed: ISyncStatus[]
     }>
     {
-        // TODO: files type isn't explicit.
         return new Promise((resolve, reject) =>
         {
             function resolveWrap(value: any)
@@ -644,7 +643,6 @@ export default class Config
                 {
                     if (settings.id)
                     {
-                        // TODO: 测试这里返回值是否正确。
                         gistIDTask = Promise.resolve({ id: settings.id });
                     }
                     else
@@ -731,7 +729,6 @@ export default class Config
             const api: Gist = Gist.create(token, this._env.syncingProxy);
             return Toast.showRemoteGistListBox(api, forUpload).then((value) =>
             {
-                // TODO: 测试这里返回值是否正确。
                 if (value.id === "")
                 {
                     // Show gist input box when id is still null.
