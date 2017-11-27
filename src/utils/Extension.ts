@@ -199,7 +199,6 @@ export default class Extension
                     {
                         task().then((value: any) =>
                         {
-                            // TODO: 检查结果是否正确。
                             Object.assign(result.extension, value);
                             done();
                         });
@@ -224,7 +223,7 @@ export default class Extension
     {
         return new Promise((resolve) =>
         {
-            const { extensions, progress, total, showIndicator = false } = options;
+            const { extensions, progress, showIndicator = false, total } = options;
 
             let steps: number = progress;
             const result = { added: [] as IExtension[], addedErrors: [] as IExtension[] };
@@ -278,7 +277,7 @@ export default class Extension
     {
         return new Promise((resolve) =>
         {
-            const { extensions, progress, total, showIndicator = false } = options;
+            const { extensions, progress, showIndicator = false, total } = options;
 
             let steps: number = progress;
             const result = { updated: [] as IExtension[], updatedErrors: [] as IExtension[] };
@@ -340,7 +339,7 @@ export default class Extension
     {
         return new Promise((resolve) =>
         {
-            const { extensions, progress, total, showIndicator = false } = options;
+            const { extensions, progress, showIndicator = false, total } = options;
 
             let steps: number = progress;
             const result = { removed: [] as IExtension[], removedErrors: [] as IExtension[] };
@@ -532,7 +531,6 @@ export default class Extension
                 updated: [] as IExtension[],
                 get total()
                 {
-                    // TODO: 检查 total 是否正确。
                     return this.added.length + this.removed.length + this.updated.length;
                 }
             };
