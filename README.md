@@ -81,6 +81,8 @@ You can use a proxy to accelerate the synchronization, find and set the `"http.p
 "http.proxy": "http://127.0.0.1:1080"
 ```
 
+In addition, if the `"http.proxy"` property in `VSCode User Settings` is not set, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
+
 
 ## Getting Started
 
