@@ -1,5 +1,12 @@
 # Changelogs
 
+## 1.5.0 - November 30, 2017
+
+- Changed: Rewrite in `TypeScript`, now we have `typings`.
+- Added: Read `http proxy` settings from the `http_proxy` and `https_proxy` environment variables.
+- Added: Persist `http proxy` settings while downloading, to prevent the local proxy settings from being unintentionally modified, which may lead to failure.
+
+
 ## 1.4.9 - September 16, 2017
 
 - Changed: Enhance user guides.
