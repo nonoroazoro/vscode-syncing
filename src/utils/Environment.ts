@@ -111,7 +111,7 @@ export default class Environment
     }
 
     /**
-     * Reload proxy settings from VSCode `http.proxy` settings or from `http_proxy` and `https_proxy` of system environment variables.
+     * Reload proxy settings from VSCode `http.proxy` settings or from `http_proxy` and `https_proxy` environment variables.
      * This function is designed to persist the proxy settings during the synchronization.
      * Make sure to call it before downloading and uploading.
      */
