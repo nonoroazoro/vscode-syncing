@@ -28,6 +28,7 @@
         "Other"
     ],
     "keywords": [
+        "sync-settings",
         "sync",
         "syncing",
         "vscode-syncing"
