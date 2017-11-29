@@ -1,10 +1,14 @@
 # Editor files
 .vscode/**
 
-# Project specific stuff
+# Configuration files
 .editorconfig
-.github/**
 .gitignore
+tsconfig.json
+tslint.json
+
+# Project specific stuff
+.github/**
 @types/**
 src/**
 test/**
