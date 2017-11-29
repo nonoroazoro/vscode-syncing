@@ -2,6 +2,7 @@
 .vscode/**
 
 # Project specific stuff
+.editorconfig
 .github/**
 .gitignore
 @types/**
