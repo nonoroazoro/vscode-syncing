@@ -68,9 +68,11 @@
     "scripts": {
         "vscode:prepublish": "npm run build",
         "precommit": "lint-staged",
-        "build": "tsc -p ./tsconfig.json",
-        "watch": "tsc -w -p ./tsconfig.json",
+        "prebuild": "npm run clean",
+        "build": "tsc -p ./tsconfig.json --sourceMap false",
+        "watch": "tsc -p ./tsconfig.json -w",
         "test": "mocha",
+        "clean": "rimraf ./dist/*",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "devDependencies": {
@@ -82,6 +84,7 @@
         "husky": "^0.14.3",
         "lint-staged": "^5.0.0",
         "mocha": "^4.0.1",
+        "rimraf": "^2.6.2",
         "should": "^13.1.3",
         "tslint": "^5.8.0",
         "typescript": "^2.6.2",
