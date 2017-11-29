@@ -1,105 +1,105 @@
 {
-  "name": "syncing",
-  "displayName": "Syncing",
-  "description": "Sync every settings with your own GitHub Gist.",
-  "version": "1.4.9",
-  "publisher": "nonoroazoro",
-  "author": {
-    "email": "xiaochao.k@gmail.com",
-    "name": "nonoroazoro",
-    "url": "http://www.alibabagroup.com/"
-  },
-  "homepage": "https://github.com/nonoroazoro/vscode-syncing",
-  "license": "MIT",
-  "main": "./dist/src/extension",
-  "icon": "./src/res/logo.png",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/nonoroazoro/vscode-syncing"
-  },
-  "bugs": {
-    "url": "https://github.com/nonoroazoro/vscode-syncing/issues",
-    "email": "xiaochao.k@gmail.com"
-  },
-  "engines": {
-    "vscode": "^1.5.0"
-  },
-  "categories": [
-    "Other"
-  ],
-  "keywords": [
-    "sync",
-    "syncing",
-    "vscode-syncing"
-  ],
-  "activationEvents": [
-    "*"
-  ],
-  "contributes": {
-    "commands": [
-      {
-        "command": "syncing.uploadSettings",
-        "title": "Syncing: Upload Settings"
-      },
-      {
-        "command": "syncing.downloadSettings",
-        "title": "Syncing: Download Settings"
-      },
-      {
-        "command": "syncing.openSettings",
-        "title": "Syncing: Open Syncing Settings"
-      }
+    "name": "syncing",
+    "displayName": "Syncing",
+    "description": "Sync every settings with your own GitHub Gist.",
+    "version": "1.4.9",
+    "publisher": "nonoroazoro",
+    "author": {
+        "email": "xiaochao.k@gmail.com",
+        "name": "nonoroazoro",
+        "url": "http://www.alibabagroup.com/"
+    },
+    "homepage": "https://github.com/nonoroazoro/vscode-syncing",
+    "license": "MIT",
+    "main": "./dist/src/extension",
+    "icon": "./resources/logo.png",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/nonoroazoro/vscode-syncing"
+    },
+    "bugs": {
+        "url": "https://github.com/nonoroazoro/vscode-syncing/issues",
+        "email": "xiaochao.k@gmail.com"
+    },
+    "engines": {
+        "vscode": "^1.5.0"
+    },
+    "categories": [
+        "Other"
     ],
-    "keybindings": [
-      {
-        "key": "",
-        "command": "syncing.uploadSettings"
-      },
-      {
-        "key": "",
-        "command": "syncing.downloadSettings"
-      },
-      {
-        "key": "",
-        "command": "syncing.openSettings"
-      }
-    ]
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run build",
-    "precommit": "lint-staged",
-    "build": "tsc -p ./tsconfig.json",
-    "watch": "tsc -w -p ./tsconfig.json",
-    "test": "mocha",
-    "postinstall": "node ./node_modules/vscode/bin/install"
-  },
-  "devDependencies": {
-    "@types/adm-zip": "^0.4.31",
-    "@types/async": "^2.0.45",
-    "@types/fs-extra": "^4.0.5",
-    "@types/node": "^8.0.53",
-    "@types/temp": "^0.8.31",
-    "husky": "^0.14.3",
-    "lint-staged": "^5.0.0",
-    "mocha": "^4.0.1",
-    "should": "^13.1.3",
-    "tslint": "^5.8.0",
-    "typescript": "^2.6.1",
-    "vscode": "^1.1.8"
-  },
-  "dependencies": {
-    "adm-zip": "^0.4.7",
-    "async": "^2.6.0",
-    "fs-extra": "^4.0.2",
-    "github": "^8.1.1",
-    "https-proxy-agent": "^2.1.0",
-    "moment": "^2.19.2",
-    "temp": "^0.8.3"
-  },
-  "lint-staged": {
-    "./src/**/*.ts": [
-      "tslint",
-      "git add"
-    ]
-  }
+    "keywords": [
+        "sync",
+        "syncing",
+        "vscode-syncing"
+    ],
+    "activationEvents": [
+        "*"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "syncing.uploadSettings",
+                "title": "Syncing: Upload Settings"
+            },
+            {
+                "command": "syncing.downloadSettings",
+                "title": "Syncing: Download Settings"
+            },
+            {
+                "command": "syncing.openSettings",
+                "title": "Syncing: Open Syncing Settings"
+            }
+        ],
+        "keybindings": [
+            {
+                "key": "",
+                "command": "syncing.uploadSettings"
+            },
+            {
+                "key": "",
+                "command": "syncing.downloadSettings"
+            },
+            {
+                "key": "",
+                "command": "syncing.openSettings"
+            }
+        ]
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run build",
+        "precommit": "lint-staged",
+        "build": "tsc -p ./tsconfig.json",
+        "watch": "tsc -w -p ./tsconfig.json",
+        "test": "mocha",
+        "postinstall": "node ./node_modules/vscode/bin/install"
+    },
+    "devDependencies": {
+        "@types/adm-zip": "^0.4.31",
+        "@types/async": "^2.0.45",
+        "@types/fs-extra": "^4.0.5",
+        "@types/node": "^8.0.53",
+        "@types/temp": "^0.8.31",
+        "husky": "^0.14.3",
+        "lint-staged": "^5.0.0",
+        "mocha": "^4.0.1",
+        "should": "^13.1.3",
+        "tslint": "^5.8.0",
+        "typescript": "^2.6.2",
+        "vscode": "^1.1.8"
+    },
+    "dependencies": {
+        "adm-zip": "^0.4.7",
+        "async": "^2.6.0",
+        "fs-extra": "^4.0.2",
+        "github": "^8.1.1",
+        "https-proxy-agent": "^2.1.1",
+        "moment": "^2.19.2",
+        "temp": "^0.8.3"
+    },
+    "lint-staged": {
+        "./src/**/*.ts": [
+            "tslint",
+            "git add"
+        ]
+    }
 }
