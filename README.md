@@ -92,7 +92,11 @@ In addition, if the `"http.proxy"` property in `VSCode User Settings` is not set
 
         ![login to settings page](docs/png/Settings.png)
 
-    1. **From the list on the left, select `Personal access tokens` and click `Generate new token`.**
+    1. **Select `Developer settings`.**
+
+        ![generate new token](docs/png/Public-Profile.png)
+
+    1. **Select `Personal access tokens` and click `Generate new token`.**
 
         ![generate new token](docs/png/Generate-New-Token.png)
 
