@@ -146,4 +146,10 @@ In addition, if the `"http_proxy"` is not set, `Syncing` will try to use the `ht
 
 ## Example
 
-![upload example](docs/gif/Example-Upload.gif)
+1. Upload:
+
+    ![upload example](docs/gif/Example-Upload.gif)
+
+1. Download:
+
+    ![download example](docs/gif/Example-Download.gif)
