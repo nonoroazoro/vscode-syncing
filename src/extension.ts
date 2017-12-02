@@ -140,7 +140,11 @@ function _openSettings(): void
 {
     if (fs.existsSync(_env.syncingSettingsPath))
     {
-        _openFile(_env.syncingSettingsPath);
+        // Upgrade settings file for `Syncing` v1.5.0.
+        _config.upgradeSyncingSettings().then(() =>
+        {
+            _openFile(_env.syncingSettingsPath);
+        });
     }
     else
     {

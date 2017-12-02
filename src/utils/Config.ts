@@ -85,6 +85,11 @@ export interface ISyncingSettings
      * Store GitHub Personal Access Token.
      */
     token: string;
+
+    /**
+     * Store http proxy setting.
+     */
+    http_proxy?: string;
 }
 
 /**
@@ -97,7 +102,7 @@ export default class Config
     /**
      * Default settings of Syncing.
      */
-    private static readonly DEFAULT_SETTINGS: ISyncingSettings = { id: "", token: "" };
+    private static readonly DEFAULT_SETTINGS: ISyncingSettings = { id: "", token: "", http_proxy: "" };
 
     /**
      * Prefix of remote snippet files.
@@ -557,6 +562,14 @@ export default class Config
     initSyncingSettings(): Promise<void>
     {
         return this.saveSyncingSettings(Config.DEFAULT_SETTINGS);
+    }
+
+    /**
+     * Upgrade Syncing settings file (only used for http proxy settings change).
+     */
+    upgradeSyncingSettings(): Promise<void>
+    {
+        return this.saveSyncingSettings(this.loadSyncingSettings());
     }
 
     /**
