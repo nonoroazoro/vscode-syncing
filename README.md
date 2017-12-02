@@ -86,7 +86,7 @@ In addition, if the `"http.proxy"` property in `VSCode User Settings` is not set
 
 ## Getting Started
 
-1. Get your own `GitHub Personal Access Token`
+1. Get your own `GitHub Personal Access Token`.
 
     1. **Login to your `GitHub Settings` page.**
 
@@ -108,7 +108,7 @@ In addition, if the `"http.proxy"` property in `VSCode User Settings` is not set
 
         ![copy and backup token](docs/png/Copy-Token.png)
 
-1. Sync your VSCode settings
+1. Sync your VSCode settings.
 
     *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
 
