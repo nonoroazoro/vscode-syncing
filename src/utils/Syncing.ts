@@ -73,8 +73,7 @@ export default class Syncing
      */
     public get proxy(): string | undefined
     {
-        // TODO: change name to proxy.
-        let proxy: string | undefined = vscode.workspace.getConfiguration("http")["proxy"];
+        let proxy = this.loadSettings().http_proxy;
         if (!proxy)
         {
             proxy = process.env["http_proxy"] || process.env["https_proxy"];
