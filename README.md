@@ -26,7 +26,7 @@
     * Automatically `install, update` and `remove` extensions.
     * You can leave the `GitHub Personal Access Token` blank to download from `a public Gist`.
 
-And, of cause there will be a progress indicator during the synchronization :).
+And, of cause you'll have a progress indicator during the synchronization :).
 
 
 ## Commands
