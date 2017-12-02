@@ -3,8 +3,8 @@
 ## 1.5.0 - November 30, 2017
 
 - Changed: Rewrite in `TypeScript`, now we have `typings`.
-- Added: Read `http proxy` settings from the `http_proxy` and `https_proxy` environment variables.
-- Added: Persist `http proxy` settings while downloading, to prevent the local proxy settings from being unintentionally modified, which may lead to failure.
+- Added: Pick `http_proxy` settings from `http_proxy` and `https_proxy` environment variables.
+- Added: Isolate the `http_proxy` setting into `Syncing`'s settings file (which means `Syncing` will no longer read proxy settings from `VSCode` settings), this may prevent a potential failure caused by wrong proxy settings while syncing between different devices (Thank [@mubaidr](https://github.com/mubaidr) for the advice).
 
 
 ## 1.4.9 - September 16, 2017
