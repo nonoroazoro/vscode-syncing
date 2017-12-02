@@ -1,6 +1,6 @@
 # Changelogs
 
-## 1.5.0 - November 30, 2017
+## 1.5.0 - December 2, 2017
 
 - Changed: Rewrite in `TypeScript`, now we have `typings`.
 - Added: Pick `http_proxy` settings from `http_proxy` and `https_proxy` environment variables.
