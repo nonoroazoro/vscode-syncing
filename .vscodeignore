@@ -1,27 +1,14 @@
 # Editor files
-.vscode
+.vscode/**
 
-# Compiled source
-*.dat
-*.dll
-*.exe
-*.log
-*.suo
-*.tmp
-*.user
-obj
-
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-Icon?
-ehthumbs.db
-Thumbs.db
+# Configuration files
+.editorconfig
+.gitignore
+tsconfig.json
+tslint.json
 
 # Project specific stuff
-test
-.eslintrc
-.gitignore
+.github/**
+@types/**
+src/**
+test/**

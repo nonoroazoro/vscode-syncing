@@ -26,6 +26,8 @@
     * Automatically `install, update` and `remove` extensions.
     * You can leave the `GitHub Personal Access Token` blank to download from `a public Gist`.
 
+And, of cause you'll have a `progress indicator` during the synchronization :).
+
 
 ## Commands
 
@@ -46,14 +48,13 @@ You can type `upload/download` (or `syncing`) in `VSCode Command Palette` to acc
 
 ## Keybindings
 
-The keybindings **are disabled by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
+The keybindings **are unassigned by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
 
-1. for VSCode versions >= 1.11 (***recommended***):
+1. For VSCode versions >= 1.11 (***recommended***):
 
     ![keyboard shortcuts](docs/gif/Keyboard-Shortcuts.gif)
 
-
-1. for VSCode versions < 1.11, for example:
+1. For VSCode versions < 1.11, for example:
 
     ```json
     {
@@ -73,22 +74,34 @@ The keybindings **are disabled by default**, you can enable them by updating `VS
 
 ## Proxy Settings
 
-You can use a proxy to accelerate the synchronization, find and set the `"http.proxy"` property in `VSCode User Settings`. For example:
+You can set a proxy to accelerate the synchronization. Here are the steps:
 
-```json
-"http.proxy": "http://127.0.0.1:1080"
-```
+1. Open `Syncing`'s settings file by: `Syncing: Open Syncing Settings` (type this command in `VSCode Command Palette`).
+
+1. Set the `"http_proxy"` property, for example:
+
+    ```json
+    "http_proxy": "http://127.0.0.1:1080"
+    ```
+
+In addition, if the `"http_proxy"` is not set, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables instead.
+
+> Notice that `Syncing` will no longer read `http.proxy` from VSCode settings, it has been moved into `Syncing`'s own settings file since version `v1.5.0`.
 
 
 ## Getting Started
 
-1. Get your own `GitHub Personal Access Token`
+1. Get your own `GitHub Personal Access Token`.
 
     1. **Login to your `GitHub Settings` page.**
 
         ![login to settings page](docs/png/Settings.png)
 
-    1. **From the list on the left, select `Personal access tokens` and click `Generate new token`.**
+    1. **Select `Developer settings`.**
+
+        ![generate new token](docs/png/Public-Profile.png)
+
+    1. **Select `Personal access tokens` and click `Generate new token`.**
 
         ![generate new token](docs/png/Generate-New-Token.png)
 
@@ -100,7 +113,7 @@ You can use a proxy to accelerate the synchronization, find and set the `"http.p
 
         ![copy and backup token](docs/png/Copy-Token.png)
 
-1. Sync your VSCode settings
+1. Sync your VSCode settings.
 
     *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
 
@@ -133,4 +146,10 @@ You can use a proxy to accelerate the synchronization, find and set the `"http.p
 
 ## Example
 
-![upload example](docs/gif/Example-Upload.gif)
+1. Upload:
+
+    ![upload example](docs/gif/Example-Upload.gif)
+
+1. Download:
+
+    ![download example](docs/gif/Example-Download.gif)
