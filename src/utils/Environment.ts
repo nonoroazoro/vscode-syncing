@@ -14,13 +14,10 @@ export default class Environment
     private _extensionsPath: string;
     private _isInsiders: boolean;
     private _isMac: boolean;
-    private _proxy: string | undefined;
     private _snippetsPath: string;
-    private _syncingSettingsPath: string;
 
     private constructor(context: vscode.ExtensionContext)
     {
-        this.reloadSyncingProxy();
         this._isMac = process.platform === "darwin";
         this._isInsiders = context.extensionPath.includes("insider");
         this._extensionsPath = path.join(
@@ -31,7 +28,6 @@ export default class Environment
         this._codeBasePath = this._getCodeBasePath(this._isInsiders);
         this._codeUserPath = path.join(this._codeBasePath, "User");
         this._snippetsPath = path.join(this._codeUserPath, "snippets");
-        this._syncingSettingsPath = path.join(this._codeUserPath, "syncing.json");
     }
 
     /**
@@ -92,37 +88,6 @@ export default class Environment
     public get snippetsPath(): string
     {
         return this._snippetsPath;
-    }
-
-    /**
-     * Get Syncing settings file path.
-     */
-    public get syncingSettingsPath(): string
-    {
-        return this._syncingSettingsPath;
-    }
-
-    /**
-     * Get proxy settings for Syncing.
-     */
-    public get syncingProxy(): string | undefined
-    {
-        return this._proxy;
-    }
-
-    /**
-     * Reload proxy settings from VSCode `http.proxy` settings or from `http_proxy` and `https_proxy` environment variables.
-     * This function is designed to persist the proxy settings during the synchronization.
-     * Make sure to call it before downloading and uploading.
-     */
-    public reloadSyncingProxy(): void
-    {
-        let proxy: string | undefined = vscode.workspace.getConfiguration("http")["proxy"];
-        if (!proxy)
-        {
-            proxy = process.env["http_proxy"] || process.env["https_proxy"];
-        }
-        this._proxy = proxy;
     }
 
     /**
