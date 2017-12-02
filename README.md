@@ -50,12 +50,11 @@ You can type `upload/download` (or `syncing`) in `VSCode Command Palette` to acc
 
 The keybindings **are unassigned by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
 
-1. for VSCode versions >= 1.11 (***recommended***):
+1. For VSCode versions >= 1.11 (***recommended***):
 
     ![keyboard shortcuts](docs/gif/Keyboard-Shortcuts.gif)
 
-
-1. for VSCode versions < 1.11, for example:
+1. For VSCode versions < 1.11, for example:
 
     ```json
     {
@@ -75,13 +74,19 @@ The keybindings **are unassigned by default**, you can enable them by updating `
 
 ## Proxy Settings
 
-You can use a proxy to accelerate the synchronization, find and set the `"http.proxy"` property in `VSCode User Settings`. For example:
+You can set a proxy to accelerate the synchronization. Here are the steps:
 
-```json
-"http.proxy": "http://127.0.0.1:1080"
-```
+1. Open `Syncing`'s settings file by: `Syncing: Open Syncing Settings` (type this command in `VSCode Command Palette`).
 
-In addition, if the `"http.proxy"` property in `VSCode User Settings` is not set, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
+1. Set the `"http_proxy"` property, for example:
+
+    ```json
+    "http_proxy": "http://127.0.0.1:1080"
+    ```
+
+In addition, if the `"http_proxy"` is not set, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables instead.
+
+> Notice that `Syncing` will no longer read `http.proxy` from VSCode settings, it has been moved into `Syncing`'s own settings file since version `v1.5.0`.
 
 
 ## Getting Started
