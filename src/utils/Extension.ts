@@ -10,6 +10,7 @@ import * as vscode from "vscode";
 
 import { IConfig } from "./Config";
 import Environment from "./Environment";
+import Syncing from "./Syncing";
 import Toast from "./Toast";
 
 temp.track();
@@ -113,10 +114,12 @@ export default class Extension
     private static _instance: Extension;
 
     private _env: Environment;
+    private _syncing: Syncing;
 
     private constructor(context: vscode.ExtensionContext)
     {
         this._env = Environment.create(context);
+        this._syncing = Syncing.create(context);
     }
 
     /**
@@ -390,7 +393,7 @@ export default class Extension
                 host: `${extension.publisher}.gallery.vsassets.io`,
                 path: `/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
             };
-            const proxy = this._env.syncingProxy;
+            const proxy = this._syncing.proxy;
             if (proxy)
             {
                 options.agent = new HttpsProxyAgent(proxy);

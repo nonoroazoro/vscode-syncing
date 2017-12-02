@@ -3,13 +3,13 @@ import * as moment from "moment";
 import * as vscode from "vscode";
 
 import Config from "./utils/Config";
-import Environment from "./utils/Environment";
 import { ISyncStatus } from "./utils/Extension";
 import Gist from "./utils/Gist";
+import Syncing from "./utils/Syncing";
 import Toast from "./utils/Toast";
 
 let _config: Config;
-let _env: Environment;
+let _syncing: Syncing;
 let _isSyncing: boolean;
 
 export function activate(context: vscode.ExtensionContext): void
@@ -23,9 +23,9 @@ export function activate(context: vscode.ExtensionContext): void
  */
 function _initGlobals(context: vscode.ExtensionContext): void
 {
-    _config = Config.create(context);
-    _env = Environment.create(context);
     _isSyncing = false;
+    _config = Config.create(context);
+    _syncing = Syncing.create(context);
 
     // TODO: i18n, using vscode.env.language
     moment.locale("en");
@@ -58,10 +58,9 @@ function _uploadSettings(): void
     if (!_isSyncing)
     {
         _isSyncing = true;
-        _env.reloadSyncingProxy();
-        _config.prepareUploadSettings(true).then((settings) =>
+        _syncing.prepareUploadSettings(true).then((settings) =>
         {
-            const api = Gist.create(settings.token, _env.syncingProxy);
+            const api = Gist.create(settings.token, _syncing.proxy);
             return _config.getConfigs({ load: true, showIndicator: true }).then((configs) =>
             {
                 return api.findAndUpdate(settings.id, configs, true, true).then((gist: any) =>
@@ -72,7 +71,7 @@ function _uploadSettings(): void
                     }
                     else
                     {
-                        _config.saveSyncingSettings(Object.assign({}, settings, { id: gist.id })).then(() =>
+                        _syncing.saveSettings(Object.assign({}, settings, { id: gist.id })).then(() =>
                         {
                             Toast.statusInfo("Syncing: Settings uploaded.");
                         });
@@ -96,10 +95,9 @@ function _downloadSettings(): void
     if (!_isSyncing)
     {
         _isSyncing = true;
-        _env.reloadSyncingProxy();
-        _config.prepareDownloadSettings(true).then((settings) =>
+        _syncing.prepareDownloadSettings(true).then((settings) =>
         {
-            const api = Gist.create(settings.token, _env.syncingProxy);
+            const api = Gist.create(settings.token, _syncing.proxy);
             return api.get(settings.id, true).then((gist) =>
             {
                 return _config.saveConfigs(gist.files, true).then((synced) =>
@@ -117,11 +115,11 @@ function _downloadSettings(): void
             {
                 if (err.code === 401)
                 {
-                    _config.clearSyncingToken();
+                    _syncing.clearGitHubToken();
                 }
                 else if (err.code === 404)
                 {
-                    _config.clearSyncingID();
+                    _syncing.clearGistID();
                 }
 
                 _isSyncing = false;
@@ -138,19 +136,19 @@ function _downloadSettings(): void
  */
 function _openSettings(): void
 {
-    if (fs.existsSync(_env.syncingSettingsPath))
+    if (fs.existsSync(_syncing.settingsPath))
     {
         // Upgrade settings file for `Syncing` v1.5.0.
-        _config.upgradeSyncingSettings().then(() =>
+        _syncing.migrateSettings().then(() =>
         {
-            _openFile(_env.syncingSettingsPath);
+            _openFile(_syncing.settingsPath);
         });
     }
     else
     {
-        _config.initSyncingSettings().then(() =>
+        _syncing.initSettings().then(() =>
         {
-            _openFile(_env.syncingSettingsPath);
+            _openFile(_syncing.settingsPath);
         });
     }
 }
