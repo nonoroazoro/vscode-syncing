@@ -11,8 +11,8 @@
     },
     "homepage": "https://github.com/nonoroazoro/vscode-syncing",
     "license": "MIT",
-    "main": "./dist/src/extension",
-    "icon": "./resources/logo.png",
+    "main": "dist/src/extension",
+    "icon": "resources/logo.png",
     "repository": {
         "type": "git",
         "url": "https://github.com/nonoroazoro/vscode-syncing"
