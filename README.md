@@ -4,23 +4,32 @@
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing#review-details)
 
-*Syncing ([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **sync all of your VSCode settings across multiple devices** with GitHub Gist. [Getting started!](#getting-started) or [check out the example](#example).
+***Syncing*** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **sync all of your VSCode settings across multiple devices** with GitHub Gist.
 
-> *Keep it simple & reliable*.
+[Getting started](#getting-started) or [check out the examples](#examples).
+
+> *Keep it simple & reliable!*
+
+
+## Breaking Changes
+
+* From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`. The proxy settings have been moved into `Syncing`'s own settings file.
+
+    > Check [Proxy Settings](#proxy-settings) for more information.
 
 
 ## Features
 
 *Syncing* will `keep the consistency of your VSCode settings between local and remote`, and let you:
 
-1. **Upload Settings**:
+1. **Upload VSCode Settings**:
 
     * Include `settings, keybindings, extensions, locales` and `snippets`.
     * The `settings` and `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
     * Automatically create new Gist if you leave it blank or it doesn't exist in your GitHub Gist.
     * Use an incremental algorithm to boost the synchronization.
 
-1. **Download Settings**:
+1. **Download VSCode Settings**:
 
     * **Always overwrite** local settings.
     * Automatically `install, update` and `remove` extensions.
@@ -31,7 +40,7 @@ And, of cause you'll have a `progress indicator` during the synchronization :).
 
 ## Commands
 
-You can type `upload/download` (or `syncing`) in `VSCode Command Palette` to access the commands:
+You can type `"upload"`, `"download"` (or `"syncing"`) in `VSCode Command Palette` to access these commands:
 
 1. ***`Syncing: Upload Settings`***
 
@@ -43,12 +52,12 @@ You can type `upload/download` (or `syncing`) in `VSCode Command Palette` to acc
 
 1. ***`Syncing: Open Syncing Settings`***
 
-    > Set `GitHub Personal Access Token` and `Gist ID`.
+    > Set `GitHub Personal Access Token`, `Gist ID` and `HTTP Proxy`.
 
 
 ## Keybindings
 
-The keybindings **are unassigned by default**, you can enable them by updating `VSCode Keyboard Shortcuts`:
+The keybindings **are unassigned by default**, but you can easily turn them on by updating `VSCode Keyboard Shortcuts`:
 
 1. For VSCode versions >= 1.11 (***recommended***):
 
@@ -76,7 +85,7 @@ The keybindings **are unassigned by default**, you can enable them by updating `
 
 You can set a proxy to accelerate the synchronization. Here are the steps:
 
-1. Open `Syncing`'s settings file by: `Syncing: Open Syncing Settings` (type this command in `VSCode Command Palette`).
+1. Type `"Syncing: Open Syncing Settings"` (or just `"opensync"`) in `VSCode Command Palette` to open `Syncing`'s own settings file.
 
 1. Set the `"http_proxy"` property, for example:
 
@@ -84,24 +93,16 @@ You can set a proxy to accelerate the synchronization. Here are the steps:
     "http_proxy": "http://127.0.0.1:1080"
     ```
 
-In addition, if the `"http_proxy"` is not set, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables instead.
+Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
 
-> Notice that `Syncing` will no longer read `http.proxy` from VSCode settings, it has been moved into `Syncing`'s own settings file since version `v1.5.0`.
+> Please notice that Syncing **does not upload** its settings file (i.e. `syncing.json`) because it may contains your sensitive information.
 
 
 ## Getting Started
 
-1. Get your own `GitHub Personal Access Token`.
+1. Get your own `GitHub Personal Access Token` (3 steps).
 
-    1. **Login to your `GitHub Settings` page.**
-
-        ![login to settings page](docs/png/Settings.png)
-
-    1. **Select `Developer settings`.**
-
-        ![generate new token](docs/png/Public-Profile.png)
-
-    1. **Select `Personal access tokens` and click `Generate new token`.**
+    1. **Login to your [GitHub Personal Access Tokens page](https://github.com/settings/tokens) and click `Generate new token`.**
 
         ![generate new token](docs/png/Generate-New-Token.png)
 
@@ -117,7 +118,7 @@ In addition, if the `"http_proxy"` is not set, `Syncing` will try to use the `ht
 
     *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
 
-    1. **Upload Settings**
+    1. **Upload**
 
         1. Type `upload` in `VSCode Command Palette`.
 
@@ -125,26 +126,30 @@ In addition, if the `"http_proxy"` is not set, `Syncing` will try to use the `ht
 
         1. Enter your `GitHub Personal Access Token`.
 
-        1. Select or enter your `Gist ID` (or `leave it blank` to create automatically).
+        1. Select or enter your `Gist ID`.
+
+            > You can `leave it blank` to create a new `Gist` automatically.
 
         1. Done!
 
-        1. *After uploading, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com).*
+        1. *After it's done, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com).*
 
-    1. **Download Settings**
+    1. **Download**
 
         1. Type `download` in `VSCode Command Palette`.
 
             ![download settings](docs/png/Download-Settings.png)
 
-        1. Enter your `GitHub Personal Access Token` (or `leave it blank` if you want to download from a `public Gist`).
+        1. Enter your `GitHub Personal Access Token`.
 
-        1. Select or enter your own `Gist ID` (or a `public Gist ID`).
+            > You can `leave it blank` if you want to download from a `public Gist`.
+
+        1. Select or enter your `Gist ID` or a `public Gist ID`.
 
         1. Done!
 
 
-## Example
+## Examples
 
 1. Upload:
 
