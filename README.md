@@ -96,17 +96,9 @@ Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_p
 
 ## Getting Started
 
-1. Get your own `GitHub Personal Access Token`.
+1. Get your own `GitHub Personal Access Token` (3 steps).
 
-    1. **Login to your `GitHub Settings` page.**
-
-        ![login to settings page](docs/png/Settings.png)
-
-    1. **Select `Developer settings`.**
-
-        ![generate new token](docs/png/Public-Profile.png)
-
-    1. **Select `Personal access tokens` and click `Generate new token`.**
+    1. **Login to your [GitHub Personal Access Tokens page](https://github.com/settings/tokens) and click `Generate new token`.**
 
         ![generate new token](docs/png/Generate-New-Token.png)
 
@@ -122,7 +114,7 @@ Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_p
 
     *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
 
-    1. **Upload VSCode Settings**
+    1. **Upload**
 
         1. Type `upload` in `VSCode Command Palette`.
 
@@ -138,7 +130,7 @@ Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_p
 
         1. *After it's done, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com).*
 
-    1. **Download VSCode Settings**
+    1. **Download**
 
         1. Type `download` in `VSCode Command Palette`.
 
@@ -155,10 +147,10 @@ Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_p
 
 ## Examples
 
-1. Upload Settings:
+1. Upload:
 
     ![upload example](docs/gif/Example-Upload.gif)
 
-1. Download Settings:
+1. Download:
 
     ![download example](docs/gif/Example-Download.gif)
