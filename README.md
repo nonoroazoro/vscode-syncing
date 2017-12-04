@@ -122,7 +122,7 @@ Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_p
 
     *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
 
-    1. **Upload Settings**
+    1. **Upload VSCode Settings**
 
         1. Type `upload` in `VSCode Command Palette`.
 
@@ -138,7 +138,7 @@ Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_p
 
         1. *After it's done, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com).*
 
-    1. **Download Settings**
+    1. **Download VSCode Settings**
 
         1. Type `download` in `VSCode Command Palette`.
 
