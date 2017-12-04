@@ -2,7 +2,7 @@
 
 ## 1.5.1 - December 4, 2017
 
-- Added: Added `Notable Changes` section in README.md.
+- Added: Added `Breaking Changes` section in README.md.
 - Changed: Simplified user guide.
 - Changed: Reduced extension file size.
 
