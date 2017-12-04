@@ -11,7 +11,7 @@
 > *Keep it simple & reliable!*
 
 
-## Notable Changes
+## Breaking Changes
 
 * From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`. The proxy settings have been moved into `Syncing`'s own settings file, i.e., `syncing.json`.
 
