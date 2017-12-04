@@ -22,14 +22,14 @@
 
 *Syncing* will `keep the consistency of your VSCode settings between local and remote`, and let you:
 
-1. **Upload Settings**:
+1. **Upload VSCode Settings**:
 
     * Include `settings, keybindings, extensions, locales` and `snippets`.
     * The `settings` and `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
     * Automatically create new Gist if you leave it blank or it doesn't exist in your GitHub Gist.
     * Use an incremental algorithm to boost the synchronization.
 
-1. **Download Settings**:
+1. **Download VSCode Settings**:
 
     * **Always overwrite** local settings.
     * Automatically `install, update` and `remove` extensions.
