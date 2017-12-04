@@ -13,7 +13,7 @@
 
 ## Breaking Changes
 
-* From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`. The proxy settings have been moved into `Syncing`'s own settings file, i.e., `syncing.json`.
+* From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`. The proxy settings have been moved into `Syncing`'s own settings file.
 
     > Check [Proxy Settings](#proxy-settings) for more information.
 
@@ -94,6 +94,8 @@ You can set a proxy to accelerate the synchronization. Here are the steps:
     ```
 
 Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
+
+> Please notice that Syncing **does not upload** its settings file (i.e. `syncing.json`) because it may contains your sensitive information.
 
 
 ## Getting Started
