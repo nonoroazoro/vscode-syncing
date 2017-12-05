@@ -2,7 +2,7 @@
 
 ## 1.5.1 - December 4, 2017
 
-- Added: Added `Breaking Changes` section in README.md.
+- Added: Added `Breaking Changes` section in README.
 - Changed: Simplified user guide.
 - Changed: Reduced extension file size.
 
@@ -106,7 +106,7 @@
 - Fixed: Checking user access privileges when uploading.
 
 
-## 1.3.2 March 2, 2017
+## 1.3.2 - March 2, 2017
 
 - Changed: Update the messages of `Settings File Not Found` and `Setting File Invalid` errors.
 - Fixed: Upload an `empty array` (instead of `null`) when extension list is empty, to avoid potential error.
