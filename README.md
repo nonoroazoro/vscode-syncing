@@ -95,7 +95,7 @@ You can set a proxy to accelerate the synchronization. Here are the steps:
 
 Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
 
-> Please notice that Syncing **does not upload** its settings file (i.e. `syncing.json`) because it may contains your sensitive information.
+> Please notice that Syncing **does not upload** its settings file (i.e. `syncing.json`) because it may contain your sensitive information.
 
 
 ## Getting Started
