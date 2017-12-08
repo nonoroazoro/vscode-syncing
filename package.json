@@ -73,7 +73,7 @@
         "build": "tsc -p ./tsconfig.json --sourceMap false",
         "watch": "tsc -p ./tsconfig.json -w",
         "test": "mocha",
-        "clean": "rimraf ./dist/*",
+        "clean": "rimraf dist/*",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "dependencies": {
