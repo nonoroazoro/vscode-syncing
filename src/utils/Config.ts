@@ -236,33 +236,6 @@ export default class Config
     }
 
     /**
-     * Get all snippet files.
-     * @param snippetsDir Snippets dir.
-     */
-    _getSnippets(snippetsDir: string): IConfig[]
-    {
-        const results: IConfig[] = [];
-        try
-        {
-            const filenames: string[] = fs.readdirSync(snippetsDir);
-            filenames.forEach((filename: string) =>
-            {
-                // Add prefix `snippet-` to all snippets.
-                results.push({
-                    name: filename,
-                    path: path.join(snippetsDir, filename),
-                    remote: `${Config.SNIPPET_PREFIX}${filename}`
-                });
-            });
-        }
-        catch (err)
-        {
-            console.error("Syncing: Error loading snippets.");
-        }
-        return results;
-    }
-
-    /**
      * Save VSCode settings to files.
      * @param files VSCode Configs from Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
@@ -410,85 +383,6 @@ export default class Config
     }
 
     /**
-     * Load file content of configs.
-     * The content will exactly be `undefined` when failure happens.
-     * @param configs VSCode configs.
-     */
-    _loadContent(configs: IConfig[]): Promise<IConfig[]>
-    {
-        return new Promise((resolve) =>
-        {
-            let content: string | undefined;
-            const results: IConfig[] = configs.map((item: IConfig) =>
-            {
-                try
-                {
-                    if (item.name === "extensions")
-                    {
-                        content = JSON.stringify(this._ext.getAll(), null, 4);
-                    }
-                    else
-                    {
-                        content = fs.readFileSync(item.path, "utf8");
-                    }
-                }
-                catch (e)
-                {
-                    content = undefined;
-                    console.error(`Syncing: Error loading config file: ${item.name}.\n${e}`);
-                }
-                return Object.assign({}, item, { content });
-            });
-            resolve(results);
-        });
-    }
-
-    /**
-     * Save item content to file or sync extensions.
-     * @param item Item of configs.
-     */
-    _saveItemContent(item: IConfig): Promise<ISyncStatus>
-    {
-        return new Promise((resolve, reject) =>
-        {
-            if (item.name === "extensions")
-            {
-                if (item.content)
-                {
-                    try
-                    {
-                        // Sync extensions.
-                        this._ext.sync(JSON.parse(item.content), true).then(resolve).catch(reject);
-                    }
-                    catch (err)
-                    {
-                        reject(err);
-                    }
-                }
-                else
-                {
-                    reject(new Error("Invalid config content."));
-                }
-            }
-            else
-            {
-                // Save files.
-                fs.writeFile(item.path, item.content || "{}", (err) =>
-                {
-                    if (err)
-                    {
-                        reject(err);
-                    }
-                    else
-                    {
-                        resolve({ file: item });
-                    }
-                });
-            }
-        });
-    }
-
-    /**
      * Delete the physical files.
      * @param files Files list.
      */
@@ -526,6 +420,112 @@ export default class Config
                     }
                 }
             );
+        });
+    }
+
+    /**
+     * Get all snippet files.
+     * @param snippetsDir Snippets dir.
+     */
+    private _getSnippets(snippetsDir: string): IConfig[]
+    {
+        const results: IConfig[] = [];
+        try
+        {
+            const filenames: string[] = fs.readdirSync(snippetsDir);
+            filenames.forEach((filename: string) =>
+            {
+                // Add prefix `snippet-` to all snippets.
+                results.push({
+                    name: filename,
+                    path: path.join(snippetsDir, filename),
+                    remote: `${Config.SNIPPET_PREFIX}${filename}`
+                });
+            });
+        }
+        catch (err)
+        {
+            console.error("Syncing: Error loading snippets.");
+        }
+        return results;
+    }
+
+    /**
+     * Load file content of configs.
+     * The content will exactly be `undefined` when failure happens.
+     * @param configs VSCode configs.
+     */
+    private _loadContent(configs: IConfig[]): Promise<IConfig[]>
+    {
+        return new Promise((resolve) =>
+        {
+            let content: string | undefined;
+            const results: IConfig[] = configs.map((item: IConfig) =>
+            {
+                try
+                {
+                    if (item.name === "extensions")
+                    {
+                        content = JSON.stringify(this._ext.getAll(), null, 4);
+                    }
+                    else
+                    {
+                        content = fs.readFileSync(item.path, "utf8");
+                    }
+                }
+                catch (e)
+                {
+                    content = undefined;
+                    console.error(`Syncing: Error loading config file: ${item.name}.\n${e}`);
+                }
+                return Object.assign({}, item, { content });
+            });
+            resolve(results);
+        });
+    }
+
+    /**
+     * Save item content to file or sync extensions.
+     * @param item Item of configs.
+     */
+    private _saveItemContent(item: IConfig): Promise<ISyncStatus>
+    {
+        return new Promise((resolve, reject) =>
+        {
+            if (item.name === "extensions")
+            {
+                if (item.content)
+                {
+                    try
+                    {
+                        // Sync extensions.
+                        this._ext.sync(JSON.parse(item.content), true).then(resolve).catch(reject);
+                    }
+                    catch (err)
+                    {
+                        reject(err);
+                    }
+                }
+                else
+                {
+                    reject(new Error("Invalid config content."));
+                }
+            }
+            else
+            {
+                // Save files.
+                fs.writeFile(item.path, item.content || "{}", (err) =>
+                {
+                    if (err)
+                    {
+                        reject(err);
+                    }
+                    else
+                    {
+                        resolve({ file: item });
+                    }
+                });
+            }
         });
     }
 }
