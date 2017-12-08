@@ -363,7 +363,7 @@ export default class Gist
      * Get modified files list.
      * @returns {} or `undefined`.
      */
-    _getModifiedFiles(localFiles: any, remoteFiles: any): any
+    private _getModifiedFiles(localFiles: any, remoteFiles: any): any
     {
         let localFile;
         let remoteFile;

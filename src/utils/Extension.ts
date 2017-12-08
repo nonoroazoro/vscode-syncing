@@ -220,162 +220,6 @@ export default class Extension
     }
 
     /**
-     * Add extensions.
-     */
-    _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
-    {
-        return new Promise((resolve) =>
-        {
-            const { extensions, progress, showIndicator = false, total } = options;
-
-            let steps: number = progress;
-            const result = { added: [] as IExtension[], addedErrors: [] as IExtension[] };
-            async.eachSeries(
-                extensions,
-                (item, done) =>
-                {
-                    steps++;
-
-                    if (showIndicator)
-                    {
-                        Toast.showSpinner(`Syncing: Downloading extension: ${item.id}`, steps, total);
-                    }
-
-                    this.downloadExtension(item)
-                        .then((extension) =>
-                        {
-                            if (showIndicator)
-                            {
-                                Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
-                            }
-                            return this.extractExtension(extension);
-                        })
-                        .then((extension) =>
-                        {
-                            return this.updateMetadata(extension);
-                        })
-                        .then(() =>
-                        {
-                            result.added.push(item);
-                            done();
-                        })
-                        .catch(() =>
-                        {
-                            result.addedErrors.push(item);
-                            done();
-                        });
-                },
-                () =>
-                {
-                    resolve(result);
-                }
-            );
-        });
-    }
-
-    /**
-     * Update extensions.
-     */
-    _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
-    {
-        return new Promise((resolve) =>
-        {
-            const { extensions, progress, showIndicator = false, total } = options;
-
-            let steps: number = progress;
-            const result = { updated: [] as IExtension[], updatedErrors: [] as IExtension[] };
-            async.eachSeries(
-                extensions,
-                (item, done) =>
-                {
-                    steps++;
-
-                    if (showIndicator)
-                    {
-                        Toast.showSpinner(`Syncing: Downloading extension: ${item.id}`, steps, total);
-                    }
-
-                    this.downloadExtension(item)
-                        .then((extension) =>
-                        {
-                            if (showIndicator)
-                            {
-                                Toast.showSpinner(`Syncing: Removing outdated extension: ${item.id}`, steps, total);
-                            }
-                            return this.uninstallExtension(extension);
-                        })
-                        .then((extension) =>
-                        {
-                            if (showIndicator)
-                            {
-                                Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
-                            }
-                            return this.extractExtension(extension);
-                        })
-                        .then((extension) =>
-                        {
-                            return this.updateMetadata(extension);
-                        })
-                        .then(() =>
-                        {
-                            result.updated.push(item);
-                            done();
-                        })
-                        .catch(() =>
-                        {
-                            result.updatedErrors.push(item);
-                            done();
-                        });
-                },
-                () =>
-                {
-                    resolve(result);
-                }
-            );
-        });
-    }
-
-    /**
-     * Remove extensions.
-     */
-    _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
-    {
-        return new Promise((resolve) =>
-        {
-            const { extensions, progress, showIndicator = false, total } = options;
-
-            let steps: number = progress;
-            const result = { removed: [] as IExtension[], removedErrors: [] as IExtension[] };
-            async.eachSeries(
-                extensions,
-                (item, done) =>
-                {
-                    steps++;
-
-                    if (showIndicator)
-                    {
-                        Toast.showSpinner(`Syncing: Uninstalling extension: ${item.id}`, steps, total);
-                    }
-
-                    this.uninstallExtension(item).then(() =>
-                    {
-                        result.removed.push(item);
-                        done();
-                    }).catch(() =>
-                    {
-                        result.removedErrors.push(item);
-                        done();
-                    });
-                },
-                () =>
-                {
-                    resolve(result);
-                }
-            );
-        });
-    }
-
-    /**
      * Download extension from VSCode marketplace.
      */
     downloadExtension(extension: IExtension): Promise<IExtension>
@@ -519,7 +363,7 @@ export default class Extension
     /**
      * Get extensions that are added/updated/removed.
      */
-    _getDifferentExtensions(extensions: IExtension[]): Promise<{
+    private _getDifferentExtensions(extensions: IExtension[]): Promise<{
         added: IExtension[],
         removed: IExtension[],
         updated: IExtension[],
@@ -577,6 +421,162 @@ export default class Extension
                 }
             }
             resolve(result);
+        });
+    }
+
+    /**
+     * Add extensions.
+     */
+    private _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
+    {
+        return new Promise((resolve) =>
+        {
+            const { extensions, progress, showIndicator = false, total } = options;
+
+            let steps: number = progress;
+            const result = { added: [] as IExtension[], addedErrors: [] as IExtension[] };
+            async.eachSeries(
+                extensions,
+                (item, done) =>
+                {
+                    steps++;
+
+                    if (showIndicator)
+                    {
+                        Toast.showSpinner(`Syncing: Downloading extension: ${item.id}`, steps, total);
+                    }
+
+                    this.downloadExtension(item)
+                        .then((extension) =>
+                        {
+                            if (showIndicator)
+                            {
+                                Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
+                            }
+                            return this.extractExtension(extension);
+                        })
+                        .then((extension) =>
+                        {
+                            return this.updateMetadata(extension);
+                        })
+                        .then(() =>
+                        {
+                            result.added.push(item);
+                            done();
+                        })
+                        .catch(() =>
+                        {
+                            result.addedErrors.push(item);
+                            done();
+                        });
+                },
+                () =>
+                {
+                    resolve(result);
+                }
+            );
+        });
+    }
+
+    /**
+     * Update extensions.
+     */
+    private _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
+    {
+        return new Promise((resolve) =>
+        {
+            const { extensions, progress, showIndicator = false, total } = options;
+
+            let steps: number = progress;
+            const result = { updated: [] as IExtension[], updatedErrors: [] as IExtension[] };
+            async.eachSeries(
+                extensions,
+                (item, done) =>
+                {
+                    steps++;
+
+                    if (showIndicator)
+                    {
+                        Toast.showSpinner(`Syncing: Downloading extension: ${item.id}`, steps, total);
+                    }
+
+                    this.downloadExtension(item)
+                        .then((extension) =>
+                        {
+                            if (showIndicator)
+                            {
+                                Toast.showSpinner(`Syncing: Removing outdated extension: ${item.id}`, steps, total);
+                            }
+                            return this.uninstallExtension(extension);
+                        })
+                        .then((extension) =>
+                        {
+                            if (showIndicator)
+                            {
+                                Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
+                            }
+                            return this.extractExtension(extension);
+                        })
+                        .then((extension) =>
+                        {
+                            return this.updateMetadata(extension);
+                        })
+                        .then(() =>
+                        {
+                            result.updated.push(item);
+                            done();
+                        })
+                        .catch(() =>
+                        {
+                            result.updatedErrors.push(item);
+                            done();
+                        });
+                },
+                () =>
+                {
+                    resolve(result);
+                }
+            );
+        });
+    }
+
+    /**
+     * Remove extensions.
+     */
+    private _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
+    {
+        return new Promise((resolve) =>
+        {
+            const { extensions, progress, showIndicator = false, total } = options;
+
+            let steps: number = progress;
+            const result = { removed: [] as IExtension[], removedErrors: [] as IExtension[] };
+            async.eachSeries(
+                extensions,
+                (item, done) =>
+                {
+                    steps++;
+
+                    if (showIndicator)
+                    {
+                        Toast.showSpinner(`Syncing: Uninstalling extension: ${item.id}`, steps, total);
+                    }
+
+                    this.uninstallExtension(item).then(() =>
+                    {
+                        result.removed.push(item);
+                        done();
+                    }).catch(() =>
+                    {
+                        result.removedErrors.push(item);
+                        done();
+                    });
+                },
+                () =>
+                {
+                    resolve(result);
+                }
+            );
         });
     }
 }
