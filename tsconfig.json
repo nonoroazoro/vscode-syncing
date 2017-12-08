@@ -1,5 +1,4 @@
 {
-    "compileOnSave": true,
     "compilerOptions": {
         "allowUnreachableCode": true,
         "allowUnusedLabels": false,
@@ -16,12 +15,11 @@
         "rootDir": ".",
         "skipLibCheck": true,
         "sourceMap": true,
-        "strict": true,
         "strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": true,
         "target": "es2015",
         "typeRoots": [
-            "@types"
+            "typings"
         ]
     },
     "exclude": [
