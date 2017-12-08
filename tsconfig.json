@@ -19,7 +19,7 @@
         "suppressImplicitAnyIndexErrors": true,
         "target": "es2015",
         "typeRoots": [
-            "typings"
+            "src/typings"
         ]
     },
     "exclude": [
