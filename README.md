@@ -100,11 +100,9 @@ Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_p
 
 ## Getting Started
 
-1. Get your own `GitHub Personal Access Token` (4 steps).
+1. Get your own `GitHub Personal Access Token` (3 steps).
 
-    1. Login to your **[GitHub Personal Access Tokens page](https://github.com/settings/tokens)**.
-
-    1. Click **`Generate new token`**.
+    1. Login to your **[GitHub Personal Access Tokens page](https://github.com/settings/tokens)** and click **`Generate new token`**.
 
         ![generate new token](docs/png/Generate-New-Token.png)
 
