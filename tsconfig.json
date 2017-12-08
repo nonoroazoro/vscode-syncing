@@ -1,9 +1,9 @@
 {
     "compileOnSave": true,
     "compilerOptions": {
-        "allowJs": true,
         "allowUnreachableCode": true,
         "allowUnusedLabels": false,
+        "declaration": true,
         "experimentalDecorators": true,
         "module": "commonjs",
         "noImplicitAny": true,
