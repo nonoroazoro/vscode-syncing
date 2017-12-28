@@ -1,5 +1,11 @@
 # Changelogs
 
+## 1.5.2 - December 28, 2017
+
+- Fixed: A bug caused by adm-zip on Linux Mint and Xubuntu ([Issue #21](https://github.com/nonoroazoro/vscode-syncing/issues/21)).
+- Changed: Enhance user guides.
+
+
 ## 1.5.1 - December 4, 2017
 
 - Added: Added `Breaking Changes` section in README.
