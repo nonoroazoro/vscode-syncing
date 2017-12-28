@@ -95,22 +95,22 @@ You can set a proxy to accelerate the synchronization. Here are the steps:
 
 Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
 
-> Please notice that Syncing **does not upload** its settings file (i.e. `syncing.json`) because it may contains your sensitive information.
+> Please notice that Syncing **does not upload** its settings file (i.e. `syncing.json`) because it may contain your sensitive information.
 
 
 ## Getting Started
 
 1. Get your own `GitHub Personal Access Token` (3 steps).
 
-    1. **Login to your [GitHub Personal Access Tokens page](https://github.com/settings/tokens) and click `Generate new token`.**
+    1. Login to your **[GitHub Personal Access Tokens page](https://github.com/settings/tokens)** and click **`Generate new token`**.
 
         ![generate new token](docs/png/Generate-New-Token.png)
 
-    1. **Select `gist` and click `Generate token`.**
+    1. Give your token a descriptive **`name`**, check **`gist`** and click **`Generate token`**.
 
         ![allow gist](docs/png/Allow-Gist.png)
 
-    1. **Copy and backup your token.**
+    1. **`Copy`** and **`backup`** your token.
 
         ![copy and backup token](docs/png/Copy-Token.png)
 

@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "Syncing",
     "description": "Sync every settings with your own GitHub Gist.",
-    "version": "1.5.1",
+    "version": "1.5.2",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -73,7 +73,7 @@
         "build": "tsc -p ./tsconfig.json --sourceMap false",
         "watch": "tsc -p ./tsconfig.json -w",
         "test": "mocha",
-        "clean": "rimraf ./dist/*",
+        "clean": "rimraf dist/*",
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "dependencies": {

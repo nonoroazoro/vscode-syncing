@@ -220,9 +220,214 @@ export default class Extension
     }
 
     /**
+     * Download extension from VSCode marketplace.
+     */
+    downloadExtension(extension: IExtension): Promise<IExtension>
+    {
+        return new Promise((resolve, reject) =>
+        {
+            const filepath = temp.path({ suffix: `.${extension.id}.zip` });
+            const file = fs.createWriteStream(filepath);
+            file.on("finish", () =>
+            {
+                resolve(Object.assign({}, extension, { zip: filepath }));
+            }).on("error", reject);
+
+            const options: https.RequestOptions = {
+                host: `${extension.publisher}.gallery.vsassets.io`,
+                path: `/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
+            };
+            const proxy = this._syncing.proxy;
+            if (proxy)
+            {
+                options.agent = new HttpsProxyAgent(proxy);
+            }
+
+            https.get(options, (res) =>
+            {
+                if (res.statusCode === 200)
+                {
+                    res.pipe(file);
+                }
+                else
+                {
+                    reject();
+                }
+            }).on("error", reject);
+        });
+    }
+
+    /**
+     * Extract extension zip file to VSCode extensions folder.
+     */
+    extractExtension(extension: IExtension): Promise<IExtension>
+    {
+        return new Promise((resolve, reject) =>
+        {
+            temp.mkdir("syncing-", (err1, dirPath) =>
+            {
+                if (err1)
+                {
+                    reject(`Cannot extract extension: ${extension.id}. Access temp folder denied.`);
+                }
+                else if (!extension.zip)
+                {
+                    reject(`Cannot extract extension: ${extension.id}. Zip file not found.`);
+                }
+                else
+                {
+                    const zip: AdmZip = new AdmZip(extension.zip);
+                    try
+                    {
+                        zip.extractAllTo(dirPath, true);
+                    }
+                    catch (err2)
+                    {
+                        reject(`Cannot extract extension: ${extension.id}. ${err2.message}`);
+                        return;
+                    }
+
+                    const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
+                    fse.emptyDir(extPath)
+                        .then(() =>
+                        {
+                            return fse.copy(path.join(dirPath, "extension"), extPath);
+                        })
+                        .then(() =>
+                        {
+                            // Clear temp file (background and don't wait).
+                            fse.remove(extension.zip!).catch(() => { });
+                            resolve(Object.assign({}, extension, { path: extPath }));
+                        })
+                        .catch((err3) =>
+                        {
+                            reject(`Cannot extract extension: ${extension.id}. ${err3.message}`);
+                        });
+                }
+            });
+        });
+    }
+
+    /**
+     * Update extension's __metadata (post-process).
+     */
+    updateMetadata(extension: IExtension): Promise<IExtension>
+    {
+        return new Promise((resolve, reject) =>
+        {
+            if (extension && extension.__metadata && extension.path)
+            {
+                try
+                {
+                    const filepath = path.join(extension.path, "package.json");
+                    const packageJSON = JSON.parse(fs.readFileSync(filepath, "utf8"));
+                    packageJSON.__metadata = extension.__metadata;
+                    fs.writeFileSync(filepath, JSON.stringify(packageJSON), "utf8");
+                    resolve(extension);
+                }
+                catch (err)
+                {
+                    reject(`Cannot update extension's metadata: ${extension.id}.`);
+                }
+            }
+            else
+            {
+                resolve(extension);
+            }
+        });
+    }
+
+    /**
+     * Uninstall extension.
+     */
+    uninstallExtension(extension: IExtension): Promise<IExtension>
+    {
+        return new Promise((resolve, reject) =>
+        {
+            const localExtension = vscode.extensions.getExtension(extension.id);
+            const version = localExtension ? localExtension.packageJSON.version : extension.version;
+            fse.remove(path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${version}`), (err) =>
+            {
+                if (err)
+                {
+                    reject(new Error(`Cannot uninstall extension: ${extension.id}`));
+                }
+                else
+                {
+                    resolve(extension);
+                }
+            });
+        });
+    }
+
+    /**
+     * Get extensions that are added/updated/removed.
+     */
+    private _getDifferentExtensions(extensions: IExtension[]): Promise<{
+        added: IExtension[],
+        removed: IExtension[],
+        updated: IExtension[],
+        total: number
+    }>
+    {
+        return new Promise((resolve) =>
+        {
+            const result = {
+                added: [] as IExtension[],
+                removed: [] as IExtension[],
+                updated: [] as IExtension[],
+                get total()
+                {
+                    return this.added.length + this.removed.length + this.updated.length;
+                }
+            };
+            if (extensions)
+            {
+                let localExtension: vscode.Extension<any>;
+                const reservedExtensionIDs: string[] = [];
+
+                // Find added & updated extensions.
+                for (const ext of extensions)
+                {
+                    localExtension = vscode.extensions.getExtension(ext.id);
+                    if (localExtension)
+                    {
+                        if (localExtension.packageJSON.version === ext.version)
+                        {
+                            // Reserved.
+                            reservedExtensionIDs.push(ext.id);
+                        }
+                        else
+                        {
+                            // Updated.
+                            result.updated.push(ext);
+                        }
+                    }
+                    else
+                    {
+                        // Added.
+                        result.added.push(ext);
+                    }
+                }
+
+                const localExtensions: IExtension[] = this.getAll();
+                for (const ext of localExtensions)
+                {
+                    if (reservedExtensionIDs.indexOf(ext.id) === -1)
+                    {
+                        // Removed.
+                        result.removed.push(ext);
+                    }
+                }
+            }
+            resolve(result);
+        });
+    }
+
+    /**
      * Add extensions.
      */
-    _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
+    private _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
     {
         return new Promise((resolve) =>
         {
@@ -276,7 +481,7 @@ export default class Extension
     /**
      * Update extensions.
      */
-    _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
+    private _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
     {
         return new Promise((resolve) =>
         {
@@ -338,7 +543,7 @@ export default class Extension
     /**
      * Remove extensions.
      */
-    _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
+    private _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
     {
         return new Promise((resolve) =>
         {
@@ -372,211 +577,6 @@ export default class Extension
                     resolve(result);
                 }
             );
-        });
-    }
-
-    /**
-     * Download extension from VSCode marketplace.
-     */
-    downloadExtension(extension: IExtension): Promise<IExtension>
-    {
-        return new Promise((resolve, reject) =>
-        {
-            const filepath = temp.path({ suffix: `.${extension.id}.zip` });
-            const file = fs.createWriteStream(filepath);
-            file.on("finish", () =>
-            {
-                resolve(Object.assign({}, extension, { zip: filepath }));
-            }).on("error", reject);
-
-            const options: https.RequestOptions = {
-                host: `${extension.publisher}.gallery.vsassets.io`,
-                path: `/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
-            };
-            const proxy = this._syncing.proxy;
-            if (proxy)
-            {
-                options.agent = new HttpsProxyAgent(proxy);
-            }
-
-            https.get(options, (res) =>
-            {
-                if (res.statusCode === 200)
-                {
-                    res.pipe(file);
-                }
-                else
-                {
-                    reject();
-                }
-            }).on("error", reject);
-        });
-    }
-
-    /**
-     * Extract extension zip file to VSCode extensions folder.
-     */
-    extractExtension(extension: IExtension): Promise<IExtension>
-    {
-        return new Promise((resolve, reject) =>
-        {
-            temp.mkdir("syncing-", (err1, dirPath) =>
-            {
-                if (err1)
-                {
-                    reject(`Cannot extract extension: ${extension.id}. Access temp folder denied.`);
-                }
-                else if (!extension.zip)
-                {
-                    reject(`Cannot extract extension: ${extension.id}. Zip file not found.`);
-                }
-                else
-                {
-                    const zip: AdmZip = new AdmZip(extension.zip);
-                    zip.extractAllToAsync(dirPath, true, (err2) =>
-                    {
-                        if (err2)
-                        {
-                            reject(`Cannot extract extension: ${extension.id}. ${err2.message}`);
-                        }
-                        else
-                        {
-                            const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
-                            fse.emptyDir(extPath)
-                                .then(() =>
-                                {
-                                    return fse.copy(path.join(dirPath, "extension"), extPath);
-                                })
-                                .then(() =>
-                                {
-                                    // Clear temp file (background and don't wait).
-                                    fse.remove(extension.zip!).catch(() => { });
-                                    resolve(Object.assign({}, extension, { path: extPath }));
-                                })
-                                .catch((err3) =>
-                                {
-                                    reject(`Cannot extract extension: ${extension.id}. ${err3.message}`);
-                                });
-                        }
-                    });
-                }
-            });
-        });
-    }
-
-    /**
-     * Update extension's __metadata (post-process).
-     */
-    updateMetadata(extension: IExtension): Promise<IExtension>
-    {
-        return new Promise((resolve, reject) =>
-        {
-            if (extension && extension.__metadata && extension.path)
-            {
-                try
-                {
-                    const filepath = path.join(extension.path, "package.json");
-                    const packageJSON = JSON.parse(fs.readFileSync(filepath, "utf8"));
-                    packageJSON.__metadata = extension.__metadata;
-                    fs.writeFileSync(filepath, JSON.stringify(packageJSON), "utf8");
-                    resolve(extension);
-                }
-                catch (err)
-                {
-                    reject(`Cannot update extension's metadata: ${extension.id}.`);
-                }
-            }
-            else
-            {
-                resolve(extension);
-            }
-        });
-    }
-
-    /**
-     * Uninstall extension.
-     */
-    uninstallExtension(extension: IExtension): Promise<IExtension>
-    {
-        return new Promise((resolve, reject) =>
-        {
-            const localExtension = vscode.extensions.getExtension(extension.id);
-            const version = localExtension ? localExtension.packageJSON.version : extension.version;
-            fse.remove(path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${version}`), (err) =>
-            {
-                if (err)
-                {
-                    reject(new Error(`Cannot uninstall extension: ${extension.id}`));
-                }
-                else
-                {
-                    resolve(extension);
-                }
-            });
-        });
-    }
-
-    /**
-     * Get extensions that are added/updated/removed.
-     */
-    _getDifferentExtensions(extensions: IExtension[]): Promise<{
-        added: IExtension[],
-        removed: IExtension[],
-        updated: IExtension[],
-        total: number
-    }>
-    {
-        return new Promise((resolve) =>
-        {
-            const result = {
-                added: [] as IExtension[],
-                removed: [] as IExtension[],
-                updated: [] as IExtension[],
-                get total()
-                {
-                    return this.added.length + this.removed.length + this.updated.length;
-                }
-            };
-            if (extensions)
-            {
-                let localExtension: vscode.Extension<any>;
-                const reservedExtensionIDs: string[] = [];
-
-                // Find added & updated extensions.
-                for (const ext of extensions)
-                {
-                    localExtension = vscode.extensions.getExtension(ext.id);
-                    if (localExtension)
-                    {
-                        if (localExtension.packageJSON.version === ext.version)
-                        {
-                            // Reserved.
-                            reservedExtensionIDs.push(ext.id);
-                        }
-                        else
-                        {
-                            // Updated.
-                            result.updated.push(ext);
-                        }
-                    }
-                    else
-                    {
-                        // Added.
-                        result.added.push(ext);
-                    }
-                }
-
-                const localExtensions: IExtension[] = this.getAll();
-                for (const ext of localExtensions)
-                {
-                    if (reservedExtensionIDs.indexOf(ext.id) === -1)
-                    {
-                        // Removed.
-                        result.removed.push(ext);
-                    }
-                }
-            }
-            resolve(result);
         });
     }
 }

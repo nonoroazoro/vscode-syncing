@@ -1,9 +1,8 @@
 {
-    "compileOnSave": true,
     "compilerOptions": {
-        "allowJs": true,
         "allowUnreachableCode": true,
         "allowUnusedLabels": false,
+        "declaration": false,
         "experimentalDecorators": true,
         "module": "commonjs",
         "noImplicitAny": true,
@@ -11,17 +10,16 @@
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "outDir": "./dist",
+        "outDir": "dist",
         "pretty": true,
         "rootDir": ".",
         "skipLibCheck": true,
         "sourceMap": true,
-        "strict": true,
         "strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": true,
         "target": "es2015",
         "typeRoots": [
-            "@types"
+            "src/typings"
         ]
     },
     "exclude": [
