@@ -2,7 +2,7 @@
 
 ## 1.5.3 - February 08, 2018
 
-- Fixed: An error introduced by VSCode 1.2.0.
+- Fixed: An error introduced by VSCode 1.20.
 
 
 ## 1.5.2 - December 28, 2017
