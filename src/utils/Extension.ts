@@ -212,7 +212,10 @@ export default class Extension
                         {
                             Toast.clearSpinner("");
                         }
-                        resolve(result);
+
+                        // Fixed: Remove ".obsolete" file (added from VSCode v1.2.0) after the synchronization.
+                        fse.remove(path.join(this._env.extensionsPath, ".obsolete"))
+                            .then(() => resolve(result)).catch(() => resolve(result));
                     }
                 );
             });

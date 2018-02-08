@@ -1,19 +1,24 @@
 # Changelogs
 
+## 1.5.3 - February 08, 2018
+
+- Fixed: An error introduced by VSCode 1.2.0.
+
+
 ## 1.5.2 - December 28, 2017
 
 - Fixed: A bug caused by adm-zip on Linux Mint and Xubuntu ([Issue #21](https://github.com/nonoroazoro/vscode-syncing/issues/21)).
 - Changed: Enhance user guides.
 
 
-## 1.5.1 - December 4, 2017
+## 1.5.1 - December 04, 2017
 
 - Added: Added `Breaking Changes` section in README.
 - Changed: Simplified user guide.
 - Changed: Reduced extension file size.
 
 
-## 1.5.0 - December 2, 2017
+## 1.5.0 - December 02, 2017
 
 - Changed: Rewrite in `TypeScript`, now we have `typings`.
 - Added: Isolate the `http_proxy` setting into `Syncing`'s settings file (which means `Syncing` will no longer read proxy settings from `VSCode` settings), this may prevent a potential failure caused by wrong proxy settings while syncing between different devices (Thank [@mubaidr](https://github.com/mubaidr) for the advice).
@@ -77,7 +82,7 @@
 - Fixed: Image URLs are now resolved to `https` URLs as required by VSCode-1.14.
 
 
-## 1.3.9 - June 9, 2017
+## 1.3.9 - June 09, 2017
 
 - Fixed: Using extension's local version to properly remove the old extensions.
 
@@ -87,32 +92,32 @@
 - Changed: Tuning the timeout threshold to reduce the connection failures on slow networks.
 
 
-## 1.3.7 - May 4, 2017
+## 1.3.7 - May 04, 2017
 
 - Fixed: Reset Keyboard-Shortcuts image size.
 
 
-## 1.3.6 - May 4, 2017
+## 1.3.6 - May 04, 2017
 
 - Changed: Resize Keyboard-Shortcuts image.
 
 
-## 1.3.5 - May 4, 2017
+## 1.3.5 - May 04, 2017
 
 - Changed: Update guides.
 
 
-## 1.3.4 - April 7, 2017
+## 1.3.4 - April 07, 2017
 
 - Fixed: Minor fixes to the Downloading and Uploading features.
 
 
-## 1.3.3 - March 3, 2017
+## 1.3.3 - March 03, 2017
 
 - Fixed: Checking user access privileges when uploading.
 
 
-## 1.3.2 - March 2, 2017
+## 1.3.2 - March 02, 2017
 
 - Changed: Update the messages of `Settings File Not Found` and `Setting File Invalid` errors.
 - Fixed: Upload an `empty array` (instead of `null`) when extension list is empty, to avoid potential error.
@@ -130,7 +135,7 @@
 - Changed: Enhance user guides.
 
 
-## 1.2.9 - February 8, 2017
+## 1.2.9 - February 08, 2017
 
 - Added: Clean up temporary files automatically.
 - Changed: Pretty JSON files: `extensions.json`, `syncing.json`, make it a little more user-friendly (Thank [@fengcen](https://github.com/fengcen) for the advice).
@@ -151,7 +156,7 @@
 - Fixed: Reload dialog isn't shown when extensions are changed.
 
 
-## 1.2.5 - November 9, 2016
+## 1.2.5 - November 09, 2016
 
 - Added: Hints of the synchronization.
 - Added: Show reload dialog when extensions are changed.
