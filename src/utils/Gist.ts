@@ -1,4 +1,8 @@
-import * as Github from "github";
+import * as Github from "@octokit/rest";
+import * as HttpsProxyAgent from "https-proxy-agent";
+
+import { IConfig } from "./Config";
+import * as GitHubTypes from "./types/GitHub";
 
 import Toast from "./Toast";
 
@@ -16,13 +20,12 @@ export default class Gist
 
     private _api: Github;
     private _proxy?: string;
-    private _token: string;
-    private _user: { name: string, id: string } | null;
+    private _token?: string;
 
-    private constructor(token: string, proxy?: string)
+    private constructor(token?: string, proxy?: string)
     {
         this._proxy = proxy;
-        this._api = new Github(Object.assign({ timeout: 10000 }, proxy ? { proxy } : {}));
+        this._api = new Github(Object.assign({ timeout: 10000 }, proxy ? { agent: new HttpsProxyAgent(proxy) } : {}));
         this._token = token;
         if (token)
         {
@@ -38,7 +41,7 @@ export default class Gist
      * @param token GitHub Personal Access Token.
      * @param proxy Proxy url.
      */
-    public static create(token: string, proxy?: string): Gist
+    public static create(token?: string, proxy?: string): Gist
     {
         if (!Gist._instance || Gist._instance.token !== token || Gist._instance.proxy !== proxy)
         {
@@ -66,29 +69,20 @@ export default class Gist
     /**
      * Get the currently authenticated GitHub user.
      */
-    public user(): Promise<{ name: string, id: string } | null>
+    public user(): Promise<{ name: string, id: number } | null>
     {
         return new Promise((resolve) =>
         {
-            if (this._user)
-            {
-                resolve(this._user);
-            }
-            else
-            {
-                this._api.users
-                    .get({} as any)
-                    .then((value) =>
-                    {
-                        this._user = { name: value.login, id: value.id };
-                        resolve(this._user);
-                    })
-                    .catch(() =>
-                    {
-                        this._user = null;
-                        resolve();
-                    });
-            }
+            this._api.users
+                .get({})
+                .then(({ data }: { data: GitHubTypes.IGistOwner }) =>
+                {
+                    resolve({ name: data.login, id: data.id });
+                })
+                .catch(() =>
+                {
+                    resolve();
+                });
         });
     }
 
@@ -97,17 +91,17 @@ export default class Gist
      * @param id Gist id.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
-    public get(id: string, showIndicator: boolean = false): Promise<any>
+    public get(id: string, showIndicator: boolean = false): Promise<GitHubTypes.IGist>
     {
         return new Promise((resolve, reject) =>
         {
-            function resolveWrap(value: any)
+            function resolveWrap(value: Github.AnyResponse)
             {
                 if (showIndicator)
                 {
                     Toast.clearSpinner("");
                 }
-                resolve(value);
+                resolve(value.data);
             }
 
             function rejectWrap(error: Error)
@@ -124,20 +118,9 @@ export default class Gist
                 Toast.showSpinner("Syncing: Checking remote settings.");
             }
 
-            this._api.gists.get({ id }).then(resolveWrap).catch((err) =>
+            this._api.gists.get({ id }).then(resolveWrap).catch(({ code }) =>
             {
-                let error = new Error("Please check your Internet connection or proxy settings.");
-                const code: number = err.code;
-                if (code === 401)
-                {
-                    error = new Error("Please check your GitHub Personal Access Token.");
-                }
-                else if (code === 404)
-                {
-                    error = new Error("Please check your Gist ID.");
-                }
-                Object.assign(error, { code });
-                rejectWrap(error);
+                rejectWrap(this._createError(code));
             });
         });
     }
@@ -145,40 +128,21 @@ export default class Gist
     /**
      * Get all gists of the authenticated user.
      */
-    public getAll(): Promise<any[]>
+    public getAll(): Promise<GitHubTypes.IGist[]>
     {
         return new Promise((resolve, reject) =>
         {
-            this._api.gists.getAll({}).then((gists: any[]) =>
+            this._api.gists.getAll({}).then((res) =>
             {
-                if (gists)
-                {
-                    // filter out the VSCode settings.
-                    resolve(gists
-                        .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files["extensions.json"]))
-                        .sort((a, b) => new Date(a.update_id).getTime() - new Date(b.update_id).getTime())
-                    );
-                }
-                else
-                {
-                    resolve([]);
-                }
-            }).catch((err) =>
+                // filter out the VSCode settings.
+                const gists: GitHubTypes.IGist[] = res.data;
+                resolve(gists
+                    .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files["extensions.json"]))
+                    .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime())
+                );
+            }).catch(({ code }) =>
             {
-                if (err.code === 401)
-                {
-                    const error = new Error("Please check your GitHub Personal Access Token.");
-                    Object.assign(error, { code: err.code });
-                    reject(error);
-                }
-                else if (err.code === 404)
-                {
-                    reject(new Error("Please check your Gist ID."));
-                }
-                else
-                {
-                    reject(new Error("Please check your Internet connection or proxy settings."));
-                }
+                reject(this._createError(code));
             });
         });
     }
@@ -187,25 +151,25 @@ export default class Gist
      * Delete gist.
      * @param id Gist id.
      */
-    public delete(id: string): Promise<any>
+    public delete(id: string): Promise<GitHubTypes.IGist>
     {
-        return this._api.gists.delete({ id });
+        return this._api.gists.delete({ id }).then((res) => res.data);
     }
 
     /**
      * Update gist.
      * @param content Gist content.
      */
-    public update(content: any): Promise<any>
+    public update(content: Github.GistsEditParams): Promise<GitHubTypes.IGist>
     {
-        return this._api.gists.edit(content);
+        return this._api.gists.edit(content).then((res) => res.data);
     }
 
     /**
      * Check if gist exists of the currently authenticated user.
      * @param id Gist id.
      */
-    public exists(id: string): Promise<boolean | any>
+    public exists(id: string): Promise<GitHubTypes.IGist | boolean>
     {
         return new Promise((resolve) =>
         {
@@ -216,10 +180,10 @@ export default class Gist
                     {
                         if (this.token)
                         {
-                            this.user().then((value) =>
+                            this.user().then((user) =>
                             {
                                 // check if the Gist's owner is the currently authenticated user.
-                                if (value && value.id === gist.owner.id)
+                                if (user && user.id === gist.owner.id)
                                 {
                                     resolve(gist);
                                 }
@@ -247,25 +211,16 @@ export default class Gist
      * Create gist.
      * @param content Gist content.
      */
-    public create(content: any): Promise<any>
+    public create(content: Github.GistsCreateParams): Promise<GitHubTypes.IGist>
     {
         return new Promise((resolve, reject) =>
         {
-            this._api.gists.create(content).then((gist) =>
+            this._api.gists.create(content).then((res) =>
             {
-                resolve(gist);
-            }).catch((err) =>
+                resolve(res.data);
+            }).catch(({ code }) =>
             {
-                if (err.code === 401)
-                {
-                    const error = new Error("Please check your GitHub Personal Access Token.");
-                    Object.assign(error, { code: err.code });
-                    reject(error);
-                }
-                else
-                {
-                    reject(new Error("Please check your Internet connection or proxy settings."));
-                }
+                reject(this._createError(code));
             });
         });
     }
@@ -275,7 +230,7 @@ export default class Gist
      * @param files Settings files.
      * @param isPublic Defaults to `false`, gist is set to private.
      */
-    public createSettings(files = {}, isPublic = false): Promise<any>
+    public createSettings(files = {}, isPublic = false): Promise<GitHubTypes.IGist>
     {
         return this.create({
             description: Gist.GIST_DESCRIPTION,
@@ -291,11 +246,11 @@ export default class Gist
      * @param upsert Default is `true`, create new if gist not exists.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
-    public findAndUpdate(id: string, uploads: any, upsert = true, showIndicator = false): Promise<any>
+    public findAndUpdate(id: string, uploads: IConfig[], upsert = true, showIndicator = false): Promise<GitHubTypes.IGist>
     {
         return new Promise((resolve, reject) =>
         {
-            function resolveWrap(value: any)
+            function resolveWrap(value: GitHubTypes.IGist)
             {
                 if (showIndicator)
                 {
@@ -323,7 +278,7 @@ export default class Gist
                 const gist: { id: string, files: any } = { id, files: {} };
                 for (const item of uploads)
                 {
-                    // any `null` content will be filtered out, just in case.
+                    // `null` content will be filtered out, just in case.
                     if (item.content)
                     {
                         gist.files[item.remote] = { content: item.content };
@@ -333,14 +288,14 @@ export default class Gist
                 if (exists)
                 {
                     // only update when files are modified.
-                    gist.files = this._getModifiedFiles(gist.files, exists.files);
+                    gist.files = this._getModifiedFiles(gist.files, (exists as GitHubTypes.IGist).files);
                     if (gist.files)
                     {
                         this.update(gist).then(resolveWrap).catch(rejectWrap);
                     }
                     else
                     {
-                        resolveWrap(exists);
+                        resolveWrap(exists as GitHubTypes.IGist);
                     }
                 }
                 else
@@ -361,9 +316,9 @@ export default class Gist
 
     /**
      * Get modified files list.
-     * @returns {} or `undefined`.
+     * @returns {} or `null`.
      */
-    private _getModifiedFiles(localFiles: any, remoteFiles: any): any
+    private _getModifiedFiles(localFiles: any, remoteFiles: GitHubTypes.IGistFile[]): any
     {
         let localFile;
         let remoteFile;
@@ -406,6 +361,25 @@ export default class Gist
             }
         }
 
-        return (Object.keys(result).length === 0) ? undefined : result;
+        return (Object.keys(result).length === 0) ? null : result;
+    }
+
+    /**
+     * Create error from error code.
+     */
+    private _createError(code: number)
+    {
+        let message = "Please check your Internet connection or proxy settings.";
+        if (code === 401)
+        {
+            message = "Please check your GitHub Personal Access Token.";
+        }
+        else if (code === 404)
+        {
+            message = "Please check your Gist ID.";
+        }
+        const error = new Error(message);
+        Object.assign(error, { code });
+        return error;
     }
 }
