@@ -77,11 +77,12 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "dependencies": {
+        "@octokit/rest": "^15.2.6",
         "adm-zip": "^0.4.9",
         "async": "^2.6.0",
         "fs-extra": "^5.0.0",
-        "github": "^8.1.1",
         "https-proxy-agent": "^2.2.1",
+        "junk": "^2.1.0",
         "moment": "^2.22.1",
         "temp": "^0.8.3"
     },
