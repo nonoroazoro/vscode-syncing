@@ -9,7 +9,7 @@
             "spaces",
             4
         ],
-        "max-classes-per-file": false,
+        "max-classes-per-file": true,
         "max-line-length": [
             true,
             200
