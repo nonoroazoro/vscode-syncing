@@ -1,7 +1,20 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
+import * as GitHubTypes from "./types/GitHub";
+
 import Gist from "./Gist";
+
+/**
+ * Represents the item of GistListBox.
+ */
+interface IGistListBoxItem extends vscode.QuickPickItem
+{
+    /**
+     * Payload of the item.
+     */
+    data: string;
+}
 
 /**
  * Set a message to the VSCode status bar.
@@ -99,16 +112,15 @@ function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
 {
     return new Promise((resolve, reject) =>
     {
-        const placeHolder = forUpload ?
-            "Enter Gist ID (Leave it blank to create a new Gist automatically)." :
-            "Enter Gist ID.";
-        const options = {
+        const placeHolder = forUpload
+            ? "Enter Gist ID (Leave it blank to create a new Gist automatically)."
+            : "Enter Gist ID.";
+        vscode.window.showInputBox({
             ignoreFocusOut: true,
             password: false,
             placeHolder,
             prompt: "Used for synchronizing your settings with Gist."
-        };
-        vscode.window.showInputBox(options).then((value) =>
+        }).then((value) =>
         {
             if (value === undefined)
             {
@@ -143,19 +155,20 @@ function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ 
     {
         showSpinner("Syncing: Checking remote Gists.");
         return api.getAll()
-            .then((gists: any[]) =>
+            .then((gists: GitHubTypes.IGist[]) =>
             {
                 clearSpinner("");
 
-                const manualItem = {
+                const manualItem: IGistListBoxItem = {
                     data: "@@manual",
+                    description: "",
                     label: `Enter Gist ID manually...`
                 };
 
-                // Don't show quick pick dialog when gists is empty.
-                if (gists && gists.length > 0)
+                // Show quick pick dialog only if the gists is not empty.
+                if (gists.length > 0)
                 {
-                    const items: any[] = gists.map((gist) => ({
+                    const items: IGistListBoxItem[] = gists.map((gist) => ({
                         data: gist.id,
                         description: `Last uploaded ${moment.duration(new Date(gist.updated_at).getTime() - Date.now()).humanize(true)}.`,
                         label: `Gist ID: ${gist.id}`
@@ -167,36 +180,25 @@ function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ 
                         placeHolder: `Choose a Gist to ${forUpload ? "upload" : "download"} your settings.`
                     });
                 }
-                else
-                {
-                    return manualItem;
-                }
+                return manualItem;
             })
-            .then((item: { data: string }) =>
+            .then((item) =>
             {
-                // Reject if cancelled.
                 if (item)
                 {
-                    const id = item.data;
-                    if (!forUpload && !id)
+                    const { data: id } = item;
+                    if (id === "@@manual")
                     {
-                        // Only reject when downloading.
-                        reject(new Error("the Gist ID is not set."));
+                        resolve({ id: "" });
                     }
                     else
                     {
-                        if (id === "@@manual")
-                        {
-                            resolve({ id: "" });
-                        }
-                        else
-                        {
-                            resolve({ id });
-                        }
+                        resolve({ id });
                     }
                 }
                 else
                 {
+                    // Reject if cancelled.
                     reject(new Error("You abort the synchronization."));
                 }
             })
