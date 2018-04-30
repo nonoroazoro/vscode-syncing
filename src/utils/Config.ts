@@ -1,11 +1,13 @@
 import * as async from "async";
 import * as fs from "fs";
+import * as junk from "junk";
 import * as path from "path";
 import * as vscode from "vscode";
 
 import Environment from "./Environment";
 import Extension, { ISyncStatus } from "./Extension";
 import Toast from "./Toast";
+import * as GitHubTypes from "./types/GitHub";
 
 /**
  * Represent the type of VSCode configs.
@@ -240,14 +242,17 @@ export default class Config
      * @param files VSCode Configs from Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    saveConfigs(files: any, showIndicator: boolean = false): Promise<{
+    saveConfigs(files: GitHubTypes.IGistFile[], showIndicator: boolean = false): Promise<{
         updated: ISyncStatus[],
         removed: ISyncStatus[]
     }>
     {
         return new Promise((resolve, reject) =>
         {
-            function resolveWrap(value: any)
+            function resolveWrap(value: {
+                updated: ISyncStatus[],
+                removed: ISyncStatus[]
+            })
             {
                 if (showIndicator)
                 {
@@ -278,7 +283,7 @@ export default class Config
                 const existsFileKeys: string[] = [];
                 this.getConfigs().then((configs: IConfig[]) =>
                 {
-                    let file: any;
+                    let file: GitHubTypes.IGistFile;
                     for (const config of configs)
                     {
                         file = files[config.remote];
@@ -288,12 +293,18 @@ export default class Config
                             if (config.name === "extensions")
                             {
                                 // Temp extensions file.
-                                extensionsFile = Object.assign({}, config, { content: file.content });
+                                extensionsFile = {
+                                    ...config,
+                                    content: file.content
+                                };
                             }
                             else
                             {
                                 // Temp other file.
-                                saveFiles.push(Object.assign({}, config, { content: file.content }));
+                                saveFiles.push({
+                                    ...config,
+                                    content: file.content
+                                });
                             }
                             existsFileKeys.push(config.remote);
                         }
@@ -377,7 +388,7 @@ export default class Config
             }
             else
             {
-                rejectWrap(new Error("Cannot save empty Gist files."));
+                rejectWrap(new Error("Cannot find any files in your Gist."));
             }
         });
     }
@@ -433,7 +444,7 @@ export default class Config
         try
         {
             const filenames: string[] = fs.readdirSync(snippetsDir);
-            filenames.forEach((filename: string) =>
+            filenames.filter(junk.not).forEach((filename: string) =>
             {
                 // Add prefix `snippet-` to all snippets.
                 results.push({
