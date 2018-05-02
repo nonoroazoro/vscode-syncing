@@ -10,7 +10,7 @@ export interface IGist
     git_push_url: string;
     html_url: string;
     id: string;
-    omments_url: string;
+    comments_url: string;
     owner: IGistOwner;
     public: boolean;
     truncated: boolean;
