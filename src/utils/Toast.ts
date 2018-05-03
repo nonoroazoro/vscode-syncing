@@ -211,15 +211,23 @@ function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ 
  */
 function showReloadBox(): void
 {
-    const title: string = "Reload";
-    const message: string = "Syncing: Settings are successfully synced. Reload VSCode to take effect.";
-    vscode.window.showInformationMessage(message, { title }).then((btn) =>
+    const reloadButton = "Reload";
+    const message = "Settings are successfully synced. Please reload VSCode to take effect.";
+    vscode.window.showInformationMessage(message, reloadButton).then((selection) =>
     {
-        if (btn && btn.title === title)
+        if (selection === reloadButton)
         {
             vscode.commands.executeCommand("workbench.action.reloadWindow");
         }
     });
+}
+
+/**
+ * Show a confirm prompt dialog.
+ */
+function showConfirmBox(message: string, ...buttons: string[])
+{
+    return vscode.window.showWarningMessage(message, ...buttons);
 }
 
 let spinnerTimer: NodeJS.Timer | null;
@@ -287,6 +295,7 @@ function clearSpinner(message?: string): void
  */
 export default {
     clearSpinner,
+    showConfirmBox,
     showGistInputBox,
     showGitHubTokenInputBox,
     showReloadBox,
