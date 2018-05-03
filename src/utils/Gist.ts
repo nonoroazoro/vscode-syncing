@@ -1,7 +1,9 @@
 import * as Github from "@octokit/rest";
 import * as HttpsProxyAgent from "https-proxy-agent";
+import * as stripJsonComments from "strip-json-comments";
 
 import { IConfig } from "./Config";
+import { diff } from "./Diff";
 import * as GitHubTypes from "./types/GitHub";
 
 import Toast from "./Toast";
@@ -288,14 +290,36 @@ export default class Gist
                 if (exists)
                 {
                     // only update when files are modified.
-                    gist.files = this._getModifiedFiles(gist.files, (exists as GitHubTypes.IGist).files);
+                    const remoteGist = exists as GitHubTypes.IGist;
+                    gist.files = this._getModifiedFiles(gist.files, remoteGist.files);
                     if (gist.files)
                     {
-                        this.update(gist).then(resolveWrap).catch(rejectWrap);
+                        // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
+                        const changes = this._diff(gist.files, remoteGist.files);
+                        if (changes >= 10)
+                        {
+                            const okButton = "Continue to Upload";
+                            const message = "The local settings have been changed a lot since your last upload. Please make sure you've checked everything.";
+                            Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
+                            {
+                                if (selection === okButton)
+                                {
+                                    this.update(gist).then(resolveWrap).catch(rejectWrap);
+                                }
+                                else
+                                {
+                                    rejectWrap(new Error("You abort the synchronization."));
+                                }
+                            });
+                        }
+                        else
+                        {
+                            this.update(gist).then(resolveWrap).catch(rejectWrap);
+                        }
                     }
                     else
                     {
-                        resolveWrap(exists as GitHubTypes.IGist);
+                        resolveWrap(remoteGist);
                     }
                 }
                 else
@@ -318,7 +342,7 @@ export default class Gist
      * Get modified files list.
      * @returns {} or `null`.
      */
-    private _getModifiedFiles(localFiles: any, remoteFiles: GitHubTypes.IGistFile[]): any
+    private _getModifiedFiles(localFiles: any, remoteFiles: GitHubTypes.IGistFiles): any
     {
         let localFile;
         let remoteFile;
@@ -381,5 +405,36 @@ export default class Gist
         const error = new Error(message);
         Object.assign(error, { code });
         return error;
+    }
+
+    /**
+     * Calculates the number of differences between the local and remote files.
+     */
+    private _diff(localFiles: GitHubTypes.IGistFiles, remoteFiles: GitHubTypes.IGistFiles): number
+    {
+        const localKeys = Object.keys(localFiles);
+        const left = this.parseIntoJSON(localFiles, localKeys);
+        const right = this.parseIntoJSON(remoteFiles, localKeys);
+        return diff(left, right);
+    }
+
+    /**
+     * Converts the `content` of `GitHubTypes.IGistFiles` into an object.
+     */
+    private parseIntoJSON(files: GitHubTypes.IGistFiles, keys: string[]): any
+    {
+        const result = {};
+        keys.forEach((key) =>
+        {
+            try
+            {
+                result[key] = JSON.parse((stripJsonComments(files[key].content)));
+            }
+            catch (e)
+            {
+                result[key] = files[key].content;
+            }
+        });
+        return result;
     }
 }
