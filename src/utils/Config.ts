@@ -242,7 +242,7 @@ export default class Config
      * @param files VSCode Configs from Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    saveConfigs(files: GitHubTypes.IGistFile[], showIndicator: boolean = false): Promise<{
+    saveConfigs(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
         updated: ISyncStatus[],
         removed: ISyncStatus[]
     }>
