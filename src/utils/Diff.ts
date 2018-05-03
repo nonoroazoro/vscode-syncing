@@ -1,6 +1,6 @@
 import { DiffPatcher } from "jsondiffpatch";
 
-const diffPatcher = new DiffPatcher({ objectHash(obj: any) { return obj.id; } });
+const diffPatcher = new DiffPatcher({ objectHash(obj: any) { return obj.id || obj.key; } });
 
 /**
  * Calculates the number of differences between the two objects.
