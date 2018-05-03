@@ -2,8 +2,10 @@ import * as async from "async";
 import * as fs from "fs";
 import * as junk from "junk";
 import * as path from "path";
+import * as stripJsonComments from "strip-json-comments";
 import * as vscode from "vscode";
 
+import { diff } from "./Diff";
 import Environment from "./Environment";
 import Extension, { ISyncStatus } from "./Extension";
 import Toast from "./Toast";
@@ -351,39 +353,50 @@ export default class Config
                         saveFiles.push(extensionsFile);
                     }
 
-                    const syncedFiles: {
-                        updated: ISyncStatus[],
-                        removed: ISyncStatus[]
-                    } = { updated: [], removed: [] };
-                    async.eachSeries(
-                        saveFiles,
-                        (item: IConfig, done: async.ErrorCallback<Error>) =>
+                    // poka-yoke - check if there have been two much changes (more than 10 changes) since the last downloading.
+                    this._checkIfContinue(configs, saveFiles, removeFiles).then((value) =>
+                    {
+                        if (value)
                         {
-                            this._saveItemContent(item).then((saved) =>
-                            {
-                                syncedFiles.updated.push(saved);
-                                done();
-                            }).catch((err) =>
-                            {
-                                done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
-                            });
-                        },
-                        (err) =>
-                        {
-                            if (err)
-                            {
-                                rejectWrap(err);
-                            }
-                            else
-                            {
-                                this.removeConfigs(removeFiles).then((removed) =>
+                            const syncedFiles: {
+                                updated: ISyncStatus[],
+                                removed: ISyncStatus[]
+                            } = { updated: [], removed: [] };
+                            async.eachSeries(
+                                saveFiles,
+                                (item: IConfig, done: async.ErrorCallback<Error>) =>
                                 {
-                                    syncedFiles.removed = removed;
-                                    resolveWrap(syncedFiles);
-                                }).catch(rejectWrap);
-                            }
+                                    this._saveItemContent(item).then((saved) =>
+                                    {
+                                        syncedFiles.updated.push(saved);
+                                        done();
+                                    }).catch((err) =>
+                                    {
+                                        done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
+                                    });
+                                },
+                                (err) =>
+                                {
+                                    if (err)
+                                    {
+                                        rejectWrap(err);
+                                    }
+                                    else
+                                    {
+                                        this.removeConfigs(removeFiles).then((removed) =>
+                                        {
+                                            syncedFiles.removed = removed;
+                                            resolveWrap(syncedFiles);
+                                        }).catch(rejectWrap);
+                                    }
+                                }
+                            );
                         }
-                    );
+                        else
+                        {
+                            rejectWrap(new Error("You abort the synchronization."));
+                        }
+                    });
                 });
             }
             else
@@ -538,5 +551,62 @@ export default class Config
                 });
             }
         });
+    }
+
+    /**
+     * Check if the downloading should be continued.
+     */
+    private _checkIfContinue(configs: IConfig[], saveFiles: IConfig[], removeFiles: IConfig[])
+    {
+        return new Promise((resolve) =>
+        {
+            this._loadContent(configs).then((loadedConfigs) =>
+            {
+                const changes = this._diff(loadedConfigs, saveFiles) + removeFiles.length;
+                if (changes >= 10)
+                {
+                    const okButton = "Continue to Download";
+                    const message = "The local settings have been changed a lot since your last download. Please make sure you've checked everything before you continue.";
+                    Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
+                    {
+                        resolve(selection === okButton);
+                    });
+                }
+                else
+                {
+                    resolve(true);
+                }
+            });
+        });
+    }
+
+    /**
+     * Calculates the number of differences between the local and remote files.
+     */
+    private _diff(localFiles: IConfig[], remoteFiles: IConfig[]): number
+    {
+        const left = this.parseIntoJSON(localFiles);
+        const right = this.parseIntoJSON(remoteFiles);
+        return diff(left, right);
+    }
+
+    /**
+     * Converts the `content` of `IConfig[]` into an object.
+     */
+    private parseIntoJSON(files: IConfig[]): any
+    {
+        const result = {};
+        files.forEach((f) =>
+        {
+            try
+            {
+                result[f.remote] = JSON.parse((stripJsonComments(f.content || "")));
+            }
+            catch (e)
+            {
+                result[f.remote] = f.content || "";
+            }
+        });
+        return result;
     }
 }
