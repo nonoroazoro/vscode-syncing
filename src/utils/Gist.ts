@@ -299,7 +299,7 @@ export default class Gist
                         if (changes >= 10)
                         {
                             const okButton = "Continue to Upload";
-                            const message = "The local settings have been changed a lot since your last upload. Please make sure you've checked everything.";
+                            const message = "The local settings have been changed a lot since your last upload. Please make sure you've checked everything before you continue.";
                             Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
                             {
                                 if (selection === okButton)
