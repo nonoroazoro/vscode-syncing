@@ -4,7 +4,7 @@ export interface IGist
     commits_url: string;
     created_at: string;
     description: string;
-    files: IGistFile[];
+    files: IGistFiles;
     forks_url: string;
     git_pull_url: string;
     git_push_url: string;
@@ -28,6 +28,11 @@ export interface IGistFile
     size: number;
     truncated: boolean;
     type: string;
+}
+
+export interface IGistFiles
+{
+    [key: string]: IGistFile;
 }
 
 export interface IGistOwner
