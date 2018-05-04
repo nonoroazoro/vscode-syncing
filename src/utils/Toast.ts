@@ -227,7 +227,7 @@ function showReloadBox(): void
  */
 function showConfirmBox(message: string, ...buttons: string[])
 {
-    return vscode.window.showWarningMessage(message, ...buttons);
+    return vscode.window.showInformationMessage(message, ...buttons);
 }
 
 let spinnerTimer: NodeJS.Timer | null;
