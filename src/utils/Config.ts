@@ -565,8 +565,8 @@ export default class Config
                 const changes = this._diff(loadedConfigs, saveFiles) + removeFiles.length;
                 if (changes >= 10)
                 {
-                    const okButton = "Continue to Download";
-                    const message = "The local settings have been changed a lot since your last download. Please make sure you've checked everything before you continue.";
+                    const okButton = "Continue to download";
+                    const message = "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE LOCAL SETTINGS?";
                     Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
                     {
                         resolve(selection === okButton);

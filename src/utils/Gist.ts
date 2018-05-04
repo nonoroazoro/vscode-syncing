@@ -298,8 +298,8 @@ export default class Gist
                         const changes = this._diff(gist.files, remoteGist.files);
                         if (changes >= 10)
                         {
-                            const okButton = "Continue to Upload";
-                            const message = "The local settings have been changed a lot since your last upload. Please make sure you've checked everything before you continue.";
+                            const okButton = "Continue to upload";
+                            const message = "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE REMOTE SETTINGS?";
                             Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
                             {
                                 if (selection === okButton)
