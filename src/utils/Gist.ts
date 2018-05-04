@@ -27,7 +27,7 @@ export default class Gist
     private constructor(token?: string, proxy?: string)
     {
         this._proxy = proxy;
-        this._api = new Github(Object.assign({ timeout: 10000 }, proxy ? { agent: new HttpsProxyAgent(proxy) } : {}));
+        this._api = new Github(Object.assign({ timeout: 8000 }, proxy ? { agent: new HttpsProxyAgent(proxy) } : {}));
         this._token = token;
         if (token)
         {
