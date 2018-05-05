@@ -132,7 +132,7 @@ Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_p
 
         1. Done!
 
-        1. *After it's done, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com).*
+        1. *After it's done, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com). Also, you can `Edit` and `make it public` to share your settings with others.*
 
     1. **Download**
 
