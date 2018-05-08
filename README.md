@@ -15,9 +15,13 @@
 
 ## Breaking Changes
 
-* From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`. The proxy settings have been moved into `Syncing`'s own settings file.
+* From ***version 1.6.0*** onwards, I've introduced two important changes:
 
-    > Check [Proxy Settings](#proxy-settings) for more information.
+    1. **Exclude VSCode Settings.**
+
+    1. **Mistake-Proofing ([Poka-Yoke](https://en.wikipedia.org/wiki/Poka-yoke)).**
+
+    > Please [check out the VSCode Settings](#vscode-settings) for more details.
 
 
 ## Features
@@ -26,18 +30,20 @@
 
 1. **Upload VSCode Settings**:
 
-    * Include `settings, keybindings, extensions, locales` and `snippets`.
+    * It will upload the `settings, keybindings, extensions, locales` and `snippets`.
     * The `settings` and `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
-    * Automatically create new Gist if you leave it blank or it doesn't exist in your GitHub Gist.
+    * Automatically create a new Gist to store your settings.
     * Use an incremental algorithm to boost the synchronization.
+    * You can `exclude some VSCode settings` from being uploaded, [check out the VSCode Settings](#vscode-settings) for more details.
 
 1. **Download VSCode Settings**:
 
     * **Always overwrite** local settings.
     * Automatically `install, update` and `remove` extensions.
-    * You can leave the `GitHub Personal Access Token` blank to download from `a public Gist`.
+    * You can leave the `GitHub Personal Access Token` blank to download from `a public Gist`, e.g., your friend's VSCode settings.
+    * You can `exclude some VSCode settings` from being downloaded, [check out the VSCode Settings](#vscode-settings) for more details.
 
-And, of cause you'll have a `progress indicator` during the synchronization :).
+Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of cause, you'll have a `progress indicator` during the synchronization :).
 
 
 ## Commands
@@ -54,7 +60,7 @@ You can type `"upload"`, `"download"` (or `"syncing"`) in `VSCode Command Palett
 
 1. ***`Syncing: Open Syncing Settings`***
 
-    > Set `GitHub Personal Access Token`, `Gist ID` and `HTTP Proxy`.
+    > Set your `GitHub Personal Access Token`, `Gist ID` and `HTTP Proxy` settings.
 
 
 ## Keybindings
@@ -83,9 +89,41 @@ The keybindings **are unassigned by default**, but you can easily turn them on b
     ```
 
 
+## VSCode Settings
+
+You can find these in `VSCode settings`, and these will also be synced through your devices.
+
+1. ***`syncing.upload.exclude`***
+
+    The new `syncing.upload.exclude` setting is added to the `VSCode settings`. Now you can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding VSCode settings from being synced.
+
+    Take this for example:
+
+    ```json
+    "syncing.upload.exclude" : [
+        "editor.*",
+        "workbench.colorTheme"
+    ]
+    ```
+
+    Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synced.
+
+1. ***`syncing.pokaYokeThreshold`***
+
+    The new `syncing.pokaYokeThreshold` setting is added to the `VSCode settings`.
+
+    ```json
+    "syncing.pokaYokeThreshold" : 10
+    ```
+
+    From now on, each time you start a synchronization, `Syncing` will display a `confirm dialog` if the changes between the local and remote setting exceed the threshold.
+
+    The default value of this setting is `10`, and you can disable this feature by setting to a number `less than or equal to zero` (`<= 0`).
+
+
 ## Proxy Settings
 
-You can set a proxy to accelerate the synchronization. Here are the steps:
+You can set up a proxy to accelerate the synchronization (From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`). Here are the steps:
 
 1. Type `"Syncing: Open Syncing Settings"` (or just `"opensync"`) in `VSCode Command Palette` to open `Syncing`'s own settings file.
 
@@ -97,7 +135,7 @@ You can set a proxy to accelerate the synchronization. Here are the steps:
 
 Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
 
-> Please notice that Syncing **does not upload** its settings file (i.e. `syncing.json`) because it may contain your sensitive information.
+> Please notice that `Syncing` **does not upload** its own settings file (i.e. `syncing.json`) because it may contain your sensitive information.
 
 
 ## Getting Started
