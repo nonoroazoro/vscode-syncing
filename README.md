@@ -40,7 +40,7 @@
 
     * **Always overwrite** local settings.
     * Automatically `install, update` and `remove` extensions.
-    * You can leave the `GitHub Personal Access Token` blank to download from `a public Gist`, e.g., your friend's VSCode settings.
+    * You can leave the `GitHub Personal Access Token` blank to download from `a public Gist`, such as your friend's VSCode settings.
     * You can `exclude some VSCode settings` from being downloaded, [check out the VSCode Settings](#vscode-settings) for more details.
 
 Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of cause, you'll have a `progress indicator` during the synchronization :).
@@ -97,6 +97,8 @@ You can find these in `VSCode settings`, and these will also be synced through y
 
     The new `syncing.upload.exclude` setting is added to the `VSCode settings`. Now you can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding VSCode settings from being synced.
 
+    > Note that the settings that are not included in this list will be synced normally.
+
     Take this for example:
 
     ```json
@@ -118,7 +120,7 @@ You can find these in `VSCode settings`, and these will also be synced through y
 
     From now on, each time you start a synchronization, `Syncing` will display a `confirm dialog` if the changes between the local and remote setting exceed the threshold.
 
-    The default value of this setting is `10`, and you can disable this feature by setting to a number `less than or equal to zero` (`<= 0`).
+    The `default value` of this setting is `10`, and you can `disable this feature` by setting to a number `less than or equal to zero` (`<= 0`).
 
 
 ## Proxy Settings
@@ -182,7 +184,7 @@ Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_p
 
         1. Enter your `GitHub Personal Access Token`.
 
-            > You can `leave it blank` if you want to download from a `public Gist`.
+            > You can `leave it blank` if you want to download from a `public Gist`, such as your friend's VSCode settings.
 
         1. Select or enter your `Gist ID` or a `public Gist ID`.
 
