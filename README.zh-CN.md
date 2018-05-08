@@ -6,66 +6,72 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-***Syncing*** *([源码](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **sync all of your VSCode settings across multiple devices** with GitHub Gist.
+***Syncing*** *([源码](https://github.com/nonoroazoro/vscode-syncing))* 是一个 VSCode 插件，它能够在**多台设备之间同步你的所有 VSCode 配置**（借助了 [GitHub Gist](https://gist.github.com)，嘿嘿）。
 
-[Getting started](#getting-started) or [check out the examples](#examples).
+[点击这里](#快速开始)快速开始配置吧，当然你也可以先看看[演示动画](#演示动画)哦。
 
-> *Keep it simple & reliable!*
-
-
-## Breaking Changes
-
-* From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`. The proxy settings have been moved into `Syncing`'s own settings file.
-
-    > Check [Proxy Settings](#proxy-settings) for more information.
+> ***简单可靠**就是这个插件的唯一追求了。。。所以提需求别太过分了啊 :)*
 
 
-## Features
+## 重要变更
 
-*Syncing* will `keep the consistency of your VSCode settings between local and remote`, and let you:
+* `Syncing` 从 ***1.6.0*** 版本开始将会带来以下两个重要变更：
 
-1. **Upload VSCode Settings**:
+    1. **在同步时允许忽略指定的 VSCode 配置项；**
 
-    * Include `settings, keybindings, extensions, locales` and `snippets`.
-    * The `settings` and `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
-    * Automatically create new Gist if you leave it blank or it doesn't exist in your GitHub Gist.
-    * Use an incremental algorithm to boost the synchronization.
+    1. **加入了[防呆设计](https://zh.wikipedia.org/wiki/%E9%98%B2%E5%91%86)。**
 
-1. **Download VSCode Settings**:
-
-    * **Always overwrite** local settings.
-    * Automatically `install, update` and `remove` extensions.
-    * You can leave the `GitHub Personal Access Token` blank to download from `a public Gist`.
-
-And, of cause you'll have a `progress indicator` during the synchronization :).
+    > 具体内容请参考 `Syncing` 新增的 [VSCode 配置项](#vscode-配置项)。
 
 
-## Commands
+## 功能
 
-You can type `"upload"`, `"download"` (or `"syncing"`) in `VSCode Command Palette` to access these commands:
+*Syncing* 可以在`本地和云端之间同步你的所有 VSCode 配置`，具体包括：
+
+1. **上传 VSCode 配置**:
+
+    * 上传的配置包括： `settings, keybindings, extensions, locales` 以及所有 `snippets`；
+    * 因为 `Mac` 和`非 Mac` 设备的配置通常会有一些差异，所以 `settings` 和 `keybindings` 将会按照设备类型分别上传；
+    * 自动帮你创建新的 Gist 来保存 VSCode 配置，例如当你第一次使用这个插件上传配置时；
+    * 为了加快同步速度，整个同步过程都是`增量`的；
+    * 你可以`忽略某些 VSCode 配置项`，以防止它们被上传，具体如何配置请看[这里](#vscode-配置项)。
+
+1. **下载 VSCode 配置**:
+
+    * 请注意，下载配置时会**覆盖**你的本地配置（即以云端为准，精确同步）；
+    * 自动帮你`安装`、`升级`和`删除`插件；
+    * 你可以将 `GitHub Personal Access Token` 留空，从而能够从一个`公开的 Gist` 中下载配置。例如，从你朋友分享给你的 Gist 中下载他的配置文件；
+    * 你可以`忽略某些 VSCode 配置项`，以防止它们被下载，具体如何配置请看[这里](#vscode-配置项)。
+
+另外，如果你访问 GitHub 有困难（万恶的墙），你可以[配置一个代理](#代理设置)来加速同步。最后，同步时的`进度条`肯定是会有的啦！
+
+
+## 命令
+
+在 `VSCode 的命令面板`中，你可以输入 `upload`、`download`（或者 `syncing`）来快速搜索和执行 `Syncing` 的所有命令。
 
 1. ***`Syncing: Upload Settings`***
 
-    > Upload settings to GitHub Gist.
+    > 上传配置到 GitHub Gist。
 
 1. ***`Syncing: Download Settings`***
 
-    > Download settings from GitHub Gist.
+    > 从 GitHub Gist 下载配置。
 
 1. ***`Syncing: Open Syncing Settings`***
 
-    > Set `GitHub Personal Access Token`, `Gist ID` and `HTTP Proxy`.
+    > 设置你的 `GitHub Personal Access Token`、`Gist ID` 或者`代理`。
 
 
-## Keybindings
+## 快捷键
 
-The keybindings **are unassigned by default**, but you can easily turn them on by updating `VSCode Keyboard Shortcuts`:
+**默认情况下所有的快捷键都是关闭的**，但是你可以很方便的在 `VSCode 的键盘快捷方式`中配置你想要的快捷键：
 
-1. For VSCode versions >= 1.11 (***recommended***):
+1. 如果你的 VSCode 版本高于 1.11（***这是可视化的配置，强烈推荐***）:
 
     ![keyboard shortcuts](docs/gif/Keyboard-Shortcuts.gif)
 
-1. For VSCode versions < 1.11, for example:
+1. 如果你的 VSCode 版本低于 1.11，那么只能手动配置啦，参考一下：
 
     ```json
     {
@@ -83,80 +89,114 @@ The keybindings **are unassigned by default**, but you can easily turn them on b
     ```
 
 
-## Proxy Settings
+## VSCode 配置项
 
-You can set a proxy to accelerate the synchronization. Here are the steps:
+你可以在 `VSCode 用户设置`中找到 `Syncing` 的所有配置项，当然它们也会被同步的。
 
-1. Type `"Syncing: Open Syncing Settings"` (or just `"opensync"`) in `VSCode Command Palette` to open `Syncing`'s own settings file.
+1. ***`syncing.upload.exclude`***
 
-1. Set the `"http_proxy"` property, for example:
+    通过这个配置项（配置规则可以参考 [Glob Patterns](https://github.com/isaacs/minimatch)），你可以`忽略某些 VSCode 配置项`，以防止它们被同步。当然其他配置项不受影响，依然会正常同步。
+
+    举个栗子：
+
+    ```json
+    "syncing.upload.exclude" : [
+        "editor.*",
+        "workbench.colorTheme"
+    ]
+    ```
+
+    这样一来你的 VSCode 主题（`workbench.colorTheme`）和所有与编辑器（`editor`）相关的配置项就都不会被上传啦。
+
+1. ***`syncing.pokaYokeThreshold`***
+
+    同步配置时，如果你的本地和云端的配置`差异超过这个数量`，`Syncing` 就会显示一个确认对话框，以防止错误的覆盖你的配置。通过这个配置项你可以控制是否显示确认对话框的差异阈值。
+
+    举个栗子：
+
+    ```json
+    "syncing.pokaYokeThreshold" : 10
+    ```
+
+    这样一来你每次同步时，`Syncing` 都会检查本地和云端的配置差异，并决定是否显示一个确认对话框。
+
+    这个配置项的默认值是 `10`，当然你也可以将它设置为`一个小于等于 0 的值`来关闭这个功能（不再检查和显示确认对话框）。
+
+
+## 代理设置
+
+如果你访问 GitHub 有困难，比如在国内有万恶的墙，你可以配置一个代理来加速同步（从 ***1.5.0*** 版本开始，`Syncing` 将不会再从 `VSCode 用户设置`中读取 `http.proxy` 了），具体步骤如下：
+
+1. 在 `VSCode 的命令面板`中输入 `Syncing: Open Syncing Settings`（或者 `opensync`）来打开 `Syncing` 自己的配置文件。
+
+1. 修改 `http_proxy` 的值，例如：
 
     ```json
     "http_proxy": "http://127.0.0.1:1080"
     ```
 
-Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
+这样就好啦。另外，如果你没有在这里配置代理，那么 `Syncing` 会尝试从系统环境中读取 `http_proxy` 和 `https_proxy` 作为代理配置。
 
-> Please notice that Syncing **does not upload** its settings file (i.e. `syncing.json`) because it may contain your sensitive information.
+> 注意：不同于保存在 `VSCode 用户设置`中的配置项，`Syncing` **并不会上传** 这个独立的配置文件（也就是 `syncing.json` 这个文件），因为里面保存了你的私人信息。
 
 
-## Getting Started
+## 快速开始
 
-1. Get your own `GitHub Personal Access Token` (3 steps).
+1. 创建你自己的 `GitHub Personal Access Token`（总共 3 步）：
 
-    1. Login to your **[GitHub Personal Access Tokens page](https://github.com/settings/tokens)** and click **`Generate new token`**.
+    1. 登录到你的 **[GitHub Personal Access Tokens 页面](https://github.com/settings/tokens)**，点击 **`Generate new token`**；
 
         ![generate new token](docs/png/Generate-New-Token.png)
 
-    1. Give your token a descriptive **`name`**, check **`gist`** and click **`Generate token`**.
+    1. 为你的 Token 指定一个 **`name`**，然后勾选 **`gist`**，最后点击 **`Generate token`**；
 
         ![allow gist](docs/png/Allow-Gist.png)
 
-    1. **`Copy`** and **`backup`** your token.
+    1. 点击 **`Copy`** 并且 **`备份`** 你的 Token。
 
         ![copy and backup token](docs/png/Copy-Token.png)
 
-1. Sync your VSCode settings.
+1. 同步你的 VSCode 配置：
 
-    *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
+    在第一次使用时，*`Syncing`* 会向你询问一些必要的信息并保存下来以供后续使用，主要就是前面申请的 `GitHub Personal Access Token` 啦。
 
-    1. **Upload**
+    1. **上传配置**
 
-        1. Type `upload` in `VSCode Command Palette`.
+        1. 在 `VSCode 的命令面板` 中输入 `upload`；
 
             ![upload settings](docs/png/Upload-Settings.png)
 
-        1. Enter your `GitHub Personal Access Token`.
+        1. 填写刚才申请的 `GitHub Personal Access Token`；
 
-        1. Select or enter your `Gist ID`.
+        1. 在下拉框中选择或者手动输入一个 `Gist ID`；
 
-            > You can `leave it blank` to create a new `Gist` automatically.
+            > 你可以留空，那样的话 `Syncing` 会自动帮你创建一个新的 `Gist`。
 
-        1. Done!
+        1. 完成！
 
-        1. *After it's done, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com). Also, you can `Edit` and `make it public` to share your settings with others.*
+        1. *在上传完成后，你可以在 [GitHub Gist](https://gist.github.com) 中找到对应的 `Gist` 和 `Gist ID`。当然你也可以通过 `Edit` 和 `make it public` 操作将你的配置共享给其他人。*
 
-    1. **Download**
+    1. **下载配置**
 
-        1. Type `download` in `VSCode Command Palette`.
+        1. 在 `VSCode 的命令面板` 中输入 `download`；
 
             ![download settings](docs/png/Download-Settings.png)
 
-        1. Enter your `GitHub Personal Access Token`.
+        1. 填写你的 `GitHub Personal Access Token`；
 
-            > You can `leave it blank` if you want to download from a `public Gist`.
+            > 你可以留空，那样的话你就能从一个`公开的 Gist`（比如你朋友共享给你的 `Gist`）来下载配置了。
 
-        1. Select or enter your `Gist ID` or a `public Gist ID`.
+        1. 在下拉框中选择或者手动输入一个 `Gist ID`（当然这里也可以输入一个`公开的 Gist ID`）。
 
-        1. Done!
+        1. 完成！
 
 
-## Examples
+## 演示动画
 
-1. Upload:
+1. 上传配置：
 
     ![upload example](docs/gif/Example-Upload.gif)
 
-1. Download:
+1. 下载配置：
 
     ![download example](docs/gif/Example-Download.gif)
