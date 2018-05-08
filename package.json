@@ -95,7 +95,7 @@
     },
     "dependencies": {
         "@octokit/rest": "^15.2.6",
-        "adm-zip": "^0.4.9",
+        "adm-zip": "^0.4.7",
         "async": "^2.6.0",
         "fs-extra": "^5.0.0",
         "https-proxy-agent": "^2.2.1",
