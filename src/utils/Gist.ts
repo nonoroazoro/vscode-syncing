@@ -1,12 +1,14 @@
 import * as Github from "@octokit/rest";
 import * as HttpsProxyAgent from "https-proxy-agent";
-import * as stripJsonComments from "strip-json-comments";
+import pick = require("lodash.pick");
+import * as vscode from "vscode";
 
 import { IConfig } from "./Config";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "./constants";
 import { diff } from "./Diff";
-import * as GitHubTypes from "./types/GitHub";
-
+import { excludeSettings, parse } from "./jsonHelper";
 import Toast from "./Toast";
+import * as GitHubTypes from "./types/GitHub";
 
 /**
  * GitHub Gist utils.
@@ -277,13 +279,13 @@ export default class Gist
 
             this.exists(id).then((exists) =>
             {
-                const gist: { id: string, files: any } = { id, files: {} };
+                const localGist: { id: string, files: any } = { id, files: {} };
                 for (const item of uploads)
                 {
                     // `null` content will be filtered out, just in case.
                     if (item.content)
                     {
-                        gist.files[item.remote] = { content: item.content };
+                        localGist.files[item.remote] = { content: item.content };
                     }
                 }
 
@@ -291,30 +293,66 @@ export default class Gist
                 {
                     // only update when files are modified.
                     const remoteGist = exists as GitHubTypes.IGist;
-                    gist.files = this._getModifiedFiles(gist.files, remoteGist.files);
-                    if (gist.files)
+                    localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
+                    if (localGist.files)
                     {
                         // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
-                        const changes = this._diff(gist.files, remoteGist.files);
-                        if (changes >= 10)
+                        const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
+                        if (threshold > 0)
                         {
-                            const okButton = "Continue to upload";
-                            const message = "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE REMOTE SETTINGS?";
-                            Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
+                            const localFiles = { ...localGist.files };
+                            const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
+
+                            // 1. Get the excluded settings.
+                            const settingItem = uploads.find((item) => item.name.includes("settings"));
+                            if (settingItem)
                             {
-                                if (selection === okButton)
+                                const settingsName = settingItem.remote;
+                                const localSettings = localFiles[settingsName];
+                                const remoteSettings = remoteFiles[settingsName];
+                                if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
                                 {
-                                    this.update(gist).then(resolveWrap).catch(rejectWrap);
+                                    const localSettingsJSON = parse(localSettings.content);
+                                    const patterns = localSettingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [];
+                                    localFiles[settingsName] = {
+                                        ...localSettings,
+                                        content: excludeSettings(localSettings.content, localSettingsJSON, patterns)
+                                    };
+
+                                    const remoteSettingsJSON = parse(remoteSettings.content);
+                                    remoteFiles[settingsName] = {
+                                        ...remoteSettings,
+                                        content: excludeSettings(remoteSettings.content, remoteSettingsJSON, patterns)
+                                    };
                                 }
-                                else
+                            }
+
+                            // 2. Diff settings.
+                            const changes = this._diffSettings(localFiles, remoteFiles);
+                            if (changes >= threshold)
+                            {
+                                const okButton = "Continue to upload";
+                                const message = "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE REMOTE SETTINGS?";
+                                Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
                                 {
-                                    rejectWrap(new Error("You abort the synchronization."));
-                                }
-                            });
+                                    if (selection === okButton)
+                                    {
+                                        this.update(localGist).then(resolveWrap).catch(rejectWrap);
+                                    }
+                                    else
+                                    {
+                                        rejectWrap(new Error("You abort the synchronization."));
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                this.update(localGist).then(resolveWrap).catch(rejectWrap);
+                            }
                         }
                         else
                         {
-                            this.update(gist).then(resolveWrap).catch(rejectWrap);
+                            this.update(localGist).then(resolveWrap).catch(rejectWrap);
                         }
                     }
                     else
@@ -327,7 +365,7 @@ export default class Gist
                     if (upsert)
                     {
                         // TODO: pass gist public.
-                        this.createSettings(gist.files).then(resolveWrap).catch(rejectWrap);
+                        this.createSettings(localGist.files).then(resolveWrap).catch(rejectWrap);
                     }
                     else
                     {
@@ -342,8 +380,13 @@ export default class Gist
      * Get modified files list.
      * @returns {} or `null`.
      */
-    private _getModifiedFiles(localFiles: any, remoteFiles: GitHubTypes.IGistFiles): any
+    private _getModifiedFiles(localFiles: any, remoteFiles?: GitHubTypes.IGistFiles): any
     {
+        if (!remoteFiles)
+        {
+            return localFiles;
+        }
+
         let localFile;
         let remoteFile;
         const result = {};
@@ -410,31 +453,32 @@ export default class Gist
     /**
      * Calculates the number of differences between the local and remote files.
      */
-    private _diff(localFiles: GitHubTypes.IGistFiles, remoteFiles: GitHubTypes.IGistFiles): number
+    private _diffSettings(localFiles: GitHubTypes.IGistFiles, remoteFiles: GitHubTypes.IGistFiles): number
     {
-        const localKeys = Object.keys(localFiles);
-        const left = this.parseIntoJSON(localFiles, localKeys);
-        const right = this.parseIntoJSON(remoteFiles, localKeys);
+        const left = this._parseToJSON(localFiles);
+        const right = this._parseToJSON(pick(remoteFiles, Object.keys(localFiles)));
         return diff(left, right);
     }
 
     /**
-     * Converts the `content` of `GitHubTypes.IGistFiles` into an object.
+     * Converts the `content` of `GitHubTypes.IGistFiles` into a `JSON object`.
      */
-    private parseIntoJSON(files: GitHubTypes.IGistFiles, keys: string[]): any
+    private _parseToJSON(files: GitHubTypes.IGistFiles): any
     {
+        let file: any;
         const result = {};
-        keys.forEach((key) =>
+        for (const key of Object.keys(files))
         {
-            try
+            file = files[key];
+            if (file)
             {
-                result[key] = JSON.parse((stripJsonComments(files[key].content)));
+                result[key] = parse(file.content || "");
             }
-            catch (e)
+            else
             {
-                result[key] = files[key].content;
+                result[key] = file;
             }
-        });
+        }
         return result;
     }
 }

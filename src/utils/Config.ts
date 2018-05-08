@@ -2,12 +2,13 @@ import * as async from "async";
 import * as fs from "fs";
 import * as junk from "junk";
 import * as path from "path";
-import * as stripJsonComments from "strip-json-comments";
 import * as vscode from "vscode";
 
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "./constants";
 import { diff } from "./Diff";
 import Environment from "./Environment";
-import Extension, { ISyncStatus } from "./Extension";
+import Extension, { IExtension, ISyncStatus } from "./Extension";
+import { excludeSettings, mergeSettings, parse } from "./jsonHelper";
 import Toast from "./Toast";
 import * as GitHubTypes from "./types/GitHub";
 
@@ -478,8 +479,9 @@ export default class Config
      * Load file content of configs.
      * The content will exactly be `undefined` when failure happens.
      * @param configs VSCode configs.
+     * @param exclude Default is `true`, exclude the VSCode settings base on the exclude list of Syncing.
      */
-    private _loadContent(configs: IConfig[]): Promise<IConfig[]>
+    private _loadContent(configs: IConfig[], exclude: boolean = true): Promise<IConfig[]>
     {
         return new Promise((resolve) =>
         {
@@ -502,7 +504,22 @@ export default class Config
                     content = undefined;
                     console.error(`Syncing: Error loading config file: ${item.name}.\n${e}`);
                 }
-                return Object.assign({}, item, { content });
+
+                // Exclude settings.
+                if (exclude && item.name.includes("settings") && content)
+                {
+                    const settingsJSON = parse(content);
+                    if (settingsJSON)
+                    {
+                        content = excludeSettings(
+                            content,
+                            settingsJSON,
+                            (settingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [])
+                        );
+                    }
+                }
+
+                return { ...item, content };
             });
             resolve(results);
         });
@@ -518,38 +535,63 @@ export default class Config
         {
             if (item.name === "extensions")
             {
-                if (item.content)
+                try
                 {
-                    try
-                    {
-                        // Sync extensions.
-                        this._ext.sync(JSON.parse(item.content), true).then(resolve).catch(reject);
-                    }
-                    catch (err)
-                    {
-                        reject(err);
-                    }
+                    // Sync extensions.
+                    const extensions: IExtension[] = parse(item.content || "[]");
+                    this._ext.sync(extensions, true).then(resolve).catch(reject);
                 }
-                else
+                catch (err)
                 {
-                    reject(new Error("Invalid config content."));
+                    reject(new Error(`The extension list is broken: ${err.message}`));
                 }
             }
             else
             {
-                // Save files.
-                fs.writeFile(item.path, item.content || "{}", (err) =>
+                if (item.name.includes("settings") && item.content)
                 {
-                    if (err)
+                    // TODO: refactor.
+                    // Merge settings.
+                    let { content } = item;
+                    this._loadContent([item], false).then((value) =>
                     {
-                        reject(err);
-                    }
-                    else
-                    {
-                        resolve({ file: item });
-                    }
-                });
+                        const localSettings = value[0].content;
+                        if (localSettings)
+                        {
+                            content = mergeSettings(content, localSettings);
+                        }
+
+                        // Save to disk.
+                        this._saveToFile({ ...item, content }).then(resolve).catch(reject);
+                    });
+                }
+                else
+                {
+                    // Save to disk.
+                    this._saveToFile(item).then(resolve).catch(reject);
+                }
             }
+        });
+    }
+
+    /**
+     * Save the config to disk.
+     */
+    private _saveToFile(config: IConfig)
+    {
+        return new Promise((resolve, reject) =>
+        {
+            fs.writeFile(config.path, config.content || "{}", (e) =>
+            {
+                if (e)
+                {
+                    reject(e);
+                }
+                else
+                {
+                    resolve({ file: config });
+                }
+            });
         });
     }
 
@@ -560,53 +602,74 @@ export default class Config
     {
         return new Promise((resolve) =>
         {
-            this._loadContent(configs).then((loadedConfigs) =>
+            const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
+            if (threshold > 0)
             {
-                const changes = this._diff(loadedConfigs, saveFiles) + removeFiles.length;
-                if (changes >= 10)
+                this._loadContent(configs, false).then((localConfigs) =>
                 {
-                    const okButton = "Continue to download";
-                    const message = "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE LOCAL SETTINGS?";
-                    Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
+                    // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
+                    // 1. Get the excluded settings.
+                    const remoteConfigs = saveFiles.map((file) => ({ ...file }));
+                    const remoteSettings = remoteConfigs.find((item) => item.name.includes("settings"));
+                    const localSettings = localConfigs.find((item) => item.name.includes("settings"));
+                    if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
                     {
-                        resolve(selection === okButton);
-                    });
-                }
-                else
-                {
-                    resolve(true);
-                }
-            });
+                        const localSettingsJSON = parse(localSettings.content);
+                        const remoteSettingsJSON = parse(remoteSettings.content);
+                        if (localSettingsJSON && remoteSettingsJSON)
+                        {
+                            const patterns = remoteSettingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [];
+                            remoteSettings.content = excludeSettings(remoteSettings.content, remoteSettingsJSON, patterns);
+                            localSettings.content = excludeSettings(localSettings.content, localSettingsJSON, patterns);
+                        }
+                    }
+
+                    // 2. Diff settings.
+                    const changes = this._diffSettings(localConfigs, remoteConfigs) + removeFiles.length;
+                    if (changes >= threshold)
+                    {
+                        const okButton = "Continue to download";
+                        const message = "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE LOCAL SETTINGS?";
+                        Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
+                        {
+                            resolve(selection === okButton);
+                        });
+                    }
+                    else
+                    {
+                        resolve(true);
+                    }
+                });
+            }
+            else
+            {
+                resolve(true);
+            }
         });
     }
 
     /**
      * Calculates the number of differences between the local and remote files.
      */
-    private _diff(localFiles: IConfig[], remoteFiles: IConfig[]): number
+    private _diffSettings(localFiles: IConfig[], remoteFiles: IConfig[]): number
     {
-        const left = this.parseIntoJSON(localFiles);
-        const right = this.parseIntoJSON(remoteFiles);
+        const left = this._parseToJSON(localFiles);
+        const right = this._parseToJSON(remoteFiles);
         return diff(left, right);
     }
 
     /**
-     * Converts the `content` of `IConfig[]` into an object.
+     * Converts the `content` of `IConfig[]` into a `JSON object`.
      */
-    private parseIntoJSON(files: IConfig[]): any
+    private _parseToJSON(configs: IConfig[]): any
     {
         const result = {};
-        files.forEach((f) =>
+        let content: string;
+        for (const config of configs)
         {
-            try
-            {
-                result[f.remote] = JSON.parse((stripJsonComments(f.content || "")));
-            }
-            catch (e)
-            {
-                result[f.remote] = f.content || "";
-            }
-        });
+            content = config.content || "";
+            result[config.remote] = parse(content) || content;
+        }
         return result;
     }
 }
