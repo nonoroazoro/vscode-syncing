@@ -63,7 +63,7 @@
                     "syncing.upload.exclude": {
                         "type": "array",
                         "default": [],
-                        "description": "Configure glob patterns for excluding VSCode settings from being synced. For example:\n[\n    \"editor.*\",\n    \"workbench.colorTheme\"\n]\nNow Syncing will no longer sync the \"workbench.colorTheme\" setting and all the settings of \"editor\"."
+                        "description": "Configure glob patterns for excluding VSCode settings from being synced. For example:\n[\n    \"editor.*\",\n    \"workbench.colorTheme\"\n]\nNow the \"workbench.colorTheme\" setting and all the settings of \"editor\" will no longer be synced."
                     }
                 }
             }
