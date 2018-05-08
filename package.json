@@ -55,15 +55,15 @@
             {
                 "title": "Syncing",
                 "properties": {
-                    "syncing.upload.exclude": {
-                        "type": "array",
-                        "default": [],
-                        "description": "Configure glob patterns for excluding VSCode settings from being uploaded by Syncing. For example:\n[\n    \"workbench.colorTheme\",\n    \"editor.*\"\n]\nNow Syncing will no longer upload the \"workbench.colorTheme\" and all the settings of \"editor\"."
-                    },
                     "syncing.pokaYokeThreshold": {
                         "type": "number",
                         "default": 10,
                         "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing). Each time you start a synchronization, Syncing will display a warning dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
+                    },
+                    "syncing.upload.exclude": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Configure glob patterns for excluding VSCode settings from being uploaded by Syncing. For example:\n[\n    \"workbench.colorTheme\",\n    \"editor.*\"\n]\nNow Syncing will no longer upload the \"workbench.colorTheme\" and all the settings of \"editor\"."
                     }
                 }
             }
