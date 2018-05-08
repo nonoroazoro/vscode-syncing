@@ -51,6 +51,23 @@
                 "title": "Syncing: Open Syncing Settings"
             }
         ],
+        "configuration": [
+            {
+                "title": "Syncing",
+                "properties": {
+                    "syncing.upload.exclude": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Configure glob patterns for excluding VSCode settings from being uploaded by Syncing. For example:\n[\n    \"workbench.colorTheme\",\n    \"editor.*\"\n]\nNow Syncing will no longer upload the \"workbench.colorTheme\" and all the settings of \"editor\"."
+                    },
+                    "syncing.pokaYokeThreshold": {
+                        "type": "number",
+                        "default": 10,
+                        "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing). Each time you start a synchronization, Syncing will display a warning dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
+                    }
+                }
+            }
+        ],
         "keybindings": [
             {
                 "key": "",
@@ -82,18 +99,21 @@
         "async": "^2.6.0",
         "fs-extra": "^5.0.0",
         "https-proxy-agent": "^2.2.1",
+        "jsonc-parser": "^2.0.0",
         "jsondiffpatch": "^0.3.9",
         "junk": "^2.1.0",
+        "lodash.pick": "^4.4.0",
+        "minimatch": "^3.0.4",
         "moment": "^2.22.1",
-        "strip-json-comments": "^2.0.1",
         "temp": "^0.8.3"
     },
     "devDependencies": {
         "@types/adm-zip": "^0.4.31",
         "@types/async": "^2.0.49",
         "@types/fs-extra": "^5.0.2",
+        "@types/lodash.pick": "^4.4.3",
+        "@types/minimatch": "^3.0.3",
         "@types/node": "^10.0.0",
-        "@types/strip-json-comments": "0.0.30",
         "@types/temp": "^0.8.32",
         "husky": "^0.14.3",
         "lint-staged": "^7.0.5",

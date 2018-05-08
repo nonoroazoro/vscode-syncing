@@ -10,10 +10,19 @@ export function diff(left: any, right: any): number
     const result = diffPatcher.diff(left, right);
     if (result)
     {
+        let value: any;
         return Object.keys(result).reduce((prev, cur) =>
         {
-            // Filter out the "_t" key.
-            return prev + Object.keys(result[cur]).filter((key) => (key !== "_t")).length;
+            value = result[cur];
+            if (value)
+            {
+                // Filter out the "_t" key.
+                return prev + Object.keys(result[cur]).filter((key) => (key !== "_t")).length;
+            }
+            else
+            {
+                return prev;
+            }
         }, 0);
     }
     return 0;
