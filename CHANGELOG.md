@@ -1,5 +1,12 @@
 # Changelogs
 
+## 1.6.0 - May 09, 2018
+
+- Added: [Poka-Yoke (Mistake-Proofing)](https://en.wikipedia.org/wiki/Poka-yoke), see [#25](https://github.com/nonoroazoro/vscode-syncing/issues/25) (Thank [@christianmalek](https://github.com/christianmalek) for the advice).
+- Added: Exclude the specified VSCode settings from being synced, see [#29](https://github.com/nonoroazoro/vscode-syncing/issues/29) (Thank [@alexanderius](https://github.com/i4004) for the advice).
+- Fixed: Filter out system junk files such as `.DS_Store` and `Thumbs.db`.
+
+
 ## 1.5.3 - February 08, 2018
 
 - Fixed: An error introduced by VSCode 1.20.
@@ -7,8 +14,8 @@
 
 ## 1.5.2 - December 28, 2017
 
-- Fixed: A bug caused by adm-zip on Linux Mint and Xubuntu ([Issue #21](https://github.com/nonoroazoro/vscode-syncing/issues/21)).
 - Changed: Enhance user guides.
+- Fixed: A bug caused by adm-zip on Linux Mint and Xubuntu ([Issue #21](https://github.com/nonoroazoro/vscode-syncing/issues/21)).
 
 
 ## 1.5.1 - December 04, 2017
@@ -20,15 +27,15 @@
 
 ## 1.5.0 - December 02, 2017
 
-- Changed: Rewrite in `TypeScript`, now we have `typings`.
 - Added: Isolate the `http_proxy` setting into `Syncing`'s settings file (which means `Syncing` will no longer read proxy settings from `VSCode` settings), this may prevent a potential failure caused by wrong proxy settings while syncing between different devices (Thank [@mubaidr](https://github.com/mubaidr) for the advice).
 - Added: Pick `http_proxy` settings from `http_proxy` and `https_proxy` environment variables.
+- Changed: Rewrite in `TypeScript`, now we have `typings`.
 
 
 ## 1.4.9 - September 16, 2017
 
-- Changed: Enhance user guides.
 - Added: Empty extension's directory before installation.
+- Changed: Enhance user guides.
 
 
 ## 1.4.8 - September 14, 2017
