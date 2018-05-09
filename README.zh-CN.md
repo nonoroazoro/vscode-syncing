@@ -97,7 +97,7 @@
 
     通过这个配置项，你可以`忽略某些指定的 VSCode 配置项`，以防止它们被同步。当然其他配置项不受影响，依然会正常同步。
 
-    > 配置规则可以参考 [Glob Patterns](https://github.com/isaacs/minimatch)。同时，不在这个规则中的 VSCode 配置项依然会被正常同步。
+    > 配置规则可以参考 [Glob Patterns](https://github.com/isaacs/minimatch)。
 
     举个栗子：
 
