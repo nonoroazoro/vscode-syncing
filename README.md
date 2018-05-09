@@ -91,13 +91,13 @@ The keybindings **are unassigned by default**, but you can easily turn them on b
 
 ## VSCode User Settings
 
-From ***version 1.6.0*** onwards, you can find the newly added `Syncing Settings` in your `VSCode User Settings`, which will also be synced between your devices.
+From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Settings` in your `VSCode User Settings`.
 
 1. ***`syncing.upload.exclude`***
 
-    You can configure these [glob patterns](https://github.com/isaacs/minimatch) for excluding VSCode settings from being synced.
+    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synced.
 
-    > Note that the settings not listed will be synced normally.
+    > Note that the settings not listed here will still be synced normally.
 
     Take this for example:
 
@@ -112,6 +112,8 @@ From ***version 1.6.0*** onwards, you can find the newly added `Syncing Settings
 
 1. ***`syncing.pokaYokeThreshold`***
 
+    During the synchronization, `Syncing` will check the changes between your local and remote setting, and display a `confirm dialog` if the changes exceed this threshold.
+
     The `default value` of this setting is `10`, and you can `disable this feature` by setting to a number `less than or equal to zero` (`<= 0`).
 
     Take this for example:
@@ -119,8 +121,6 @@ From ***version 1.6.0*** onwards, you can find the newly added `Syncing Settings
     ```json
     "syncing.pokaYokeThreshold" : 10
     ```
-
-    From now on, each time you start a synchronization, `Syncing` will display a `confirm dialog` if the changes between the local and remote setting exceed this threshold.
 
 
 ## Proxy Settings
