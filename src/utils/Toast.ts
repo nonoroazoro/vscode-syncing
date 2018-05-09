@@ -1,7 +1,7 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
-import * as GitHubTypes from "./types/GitHub";
+import * as GitHubTypes from "./GitHubTypes";
 
 import Gist from "./Gist";
 
