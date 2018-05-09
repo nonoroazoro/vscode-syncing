@@ -3,7 +3,7 @@
 ## 1.6.0 - May 09, 2018
 
 - Added: [Poka-Yoke (Mistake-Proofing)](https://en.wikipedia.org/wiki/Poka-yoke), see [#25](https://github.com/nonoroazoro/vscode-syncing/issues/25) (Thank [@christianmalek](https://github.com/christianmalek) for the advice).
-- Added: Exclude the specified VSCode settings from being synced, see [#29](https://github.com/nonoroazoro/vscode-syncing/issues/29) (Thank [@alexanderius](https://github.com/i4004) for the advice).
+- Added: Exclude VSCode settings from being synced, see [#29](https://github.com/nonoroazoro/vscode-syncing/issues/29) (Thank [@alexanderius](https://github.com/i4004) for the advice).
 - Fixed: Filter out system junk files such as `.DS_Store` and `Thumbs.db`.
 
 
