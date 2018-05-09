@@ -11,7 +11,7 @@ import * as vscode from "vscode";
 import { IConfig } from "./Config";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
-import Toast from "./Toast";
+import * as Toast from "./Toast";
 
 temp.track();
 

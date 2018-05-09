@@ -1,3 +1,7 @@
+/**
+ * VSCode message utils.
+ */
+
 import * as moment from "moment";
 import * as vscode from "vscode";
 
@@ -21,7 +25,7 @@ interface IGistListBoxItem extends vscode.QuickPickItem
  * @param message The message to show.
  * @param hideAfterTimeout Timeout in milliseconds after which the message will be cleared.
  */
-function status(message: string, hideAfterTimeout?: number): void
+export function status(message: string, hideAfterTimeout?: number): void
 {
     clearSpinner();
 
@@ -40,7 +44,7 @@ function status(message: string, hideAfterTimeout?: number): void
  * Set an `info` message to the VSCode status bar and auto-hide after `4000` milliseconds.
  * @param message The message to show.
  */
-function statusInfo(message: string): void
+export function statusInfo(message: string): void
 {
     status(message, 4000);
 }
@@ -49,7 +53,7 @@ function statusInfo(message: string): void
  * Set an `error` message to the VSCode status bar and auto-hide after `8000` milliseconds.
  * @param message The message to show.
  */
-function statusError(message: string): void
+export function statusError(message: string): void
 {
     status(message, 8000);
 }
@@ -58,7 +62,7 @@ function statusError(message: string): void
  * Set an `fatal` message to the VSCode status bar and auto-hide after `12000` milliseconds.
  * @param message The message to show.
  */
-function statusFatal(message: string): void
+export function statusFatal(message: string): void
 {
     status(message, 12000);
 }
@@ -67,7 +71,7 @@ function statusFatal(message: string): void
  * Show GitHub Personal Access Token input box.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: string }>
+export function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: string }>
 {
     return new Promise((resolve, reject) =>
     {
@@ -108,7 +112,7 @@ function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: st
  * Show Gist ID input box.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
+export function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
 {
     return new Promise((resolve, reject) =>
     {
@@ -149,7 +153,7 @@ function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
  * @param api GitHub Gist utils.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ id: string }>
+export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ id: string }>
 {
     return new Promise((resolve, reject) =>
     {
@@ -209,7 +213,7 @@ function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ 
 /**
  * Show a "Reload VSCode" prompt dialog.
  */
-function showReloadBox(): void
+export function showReloadBox(): void
 {
     const reloadButton = "Reload";
     const message = "Settings are successfully synced. Please reload VSCode to take effect.";
@@ -225,7 +229,7 @@ function showReloadBox(): void
 /**
  * Show a confirm prompt dialog.
  */
-function showConfirmBox(message: string, ...buttons: string[])
+export function showConfirmBox(message: string, ...buttons: string[])
 {
     return vscode.window.showInformationMessage(message, ...buttons);
 }
@@ -242,7 +246,7 @@ const spinner = {
  * @param progress Current progress.
  * @param total Total progress.
  */
-function showSpinner(message: string, progress?: number, total?: number): void
+export function showSpinner(message: string, progress?: number, total?: number): void
 {
     clearSpinner();
 
@@ -276,7 +280,7 @@ function showSpinner(message: string, progress?: number, total?: number): void
  * Clear spinner and show message, do nothing if currently no spinner is exist.
  * @param message The message to show.
  */
-function clearSpinner(message?: string): void
+export function clearSpinner(message?: string): void
 {
     if (spinnerTimer)
     {
@@ -289,20 +293,3 @@ function clearSpinner(message?: string): void
         }
     }
 }
-
-/**
- * VSCode message utils.
- */
-export default {
-    clearSpinner,
-    showConfirmBox,
-    showGistInputBox,
-    showGitHubTokenInputBox,
-    showReloadBox,
-    showRemoteGistListBox,
-    showSpinner,
-    status,
-    statusError,
-    statusFatal,
-    statusInfo
-};

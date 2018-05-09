@@ -10,7 +10,7 @@ import { excludeSettings, mergeSettings, parse } from "../utils/jsonHelper";
 import Environment from "./Environment";
 import Extension, { IExtension, ISyncStatus } from "./Extension";
 import * as GitHubTypes from "./GitHubTypes";
-import Toast from "./Toast";
+import * as Toast from "./Toast";
 
 /**
  * Represent the type of VSCode configs.
