@@ -8,9 +8,9 @@ import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_E
 import { diff } from "./diffHelper";
 import Environment from "./Environment";
 import Extension, { IExtension, ISyncStatus } from "./Extension";
+import * as GitHubTypes from "./GitHubTypes";
 import { excludeSettings, mergeSettings, parse } from "./jsonHelper";
 import Toast from "./Toast";
-import * as GitHubTypes from "./types/GitHub";
 
 /**
  * Represent the type of VSCode configs.

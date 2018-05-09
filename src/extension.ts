@@ -5,9 +5,9 @@ import * as vscode from "vscode";
 import Config from "./utils/Config";
 import { ISyncStatus } from "./utils/Extension";
 import Gist from "./utils/Gist";
+import * as GitHubTypes from "./utils/GitHubTypes";
 import Syncing from "./utils/Syncing";
 import Toast from "./utils/Toast";
-import * as GitHubTypes from "./utils/types/GitHub";
 
 let _config: Config;
 let _syncing: Syncing;
