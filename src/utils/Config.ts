@@ -5,7 +5,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "./constants";
-import { diff } from "./Diff";
+import { diff } from "./diffHelper";
 import Environment from "./Environment";
 import Extension, { IExtension, ISyncStatus } from "./Extension";
 import { excludeSettings, mergeSettings, parse } from "./jsonHelper";

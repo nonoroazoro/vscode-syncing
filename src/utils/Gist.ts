@@ -5,7 +5,7 @@ import * as vscode from "vscode";
 
 import { IConfig } from "./Config";
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "./constants";
-import { diff } from "./Diff";
+import { diff } from "./diffHelper";
 import { excludeSettings, parse } from "./jsonHelper";
 import Toast from "./Toast";
 import * as GitHubTypes from "./types/GitHub";
