@@ -17,10 +17,7 @@
         "sourceMap": true,
         "strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": true,
-        "target": "es2015",
-        "typeRoots": [
-            "src/typings"
-        ]
+        "target": "es2015"
     },
     "exclude": [
         "dist",

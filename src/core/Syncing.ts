@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 
 import Environment from "./Environment";
 import Gist from "./Gist";
-import Toast from "./Toast";
+import * as Toast from "./Toast";
 
 /**
  * Represent the settings of `Syncing`.
@@ -218,7 +218,7 @@ export default class Syncing
      */
     loadSettings(): ISyncingSettings
     {
-        const settings: ISyncingSettings = Object.assign({}, Syncing.DEFAULT_SETTINGS);
+        const settings: ISyncingSettings = { ...Syncing.DEFAULT_SETTINGS };
         try
         {
             Object.assign(
@@ -272,15 +272,9 @@ export default class Syncing
                     // Show gist input box when id is still null.
                     return Toast.showGistInputBox(forUpload);
                 }
-                else
-                {
-                    return value;
-                }
+                return value;
             });
         }
-        else
-        {
-            return Toast.showGistInputBox(forUpload);
-        }
+        return Toast.showGistInputBox(forUpload);
     }
 }

@@ -1,11 +1,16 @@
 import * as async from "async";
 import * as fs from "fs";
+import * as junk from "junk";
 import * as path from "path";
 import * as vscode from "vscode";
 
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../constants";
+import { diff } from "../utils/diffHelper";
+import { excludeSettings, mergeSettings, parse } from "../utils/jsonHelper";
 import Environment from "./Environment";
-import Extension, { ISyncStatus } from "./Extension";
-import Toast from "./Toast";
+import Extension, { IExtension, ISyncStatus } from "./Extension";
+import * as GitHubTypes from "./GitHubTypes";
+import * as Toast from "./Toast";
 
 /**
  * Represent the type of VSCode configs.
@@ -240,14 +245,17 @@ export default class Config
      * @param files VSCode Configs from Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    saveConfigs(files: any, showIndicator: boolean = false): Promise<{
+    saveConfigs(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
         updated: ISyncStatus[],
         removed: ISyncStatus[]
     }>
     {
         return new Promise((resolve, reject) =>
         {
-            function resolveWrap(value: any)
+            function resolveWrap(value: {
+                updated: ISyncStatus[],
+                removed: ISyncStatus[]
+            })
             {
                 if (showIndicator)
                 {
@@ -278,7 +286,7 @@ export default class Config
                 const existsFileKeys: string[] = [];
                 this.getConfigs().then((configs: IConfig[]) =>
                 {
-                    let file: any;
+                    let file: GitHubTypes.IGistFile;
                     for (const config of configs)
                     {
                         file = files[config.remote];
@@ -288,12 +296,18 @@ export default class Config
                             if (config.name === "extensions")
                             {
                                 // Temp extensions file.
-                                extensionsFile = Object.assign({}, config, { content: file.content });
+                                extensionsFile = {
+                                    ...config,
+                                    content: file.content
+                                };
                             }
                             else
                             {
                                 // Temp other file.
-                                saveFiles.push(Object.assign({}, config, { content: file.content }));
+                                saveFiles.push({
+                                    ...config,
+                                    content: file.content
+                                });
                             }
                             existsFileKeys.push(config.remote);
                         }
@@ -340,44 +354,55 @@ export default class Config
                         saveFiles.push(extensionsFile);
                     }
 
-                    const syncedFiles: {
-                        updated: ISyncStatus[],
-                        removed: ISyncStatus[]
-                    } = { updated: [], removed: [] };
-                    async.eachSeries(
-                        saveFiles,
-                        (item: IConfig, done: async.ErrorCallback<Error>) =>
+                    // poka-yoke - check if there have been two much changes (more than 10 changes) since the last downloading.
+                    this._checkIfContinue(configs, saveFiles, removeFiles).then((value) =>
+                    {
+                        if (value)
                         {
-                            this._saveItemContent(item).then((saved) =>
-                            {
-                                syncedFiles.updated.push(saved);
-                                done();
-                            }).catch((err) =>
-                            {
-                                done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
-                            });
-                        },
-                        (err) =>
-                        {
-                            if (err)
-                            {
-                                rejectWrap(err);
-                            }
-                            else
-                            {
-                                this.removeConfigs(removeFiles).then((removed) =>
+                            const syncedFiles: {
+                                updated: ISyncStatus[],
+                                removed: ISyncStatus[]
+                            } = { updated: [], removed: [] };
+                            async.eachSeries(
+                                saveFiles,
+                                (item: IConfig, done: async.ErrorCallback<Error>) =>
                                 {
-                                    syncedFiles.removed = removed;
-                                    resolveWrap(syncedFiles);
-                                }).catch(rejectWrap);
-                            }
+                                    this._saveItemContent(item).then((saved) =>
+                                    {
+                                        syncedFiles.updated.push(saved);
+                                        done();
+                                    }).catch((err) =>
+                                    {
+                                        done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
+                                    });
+                                },
+                                (err) =>
+                                {
+                                    if (err)
+                                    {
+                                        rejectWrap(err);
+                                    }
+                                    else
+                                    {
+                                        this.removeConfigs(removeFiles).then((removed) =>
+                                        {
+                                            syncedFiles.removed = removed;
+                                            resolveWrap(syncedFiles);
+                                        }).catch(rejectWrap);
+                                    }
+                                }
+                            );
                         }
-                    );
+                        else
+                        {
+                            rejectWrap(new Error("You abort the synchronization."));
+                        }
+                    });
                 });
             }
             else
             {
-                rejectWrap(new Error("Cannot save empty Gist files."));
+                rejectWrap(new Error("Cannot find any files in your Gist."));
             }
         });
     }
@@ -433,7 +458,7 @@ export default class Config
         try
         {
             const filenames: string[] = fs.readdirSync(snippetsDir);
-            filenames.forEach((filename: string) =>
+            filenames.filter(junk.not).forEach((filename: string) =>
             {
                 // Add prefix `snippet-` to all snippets.
                 results.push({
@@ -454,8 +479,9 @@ export default class Config
      * Load file content of configs.
      * The content will exactly be `undefined` when failure happens.
      * @param configs VSCode configs.
+     * @param exclude Default is `true`, exclude the VSCode settings base on the exclude list of Syncing.
      */
-    private _loadContent(configs: IConfig[]): Promise<IConfig[]>
+    private _loadContent(configs: IConfig[], exclude: boolean = true): Promise<IConfig[]>
     {
         return new Promise((resolve) =>
         {
@@ -478,7 +504,22 @@ export default class Config
                     content = undefined;
                     console.error(`Syncing: Error loading config file: ${item.name}.\n${e}`);
                 }
-                return Object.assign({}, item, { content });
+
+                // Exclude settings.
+                if (exclude && item.name.includes("settings") && content)
+                {
+                    const settingsJSON = parse(content);
+                    if (settingsJSON)
+                    {
+                        content = excludeSettings(
+                            content,
+                            settingsJSON,
+                            (settingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [])
+                        );
+                    }
+                }
+
+                return { ...item, content };
             });
             resolve(results);
         });
@@ -494,38 +535,141 @@ export default class Config
         {
             if (item.name === "extensions")
             {
-                if (item.content)
+                try
                 {
-                    try
-                    {
-                        // Sync extensions.
-                        this._ext.sync(JSON.parse(item.content), true).then(resolve).catch(reject);
-                    }
-                    catch (err)
-                    {
-                        reject(err);
-                    }
+                    // Sync extensions.
+                    const extensions: IExtension[] = parse(item.content || "[]");
+                    this._ext.sync(extensions, true).then(resolve).catch(reject);
                 }
-                else
+                catch (err)
                 {
-                    reject(new Error("Invalid config content."));
+                    reject(new Error(`The extension list is broken: ${err.message}`));
                 }
             }
             else
             {
-                // Save files.
-                fs.writeFile(item.path, item.content || "{}", (err) =>
+                if (item.name.includes("settings") && item.content)
                 {
-                    if (err)
+                    // TODO: refactor.
+                    // Merge settings.
+                    let { content } = item;
+                    this._loadContent([item], false).then((value) =>
                     {
-                        reject(err);
+                        const localSettings = value[0].content;
+                        if (localSettings)
+                        {
+                            content = mergeSettings(content, localSettings);
+                        }
+
+                        // Save to disk.
+                        this._saveToFile({ ...item, content }).then(resolve).catch(reject);
+                    });
+                }
+                else
+                {
+                    // Save to disk.
+                    this._saveToFile(item).then(resolve).catch(reject);
+                }
+            }
+        });
+    }
+
+    /**
+     * Save the config to disk.
+     */
+    private _saveToFile(config: IConfig)
+    {
+        return new Promise((resolve, reject) =>
+        {
+            fs.writeFile(config.path, config.content || "{}", (e) =>
+            {
+                if (e)
+                {
+                    reject(e);
+                }
+                else
+                {
+                    resolve({ file: config });
+                }
+            });
+        });
+    }
+
+    /**
+     * Check if the downloading should be continued.
+     */
+    private _checkIfContinue(configs: IConfig[], saveFiles: IConfig[], removeFiles: IConfig[])
+    {
+        return new Promise((resolve) =>
+        {
+            const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
+            if (threshold > 0)
+            {
+                this._loadContent(configs, false).then((localConfigs) =>
+                {
+                    // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
+                    // 1. Get the excluded settings.
+                    const remoteConfigs = saveFiles.map((file) => ({ ...file }));
+                    const remoteSettings = remoteConfigs.find((item) => item.name.includes("settings"));
+                    const localSettings = localConfigs.find((item) => item.name.includes("settings"));
+                    if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
+                    {
+                        const localSettingsJSON = parse(localSettings.content);
+                        const remoteSettingsJSON = parse(remoteSettings.content);
+                        if (localSettingsJSON && remoteSettingsJSON)
+                        {
+                            const patterns = remoteSettingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [];
+                            remoteSettings.content = excludeSettings(remoteSettings.content, remoteSettingsJSON, patterns);
+                            localSettings.content = excludeSettings(localSettings.content, localSettingsJSON, patterns);
+                        }
+                    }
+
+                    // 2. Diff settings.
+                    const changes = this._diffSettings(localConfigs, remoteConfigs) + removeFiles.length;
+                    if (changes >= threshold)
+                    {
+                        const okButton = "Continue to download";
+                        const message = "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE LOCAL SETTINGS?";
+                        Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
+                        {
+                            resolve(selection === okButton);
+                        });
                     }
                     else
                     {
-                        resolve({ file: item });
+                        resolve(true);
                     }
                 });
             }
+            else
+            {
+                resolve(true);
+            }
         });
+    }
+
+    /**
+     * Calculates the number of differences between the local and remote files.
+     */
+    private _diffSettings(localFiles: IConfig[], remoteFiles: IConfig[]): number
+    {
+        const left = this._parseToJSON(localFiles);
+        const right = this._parseToJSON(remoteFiles);
+        return diff(left, right);
+    }
+
+    /**
+     * Converts the `content` of `IConfig[]` into a `JSON object`.
+     */
+    private _parseToJSON(configs: IConfig[]): any
+    {
+        const result = {};
+        let content: string;
+        for (const config of configs)
+        {
+            content = config.content || "";
+            result[config.remote] = parse(content) || content;
+        }
+        return result;
     }
 }

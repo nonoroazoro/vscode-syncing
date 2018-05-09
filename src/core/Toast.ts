@@ -1,14 +1,31 @@
+/**
+ * VSCode message utils.
+ */
+
 import * as moment from "moment";
 import * as vscode from "vscode";
 
+import * as GitHubTypes from "./GitHubTypes";
+
 import Gist from "./Gist";
+
+/**
+ * Represents the item of GistListBox.
+ */
+interface IGistListBoxItem extends vscode.QuickPickItem
+{
+    /**
+     * Payload of the item.
+     */
+    data: string;
+}
 
 /**
  * Set a message to the VSCode status bar.
  * @param message The message to show.
  * @param hideAfterTimeout Timeout in milliseconds after which the message will be cleared.
  */
-function status(message: string, hideAfterTimeout?: number): void
+export function status(message: string, hideAfterTimeout?: number): void
 {
     clearSpinner();
 
@@ -27,7 +44,7 @@ function status(message: string, hideAfterTimeout?: number): void
  * Set an `info` message to the VSCode status bar and auto-hide after `4000` milliseconds.
  * @param message The message to show.
  */
-function statusInfo(message: string): void
+export function statusInfo(message: string): void
 {
     status(message, 4000);
 }
@@ -36,7 +53,7 @@ function statusInfo(message: string): void
  * Set an `error` message to the VSCode status bar and auto-hide after `8000` milliseconds.
  * @param message The message to show.
  */
-function statusError(message: string): void
+export function statusError(message: string): void
 {
     status(message, 8000);
 }
@@ -45,7 +62,7 @@ function statusError(message: string): void
  * Set an `fatal` message to the VSCode status bar and auto-hide after `12000` milliseconds.
  * @param message The message to show.
  */
-function statusFatal(message: string): void
+export function statusFatal(message: string): void
 {
     status(message, 12000);
 }
@@ -54,7 +71,7 @@ function statusFatal(message: string): void
  * Show GitHub Personal Access Token input box.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: string }>
+export function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: string }>
 {
     return new Promise((resolve, reject) =>
     {
@@ -95,20 +112,19 @@ function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: st
  * Show Gist ID input box.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
+export function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
 {
     return new Promise((resolve, reject) =>
     {
-        const placeHolder = forUpload ?
-            "Enter Gist ID (Leave it blank to create a new Gist automatically)." :
-            "Enter Gist ID.";
-        const options = {
+        const placeHolder = forUpload
+            ? "Enter Gist ID (Leave it blank to create a new Gist automatically)."
+            : "Enter Gist ID.";
+        vscode.window.showInputBox({
             ignoreFocusOut: true,
             password: false,
             placeHolder,
             prompt: "Used for synchronizing your settings with Gist."
-        };
-        vscode.window.showInputBox(options).then((value) =>
+        }).then((value) =>
         {
             if (value === undefined)
             {
@@ -137,25 +153,26 @@ function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
  * @param api GitHub Gist utils.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ id: string }>
+export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ id: string }>
 {
     return new Promise((resolve, reject) =>
     {
         showSpinner("Syncing: Checking remote Gists.");
         return api.getAll()
-            .then((gists: any[]) =>
+            .then((gists: GitHubTypes.IGist[]) =>
             {
                 clearSpinner("");
 
-                const manualItem = {
+                const manualItem: IGistListBoxItem = {
                     data: "@@manual",
+                    description: "",
                     label: `Enter Gist ID manually...`
                 };
 
-                // Don't show quick pick dialog when gists is empty.
-                if (gists && gists.length > 0)
+                // Show quick pick dialog only if the gists is not empty.
+                if (gists.length > 0)
                 {
-                    const items: any[] = gists.map((gist) => ({
+                    const items: IGistListBoxItem[] = gists.map((gist) => ({
                         data: gist.id,
                         description: `Last uploaded ${moment.duration(new Date(gist.updated_at).getTime() - Date.now()).humanize(true)}.`,
                         label: `Gist ID: ${gist.id}`
@@ -167,36 +184,25 @@ function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ 
                         placeHolder: `Choose a Gist to ${forUpload ? "upload" : "download"} your settings.`
                     });
                 }
-                else
-                {
-                    return manualItem;
-                }
+                return manualItem;
             })
-            .then((item: { data: string }) =>
+            .then((item) =>
             {
-                // Reject if cancelled.
                 if (item)
                 {
-                    const id = item.data;
-                    if (!forUpload && !id)
+                    const { data: id } = item;
+                    if (id === "@@manual")
                     {
-                        // Only reject when downloading.
-                        reject(new Error("the Gist ID is not set."));
+                        resolve({ id: "" });
                     }
                     else
                     {
-                        if (id === "@@manual")
-                        {
-                            resolve({ id: "" });
-                        }
-                        else
-                        {
-                            resolve({ id });
-                        }
+                        resolve({ id });
                     }
                 }
                 else
                 {
+                    // Reject if cancelled.
                     reject(new Error("You abort the synchronization."));
                 }
             })
@@ -207,17 +213,25 @@ function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ 
 /**
  * Show a "Reload VSCode" prompt dialog.
  */
-function showReloadBox(): void
+export function showReloadBox(): void
 {
-    const title: string = "Reload";
-    const message: string = "Syncing: Settings are successfully synced. Reload VSCode to take effect.";
-    vscode.window.showInformationMessage(message, { title }).then((btn) =>
+    const reloadButton = "Reload";
+    const message = "Settings are successfully synced. Please reload VSCode to take effect.";
+    vscode.window.showInformationMessage(message, reloadButton).then((selection) =>
     {
-        if (btn && btn.title === title)
+        if (selection === reloadButton)
         {
             vscode.commands.executeCommand("workbench.action.reloadWindow");
         }
     });
+}
+
+/**
+ * Show a confirm prompt dialog.
+ */
+export function showConfirmBox(message: string, ...buttons: string[])
+{
+    return vscode.window.showInformationMessage(message, ...buttons);
 }
 
 let spinnerTimer: NodeJS.Timer | null;
@@ -232,7 +246,7 @@ const spinner = {
  * @param progress Current progress.
  * @param total Total progress.
  */
-function showSpinner(message: string, progress?: number, total?: number): void
+export function showSpinner(message: string, progress?: number, total?: number): void
 {
     clearSpinner();
 
@@ -266,7 +280,7 @@ function showSpinner(message: string, progress?: number, total?: number): void
  * Clear spinner and show message, do nothing if currently no spinner is exist.
  * @param message The message to show.
  */
-function clearSpinner(message?: string): void
+export function clearSpinner(message?: string): void
 {
     if (spinnerTimer)
     {
@@ -279,19 +293,3 @@ function clearSpinner(message?: string): void
         }
     }
 }
-
-/**
- * VSCode message utils.
- */
-export default {
-    clearSpinner,
-    showGistInputBox,
-    showGitHubTokenInputBox,
-    showReloadBox,
-    showRemoteGistListBox,
-    showSpinner,
-    status,
-    statusError,
-    statusFatal,
-    statusInfo
-};

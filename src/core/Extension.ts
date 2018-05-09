@@ -11,7 +11,7 @@ import * as vscode from "vscode";
 import { IConfig } from "./Config";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
-import Toast from "./Toast";
+import * as Toast from "./Toast";
 
 temp.track();
 
@@ -213,7 +213,7 @@ export default class Extension
                             Toast.clearSpinner("");
                         }
 
-                        // Fixed: Remove ".obsolete" file (added from VSCode v1.2.0) after the synchronization.
+                        // Fixed: Remove ".obsolete" file (added from VSCode v1.20) after the synchronization.
                         fse.remove(path.join(this._env.extensionsPath, ".obsolete"))
                             .then(() => resolve(result)).catch(() => resolve(result));
                     }

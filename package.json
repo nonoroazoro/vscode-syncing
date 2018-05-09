@@ -1,8 +1,8 @@
 {
     "name": "syncing",
     "displayName": "Syncing",
-    "description": "Sync every settings with your own GitHub Gist.",
-    "version": "1.5.3",
+    "description": "Sync all of your VSCode settings across multiple devices.",
+    "version": "1.6.0",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -51,6 +51,23 @@
                 "title": "Syncing: Open Syncing Settings"
             }
         ],
+        "configuration": [
+            {
+                "title": "Syncing",
+                "properties": {
+                    "syncing.pokaYokeThreshold": {
+                        "type": "number",
+                        "default": 10,
+                        "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing). Each time you start a synchronization, Syncing will display a confirm dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
+                    },
+                    "syncing.upload.exclude": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Configure glob patterns for excluding VSCode settings from being synced. For example:\n[\n    \"editor.*\",\n    \"workbench.colorTheme\"\n]\nNow the \"workbench.colorTheme\" setting and all the settings of \"editor\" will no longer be synced."
+                    }
+                }
+            }
+        ],
         "keybindings": [
             {
                 "key": "",
@@ -77,28 +94,35 @@
         "postinstall": "node ./node_modules/vscode/bin/install"
     },
     "dependencies": {
+        "@octokit/rest": "^15.2.6",
         "adm-zip": "^0.4.7",
         "async": "^2.6.0",
-        "fs-extra": "^4.0.2",
-        "github": "^8.1.1",
-        "https-proxy-agent": "^2.1.1",
-        "moment": "^2.19.2",
+        "fs-extra": "^5.0.0",
+        "https-proxy-agent": "^2.2.1",
+        "jsonc-parser": "^2.0.0",
+        "jsondiffpatch": "^0.3.9",
+        "junk": "^2.1.0",
+        "lodash.pick": "^4.4.0",
+        "minimatch": "^3.0.4",
+        "moment": "^2.22.1",
         "temp": "^0.8.3"
     },
     "devDependencies": {
         "@types/adm-zip": "^0.4.31",
-        "@types/async": "^2.0.45",
-        "@types/fs-extra": "^4.0.5",
-        "@types/node": "^8.0.53",
-        "@types/temp": "^0.8.31",
+        "@types/async": "^2.0.49",
+        "@types/fs-extra": "^5.0.2",
+        "@types/lodash.pick": "^4.4.3",
+        "@types/minimatch": "^3.0.3",
+        "@types/node": "^10.0.0",
+        "@types/temp": "^0.8.32",
         "husky": "^0.14.3",
-        "lint-staged": "^5.0.0",
-        "mocha": "^4.0.1",
+        "lint-staged": "^7.0.5",
+        "mocha": "^5.1.1",
         "rimraf": "^2.6.2",
-        "should": "^13.1.3",
-        "tslint": "^5.8.0",
-        "typescript": "^2.6.2",
-        "vscode": "^1.1.8"
+        "should": "^13.2.1",
+        "tslint": "^5.9.1",
+        "typescript": "^2.8.3",
+        "vscode": "^1.1.16"
     },
     "lint-staged": {
         "./src/**/*.ts": [

@@ -2,17 +2,18 @@ import * as fs from "fs";
 import * as moment from "moment";
 import * as vscode from "vscode";
 
-import Config from "./utils/Config";
-import { ISyncStatus } from "./utils/Extension";
-import Gist from "./utils/Gist";
-import Syncing from "./utils/Syncing";
-import Toast from "./utils/Toast";
+import Config from "./core/Config";
+import { ISyncStatus } from "./core/Extension";
+import Gist from "./core/Gist";
+import * as GitHubTypes from "./core/GitHubTypes";
+import Syncing from "./core/Syncing";
+import * as Toast from "./core/Toast";
 
 let _config: Config;
 let _syncing: Syncing;
 let _isSyncing: boolean;
 
-export function activate(context: vscode.ExtensionContext): void
+export function activate(context: vscode.ExtensionContext)
 {
     _initGlobals(context);
     _initCommands(context);
@@ -21,7 +22,7 @@ export function activate(context: vscode.ExtensionContext): void
 /**
  * Init global variables.
  */
-function _initGlobals(context: vscode.ExtensionContext): void
+function _initGlobals(context: vscode.ExtensionContext)
 {
     _isSyncing = false;
     _config = Config.create(context);
@@ -34,7 +35,7 @@ function _initGlobals(context: vscode.ExtensionContext): void
 /**
  * Init Syncing's commands.
  */
-function _initCommands(context: vscode.ExtensionContext): void
+function _initCommands(context: vscode.ExtensionContext)
 {
     _registerCommand(context, "syncing.uploadSettings", _uploadSettings);
     _registerCommand(context, "syncing.downloadSettings", _downloadSettings);
@@ -44,7 +45,7 @@ function _initCommands(context: vscode.ExtensionContext): void
 /**
  * VSCode's registerCommand wrapper.
  */
-function _registerCommand(context: vscode.ExtensionContext, command: string, callback: (...args: any[]) => any): void
+function _registerCommand(context: vscode.ExtensionContext, command: string, callback: () => void)
 {
     // Add to a list of disposables which are disposed when this extension is deactivated.
     context.subscriptions.push(vscode.commands.registerCommand(command, callback));
@@ -53,7 +54,7 @@ function _registerCommand(context: vscode.ExtensionContext, command: string, cal
 /**
  * Upload settings.
  */
-function _uploadSettings(): void
+function _uploadSettings()
 {
     if (!_isSyncing)
     {
@@ -63,7 +64,7 @@ function _uploadSettings(): void
             const api = Gist.create(settings.token, _syncing.proxy);
             return _config.getConfigs({ load: true, showIndicator: true }).then((configs) =>
             {
-                return api.findAndUpdate(settings.id, configs, true, true).then((gist: any) =>
+                return api.findAndUpdate(settings.id, configs, true, true).then((gist: GitHubTypes.IGist) =>
                 {
                     if (gist.id === settings.id)
                     {
@@ -90,7 +91,7 @@ function _uploadSettings(): void
 /**
  * download settings.
  */
-function _downloadSettings(): void
+function _downloadSettings()
 {
     if (!_isSyncing)
     {
@@ -134,7 +135,7 @@ function _downloadSettings(): void
 /**
  * Open Syncing's settings.
  */
-function _openSettings(): void
+function _openSettings()
 {
     if (fs.existsSync(_syncing.settingsPath))
     {

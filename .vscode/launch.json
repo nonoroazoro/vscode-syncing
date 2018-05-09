@@ -8,12 +8,12 @@
             "runtimeExecutable": "${execPath}",
             "preLaunchTask": "tsc-watch",
             "args": [
-                "--extensionDevelopmentPath=${workspaceRoot}"
+                "--extensionDevelopmentPath=${workspaceFolder}"
             ],
             "outFiles": [
-                "${workspaceRoot}/dist/**/*.js"
+                "${workspaceFolder}/dist/**/*.js"
             ],
-            "stopOnEntry": false,
+            "smartStep": true,
             "sourceMaps": true
         }
     ]
