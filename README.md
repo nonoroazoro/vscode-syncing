@@ -137,7 +137,7 @@ You can set up a proxy to accelerate the synchronization. Here are the steps:
 
 Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
 
-> Please note that unlike the settings in `VSCode User Settings`, `Syncing` **will not upload** its own settings file because it contains your personal information.
+> Please note that unlike the settings in [VSCode User Settings](#vscode-user-settings), `Syncing` **will not upload** its own settings file because it contains your personal information.
 
 
 ## Getting Started
