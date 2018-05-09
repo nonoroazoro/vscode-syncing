@@ -6,7 +6,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-***Syncing*** *([源码](https://github.com/nonoroazoro/vscode-syncing))* 是一个 VSCode 插件，它能在**多台设备之间同步你的所有 VSCode 配置**（借助了 [GitHub Gist](https://gist.github.com)，嘿嘿）。
+**Syncing** *([源码](https://github.com/nonoroazoro/vscode-syncing))* 是一个 VSCode 插件，它能在**多台设备之间同步你的所有 VSCode 配置**（借助了 [GitHub Gist](https://gist.github.com)，嘿嘿）。
 
 [点击这里](#快速开始)快速开始配置吧，当然你也可以先看看[示例](#示例)哦。
 
