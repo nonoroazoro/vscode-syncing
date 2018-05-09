@@ -1,29 +1,12 @@
-<h1 align="center">
-    <img src="https://github.com/nonoroazoro/vscode-syncing/blob/develop/resources/logo.png?raw=true" alt="syncing-logo" width="128" style="background-color:transparent;">
-    <p align="center">VSCode - Syncing</p>
-</h1>
+# Syncing
 
-<h4 align="center">Sync all of your VSCode settings across multiple devices.</h4>
+[![Version](https://vsmarketplacebadge.apphb.com/version/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
+[![Installs](https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
+[![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing#review-details)
 
-<p align="center">
-    <a href="https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing">
-        <img src="https://vsmarketplacebadge.apphb.com/version/nonoroazoro.syncing.svg" alt="Version">
-    </a>
-    <a href="https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing">
-        <img src="https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg" alt="Installs">
-    </a>
-    <a href="https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing#review-details">
-        <img src="https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg" alt="Ratings">
-    </a>
-</p>
+[English](README.md) | [中文](README.zh-CN.md)
 
-<p align="center">
-    <a href="https://github.com/nonoroazoro/vscode-syncing">English</a>
-    <span>|</span>
-    <a href="https://github.com/nonoroazoro/vscode-syncing/blob/master/README.zh-CN.md">中文</a>
-</p>
-
-**Syncing** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to sync all of your VSCode settings across multiple devices with GitHub Gist.
+***Syncing*** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **sync all of your VSCode settings across multiple devices** with GitHub Gist.
 
 [Getting started](#getting-started) or [check out the examples](#examples).
 
