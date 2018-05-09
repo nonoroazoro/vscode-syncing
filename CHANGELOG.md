@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.6.1 - May 10, 2018
+
+- Fixed: Replace `adm-zip` with `extract-zip` to fix a bug on windows, finally!
+
+
 ## 1.6.0 - May 09, 2018
 
 - Added: [Poka-Yoke (Mistake-Proofing)](https://en.wikipedia.org/wiki/Poka-yoke), see [#25](https://github.com/nonoroazoro/vscode-syncing/issues/25) (Thank [@christianmalek](https://github.com/christianmalek) for the advice).
@@ -15,7 +20,7 @@
 ## 1.5.2 - December 28, 2017
 
 - Changed: Enhance user guides.
-- Fixed: A bug caused by adm-zip on Linux Mint and Xubuntu ([Issue #21](https://github.com/nonoroazoro/vscode-syncing/issues/21)).
+- Fixed: A bug caused by `adm-zip` on Linux Mint and Xubuntu ([Issue #21](https://github.com/nonoroazoro/vscode-syncing/issues/21)).
 
 
 ## 1.5.1 - December 04, 2017
