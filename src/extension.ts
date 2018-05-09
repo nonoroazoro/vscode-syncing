@@ -7,7 +7,7 @@ import { ISyncStatus } from "./core/Extension";
 import Gist from "./core/Gist";
 import * as GitHubTypes from "./core/GitHubTypes";
 import Syncing from "./core/Syncing";
-import Toast from "./core/Toast";
+import * as Toast from "./core/Toast";
 
 let _config: Config;
 let _syncing: Syncing;

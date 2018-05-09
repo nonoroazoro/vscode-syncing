@@ -4,7 +4,7 @@ import * as vscode from "vscode";
 
 import Environment from "./Environment";
 import Gist from "./Gist";
-import Toast from "./Toast";
+import * as Toast from "./Toast";
 
 /**
  * Represent the settings of `Syncing`.

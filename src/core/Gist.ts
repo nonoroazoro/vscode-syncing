@@ -8,7 +8,7 @@ import { diff } from "../utils/diffHelper";
 import { excludeSettings, parse } from "../utils/jsonHelper";
 import { IConfig } from "./Config";
 import * as GitHubTypes from "./GitHubTypes";
-import Toast from "./Toast";
+import * as Toast from "./Toast";
 
 /**
  * GitHub Gist utils.
