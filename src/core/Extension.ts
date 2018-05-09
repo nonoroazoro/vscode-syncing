@@ -1,5 +1,5 @@
-import * as AdmZip from "adm-zip";
 import * as async from "async";
+import * as extractZip from "extract-zip";
 import * as fs from "fs";
 import * as fse from "fs-extra";
 import * as https from "https";
@@ -279,33 +279,32 @@ export default class Extension
                 }
                 else
                 {
-                    const zip: AdmZip = new AdmZip(extension.zip);
-                    try
+                    extractZip(extension.zip, { dir: dirPath }, (err2) =>
                     {
-                        zip.extractAllTo(dirPath, true);
-                    }
-                    catch (err2)
-                    {
-                        reject(`Cannot extract extension: ${extension.id}. ${err2.message}`);
-                        return;
-                    }
-
-                    const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
-                    fse.emptyDir(extPath)
-                        .then(() =>
+                        if (err2)
                         {
-                            return fse.copy(path.join(dirPath, "extension"), extPath);
-                        })
-                        .then(() =>
+                            reject(`Cannot extract extension: ${extension.id}. ${err2.message}`);
+                        }
+                        else
                         {
-                            // Clear temp file (background and don't wait).
-                            fse.remove(extension.zip!).catch(() => { });
-                            resolve(Object.assign({}, extension, { path: extPath }));
-                        })
-                        .catch((err3) =>
-                        {
-                            reject(`Cannot extract extension: ${extension.id}. ${err3.message}`);
-                        });
+                            const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
+                            fse.emptyDir(extPath)
+                                .then(() =>
+                                {
+                                    return fse.copy(path.join(dirPath, "extension"), extPath);
+                                })
+                                .then(() =>
+                                {
+                                    // Clear temp file (background and don't wait).
+                                    fse.remove(extension.zip!).catch(() => { });
+                                    resolve(Object.assign({}, extension, { path: extPath }));
+                                })
+                                .catch((err3) =>
+                                {
+                                    reject(`Cannot extract extension: ${extension.id}. ${err3.message}`);
+                                });
+                        }
+                    });
                 }
             });
         });

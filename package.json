@@ -95,8 +95,8 @@
     },
     "dependencies": {
         "@octokit/rest": "^15.2.6",
-        "adm-zip": "^0.4.7",
         "async": "^2.6.0",
+        "extract-zip": "^1.6.6",
         "fs-extra": "^5.0.0",
         "https-proxy-agent": "^2.2.1",
         "jsonc-parser": "^2.0.0",
@@ -108,8 +108,8 @@
         "temp": "^0.8.3"
     },
     "devDependencies": {
-        "@types/adm-zip": "^0.4.31",
         "@types/async": "^2.0.49",
+        "@types/extract-zip": "^1.6.2",
         "@types/fs-extra": "^5.0.2",
         "@types/lodash.pick": "^4.4.3",
         "@types/minimatch": "^3.0.3",
