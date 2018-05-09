@@ -1,5 +1,5 @@
 <h1 align="center">
-    <img src="https://github.com/nonoroazoro/vscode-syncing/blob/develop/resources/logo.png?raw=true" alt="syncing-logo" width="128">
+    <img src="https://github.com/nonoroazoro/vscode-syncing/blob/develop/resources/logo.png?raw=true" alt="syncing-logo" width="128" style="background-color:transparent;">
     <p align="center">VSCode - Syncing</p>
 </h1>
 
