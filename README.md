@@ -17,16 +17,16 @@
 
 * From ***version 1.6.0*** onwards, I've introduced two important changes:
 
-    1. **Exclude VSCode Settings.**
+    1. **Exclude VSCode User Settings.**
 
     1. **Mistake-Proofing ([Poka-Yoke](https://en.wikipedia.org/wiki/Poka-yoke)).**
 
-    > Please [check out the VSCode Settings](#vscode-settings) for more details.
+    > Please [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
 
 ## Features
 
-*Syncing* will `keep the consistency of your VSCode settings between local and remote`, and let you:
+*Syncing* will `keep the consistency of your VSCode settings between your devices`, it'll let you:
 
 1. **Upload VSCode Settings**:
 
@@ -34,14 +34,14 @@
     * The `settings` and `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
     * Automatically create a new Gist to store your settings.
     * Use an incremental algorithm to boost the synchronization.
-    * You can `exclude some VSCode settings` from being uploaded, [check out the VSCode Settings](#vscode-settings) for more details.
+    * You can `exclude some VSCode User Settings` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
 1. **Download VSCode Settings**:
 
     * **Always overwrite** local settings.
     * Automatically `install, update` and `remove` extensions.
     * You can download settings from `a public Gist`, such as your friend's VSCode settings, [check out here](#getting-started) for more details.
-    * You can `exclude some VSCode settings` from being downloaded, [check out the VSCode Settings](#vscode-settings) for more details.
+    * You can `exclude some VSCode User Settings` from being downloaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
 Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of cause, you'll have a `progress indicator` during the synchronization :).
 
@@ -89,15 +89,15 @@ The keybindings **are unassigned by default**, but you can easily turn them on b
     ```
 
 
-## VSCode Settings
+## VSCode User Settings
 
-You can find these in `VSCode settings`, and these will also be synced through your devices.
+From ***version 1.6.0*** onwards, you can find the newly added `Syncing Settings` in your `VSCode User Settings`, which will also be synced between your devices.
 
 1. ***`syncing.upload.exclude`***
 
-    The new `syncing.upload.exclude` setting is added to the `VSCode settings`. Now you can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding VSCode settings from being synced.
+    You can configure these [glob patterns](https://github.com/isaacs/minimatch) for excluding VSCode settings from being synced.
 
-    > Note that the settings that are not included in this list will be synced normally.
+    > Note that the settings not listed will be synced normally.
 
     Take this for example:
 
@@ -111,8 +111,6 @@ You can find these in `VSCode settings`, and these will also be synced through y
     Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synced.
 
 1. ***`syncing.pokaYokeThreshold`***
-
-    The new `syncing.pokaYokeThreshold` setting is added to the `VSCode settings`.
 
     The `default value` of this setting is `10`, and you can `disable this feature` by setting to a number `less than or equal to zero` (`<= 0`).
 
@@ -131,7 +129,7 @@ You can set up a proxy to accelerate the synchronization. Here are the steps:
 
 1. Type `"Syncing: Open Syncing Settings"` (or just `"opensync"`) in `VSCode Command Palette` to open `Syncing`'s own settings file (i.e. `syncing.json`).
 
-1. Change the `"http_proxy"` setting (From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`), for example:
+1. Change the `"http_proxy"` setting (From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode User Settings`), for example:
 
     ```json
     "http_proxy": "http://127.0.0.1:1080"
@@ -139,7 +137,7 @@ You can set up a proxy to accelerate the synchronization. Here are the steps:
 
 Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
 
-> Please note that unlike the settings in `VSCode settings`, `Syncing` **will not upload** its own settings file because it contains your personal information.
+> Please note that unlike the settings in `VSCode User Settings`, `Syncing` **will not upload** its own settings file because it contains your personal information.
 
 
 ## Getting Started
