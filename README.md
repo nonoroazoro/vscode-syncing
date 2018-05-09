@@ -1,12 +1,29 @@
-# Syncing
+<h1 align="center">
+    <img src="https://github.com/nonoroazoro/vscode-syncing/blob/develop/resources/logo.png?raw=true" alt="syncing-logo" width="128">
+    <p align="center">VSCode - Syncing</p>
+</h1>
 
-[![Version](https://vsmarketplacebadge.apphb.com/version/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
-[![Installs](https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
-[![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing#review-details)
+<h4 align="center">Sync all of your VSCode settings across multiple devices.</h4>
 
-[English](README.md) | [中文](README.zh-CN.md)
+<p align="center">
+    <a href="https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing">
+        <img src="https://vsmarketplacebadge.apphb.com/version/nonoroazoro.syncing.svg" alt="Version">
+    </a>
+    <a href="https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing">
+        <img src="https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg" alt="Installs">
+    </a>
+    <a href="https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing#review-details">
+        <img src="https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg" alt="Ratings">
+    </a>
+</p>
 
-***Syncing*** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **sync all of your VSCode settings across multiple devices** with GitHub Gist.
+<p align="center">
+    <a href="https://github.com/nonoroazoro/vscode-syncing">English</a>
+    <span>|</span>
+    <a href="https://github.com/nonoroazoro/vscode-syncing/blob/master/README.zh-CN.md">中文</a>
+</p>
+
+**Syncing** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to sync all of your VSCode settings across multiple devices with GitHub Gist.
 
 [Getting started](#getting-started) or [check out the examples](#examples).
 
@@ -40,7 +57,7 @@
 
     * **Always overwrite** local settings.
     * Automatically `install, update` and `remove` extensions.
-    * You can leave the `GitHub Personal Access Token` blank to download from `a public Gist`, such as your friend's VSCode settings.
+    * You can download settings from `a public Gist`, such as your friend's VSCode settings, [check out here](#getting-started) for more details.
     * You can `exclude some VSCode settings` from being downloaded, [check out the VSCode Settings](#vscode-settings) for more details.
 
 Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of cause, you'll have a `progress indicator` during the synchronization :).
@@ -60,7 +77,7 @@ You can type `"upload"`, `"download"` (or `"syncing"`) in `VSCode Command Palett
 
 1. ***`Syncing: Open Syncing Settings`***
 
-    > Set your `GitHub Personal Access Token`, `Gist ID` and `HTTP Proxy` settings.
+    > Set your `GitHub Personal Access Token`, `Gist ID` or `HTTP Proxy` settings.
 
 
 ## Keybindings
@@ -114,22 +131,24 @@ You can find these in `VSCode settings`, and these will also be synced through y
 
     The new `syncing.pokaYokeThreshold` setting is added to the `VSCode settings`.
 
+    The `default value` of this setting is `10`, and you can `disable this feature` by setting to a number `less than or equal to zero` (`<= 0`).
+
+    Take this for example:
+
     ```json
     "syncing.pokaYokeThreshold" : 10
     ```
 
-    From now on, each time you start a synchronization, `Syncing` will display a `confirm dialog` if the changes between the local and remote setting exceed the threshold.
-
-    The `default value` of this setting is `10`, and you can `disable this feature` by setting to a number `less than or equal to zero` (`<= 0`).
+    From now on, each time you start a synchronization, `Syncing` will display a `confirm dialog` if the changes between the local and remote setting exceed this threshold.
 
 
 ## Proxy Settings
 
-You can set up a proxy to accelerate the synchronization (From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`). Here are the steps:
+You can set up a proxy to accelerate the synchronization. Here are the steps:
 
-1. Type `"Syncing: Open Syncing Settings"` (or just `"opensync"`) in `VSCode Command Palette` to open `Syncing`'s own settings file.
+1. Type `"Syncing: Open Syncing Settings"` (or just `"opensync"`) in `VSCode Command Palette` to open `Syncing`'s own settings file (i.e. `syncing.json`).
 
-1. Set the `"http_proxy"` property, for example:
+1. Change the `"http_proxy"` setting (From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode settings`), for example:
 
     ```json
     "http_proxy": "http://127.0.0.1:1080"
@@ -137,7 +156,7 @@ You can set up a proxy to accelerate the synchronization (From ***version 1.5.0*
 
 Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
 
-> Please notice that `Syncing` **does not upload** its own settings file (i.e. `syncing.json`) because it may contain your sensitive information.
+> Please note that unlike the settings in `VSCode settings`, `Syncing` **will not upload** its own settings file because it contains your personal information.
 
 
 ## Getting Started
