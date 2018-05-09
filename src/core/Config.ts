@@ -5,11 +5,11 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../constants";
-import { diff } from "./diffHelper";
+import { diff } from "../utils/diffHelper";
+import { excludeSettings, mergeSettings, parse } from "../utils/jsonHelper";
 import Environment from "./Environment";
 import Extension, { IExtension, ISyncStatus } from "./Extension";
 import * as GitHubTypes from "./GitHubTypes";
-import { excludeSettings, mergeSettings, parse } from "./jsonHelper";
 import Toast from "./Toast";
 
 /**

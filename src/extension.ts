@@ -2,12 +2,12 @@ import * as fs from "fs";
 import * as moment from "moment";
 import * as vscode from "vscode";
 
-import Config from "./utils/Config";
-import { ISyncStatus } from "./utils/Extension";
-import Gist from "./utils/Gist";
-import * as GitHubTypes from "./utils/GitHubTypes";
-import Syncing from "./utils/Syncing";
-import Toast from "./utils/Toast";
+import Config from "./core/Config";
+import { ISyncStatus } from "./core/Extension";
+import Gist from "./core/Gist";
+import * as GitHubTypes from "./core/GitHubTypes";
+import Syncing from "./core/Syncing";
+import Toast from "./core/Toast";
 
 let _config: Config;
 let _syncing: Syncing;
