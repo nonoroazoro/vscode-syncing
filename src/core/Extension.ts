@@ -1,7 +1,6 @@
 import * as async from "async";
 import * as extractZip from "extract-zip";
-import * as fs from "fs";
-import * as fse from "fs-extra";
+import * as fs from "fs-extra";
 import * as https from "https";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as path from "path";
@@ -214,7 +213,7 @@ export default class Extension
                         }
 
                         // Fixed: Remove ".obsolete" file (added from VSCode v1.20) after the synchronization.
-                        fse.remove(path.join(this._env.extensionsPath, ".obsolete"))
+                        fs.remove(path.join(this._env.extensionsPath, ".obsolete"))
                             .then(() => resolve(result)).catch(() => resolve(result));
                     }
                 );
@@ -288,15 +287,15 @@ export default class Extension
                         else
                         {
                             const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
-                            fse.emptyDir(extPath)
+                            fs.emptyDir(extPath)
                                 .then(() =>
                                 {
-                                    return fse.copy(path.join(dirPath, "extension"), extPath);
+                                    return fs.copy(path.join(dirPath, "extension"), extPath);
                                 })
                                 .then(() =>
                                 {
                                     // Clear temp file (background and don't wait).
-                                    fse.remove(extension.zip!).catch(() => { });
+                                    fs.remove(extension.zip!).catch(() => { });
                                     resolve(Object.assign({}, extension, { path: extPath }));
                                 })
                                 .catch((err3) =>
@@ -348,7 +347,7 @@ export default class Extension
         {
             const localExtension = vscode.extensions.getExtension(extension.id);
             const version = localExtension ? localExtension.packageJSON.version : extension.version;
-            fse.remove(path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${version}`), (err) =>
+            fs.remove(path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${version}`), (err) =>
             {
                 if (err)
                 {
