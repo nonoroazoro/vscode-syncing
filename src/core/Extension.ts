@@ -312,28 +312,24 @@ export default class Extension
     /**
      * Update extension's __metadata (post-process).
      */
-    updateMetadata(extension: IExtension): Promise<IExtension>
+    updateMetadata(extension: IExtension): Promise<void>
     {
         return new Promise((resolve, reject) =>
         {
             if (extension && extension.__metadata && extension.path)
             {
-                try
-                {
-                    const filepath = path.join(extension.path, "package.json");
-                    const packageJSON = JSON.parse(fs.readFileSync(filepath, "utf8"));
-                    packageJSON.__metadata = extension.__metadata;
-                    fs.writeFileSync(filepath, JSON.stringify(packageJSON), "utf8");
-                    resolve(extension);
-                }
-                catch (err)
-                {
-                    reject(`Cannot update extension's metadata: ${extension.id}.`);
-                }
+                const filepath = path.join(extension.path, "package.json");
+                fs.readJson(filepath, { encoding: "utf8" })
+                    .then((packageJSON) =>
+                    {
+                        return fs.writeJson(filepath, { ...packageJSON, __metadata: extension.__metadata });
+                    })
+                    .then(resolve)
+                    .catch(() => reject(`Cannot update extension's metadata: ${extension.id}.`));
             }
             else
             {
-                resolve(extension);
+                resolve();
             }
         });
     }
