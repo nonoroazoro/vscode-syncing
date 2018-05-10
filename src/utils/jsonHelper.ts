@@ -35,6 +35,7 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: any, p
                 jsonc.modify(result, [key], void 0, JSONC_MODIFICATION_OPTIONS)
             );
         }
+        result = format(result);
     }
     return result;
 }
@@ -71,6 +72,7 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
                 result = jsonc.applyEdits(result, jsonc.modify(result, [key], dValue, JSONC_MODIFICATION_OPTIONS));
             }
         }
+        result = format(result);
     }
     return result;
 }
@@ -91,6 +93,15 @@ export function getExcludeKeys(settingsJSON: { [key: string]: any }, patterns: s
         }
     }
     return excludeKeys.sort();
+}
+
+/**
+ * Format the given JSON string.
+ */
+export function format(jsonString: string, formattingOptions: jsonc.FormattingOptions = JSONC_MODIFICATION_OPTIONS.formattingOptions): string
+{
+    const edits = jsonc.format(jsonString, undefined, formattingOptions);
+    return jsonc.applyEdits(jsonString, edits);
 }
 
 /**
