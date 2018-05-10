@@ -295,7 +295,7 @@ export default class Extension
                                 .then(() =>
                                 {
                                     // Clear temp file (background and don't wait).
-                                    fs.remove(extension.zip!).catch(() => { });
+                                    fs.remove(extension.zip!).then().catch();
                                     resolve(Object.assign({}, extension, { path: extPath }));
                                 })
                                 .catch((err3) =>
