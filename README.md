@@ -112,7 +112,7 @@ From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Set
 
 1. ***`syncing.pokaYokeThreshold`***
 
-    During the synchronization, `Syncing` will check the changes between your local and remote setting, and display a `confirm dialog` if the changes exceed this threshold.
+    During the synchronization, `Syncing` will check the changes between your local and remote settings, and display a `confirm dialog` if the changes exceed this threshold.
 
     The `default value` of this setting is `10`, and you can `disable this feature` by setting to a number `less than or equal to zero` (`<= 0`).
 
