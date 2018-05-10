@@ -9,7 +9,6 @@ tslint.json
 
 # Project specific stuff
 .github/**
-@types/**
 docs/**
 src/**
 test/**
