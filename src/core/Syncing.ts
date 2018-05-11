@@ -8,9 +8,9 @@ import Gist from "./Gist";
 import * as Toast from "./Toast";
 
 /**
- * Represent the settings of `Syncing`.
+ * Represent the `Syncing Settings`.
  */
-export interface ISyncingSettings
+interface ISyncingSettings
 {
     /**
      * Store GitHub Gist ID.
