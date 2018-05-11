@@ -444,7 +444,7 @@ export default class Config
                 catch (e)
                 {
                     content = undefined;
-                    console.error(`Syncing: Error loading config file: ${item.name}.\n${e}`);
+                    console.error(`Syncing: Error loading config file: ${item.type}.\n${e}`);
                 }
 
                 // Exclude settings.
