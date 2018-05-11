@@ -1,8 +1,8 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
+import { ISyncedItem } from "./common/types";
 import Config from "./core/Config";
-import { ISyncStatus } from "./core/Extension";
 import Gist from "./core/Gist";
 import * as GitHubTypes from "./core/GitHubTypes";
 import Syncing from "./core/Syncing";
@@ -143,9 +143,9 @@ function _openSettings()
 /**
  * Check if extensions are actually synced.
  */
-function _isExtensionsSynced(items: { updated: ISyncStatus[], removed: ISyncStatus[] }): boolean
+function _isExtensionsSynced(syncLog: { updated: ISyncedItem[], removed: ISyncedItem[] }): boolean
 {
-    for (const item of items.updated)
+    for (const item of syncLog.updated)
     {
         if (item.extension && (
             item.extension.added.length > 0

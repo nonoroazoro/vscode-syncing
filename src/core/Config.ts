@@ -5,11 +5,11 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
-import { ISetting, SettingTypes } from "../common/types";
+import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffHelper";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonHelper";
 import Environment from "./Environment";
-import Extension, { IExtension, ISyncStatus } from "./Extension";
+import Extension from "./Extension";
 import * as GitHubTypes from "./GitHubTypes";
 import * as Toast from "./Toast";
 
@@ -186,15 +186,15 @@ export default class Config
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
     saveConfigs(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
-        updated: ISyncStatus[],
-        removed: ISyncStatus[]
+        updated: ISyncedItem[],
+        removed: ISyncedItem[]
     }>
     {
         return new Promise((resolve, reject) =>
         {
             function resolveWrap(value: {
-                updated: ISyncStatus[],
-                removed: ISyncStatus[]
+                updated: ISyncedItem[],
+                removed: ISyncedItem[]
             })
             {
                 if (showIndicator)
@@ -302,8 +302,8 @@ export default class Config
                         if (value)
                         {
                             const syncedFiles: {
-                                updated: ISyncStatus[],
-                                removed: ISyncStatus[]
+                                updated: ISyncedItem[],
+                                removed: ISyncedItem[]
                             } = { updated: [], removed: [] };
                             async.eachSeries(
                                 saveFiles,
@@ -353,18 +353,18 @@ export default class Config
      * Delete the physical files.
      * @param files Files list.
      */
-    removeConfigs(files: ISetting[]): Promise<ISyncStatus[]>
+    removeConfigs(files: ISetting[]): Promise<ISyncedItem[]>
     {
         return new Promise((resolve, reject) =>
         {
-            const removed: ISyncStatus[] = [];
+            const removed: ISyncedItem[] = [];
             async.eachSeries(
                 files,
                 (item, done) =>
                 {
                     fs.remove(item.filepath).then(() =>
                     {
-                        removed.push({ file: item });
+                        removed.push({ setting: item });
                         done();
                     }).catch((err) =>
                     {
@@ -468,7 +468,7 @@ export default class Config
      * Save item content to file or sync extensions.
      * @param item Item of configs.
      */
-    private _saveItemContent(item: ISetting): Promise<ISyncStatus>
+    private _saveItemContent(item: ISetting): Promise<ISyncedItem>
     {
         return new Promise((resolve, reject) =>
         {
@@ -515,7 +515,7 @@ export default class Config
      */
     private _saveToFile(config: ISetting)
     {
-        return fs.outputFile(config.filepath, config.content || "{}").then(() => ({ file: config }));
+        return fs.outputFile(config.filepath, config.content || "{}").then(() => ({ setting: config } as ISyncedItem));
     }
 
     /**

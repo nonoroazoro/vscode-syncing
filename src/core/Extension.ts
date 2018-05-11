@@ -7,7 +7,7 @@ import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
-import { ISetting } from "../common/types";
+import { IExtension, ISyncedItem } from "../common/types";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
 import * as Toast from "./Toast";
@@ -15,51 +15,9 @@ import * as Toast from "./Toast";
 tmp.setGracefulCleanup();
 
 /**
- * Represent a VSCode extension.
+ * Represent the options of synchronization.
  */
-export interface IExtension
-{
-    /**
-     * The extension's identifier in the form of: `publisher.name`.
-     */
-    id: string;
-
-    /**
-     * The extension's name.
-     */
-    name: string;
-
-    /**
-     * The extension's publisher.
-     */
-    publisher: string;
-
-    /**
-     * The extension's version.
-     */
-    version: string;
-
-    /**
-     * The extension's metadata.
-     */
-    __metadata?: string;
-
-    /**
-     * The downloaded extension's zip file path.
-     */
-    zip?: string;
-
-    /**
-     * The installed extension's folder path.
-     */
-    path?: string;
-}
-
-/**
- * Represent the options of [_addExtensions](#Extension._addExtensions),
- * [_updateExtensions](#Extension._updateExtensions) and [_removeExtensions](#Extension._removeExtensions).
- */
-export interface ISyncOptions
+interface ISyncOptions
 {
     /**
      * Extensions to add/update/remove.
@@ -80,29 +38,6 @@ export interface ISyncOptions
      * Whether to show the progress indicator. Defaults to `false`.
      */
     showIndicator?: boolean;
-}
-
-/**
- * Represent the status of synchronization.
- */
-export interface ISyncStatus
-{
-    /**
-     * Extensions that have been added, updated or removed.
-     */
-    extension?: {
-        added: IExtension[],
-        addedErrors: IExtension[],
-        updated: IExtension[],
-        updatedErrors: IExtension[],
-        removed: IExtension[],
-        removedErrors: IExtension[]
-    };
-
-    /**
-     * Files that have been added, updated or removed.
-     */
-    file?: ISetting;
 }
 
 /**
@@ -166,7 +101,7 @@ export default class Extension
      * @param extensions Extensions list.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncStatus>
+    sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
     {
         return new Promise((resolve) =>
         {
@@ -174,7 +109,7 @@ export default class Extension
             {
                 // Add/update/remove extensions.
                 const { added, updated, removed, total } = diff;
-                const result = { extension: {} } as ISyncStatus;
+                const result = { extension: {} } as ISyncedItem;
                 const tasks = [
                     this._addExtensions.bind(this, {
                         extensions: added,
