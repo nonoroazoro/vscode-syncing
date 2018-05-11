@@ -135,11 +135,8 @@ export default class Config
 
                         temp = [
                             {
-                                name: item.name,
-                                filepath: path.join(
-                                    this._env.codeUserPath,
-                                    localFilename
-                                ),
+                                filename: localFilename,
+                                filepath: path.join(this._env.codeUserPath, localFilename),
                                 remoteFilename: `${item.name}.json`,
                                 type: item.type
                             }
@@ -258,7 +255,7 @@ export default class Config
                         {
                             // File exists in remote, but not exists in local.
                             // Delete if it's a snippet file.
-                            if (config.remoteFilename.startsWith(Config.SNIPPET_PREFIX))
+                            if (config.type === SettingTypes.Snippets)
                             {
                                 removeFiles.push(config);
                             }
@@ -279,7 +276,7 @@ export default class Config
                                 {
                                     saveFiles.push({
                                         content: file.content,
-                                        name: filename,
+                                        filename,
                                         filepath: this._env.getSnippetFilePath(filename),
                                         remoteFilename: file.filename,
                                         type: SettingTypes.Snippets
@@ -403,7 +400,7 @@ export default class Config
             {
                 // Add prefix `snippet-` to all snippets.
                 results.push({
-                    name: filename,
+                    filename,
                     filepath: path.join(snippetsDir, filename),
                     remoteFilename: `${Config.SNIPPET_PREFIX}${filename}`,
                     type: SettingTypes.Snippets

@@ -3,11 +3,11 @@
  */
 export enum SettingTypes
 {
-    Extensions = "Extensions",
-    Keybindings = "Keybindings",
-    Locale = "Locale",
-    Settings = "Settings",
-    Snippets = "Snippets"
+    Extensions = "extensions",
+    Keybindings = "keybindings",
+    Locale = "locale",
+    Settings = "settings",
+    Snippets = "snippets"
 }
 
 /**
@@ -16,14 +16,14 @@ export enum SettingTypes
 export interface ISetting
 {
     /**
-     * Settings filename.
-     */
-    name: string;
-
-    /**
      * Settings content.
      */
     content?: string;
+
+    /**
+     * Settings local filename.
+     */
+    filename: string;
 
     /**
      * Settings local filepath.
