@@ -62,7 +62,7 @@ function _uploadSettings()
         _syncing.prepareUploadSettings(true).then((settings) =>
         {
             const api = Gist.create(settings.token, _syncing.proxy);
-            return _config.getConfigs({ load: true, showIndicator: true }).then((configs) =>
+            return _config.getConfigs(true, true).then((configs) =>
             {
                 return api.findAndUpdate(settings.id, configs, true, true).then((gist: GitHubTypes.IGist) =>
                 {
