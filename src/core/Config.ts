@@ -387,7 +387,7 @@ export default class Config
     }
 
     /**
-     * Get all snippet files.
+     * Get all local snippet files.
      * @param snippetsDir Snippets dir.
      */
     private _getSnippets(snippetsDir: string): ISetting[]
@@ -398,7 +398,7 @@ export default class Config
             const filenames: string[] = fs.readdirSync(snippetsDir);
             filenames.filter(junk.not).forEach((filename: string) =>
             {
-                // Add prefix `snippet-` to all snippets.
+                // Add prefix to all snippets.
                 results.push({
                     filename,
                     filepath: path.join(snippetsDir, filename),
