@@ -62,7 +62,7 @@ function _uploadSettings()
         _syncing.prepareUploadSettings(true).then((settings) =>
         {
             const api = Gist.create(settings.token, _syncing.proxy);
-            return _config.getConfigs(true, true).then((configs) =>
+            return _config.getSettings(true, true).then((configs) =>
             {
                 return api.findAndUpdate(settings.id, configs, true, true).then((gist: GitHubTypes.IGist) =>
                 {
@@ -101,7 +101,7 @@ function _downloadSettings()
             const api = Gist.create(settings.token, _syncing.proxy);
             return api.get(settings.id, true).then((gist) =>
             {
-                return _config.saveConfigs(gist.files, true).then((synced) =>
+                return _config.saveSettings(gist.files, true).then((synced) =>
                 {
                     // TODO: log synced files.
                     Toast.statusInfo("Syncing: Settings downloaded.");

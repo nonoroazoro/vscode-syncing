@@ -14,7 +14,7 @@ import Extension from "./Extension";
 import * as Toast from "./Toast";
 
 /**
- * VSCode configs wrapper.
+ * `VSCode Settings` wrapper.
  */
 export default class Config
 {
@@ -52,7 +52,7 @@ export default class Config
     }
 
     /**
-     * Get VSCode settings list (will be uploaded or downloaded, anyway).
+     * Get `VSCode Settings` (will be uploaded or downloaded, anyway).
      * For example:
      *    [
      *        {
@@ -67,7 +67,7 @@ export default class Config
      * @param {boolean} [loadFileContent=false] Whether to load the content of `VSCode Settings` files. Defaults to `false`.
      * @param {boolean} [showIndicator=false] Whether to show the progress indicator. Defaults to `false`.
      */
-    public getConfigs(loadFileContent = false, showIndicator = false): Promise<ISetting[]>
+    public getSettings(loadFileContent: boolean = false, showIndicator: boolean = false): Promise<ISetting[]>
     {
         return new Promise((resolve) =>
         {
@@ -167,11 +167,11 @@ export default class Config
     }
 
     /**
-     * Save VSCode settings to files.
-     * @param files VSCode Configs from Gist.
+     * Save `VSCode Settings` to files.
+     * @param files `VSCode Settings` from GitHub Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    saveConfigs(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
+    saveSettings(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
         updated: ISyncedItem[],
         removed: ISyncedItem[]
     }>
@@ -206,44 +206,44 @@ export default class Config
 
             if (files)
             {
-                let extensionsFile: ISetting;
-                const saveFiles: ISetting[] = [];
-                const removeFiles: ISetting[] = [];
+                let extensionsSetting: ISetting;
+                const settingsToSave: ISetting[] = [];
+                const settingsToRemove: ISetting[] = [];
                 const existsFileKeys: string[] = [];
-                this.getConfigs().then((configs: ISetting[]) =>
+                this.getSettings().then((settings: ISetting[]) =>
                 {
-                    let file: GitHubTypes.IGistFile;
-                    for (const config of configs)
+                    let gistFile: GitHubTypes.IGistFile;
+                    for (const setting of settings)
                     {
-                        file = files[config.remoteFilename];
-                        if (file)
+                        gistFile = files[setting.remoteFilename];
+                        if (gistFile)
                         {
                             // File exists in remote and local, sync it.
-                            if (config.type === SettingTypes.Extensions)
+                            if (setting.type === SettingTypes.Extensions)
                             {
                                 // Temp extensions file.
-                                extensionsFile = {
-                                    ...config,
-                                    content: file.content
+                                extensionsSetting = {
+                                    ...setting,
+                                    content: gistFile.content
                                 };
                             }
                             else
                             {
                                 // Temp other file.
-                                saveFiles.push({
-                                    ...config,
-                                    content: file.content
+                                settingsToSave.push({
+                                    ...setting,
+                                    content: gistFile.content
                                 });
                             }
-                            existsFileKeys.push(config.remoteFilename);
+                            existsFileKeys.push(setting.remoteFilename);
                         }
                         else
                         {
                             // File exists in remote, but not exists in local.
                             // Delete if it's a snippet file.
-                            if (config.type === SettingTypes.Snippets)
+                            if (setting.type === SettingTypes.Snippets)
                             {
-                                removeFiles.push(config);
+                                settingsToRemove.push(setting);
                             }
                         }
                     }
@@ -253,17 +253,17 @@ export default class Config
                     {
                         if (existsFileKeys.indexOf(key) === -1)
                         {
-                            file = files[key];
-                            if (file.filename.startsWith(Config.SNIPPET_PREFIX))
+                            gistFile = files[key];
+                            if (gistFile.filename.startsWith(Config.SNIPPET_PREFIX))
                             {
                                 // Snippets.
-                                filename = file.filename.slice(Config.SNIPPET_PREFIX.length);
+                                filename = gistFile.filename.slice(Config.SNIPPET_PREFIX.length);
                                 if (filename)
                                 {
-                                    saveFiles.push({
-                                        content: file.content,
+                                    settingsToSave.push({
+                                        content: gistFile.content,
                                         filepath: this._env.getSnippetFilePath(filename),
-                                        remoteFilename: file.filename,
+                                        remoteFilename: gistFile.filename,
                                         type: SettingTypes.Snippets
                                     });
                                 }
@@ -276,31 +276,31 @@ export default class Config
                     }
 
                     // Put extensions file to the last.
-                    if (extensionsFile)
+                    if (extensionsSetting)
                     {
-                        saveFiles.push(extensionsFile);
+                        settingsToSave.push(extensionsSetting);
                     }
 
                     // poka-yoke - check if there have been two much changes (more than 10 changes) since the last downloading.
-                    this._checkIfContinue(configs, saveFiles, removeFiles).then((value) =>
+                    this._shouldContinue(settings, settingsToSave, settingsToRemove).then((value) =>
                     {
                         if (value)
                         {
-                            const syncedFiles: {
+                            const syncedItems: {
                                 updated: ISyncedItem[],
                                 removed: ISyncedItem[]
                             } = { updated: [], removed: [] };
                             async.eachSeries(
-                                saveFiles,
-                                (item: ISetting, done: async.ErrorCallback<Error>) =>
+                                settingsToSave,
+                                (setting: ISetting, done: async.ErrorCallback<Error>) =>
                                 {
-                                    this._saveItemContent(item).then((saved) =>
+                                    this._saveSetting(setting).then((saved) =>
                                     {
-                                        syncedFiles.updated.push(saved);
+                                        syncedItems.updated.push(saved);
                                         done();
                                     }).catch((err) =>
                                     {
-                                        done(new Error(`Cannot save file: ${item.remoteFilename} : ${err.message}`));
+                                        done(new Error(`Cannot save file: ${setting.remoteFilename} : ${err.message}`));
                                     });
                                 },
                                 (err) =>
@@ -311,10 +311,10 @@ export default class Config
                                     }
                                     else
                                     {
-                                        this.removeConfigs(removeFiles).then((removed) =>
+                                        this.removeSettings(settingsToRemove).then((removed) =>
                                         {
-                                            syncedFiles.removed = removed;
-                                            resolveWrap(syncedFiles);
+                                            syncedItems.removed = removed;
+                                            resolveWrap(syncedItems);
                                         }).catch(rejectWrap);
                                     }
                                 }
@@ -335,16 +335,16 @@ export default class Config
     }
 
     /**
-     * Delete the physical files.
-     * @param files Files list.
+     * Delete the physical files corresponding to the `VSCode Settings`.
+     * @param settings `VSCode Settings`.
      */
-    removeConfigs(files: ISetting[]): Promise<ISyncedItem[]>
+    removeSettings(settings: ISetting[]): Promise<ISyncedItem[]>
     {
         return new Promise((resolve, reject) =>
         {
             const removed: ISyncedItem[] = [];
             async.eachSeries(
-                files,
+                settings,
                 (item, done) =>
                 {
                     fs.remove(item.filepath).then(() =>
@@ -399,37 +399,37 @@ export default class Config
     }
 
     /**
-     * Load file content of configs.
-     * The content will exactly be `undefined` when failure happens.
-     * @param configs VSCode configs.
-     * @param exclude Default is `true`, exclude the VSCode settings base on the exclude list of Syncing.
+     * Load the content of `VSCode Settings` files. The `content` will exactly be `undefined` when failure happens.
+     *
+     * @param settings `VSCode Settings`.
+     * @param exclude Default is `true`, exclude some `VSCode Settings` base on the exclude list of `Syncing`.
      */
-    private _loadContent(configs: ISetting[], exclude: boolean = true): Promise<ISetting[]>
+    private _loadContent(settings: ISetting[], exclude: boolean = true): Promise<ISetting[]>
     {
         return new Promise((resolve) =>
         {
             let content: string | undefined;
-            const results: ISetting[] = configs.map((item: ISetting) =>
+            const results: ISetting[] = settings.map((setting: ISetting) =>
             {
                 try
                 {
-                    if (item.type === SettingTypes.Extensions)
+                    if (setting.type === SettingTypes.Extensions)
                     {
                         content = JSON.stringify(this._ext.getAll(), null, 4);
                     }
                     else
                     {
-                        content = fs.readFileSync(item.filepath, "utf8");
+                        content = fs.readFileSync(setting.filepath, "utf8");
                     }
                 }
-                catch (e)
+                catch (err)
                 {
                     content = undefined;
-                    console.error(`Syncing: Error loading config file: ${item.type}.\n${e}`);
+                    console.error(`Syncing: Error loading VSCode settings file: ${setting.type}.\n${err}`);
                 }
 
                 // Exclude settings.
-                if (exclude && item.type === SettingTypes.Settings && content)
+                if (exclude && setting.type === SettingTypes.Settings && content)
                 {
                     const settingsJSON = parse(content);
                     if (settingsJSON)
@@ -442,26 +442,27 @@ export default class Config
                     }
                 }
 
-                return { ...item, content };
+                return { ...setting, content };
             });
             resolve(results);
         });
     }
 
     /**
-     * Save item content to file or sync extensions.
-     * @param item Item of configs.
+     * Save `VSCode Setting` to file or sync extensions.
+     *
+     * @param setting `VSCode Setting`.
      */
-    private _saveItemContent(item: ISetting): Promise<ISyncedItem>
+    private _saveSetting(setting: ISetting): Promise<ISyncedItem>
     {
         return new Promise((resolve, reject) =>
         {
-            if (item.type === SettingTypes.Extensions)
+            if (setting.type === SettingTypes.Extensions)
             {
                 try
                 {
                     // Sync extensions.
-                    const extensions: IExtension[] = parse(item.content || "[]");
+                    const extensions: IExtension[] = parse(setting.content || "[]");
                     this._ext.sync(extensions, true).then(resolve).catch(reject);
                 }
                 catch (err)
@@ -469,12 +470,12 @@ export default class Config
                     reject(new Error(`The extension list is broken: ${err.message}`));
                 }
             }
-            else if (item.type === SettingTypes.Settings && item.content)
+            else if (setting.type === SettingTypes.Settings && setting.content)
             {
                 // TODO: refactor.
                 // Merge settings.
-                let { content } = item;
-                this._loadContent([item], false).then((value) =>
+                let { content } = setting;
+                this._loadContent([setting], false).then((value) =>
                 {
                     const localSettings = value[0].content;
                     if (localSettings)
@@ -483,42 +484,42 @@ export default class Config
                     }
 
                     // Save to disk.
-                    this._saveToFile({ ...item, content }).then(resolve).catch(reject);
+                    this._saveToFile({ ...setting, content }).then(resolve).catch(reject);
                 });
             }
             else
             {
                 // Save to disk.
-                this._saveToFile(item).then(resolve).catch(reject);
+                this._saveToFile(setting).then(resolve).catch(reject);
             }
         });
     }
 
     /**
-     * Save the config to disk.
+     * Save the `VSCode Setting` to disk.
      */
-    private _saveToFile(config: ISetting)
+    private _saveToFile(setting: ISetting)
     {
-        return fs.outputFile(config.filepath, config.content || "{}").then(() => ({ setting: config } as ISyncedItem));
+        return fs.outputFile(setting.filepath, setting.content || "{}").then(() => ({ setting } as ISyncedItem));
     }
 
     /**
      * Check if the downloading should be continued.
      */
-    private _checkIfContinue(configs: ISetting[], saveFiles: ISetting[], removeFiles: ISetting[])
+    private _shouldContinue(settings: ISetting[], settingsToSave: ISetting[], settingsToRemove: ISetting[])
     {
         return new Promise((resolve) =>
         {
             const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
             if (threshold > 0)
             {
-                this._loadContent(configs, false).then((localConfigs) =>
+                this._loadContent(settings, false).then((localConfigs) =>
                 {
                     // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
                     // 1. Get the excluded settings.
-                    const remoteConfigs = saveFiles.map((file) => ({ ...file }));
-                    const remoteSettings = remoteConfigs.find((item) => (item.type === SettingTypes.Settings));
-                    const localSettings = localConfigs.find((item) => (item.type === SettingTypes.Settings));
+                    const remoteConfigs = settingsToSave.map((setting) => ({ ...setting }));
+                    const remoteSettings = remoteConfigs.find((setting) => (setting.type === SettingTypes.Settings));
+                    const localSettings = localConfigs.find((setting) => (setting.type === SettingTypes.Settings));
                     if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
                     {
                         const localSettingsJSON = parse(localSettings.content);
@@ -532,7 +533,7 @@ export default class Config
                     }
 
                     // 2. Diff settings.
-                    const changes = this._diffSettings(localConfigs, remoteConfigs) + removeFiles.length;
+                    const changes = this._diffSettings(localConfigs, remoteConfigs) + settingsToRemove.length;
                     if (changes >= threshold)
                     {
                         const okButton = "Continue to download";
@@ -556,26 +557,26 @@ export default class Config
     }
 
     /**
-     * Calculates the number of differences between the local and remote files.
+     * Calculates the number of differences between the local and remote settings.
      */
-    private _diffSettings(localFiles: ISetting[], remoteFiles: ISetting[]): number
+    private _diffSettings(localSettings: ISetting[], remoteSettings: ISetting[]): number
     {
-        const left = this._parseToJSON(localFiles);
-        const right = this._parseToJSON(remoteFiles);
+        const left = this._parseToJSON(localSettings);
+        const right = this._parseToJSON(remoteSettings);
         return diff(left, right);
     }
 
     /**
-     * Converts the `content` of `IConfig[]` into a `JSON object`.
+     * Converts the `content` of `ISetting[]` into a `JSON object`.
      */
-    private _parseToJSON(configs: ISetting[]): any
+    private _parseToJSON(settings: ISetting[]): any
     {
         const result = {};
         let content: string;
-        for (const config of configs)
+        for (const setting of settings)
         {
-            content = config.content || "";
-            result[config.remoteFilename] = parse(content) || content;
+            content = setting.content || "";
+            result[setting.remoteFilename] = parse(content) || content;
         }
         return result;
     }
