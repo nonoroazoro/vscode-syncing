@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 
+import { openFile } from "../utils/vscodeHelper";
 import Environment from "./Environment";
 import Gist from "./Gist";
 import * as Toast from "./Toast";
@@ -252,6 +253,28 @@ export default class Syncing
                 resolve();
             });
         });
+    }
+
+    /**
+     * Open Syncing's settings file (`syncing.json`) in the VSCode editor.
+     */
+    openSettings()
+    {
+        if (fs.existsSync(this.settingsPath))
+        {
+            // Upgrade settings file for `Syncing` v1.5.0.
+            this.migrateSettings().then(() =>
+            {
+                openFile(this.settingsPath);
+            });
+        }
+        else
+        {
+            this.initSettings().then(() =>
+            {
+                openFile(this.settingsPath);
+            });
+        }
     }
 
     /**
