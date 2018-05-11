@@ -4,7 +4,7 @@ import pick = require("lodash.pick");
 import * as vscode from "vscode";
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
-import { IConfig } from "../common/types";
+import { ISetting } from "../common/types";
 import { diff } from "../utils/diffHelper";
 import { excludeSettings, parse } from "../utils/jsonHelper";
 import * as GitHubTypes from "./GitHubTypes";
@@ -250,7 +250,7 @@ export default class Gist
      * @param upsert Default is `true`, create new if gist not exists.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
-    public findAndUpdate(id: string, uploads: IConfig[], upsert = true, showIndicator = false): Promise<GitHubTypes.IGist>
+    public findAndUpdate(id: string, uploads: ISetting[], upsert = true, showIndicator = false): Promise<GitHubTypes.IGist>
     {
         return new Promise((resolve, reject) =>
         {
