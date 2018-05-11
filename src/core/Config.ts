@@ -1,5 +1,5 @@
 import * as async from "async";
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as junk from "junk";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -13,45 +13,50 @@ import * as GitHubTypes from "./GitHubTypes";
 import * as Toast from "./Toast";
 
 /**
- * Represent the type of VSCode configs.
+ * Represent the type of VSCode settings.
  */
 export enum ConfigTypes
 {
-    /**
-     * Files.
-     */
-    File,
+    Extensions,
 
-    /**
-     * Folders.
-     */
-    Folder
+    Keybindings,
+
+    Locale,
+
+    Settings,
+
+    Snippets
 }
 
 /**
- * Represent a VSCode config.
+ * Represent a VSCode settings.
  */
 export interface IConfig
 {
     /**
-     * Config file name.
+     * Settings filename.
      */
     name: string;
 
     /**
-     * Config file path in local.
-     */
-    path: string;
-
-    /**
-     * Config file name in remote.
-     */
-    remote: string;
-
-    /**
-     * Config file content.
+     * Settings content.
      */
     content?: string;
+
+    /**
+     * Settings local filepath.
+     */
+    filepath: string;
+
+    /**
+     * Settings filename in GitHub Gist.
+     */
+    remoteFilename: string;
+
+    /**
+     * Settings type.
+     */
+    type: ConfigTypes;
 }
 
 /**
@@ -142,27 +147,27 @@ export default class Config
             // The item order is very important to ensure that the smaller files are synced first.
             // Thus, the extensions will be the last one to sync.
             const list = [
-                { name: "locale", type: ConfigTypes.File },
-                { name: "snippets", type: ConfigTypes.Folder },
-                { name: "extensions", type: ConfigTypes.File }
+                { name: "locale", type: ConfigTypes.Locale },
+                { name: "snippets", type: ConfigTypes.Snippets },
+                { name: "extensions", type: ConfigTypes.Extensions }
             ];
 
             if (full)
             {
                 list.unshift(
-                    { name: "settings-mac", type: ConfigTypes.File },
-                    { name: "settings", type: ConfigTypes.File },
-                    { name: "keybindings-mac", type: ConfigTypes.File },
-                    { name: "keybindings", type: ConfigTypes.File }
+                    { name: "settings-mac", type: ConfigTypes.Settings },
+                    { name: "settings", type: ConfigTypes.Settings },
+                    { name: "keybindings-mac", type: ConfigTypes.Keybindings },
+                    { name: "keybindings", type: ConfigTypes.Keybindings }
                 );
             }
             else
             {
                 list.unshift(
-                    this._env.isMac ? { name: "settings-mac", type: ConfigTypes.File }
-                        : { name: "settings", type: ConfigTypes.File },
-                    this._env.isMac ? { name: "keybindings-mac", type: ConfigTypes.File }
-                        : { name: "keybindings", type: ConfigTypes.File }
+                    this._env.isMac ? { name: "settings-mac", type: ConfigTypes.Settings }
+                        : { name: "settings", type: ConfigTypes.Settings },
+                    this._env.isMac ? { name: "keybindings-mac", type: ConfigTypes.Keybindings }
+                        : { name: "keybindings", type: ConfigTypes.Keybindings }
                 );
             }
 
@@ -174,7 +179,7 @@ export default class Config
                 list,
                 (item, done) =>
                 {
-                    if (item.type === ConfigTypes.Folder)
+                    if (item.type === ConfigTypes.Snippets)
                     {
                         // Attention: Snippets may be empty.
                         temp = this._getSnippets(this._env.snippetsPath);
@@ -194,11 +199,12 @@ export default class Config
                         temp = [
                             {
                                 name: item.name,
-                                path: path.join(
+                                filepath: path.join(
                                     this._env.codeUserPath,
                                     localFilename
                                 ),
-                                remote: `${item.name}.json`
+                                remoteFilename: `${item.name}.json`,
+                                type: item.type
                             }
                         ];
                     }
@@ -216,7 +222,7 @@ export default class Config
                                 }
                                 else
                                 {
-                                    errorFiles.push(value.remote);
+                                    errorFiles.push(value.remoteFilename);
                                 }
                             });
                             done();
@@ -289,11 +295,11 @@ export default class Config
                     let file: GitHubTypes.IGistFile;
                     for (const config of configs)
                     {
-                        file = files[config.remote];
+                        file = files[config.remoteFilename];
                         if (file)
                         {
                             // File exists in remote and local, sync it.
-                            if (config.name === "extensions")
+                            if (config.type === ConfigTypes.Extensions)
                             {
                                 // Temp extensions file.
                                 extensionsFile = {
@@ -309,13 +315,13 @@ export default class Config
                                     content: file.content
                                 });
                             }
-                            existsFileKeys.push(config.remote);
+                            existsFileKeys.push(config.remoteFilename);
                         }
                         else
                         {
                             // File exists in remote, but not exists in local.
                             // Delete if it's a snippet file.
-                            if (config.remote.startsWith(Config.SNIPPET_PREFIX))
+                            if (config.remoteFilename.startsWith(Config.SNIPPET_PREFIX))
                             {
                                 removeFiles.push(config);
                             }
@@ -330,14 +336,16 @@ export default class Config
                             file = files[key];
                             if (file.filename.startsWith(Config.SNIPPET_PREFIX))
                             {
+                                // Snippets.
                                 filename = file.filename.slice(Config.SNIPPET_PREFIX.length);
                                 if (filename)
                                 {
                                     saveFiles.push({
                                         content: file.content,
                                         name: filename,
-                                        path: this._env.getSnippetFilePath(filename),
-                                        remote: file.filename
+                                        filepath: this._env.getSnippetFilePath(filename),
+                                        remoteFilename: file.filename,
+                                        type: ConfigTypes.Snippets
                                     });
                                 }
                             }
@@ -373,7 +381,7 @@ export default class Config
                                         done();
                                     }).catch((err) =>
                                     {
-                                        done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
+                                        done(new Error(`Cannot save file: ${item.remoteFilename} : ${err.message}`));
                                     });
                                 },
                                 (err) =>
@@ -420,17 +428,13 @@ export default class Config
                 files,
                 (item, done) =>
                 {
-                    fs.unlink(item.path, (err) =>
+                    fs.remove(item.filepath).then(() =>
                     {
-                        if (err)
-                        {
-                            done(new Error(`Cannot save file: ${item.remote} : ${err.message}`));
-                        }
-                        else
-                        {
-                            removed.push({ file: item });
-                            done();
-                        }
+                        removed.push({ file: item });
+                        done();
+                    }).catch((err) =>
+                    {
+                        done(new Error(`Cannot save file: ${item.remoteFilename} : ${err.message}`));
                     });
                 },
                 (err) =>
@@ -463,8 +467,9 @@ export default class Config
                 // Add prefix `snippet-` to all snippets.
                 results.push({
                     name: filename,
-                    path: path.join(snippetsDir, filename),
-                    remote: `${Config.SNIPPET_PREFIX}${filename}`
+                    filepath: path.join(snippetsDir, filename),
+                    remoteFilename: `${Config.SNIPPET_PREFIX}${filename}`,
+                    type: ConfigTypes.Snippets
                 });
             });
         }
@@ -490,13 +495,13 @@ export default class Config
             {
                 try
                 {
-                    if (item.name === "extensions")
+                    if (item.type === ConfigTypes.Extensions)
                     {
                         content = JSON.stringify(this._ext.getAll(), null, 4);
                     }
                     else
                     {
-                        content = fs.readFileSync(item.path, "utf8");
+                        content = fs.readFileSync(item.filepath, "utf8");
                     }
                 }
                 catch (e)
@@ -506,7 +511,7 @@ export default class Config
                 }
 
                 // Exclude settings.
-                if (exclude && item.name.includes("settings") && content)
+                if (exclude && item.type === ConfigTypes.Settings && content)
                 {
                     const settingsJSON = parse(content);
                     if (settingsJSON)
@@ -533,7 +538,7 @@ export default class Config
     {
         return new Promise((resolve, reject) =>
         {
-            if (item.name === "extensions")
+            if (item.type === ConfigTypes.Extensions)
             {
                 try
                 {
@@ -546,30 +551,27 @@ export default class Config
                     reject(new Error(`The extension list is broken: ${err.message}`));
                 }
             }
+            else if (item.type === ConfigTypes.Settings && item.content)
+            {
+                // TODO: refactor.
+                // Merge settings.
+                let { content } = item;
+                this._loadContent([item], false).then((value) =>
+                {
+                    const localSettings = value[0].content;
+                    if (localSettings)
+                    {
+                        content = mergeSettings(content, localSettings);
+                    }
+
+                    // Save to disk.
+                    this._saveToFile({ ...item, content }).then(resolve).catch(reject);
+                });
+            }
             else
             {
-                if (item.name.includes("settings") && item.content)
-                {
-                    // TODO: refactor.
-                    // Merge settings.
-                    let { content } = item;
-                    this._loadContent([item], false).then((value) =>
-                    {
-                        const localSettings = value[0].content;
-                        if (localSettings)
-                        {
-                            content = mergeSettings(content, localSettings);
-                        }
-
-                        // Save to disk.
-                        this._saveToFile({ ...item, content }).then(resolve).catch(reject);
-                    });
-                }
-                else
-                {
-                    // Save to disk.
-                    this._saveToFile(item).then(resolve).catch(reject);
-                }
+                // Save to disk.
+                this._saveToFile(item).then(resolve).catch(reject);
             }
         });
     }
@@ -579,20 +581,7 @@ export default class Config
      */
     private _saveToFile(config: IConfig)
     {
-        return new Promise((resolve, reject) =>
-        {
-            fs.writeFile(config.path, config.content || "{}", (e) =>
-            {
-                if (e)
-                {
-                    reject(e);
-                }
-                else
-                {
-                    resolve({ file: config });
-                }
-            });
-        });
+        return fs.outputFile(config.filepath, config.content || "{}").then(() => ({ file: config }));
     }
 
     /**
@@ -610,8 +599,8 @@ export default class Config
                     // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
                     // 1. Get the excluded settings.
                     const remoteConfigs = saveFiles.map((file) => ({ ...file }));
-                    const remoteSettings = remoteConfigs.find((item) => item.name.includes("settings"));
-                    const localSettings = localConfigs.find((item) => item.name.includes("settings"));
+                    const remoteSettings = remoteConfigs.find((item) => (item.type === ConfigTypes.Settings));
+                    const localSettings = localConfigs.find((item) => (item.type === ConfigTypes.Settings));
                     if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
                     {
                         const localSettingsJSON = parse(localSettings.content);
@@ -668,7 +657,7 @@ export default class Config
         for (const config of configs)
         {
             content = config.content || "";
-            result[config.remote] = parse(content) || content;
+            result[config.remoteFilename] = parse(content) || content;
         }
         return result;
     }
