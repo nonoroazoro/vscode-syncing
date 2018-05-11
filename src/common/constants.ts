@@ -1,7 +1,3 @@
-/**
- * Constants of `Syncing`.
- */
-
 // Dot-separated identifiers, same as the secions of VSCode, see `vscode.workspace.getConfiguration`.
 export const CONFIGURATION_KEY = "syncing";
 export const CONFIGURATION_POKA_YOKE_THRESHOLD = "pokaYokeThreshold";
