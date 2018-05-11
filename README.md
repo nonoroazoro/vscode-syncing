@@ -43,7 +43,7 @@
     * You can download settings from `a public Gist`, such as your friend's VSCode settings, [check out here](#getting-started) for more details.
     * You can `exclude some VSCode User Settings` from being downloaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
-Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of cause, you'll have a `progress indicator` during the synchronization :).
+Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of course, you'll have a `progress indicator` during the synchronization :).
 
 
 ## Commands
@@ -112,7 +112,7 @@ From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Set
 
 1. ***`syncing.pokaYokeThreshold`***
 
-    During the synchronization, `Syncing` will check the changes between your local and remote setting, and display a `confirm dialog` if the changes exceed this threshold.
+    During the synchronization, `Syncing` will check the changes between your local and remote settings, and display a `confirm dialog` if the changes exceed this threshold.
 
     The `default value` of this setting is `10`, and you can `disable this feature` by setting to a number `less than or equal to zero` (`<= 0`).
 

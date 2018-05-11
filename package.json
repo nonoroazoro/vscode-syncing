@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "Syncing",
     "description": "Sync all of your VSCode settings across multiple devices.",
-    "version": "1.6.1",
+    "version": "1.6.2",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -105,7 +105,7 @@
         "lodash.pick": "^4.4.0",
         "minimatch": "^3.0.4",
         "moment": "^2.22.1",
-        "temp": "^0.8.3"
+        "tmp": "0.0.33"
     },
     "devDependencies": {
         "@types/async": "^2.0.49",
@@ -114,7 +114,7 @@
         "@types/lodash.pick": "^4.4.3",
         "@types/minimatch": "^3.0.3",
         "@types/node": "^10.0.0",
-        "@types/temp": "^0.8.32",
+        "@types/tmp": "0.0.33",
         "husky": "^0.14.3",
         "lint-staged": "^7.0.5",
         "mocha": "^5.1.1",

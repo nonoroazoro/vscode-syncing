@@ -1,16 +1,17 @@
-## Specifications
+### Specifications
 
 * OS Version:
 
 * VSCode Version:
 
-## Expected Behavior
+
+### Expected Behavior
 
 
-## Actual Behavior
+### Actual Behavior
 
 
-## Steps to Reproduce
+### Steps to Reproduce
 
 1.
 

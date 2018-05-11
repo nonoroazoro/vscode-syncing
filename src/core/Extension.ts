@@ -1,11 +1,10 @@
 import * as async from "async";
 import * as extractZip from "extract-zip";
-import * as fs from "fs";
-import * as fse from "fs-extra";
+import * as fs from "fs-extra";
 import * as https from "https";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as path from "path";
-import * as temp from "temp";
+import * as tmp from "tmp";
 import * as vscode from "vscode";
 
 import { IConfig } from "./Config";
@@ -13,7 +12,7 @@ import Environment from "./Environment";
 import Syncing from "./Syncing";
 import * as Toast from "./Toast";
 
-temp.track();
+tmp.setGracefulCleanup();
 
 /**
  * Represent a VSCode extension.
@@ -214,7 +213,7 @@ export default class Extension
                         }
 
                         // Fixed: Remove ".obsolete" file (added from VSCode v1.20) after the synchronization.
-                        fse.remove(path.join(this._env.extensionsPath, ".obsolete"))
+                        fs.remove(path.join(this._env.extensionsPath, ".obsolete"))
                             .then(() => resolve(result)).catch(() => resolve(result));
                     }
                 );
@@ -229,34 +228,42 @@ export default class Extension
     {
         return new Promise((resolve, reject) =>
         {
-            const filepath = temp.path({ suffix: `.${extension.id}.zip` });
-            const file = fs.createWriteStream(filepath);
-            file.on("finish", () =>
+            // Create a temporary file, the file will be automatically closed and unlinked on process exit.
+            tmp.file({ postfix: `.${extension.id}.zip` }, (err, filepath: string) =>
             {
-                resolve(Object.assign({}, extension, { zip: filepath }));
-            }).on("error", reject);
-
-            const options: https.RequestOptions = {
-                host: `${extension.publisher}.gallery.vsassets.io`,
-                path: `/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
-            };
-            const proxy = this._syncing.proxy;
-            if (proxy)
-            {
-                options.agent = new HttpsProxyAgent(proxy);
-            }
-
-            https.get(options, (res) =>
-            {
-                if (res.statusCode === 200)
+                if (err)
                 {
-                    res.pipe(file);
+                    reject(err);
+                    return;
                 }
-                else
+
+                const file = fs.createWriteStream(filepath);
+                file.on("finish", () =>
                 {
-                    reject();
+                    resolve({ ...extension, zip: filepath });
+                }).on("error", reject);
+
+                const options: https.RequestOptions = {
+                    host: `${extension.publisher}.gallery.vsassets.io`,
+                    path: `/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
+                };
+                const proxy = this._syncing.proxy;
+                if (proxy)
+                {
+                    options.agent = new HttpsProxyAgent(proxy);
                 }
-            }).on("error", reject);
+                https.get(options, (res) =>
+                {
+                    if (res.statusCode === 200)
+                    {
+                        res.pipe(file);
+                    }
+                    else
+                    {
+                        reject();
+                    }
+                }).on("error", reject);
+            });
         });
     }
 
@@ -267,74 +274,72 @@ export default class Extension
     {
         return new Promise((resolve, reject) =>
         {
-            temp.mkdir("syncing-", (err1, dirPath) =>
+            const zipFilepath = extension.zip;
+            if (zipFilepath)
             {
-                if (err1)
+                tmp.dir({ postfix: `.${extension.id}`, unsafeCleanup: true }, (err1, dirPath: string) =>
                 {
-                    reject(`Cannot extract extension: ${extension.id}. Access temp folder denied.`);
-                }
-                else if (!extension.zip)
-                {
-                    reject(`Cannot extract extension: ${extension.id}. Zip file not found.`);
-                }
-                else
-                {
-                    extractZip(extension.zip, { dir: dirPath }, (err2) =>
+                    if (err1)
                     {
-                        if (err2)
+                        reject(`Cannot extract extension: ${extension.id}. Access temporary directory denied.`);
+                    }
+                    else
+                    {
+                        extractZip(zipFilepath, { dir: dirPath }, (err2) =>
                         {
-                            reject(`Cannot extract extension: ${extension.id}. ${err2.message}`);
-                        }
-                        else
-                        {
-                            const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
-                            fse.emptyDir(extPath)
-                                .then(() =>
-                                {
-                                    return fse.copy(path.join(dirPath, "extension"), extPath);
-                                })
-                                .then(() =>
-                                {
-                                    // Clear temp file (background and don't wait).
-                                    fse.remove(extension.zip!).catch(() => { });
-                                    resolve(Object.assign({}, extension, { path: extPath }));
-                                })
-                                .catch((err3) =>
-                                {
-                                    reject(`Cannot extract extension: ${extension.id}. ${err3.message}`);
-                                });
-                        }
-                    });
-                }
-            });
+                            if (err2)
+                            {
+                                reject(`Cannot extract extension: ${extension.id}. ${err2.message}`);
+                            }
+                            else
+                            {
+                                const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
+                                fs.emptyDir(extPath)
+                                    .then(() =>
+                                    {
+                                        return fs.copy(path.join(dirPath, "extension"), extPath);
+                                    })
+                                    .then(() =>
+                                    {
+                                        resolve({ ...extension, path: extPath });
+                                    })
+                                    .catch((err3) =>
+                                    {
+                                        reject(`Cannot extract extension: ${extension.id}. ${err3.message}`);
+                                    });
+                            }
+                        });
+                    }
+                });
+            }
+            else
+            {
+                reject(`Cannot extract extension: ${extension.id}. Extension zip file not found.`);
+            }
         });
     }
 
     /**
      * Update extension's __metadata (post-process).
      */
-    updateMetadata(extension: IExtension): Promise<IExtension>
+    updateMetadata(extension: IExtension): Promise<void>
     {
         return new Promise((resolve, reject) =>
         {
             if (extension && extension.__metadata && extension.path)
             {
-                try
-                {
-                    const filepath = path.join(extension.path, "package.json");
-                    const packageJSON = JSON.parse(fs.readFileSync(filepath, "utf8"));
-                    packageJSON.__metadata = extension.__metadata;
-                    fs.writeFileSync(filepath, JSON.stringify(packageJSON), "utf8");
-                    resolve(extension);
-                }
-                catch (err)
-                {
-                    reject(`Cannot update extension's metadata: ${extension.id}.`);
-                }
+                const filepath = path.join(extension.path, "package.json");
+                fs.readJson(filepath, { encoding: "utf8" })
+                    .then((packageJSON) =>
+                    {
+                        return fs.writeJson(filepath, { ...packageJSON, __metadata: extension.__metadata });
+                    })
+                    .then(resolve)
+                    .catch(() => reject(`Cannot update extension's metadata: ${extension.id}.`));
             }
             else
             {
-                resolve(extension);
+                resolve();
             }
         });
     }
@@ -348,7 +353,7 @@ export default class Extension
         {
             const localExtension = vscode.extensions.getExtension(extension.id);
             const version = localExtension ? localExtension.packageJSON.version : extension.version;
-            fse.remove(path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${version}`), (err) =>
+            fs.remove(path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${version}`), (err) =>
             {
                 if (err)
                 {
