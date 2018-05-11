@@ -1,7 +1,7 @@
 /**
- * Represent the type of VSCode settings.
+ * Represent the types of various `VSCode Setting`, such as `Extensions`, `Keybindings`...
  */
-export enum ConfigTypes
+export enum SettingTypes
 {
     Extensions,
 
@@ -15,9 +15,9 @@ export enum ConfigTypes
 }
 
 /**
- * Represent a VSCode settings.
+ * Represent a `VSCode Setting`.
  */
-export interface IConfig
+export interface ISetting
 {
     /**
      * Settings filename.
@@ -42,5 +42,5 @@ export interface IConfig
     /**
      * Settings type.
      */
-    type: ConfigTypes;
+    type: SettingTypes;
 }

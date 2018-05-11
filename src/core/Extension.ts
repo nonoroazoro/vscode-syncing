@@ -7,7 +7,7 @@ import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
-import { IConfig } from "../common/types";
+import { ISetting } from "../common/types";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
 import * as Toast from "./Toast";
@@ -102,7 +102,7 @@ export interface ISyncStatus
     /**
      * Files that have been added, updated or removed.
      */
-    file?: IConfig;
+    file?: ISetting;
 }
 
 /**

@@ -5,7 +5,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
-import { ConfigTypes, IConfig } from "../common/types";
+import { ISetting, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffHelper";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonHelper";
 import Environment from "./Environment";
@@ -63,11 +63,11 @@ export default class Config
      * @param {boolean} [showIndicator=false] Whether to show the progress indicator. Defaults to `false`.
      * @param {boolean} [full=false] Whether to load the full list of VSCode settings. Defaults to `false`.
      */
-    public getConfigs(load = false, showIndicator = false, full = false): Promise<IConfig[]>
+    public getConfigs(load = false, showIndicator = false, full = false): Promise<ISetting[]>
     {
         return new Promise((resolve) =>
         {
-            function resolveWrap(value: IConfig[])
+            function resolveWrap(value: ISetting[])
             {
                 if (showIndicator)
                 {
@@ -84,39 +84,39 @@ export default class Config
             // The item order is very important to ensure that the smaller files are synced first.
             // Thus, the extensions will be the last one to sync.
             const list = [
-                { name: "locale", type: ConfigTypes.Locale },
-                { name: "snippets", type: ConfigTypes.Snippets },
-                { name: "extensions", type: ConfigTypes.Extensions }
+                { name: "locale", type: SettingTypes.Locale },
+                { name: "snippets", type: SettingTypes.Snippets },
+                { name: "extensions", type: SettingTypes.Extensions }
             ];
 
             if (full)
             {
                 list.unshift(
-                    { name: "settings-mac", type: ConfigTypes.Settings },
-                    { name: "settings", type: ConfigTypes.Settings },
-                    { name: "keybindings-mac", type: ConfigTypes.Keybindings },
-                    { name: "keybindings", type: ConfigTypes.Keybindings }
+                    { name: "settings-mac", type: SettingTypes.Settings },
+                    { name: "settings", type: SettingTypes.Settings },
+                    { name: "keybindings-mac", type: SettingTypes.Keybindings },
+                    { name: "keybindings", type: SettingTypes.Keybindings }
                 );
             }
             else
             {
                 list.unshift(
-                    this._env.isMac ? { name: "settings-mac", type: ConfigTypes.Settings }
-                        : { name: "settings", type: ConfigTypes.Settings },
-                    this._env.isMac ? { name: "keybindings-mac", type: ConfigTypes.Keybindings }
-                        : { name: "keybindings", type: ConfigTypes.Keybindings }
+                    this._env.isMac ? { name: "settings-mac", type: SettingTypes.Settings }
+                        : { name: "settings", type: SettingTypes.Settings },
+                    this._env.isMac ? { name: "keybindings-mac", type: SettingTypes.Keybindings }
+                        : { name: "keybindings", type: SettingTypes.Keybindings }
                 );
             }
 
-            let temp: IConfig[];
+            let temp: ISetting[];
             let localFilename: string;
-            const results: IConfig[] = [];
+            const results: ISetting[] = [];
             const errorFiles: string[] = [];
             async.eachSeries(
                 list,
                 (item, done) =>
                 {
-                    if (item.type === ConfigTypes.Snippets)
+                    if (item.type === SettingTypes.Snippets)
                     {
                         // Attention: Snippets may be empty.
                         temp = this._getSnippets(this._env.snippetsPath);
@@ -148,9 +148,9 @@ export default class Config
 
                     if (load)
                     {
-                        this._loadContent(temp).then((values: IConfig[]) =>
+                        this._loadContent(temp).then((values: ISetting[]) =>
                         {
-                            values.forEach((value: IConfig) =>
+                            values.forEach((value: ISetting) =>
                             {
                                 // Check for success.
                                 if (value.content)
@@ -223,11 +223,11 @@ export default class Config
 
             if (files)
             {
-                let extensionsFile: IConfig;
-                const saveFiles: IConfig[] = [];
-                const removeFiles: IConfig[] = [];
+                let extensionsFile: ISetting;
+                const saveFiles: ISetting[] = [];
+                const removeFiles: ISetting[] = [];
                 const existsFileKeys: string[] = [];
-                this.getConfigs().then((configs: IConfig[]) =>
+                this.getConfigs().then((configs: ISetting[]) =>
                 {
                     let file: GitHubTypes.IGistFile;
                     for (const config of configs)
@@ -236,7 +236,7 @@ export default class Config
                         if (file)
                         {
                             // File exists in remote and local, sync it.
-                            if (config.type === ConfigTypes.Extensions)
+                            if (config.type === SettingTypes.Extensions)
                             {
                                 // Temp extensions file.
                                 extensionsFile = {
@@ -282,7 +282,7 @@ export default class Config
                                         name: filename,
                                         filepath: this._env.getSnippetFilePath(filename),
                                         remoteFilename: file.filename,
-                                        type: ConfigTypes.Snippets
+                                        type: SettingTypes.Snippets
                                     });
                                 }
                             }
@@ -310,7 +310,7 @@ export default class Config
                             } = { updated: [], removed: [] };
                             async.eachSeries(
                                 saveFiles,
-                                (item: IConfig, done: async.ErrorCallback<Error>) =>
+                                (item: ISetting, done: async.ErrorCallback<Error>) =>
                                 {
                                     this._saveItemContent(item).then((saved) =>
                                     {
@@ -356,7 +356,7 @@ export default class Config
      * Delete the physical files.
      * @param files Files list.
      */
-    removeConfigs(files: IConfig[]): Promise<ISyncStatus[]>
+    removeConfigs(files: ISetting[]): Promise<ISyncStatus[]>
     {
         return new Promise((resolve, reject) =>
         {
@@ -393,9 +393,9 @@ export default class Config
      * Get all snippet files.
      * @param snippetsDir Snippets dir.
      */
-    private _getSnippets(snippetsDir: string): IConfig[]
+    private _getSnippets(snippetsDir: string): ISetting[]
     {
-        const results: IConfig[] = [];
+        const results: ISetting[] = [];
         try
         {
             const filenames: string[] = fs.readdirSync(snippetsDir);
@@ -406,7 +406,7 @@ export default class Config
                     name: filename,
                     filepath: path.join(snippetsDir, filename),
                     remoteFilename: `${Config.SNIPPET_PREFIX}${filename}`,
-                    type: ConfigTypes.Snippets
+                    type: SettingTypes.Snippets
                 });
             });
         }
@@ -423,16 +423,16 @@ export default class Config
      * @param configs VSCode configs.
      * @param exclude Default is `true`, exclude the VSCode settings base on the exclude list of Syncing.
      */
-    private _loadContent(configs: IConfig[], exclude: boolean = true): Promise<IConfig[]>
+    private _loadContent(configs: ISetting[], exclude: boolean = true): Promise<ISetting[]>
     {
         return new Promise((resolve) =>
         {
             let content: string | undefined;
-            const results: IConfig[] = configs.map((item: IConfig) =>
+            const results: ISetting[] = configs.map((item: ISetting) =>
             {
                 try
                 {
-                    if (item.type === ConfigTypes.Extensions)
+                    if (item.type === SettingTypes.Extensions)
                     {
                         content = JSON.stringify(this._ext.getAll(), null, 4);
                     }
@@ -448,7 +448,7 @@ export default class Config
                 }
 
                 // Exclude settings.
-                if (exclude && item.type === ConfigTypes.Settings && content)
+                if (exclude && item.type === SettingTypes.Settings && content)
                 {
                     const settingsJSON = parse(content);
                     if (settingsJSON)
@@ -471,11 +471,11 @@ export default class Config
      * Save item content to file or sync extensions.
      * @param item Item of configs.
      */
-    private _saveItemContent(item: IConfig): Promise<ISyncStatus>
+    private _saveItemContent(item: ISetting): Promise<ISyncStatus>
     {
         return new Promise((resolve, reject) =>
         {
-            if (item.type === ConfigTypes.Extensions)
+            if (item.type === SettingTypes.Extensions)
             {
                 try
                 {
@@ -488,7 +488,7 @@ export default class Config
                     reject(new Error(`The extension list is broken: ${err.message}`));
                 }
             }
-            else if (item.type === ConfigTypes.Settings && item.content)
+            else if (item.type === SettingTypes.Settings && item.content)
             {
                 // TODO: refactor.
                 // Merge settings.
@@ -516,7 +516,7 @@ export default class Config
     /**
      * Save the config to disk.
      */
-    private _saveToFile(config: IConfig)
+    private _saveToFile(config: ISetting)
     {
         return fs.outputFile(config.filepath, config.content || "{}").then(() => ({ file: config }));
     }
@@ -524,7 +524,7 @@ export default class Config
     /**
      * Check if the downloading should be continued.
      */
-    private _checkIfContinue(configs: IConfig[], saveFiles: IConfig[], removeFiles: IConfig[])
+    private _checkIfContinue(configs: ISetting[], saveFiles: ISetting[], removeFiles: ISetting[])
     {
         return new Promise((resolve) =>
         {
@@ -536,8 +536,8 @@ export default class Config
                     // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
                     // 1. Get the excluded settings.
                     const remoteConfigs = saveFiles.map((file) => ({ ...file }));
-                    const remoteSettings = remoteConfigs.find((item) => (item.type === ConfigTypes.Settings));
-                    const localSettings = localConfigs.find((item) => (item.type === ConfigTypes.Settings));
+                    const remoteSettings = remoteConfigs.find((item) => (item.type === SettingTypes.Settings));
+                    const localSettings = localConfigs.find((item) => (item.type === SettingTypes.Settings));
                     if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
                     {
                         const localSettingsJSON = parse(localSettings.content);
@@ -577,7 +577,7 @@ export default class Config
     /**
      * Calculates the number of differences between the local and remote files.
      */
-    private _diffSettings(localFiles: IConfig[], remoteFiles: IConfig[]): number
+    private _diffSettings(localFiles: ISetting[], remoteFiles: ISetting[]): number
     {
         const left = this._parseToJSON(localFiles);
         const right = this._parseToJSON(remoteFiles);
@@ -587,7 +587,7 @@ export default class Config
     /**
      * Converts the `content` of `IConfig[]` into a `JSON object`.
      */
-    private _parseToJSON(configs: IConfig[]): any
+    private _parseToJSON(configs: ISetting[]): any
     {
         const result = {};
         let content: string;
