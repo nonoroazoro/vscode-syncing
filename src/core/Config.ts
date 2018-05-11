@@ -21,6 +21,11 @@ export default class Config
     private static _instance: Config;
 
     /**
+     * Suffix of remote mac files.
+     */
+    private static readonly MAC_SUFFIX: string = "-mac";
+
+    /**
      * Prefix of remote snippet files.
      */
     private static readonly SNIPPET_PREFIX: string = "snippet-";
@@ -59,11 +64,10 @@ export default class Config
      *        ...
      *    ]
      *
-     * @param {boolean} [load=false] Whether to load the content of VSCode settings files. Defaults to `false`.
+     * @param {boolean} [loadFileContent=false] Whether to load the content of `VSCode Settings` files. Defaults to `false`.
      * @param {boolean} [showIndicator=false] Whether to show the progress indicator. Defaults to `false`.
-     * @param {boolean} [full=false] Whether to load the full list of VSCode settings. Defaults to `false`.
      */
-    public getConfigs(load = false, showIndicator = false, full = false): Promise<ISetting[]>
+    public getConfigs(loadFileContent = false, showIndicator = false): Promise<ISetting[]>
     {
         return new Promise((resolve) =>
         {
@@ -81,70 +85,53 @@ export default class Config
                 Toast.showSpinner("Syncing: Gathering local settings.");
             }
 
-            // The item order is very important to ensure that the smaller files are synced first.
+            // Note that this is an ordered list, to ensure that the smaller files (such as `settings.json`, `keybindings.json`) are synced first.
             // Thus, the extensions will be the last one to sync.
-            const list = [
-                { name: "locale", type: SettingTypes.Locale },
-                { name: "snippets", type: SettingTypes.Snippets },
-                { name: "extensions", type: SettingTypes.Extensions }
+            const settingsList = [
+                SettingTypes.Settings,
+                SettingTypes.Keybindings,
+                SettingTypes.Locale,
+                SettingTypes.Snippets,
+                SettingTypes.Extensions
             ];
 
-            if (full)
-            {
-                list.unshift(
-                    { name: "settings-mac", type: SettingTypes.Settings },
-                    { name: "settings", type: SettingTypes.Settings },
-                    { name: "keybindings-mac", type: SettingTypes.Keybindings },
-                    { name: "keybindings", type: SettingTypes.Keybindings }
-                );
-            }
-            else
-            {
-                list.unshift(
-                    this._env.isMac ? { name: "settings-mac", type: SettingTypes.Settings }
-                        : { name: "settings", type: SettingTypes.Settings },
-                    this._env.isMac ? { name: "keybindings-mac", type: SettingTypes.Keybindings }
-                        : { name: "keybindings", type: SettingTypes.Keybindings }
-                );
-            }
-
-            let temp: ISetting[];
+            let tempSettings: ISetting[];
             let localFilename: string;
+            let remoteFilename: string;
             const results: ISetting[] = [];
             const errorFiles: string[] = [];
             async.eachSeries(
-                list,
-                (item, done) =>
+                settingsList,
+                (type, done) =>
                 {
-                    if (item.type === SettingTypes.Snippets)
+                    if (type === SettingTypes.Snippets)
                     {
                         // Attention: Snippets may be empty.
-                        temp = this._getSnippets(this._env.snippetsPath);
+                        tempSettings = this._getSnippets(this._env.snippetsPath);
                     }
                     else
                     {
-                        localFilename = `${item.name}.json`;
-                        if (item.name.includes("settings"))
+                        localFilename = `${type}.json`;
+                        remoteFilename = localFilename;
+                        if (type === SettingTypes.Settings || type === SettingTypes.Keybindings)
                         {
-                            localFilename = "settings.json";
-                        }
-                        else if (item.name.includes("keybindings"))
-                        {
-                            localFilename = "keybindings.json";
+                            remoteFilename = this._env.isMac
+                                ? `${type}${Config.MAC_SUFFIX}.json`
+                                : `${type}.json`;
                         }
 
-                        temp = [
+                        tempSettings = [
                             {
                                 filepath: path.join(this._env.codeUserPath, localFilename),
-                                remoteFilename: `${item.name}.json`,
-                                type: item.type
+                                remoteFilename,
+                                type
                             }
                         ];
                     }
 
-                    if (load)
+                    if (loadFileContent)
                     {
-                        this._loadContent(temp).then((values: ISetting[]) =>
+                        this._loadContent(tempSettings).then((values: ISetting[]) =>
                         {
                             values.forEach((value: ISetting) =>
                             {
@@ -163,7 +150,7 @@ export default class Config
                     }
                     else
                     {
-                        results.push(...temp);
+                        results.push(...tempSettings);
                         done();
                     }
                 },
