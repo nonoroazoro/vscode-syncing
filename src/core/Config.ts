@@ -135,7 +135,6 @@ export default class Config
 
                         temp = [
                             {
-                                filename: localFilename,
                                 filepath: path.join(this._env.codeUserPath, localFilename),
                                 remoteFilename: `${item.name}.json`,
                                 type: item.type
@@ -276,7 +275,6 @@ export default class Config
                                 {
                                     saveFiles.push({
                                         content: file.content,
-                                        filename,
                                         filepath: this._env.getSnippetFilePath(filename),
                                         remoteFilename: file.filename,
                                         type: SettingTypes.Snippets
@@ -400,7 +398,6 @@ export default class Config
             {
                 // Add prefix to all snippets.
                 results.push({
-                    filename,
                     filepath: path.join(snippetsDir, filename),
                     remoteFilename: `${Config.SNIPPET_PREFIX}${filename}`,
                     type: SettingTypes.Snippets

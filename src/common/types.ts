@@ -21,11 +21,6 @@ export interface ISetting
     content?: string;
 
     /**
-     * Settings local filename.
-     */
-    filename: string;
-
-    /**
      * Settings local filepath.
      */
     filepath: string;
