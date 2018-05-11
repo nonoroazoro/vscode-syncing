@@ -16,9 +16,9 @@ import * as Toast from "./Toast";
 /**
  * `VSCode Settings` wrapper.
  */
-export default class Config
+export default class VSCodeSetting
 {
-    private static _instance: Config;
+    private static _instance: VSCodeSetting;
 
     /**
      * Suffix of remote mac files.
@@ -40,15 +40,15 @@ export default class Config
     }
 
     /**
-     * Create an instance of singleton class `Config`.
+     * Create an instance of singleton class `VSCodeSetting`.
      */
-    public static create(context: vscode.ExtensionContext): Config
+    public static create(context: vscode.ExtensionContext): VSCodeSetting
     {
-        if (!Config._instance)
+        if (!VSCodeSetting._instance)
         {
-            Config._instance = new Config(context);
+            VSCodeSetting._instance = new VSCodeSetting(context);
         }
-        return Config._instance;
+        return VSCodeSetting._instance;
     }
 
     /**
@@ -116,7 +116,7 @@ export default class Config
                         if (type === SettingTypes.Settings || type === SettingTypes.Keybindings)
                         {
                             remoteFilename = this._env.isMac
-                                ? `${type}${Config.MAC_SUFFIX}.json`
+                                ? `${type}${VSCodeSetting.MAC_SUFFIX}.json`
                                 : `${type}.json`;
                         }
 
@@ -254,10 +254,10 @@ export default class Config
                         if (existsFileKeys.indexOf(key) === -1)
                         {
                             gistFile = files[key];
-                            if (gistFile.filename.startsWith(Config.SNIPPET_PREFIX))
+                            if (gistFile.filename.startsWith(VSCodeSetting.SNIPPET_PREFIX))
                             {
                                 // Snippets.
-                                filename = gistFile.filename.slice(Config.SNIPPET_PREFIX.length);
+                                filename = gistFile.filename.slice(VSCodeSetting.SNIPPET_PREFIX.length);
                                 if (filename)
                                 {
                                     settingsToSave.push({
@@ -386,7 +386,7 @@ export default class Config
                 // Add prefix to all snippets.
                 results.push({
                     filepath: path.join(snippetsDir, filename),
-                    remoteFilename: `${Config.SNIPPET_PREFIX}${filename}`,
+                    remoteFilename: `${VSCodeSetting.SNIPPET_PREFIX}${filename}`,
                     type: SettingTypes.Snippets
                 });
             });
