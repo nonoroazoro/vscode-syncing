@@ -139,9 +139,9 @@ export default class Config
                 Toast.showSpinner("Syncing: Gathering local settings.");
             }
 
-            // The item order is very important to ensure that the small files are synced first.
+            // The item order is very important to ensure that the smaller files are synced first.
             // Thus, the extensions will be the last one to sync.
-            const list: Array<{ name: string, type: ConfigTypes }> = [
+            const list = [
                 { name: "locale", type: ConfigTypes.File },
                 { name: "snippets", type: ConfigTypes.Folder },
                 { name: "extensions", type: ConfigTypes.File }
