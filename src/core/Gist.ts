@@ -4,7 +4,7 @@ import pick = require("lodash.pick");
 import * as vscode from "vscode";
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
-import { ISetting } from "../common/types";
+import { ISetting, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffHelper";
 import { excludeSettings, parse } from "../utils/jsonHelper";
 import * as GitHubTypes from "./GitHubTypes";
@@ -304,10 +304,10 @@ export default class Gist
                             const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
 
                             // 1. Get the excluded settings.
-                            const settingItem = uploads.find((item) => item.name.includes("settings"));
-                            if (settingItem)
+                            const settingsItem = uploads.find((item) => item.type === SettingTypes.Settings);
+                            if (settingsItem)
                             {
-                                const settingsName = settingItem.remoteFilename;
+                                const settingsName = settingsItem.remoteFilename;
                                 const localSettings = localFiles[settingsName];
                                 const remoteSettings = remoteFiles[settingsName];
                                 if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
