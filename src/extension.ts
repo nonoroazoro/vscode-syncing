@@ -1,4 +1,3 @@
-import * as fs from "fs";
 import * as moment from "moment";
 import * as vscode from "vscode";
 
@@ -15,14 +14,13 @@ let _isSyncing: boolean;
 
 export function activate(context: vscode.ExtensionContext)
 {
-    _initGlobals(context);
-    _initCommands(context);
+    _init(context);
 }
 
 /**
- * Init global variables.
+ * Init.
  */
-function _initGlobals(context: vscode.ExtensionContext)
+function _init(context: vscode.ExtensionContext)
 {
     _isSyncing = false;
     _config = Config.create(context);
@@ -30,10 +28,12 @@ function _initGlobals(context: vscode.ExtensionContext)
 
     // TODO: i18n, using vscode.env.language
     moment.locale("en");
+
+    _initCommands(context);
 }
 
 /**
- * Init Syncing's commands.
+ * Init extension commands.
  */
 function _initCommands(context: vscode.ExtensionContext)
 {
@@ -133,25 +133,11 @@ function _downloadSettings()
 }
 
 /**
- * Open Syncing's settings.
+ * Open Syncing's settings file in the VSCode editor.
  */
 function _openSettings()
 {
-    if (fs.existsSync(_syncing.settingsPath))
-    {
-        // Upgrade settings file for `Syncing` v1.5.0.
-        _syncing.migrateSettings().then(() =>
-        {
-            _openFile(_syncing.settingsPath);
-        });
-    }
-    else
-    {
-        _syncing.initSettings().then(() =>
-        {
-            _openFile(_syncing.settingsPath);
-        });
-    }
+    _syncing.openSettings();
 }
 
 /**
@@ -171,13 +157,4 @@ function _isExtensionsSynced(items: { updated: ISyncStatus[], removed: ISyncStat
         }
     }
     return false;
-}
-
-/**
- * Open file with VSCode.
- * @param filepath Full path of file.
- */
-function _openFile(filepath: string)
-{
-    vscode.commands.executeCommand("vscode.open", vscode.Uri.file(filepath));
 }
