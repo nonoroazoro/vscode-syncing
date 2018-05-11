@@ -5,59 +5,13 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
+import { ConfigTypes, IConfig } from "../common/types";
 import { diff } from "../utils/diffHelper";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonHelper";
 import Environment from "./Environment";
 import Extension, { IExtension, ISyncStatus } from "./Extension";
 import * as GitHubTypes from "./GitHubTypes";
 import * as Toast from "./Toast";
-
-/**
- * Represent the type of VSCode settings.
- */
-export enum ConfigTypes
-{
-    Extensions,
-
-    Keybindings,
-
-    Locale,
-
-    Settings,
-
-    Snippets
-}
-
-/**
- * Represent a VSCode settings.
- */
-export interface IConfig
-{
-    /**
-     * Settings filename.
-     */
-    name: string;
-
-    /**
-     * Settings content.
-     */
-    content?: string;
-
-    /**
-     * Settings local filepath.
-     */
-    filepath: string;
-
-    /**
-     * Settings filename in GitHub Gist.
-     */
-    remoteFilename: string;
-
-    /**
-     * Settings type.
-     */
-    type: ConfigTypes;
-}
 
 /**
  * VSCode configs wrapper.
