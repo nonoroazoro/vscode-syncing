@@ -60,27 +60,6 @@ export interface IConfig
 }
 
 /**
- * Represent the options of [getConfigs](#Config.getConfigs).
- */
-export interface IGetConfigOptions
-{
-    /**
-     * Whether to load the full list of VSCode settings. Defaults to `false`.
-     */
-    full?: boolean;
-
-    /**
-     * Whether to load the content of VSCode settings files. Defaults to `false`.
-     */
-    load?: boolean;
-
-    /**
-     * Whether to show the progress indicator. Defaults to `false`.
-     */
-    showIndicator?: boolean;
-}
-
-/**
  * VSCode configs wrapper.
  */
 export default class Config
@@ -125,8 +104,12 @@ export default class Config
      *        },
      *        ...
      *    ]
+     *
+     * @param {boolean} [load=false] Whether to load the content of VSCode settings files. Defaults to `false`.
+     * @param {boolean} [showIndicator=false] Whether to show the progress indicator. Defaults to `false`.
+     * @param {boolean} [full=false] Whether to load the full list of VSCode settings. Defaults to `false`.
      */
-    public getConfigs({ full = false, load = false, showIndicator = false }: IGetConfigOptions = {}): Promise<IConfig[]>
+    public getConfigs(load = false, showIndicator = false, full = false): Promise<IConfig[]>
     {
         return new Promise((resolve) =>
         {
