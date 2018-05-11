@@ -285,7 +285,7 @@ export default class Gist
                     // `null` content will be filtered out, just in case.
                     if (item.content)
                     {
-                        localGist.files[item.remote] = { content: item.content };
+                        localGist.files[item.remoteFilename] = { content: item.content };
                     }
                 }
 
@@ -307,7 +307,7 @@ export default class Gist
                             const settingItem = uploads.find((item) => item.name.includes("settings"));
                             if (settingItem)
                             {
-                                const settingsName = settingItem.remote;
+                                const settingsName = settingItem.remoteFilename;
                                 const localSettings = localFiles[settingsName];
                                 const remoteSettings = remoteFiles[settingsName];
                                 if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
