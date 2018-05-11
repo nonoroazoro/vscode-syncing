@@ -1,4 +1,4 @@
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
 
@@ -224,7 +224,7 @@ export default class Syncing
         {
             Object.assign(
                 settings,
-                JSON.parse(fs.readFileSync(this.settingsPath, "utf8"))
+                fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
             );
         }
         catch (err)
@@ -243,7 +243,7 @@ export default class Syncing
     {
         return new Promise((resolve) =>
         {
-            const content = JSON.stringify(settings, null, 4) || "{}";
+            const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
             fs.writeFile(this.settingsPath, content, (err) =>
             {
                 if (err && showToast)
@@ -260,21 +260,24 @@ export default class Syncing
      */
     openSettings()
     {
-        if (fs.existsSync(this.settingsPath))
+        fs.pathExists(this.settingsPath).then((exists) =>
         {
-            // Upgrade settings file for `Syncing` v1.5.0.
-            this.migrateSettings().then(() =>
+            if (exists)
             {
-                openFile(this.settingsPath);
-            });
-        }
-        else
-        {
-            this.initSettings().then(() =>
+                // Upgrade settings file for `Syncing` v1.5.0.
+                this.migrateSettings().then(() =>
+                {
+                    openFile(this.settingsPath);
+                });
+            }
+            else
             {
-                openFile(this.settingsPath);
-            });
-        }
+                this.initSettings().then(() =>
+                {
+                    openFile(this.settingsPath);
+                });
+            }
+        });
     }
 
     /**
