@@ -4,10 +4,10 @@ import pick = require("lodash.pick");
 import * as vscode from "vscode";
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
+import * as GitHubTypes from "../common/GitHubTypes";
 import { ISetting, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffHelper";
 import { excludeSettings, parse } from "../utils/jsonHelper";
-import * as GitHubTypes from "./GitHubTypes";
 import * as Toast from "./Toast";
 
 /**
