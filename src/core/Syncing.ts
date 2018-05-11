@@ -244,7 +244,7 @@ export default class Syncing
         return new Promise((resolve) =>
         {
             const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
-            fs.writeFile(this.settingsPath, content, (err) =>
+            fs.outputFile(this.settingsPath, content, (err) =>
             {
                 if (err && showToast)
                 {

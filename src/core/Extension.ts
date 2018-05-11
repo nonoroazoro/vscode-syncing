@@ -332,7 +332,7 @@ export default class Extension
                 fs.readJson(filepath, { encoding: "utf8" })
                     .then((packageJSON) =>
                     {
-                        return fs.writeJson(filepath, { ...packageJSON, __metadata: extension.__metadata });
+                        return fs.outputJson(filepath, { ...packageJSON, __metadata: extension.__metadata });
                     })
                     .then(resolve)
                     .catch(() => reject(`Cannot update extension's metadata: ${extension.id}.`));
