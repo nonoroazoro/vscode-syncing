@@ -4,7 +4,7 @@ import * as junk from "junk";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../constants";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
 import { diff } from "../utils/diffHelper";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonHelper";
 import Environment from "./Environment";
