@@ -1,3 +1,6 @@
+/**
+ * Represent the GitHub Gist.
+ */
 export interface IGist
 {
     comments: number;
@@ -19,6 +22,17 @@ export interface IGist
     user?: any;
 }
 
+/**
+ * Represent the `files` of GitHub Gist.
+ */
+export interface IGistFiles
+{
+    [key: string]: IGistFile;
+}
+
+/**
+ * Represent the `file` of GitHub Gist.
+ */
 export interface IGistFile
 {
     content: string;
@@ -30,11 +44,9 @@ export interface IGistFile
     type: string;
 }
 
-export interface IGistFiles
-{
-    [key: string]: IGistFile;
-}
-
+/**
+ * Represent the `owner` of GitHub Gist.
+ */
 export interface IGistOwner
 {
     avatar_url: string;
