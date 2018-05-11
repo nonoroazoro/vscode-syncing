@@ -72,7 +72,7 @@ function _uploadSettings()
                     }
                     else
                     {
-                        _syncing.saveSettings(Object.assign({}, settings, { id: gist.id })).then(() =>
+                        _syncing.saveSettings({ ...settings, id: gist.id }).then(() =>
                         {
                             Toast.statusInfo("Syncing: Settings uploaded.");
                         });
