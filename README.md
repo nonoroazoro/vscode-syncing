@@ -97,7 +97,7 @@ From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Set
 
     You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synced.
 
-    > Note that the settings not listed here will still be synced normally.
+    > Note that the settings not listed here will still be synced.
 
     Take this for example:
 
