@@ -1,5 +1,12 @@
 # Changelogs
 
+## 1.6.2 - May 11, 2018
+
+- Changed: Format `VSCode User Settings` file.
+- Changed: Replace `temp` with `tmp`.
+- Fixed: Automatically clean up temporary file and directory.
+
+
 ## 1.6.1 - May 10, 2018
 
 - Fixed: Replace `adm-zip` with `extract-zip` to fix a bug on windows, finally!
@@ -7,6 +14,7 @@
 
 ## 1.6.0 - May 09, 2018
 
+- Added: `README` for Simplified Chinese.
 - Added: [Poka-Yoke (Mistake-Proofing)](https://en.wikipedia.org/wiki/Poka-yoke), see [#25](https://github.com/nonoroazoro/vscode-syncing/issues/25) (Thank [@christianmalek](https://github.com/christianmalek) for the advice).
 - Added: Exclude VSCode settings from being synced, see [#29](https://github.com/nonoroazoro/vscode-syncing/issues/29) (Thank [@alexanderius](https://github.com/i4004) for the advice).
 - Fixed: Filter out system junk files such as `.DS_Store` and `Thumbs.db`.
@@ -25,27 +33,27 @@
 
 ## 1.5.1 - December 04, 2017
 
-- Added: Added `Breaking Changes` section in README.
+- Added: Added `Breaking Changes` section in `README`.
 - Changed: Simplified user guide.
 - Changed: Reduced extension file size.
 
 
 ## 1.5.0 - December 02, 2017
 
-- Added: Isolate the `http_proxy` setting into `Syncing`'s settings file (which means `Syncing` will no longer read proxy settings from `VSCode` settings), this may prevent a potential failure caused by wrong proxy settings while syncing between different devices (Thank [@mubaidr](https://github.com/mubaidr) for the advice).
+- Added: Separate the `http_proxy` setting into `Syncing`'s own settings file (which means `Syncing` will no longer read proxy settings from `VSCode` settings), this may prevent a potential failure caused by wrong proxy settings while syncing between different devices (Thank [@mubaidr](https://github.com/mubaidr) for the advice).
 - Added: Pick `http_proxy` settings from `http_proxy` and `https_proxy` environment variables.
 - Changed: Rewrite in `TypeScript`, now we have `typings`.
 
 
 ## 1.4.9 - September 16, 2017
 
-- Added: Empty extension's directory before installation.
+- Added: Empty extension's directory before the installation.
 - Changed: Enhance user guides.
 
 
 ## 1.4.8 - September 14, 2017
 
-- Revert shit: Getting Started and Example anchors aren't working in VSCode.
+- Revert shit: The links of getting started and example aren't working in VSCode marketplace.
 
 
 ## 1.4.7 - September 14, 2017
@@ -57,7 +65,7 @@
 
 ## 1.4.6 - September 14, 2017
 
-- Fixed: Getting Started link and Example link.
+- Fixed: Getting started link and Example link.
 
 
 ## 1.4.5 - September 14, 2017
@@ -69,7 +77,7 @@
 
 ## 1.4.4 - July 17, 2017
 
-- Fixed: Getting Started link.
+- Fixed: Getting started link.
 
 
 ## 1.4.3 - July 15, 2017
@@ -96,22 +104,22 @@
 
 ## 1.3.9 - June 09, 2017
 
-- Fixed: Using extension's local version to properly remove the old extensions.
+- Fixed: Use extension's local version to properly remove the old extensions.
 
 
 ## 1.3.8 - May 15, 2017
 
-- Changed: Tuning the timeout threshold to reduce the connection failures on slow networks.
+- Changed: Tweak the timeout threshold to reduce the connection failures on slow networks.
 
 
 ## 1.3.7 - May 04, 2017
 
-- Fixed: Reset Keyboard-Shortcuts image size.
+- Fixed: Reset keyboard-shortcuts image size.
 
 
 ## 1.3.6 - May 04, 2017
 
-- Changed: Resize Keyboard-Shortcuts image.
+- Changed: Resize keyboard-shortcuts image.
 
 
 ## 1.3.5 - May 04, 2017
@@ -131,18 +139,18 @@
 
 ## 1.3.2 - March 02, 2017
 
-- Changed: Update the messages of `Settings File Not Found` and `Setting File Invalid` errors.
+- Changed: The messages of `Settings File Not Found` and `Setting File Invalid` errors.
 - Fixed: Upload an `empty array` (instead of `null`) when extension list is empty, to avoid potential error.
 
 
 ## 1.3.1 - February 21, 2017
 
-- Fixed: Message error of Download dialog.
+- Fixed: The messages of download dialog.
 
 
 ## 1.3.0 - February 21, 2017
 
-- Changed: Upload and Download dialogs.
+- Changed: Upload and download dialogs.
 - Changed: Separate error messages of invalid GitHub Personal Access Token and Gist ID.
 - Changed: Enhance user guides.
 
@@ -173,4 +181,4 @@
 - Added: Hints of the synchronization.
 - Added: Show reload dialog when extensions are changed.
 - Added: Support download settings from public Gist.
-- Fixed: Synced extensions aren't managed by vscode.
+- Fixed: Sync extensions aren't managed by VSCode.
