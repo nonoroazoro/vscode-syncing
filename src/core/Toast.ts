@@ -5,9 +5,9 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
-import * as GitHubTypes from "./GitHubTypes";
-
+import { reloadWindow } from "../utils/vscodeHelper";
 import Gist from "./Gist";
+import * as GitHubTypes from "./GitHubTypes";
 
 /**
  * Represents the item of GistListBox.
@@ -221,7 +221,7 @@ export function showReloadBox(): void
     {
         if (selection === reloadButton)
         {
-            vscode.commands.executeCommand("workbench.action.reloadWindow");
+            reloadWindow();
         }
     });
 }
