@@ -3,15 +3,11 @@
  */
 export enum SettingTypes
 {
-    Extensions,
-
-    Keybindings,
-
-    Locale,
-
-    Settings,
-
-    Snippets
+    Extensions = "Extensions",
+    Keybindings = "Keybindings",
+    Locale = "Locale",
+    Settings = "Settings",
+    Snippets = "Snippets"
 }
 
 /**
