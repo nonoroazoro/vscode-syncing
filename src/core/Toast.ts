@@ -5,9 +5,9 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
+import * as GitHubTypes from "../common/GitHubTypes";
 import { reloadWindow } from "../utils/vscodeHelper";
 import Gist from "./Gist";
-import * as GitHubTypes from "./GitHubTypes";
 
 /**
  * Represents the item of GistListBox.

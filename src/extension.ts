@@ -1,10 +1,10 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
+import * as GitHubTypes from "./common/GitHubTypes";
 import { ISyncedItem } from "./common/types";
 import Config from "./core/Config";
 import Gist from "./core/Gist";
-import * as GitHubTypes from "./core/GitHubTypes";
 import Syncing from "./core/Syncing";
 import * as Toast from "./core/Toast";
 
