@@ -7,7 +7,7 @@ import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
-import { IConfig } from "./Config";
+import { IConfig } from "../common/types";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
 import * as Toast from "./Toast";
