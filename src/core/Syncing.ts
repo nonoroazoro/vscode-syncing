@@ -235,27 +235,6 @@ export default class Syncing
     }
 
     /**
-     * Save Syncing's settings to file: `syncing.json`.
-     * @param settings Syncing's Settings.
-     * @param showToast Whether to show error toast. Defaults to `false`.
-     */
-    saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
-    {
-        return new Promise((resolve) =>
-        {
-            const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
-            fs.outputFile(this.settingsPath, content, (err) =>
-            {
-                if (err && showToast)
-                {
-                    Toast.statusError(`Syncing: Cannot save Syncing's settings: ${err}`);
-                }
-                resolve();
-            });
-        });
-    }
-
-    /**
      * Open Syncing's settings file (`syncing.json`) in the VSCode editor.
      */
     openSettings()
@@ -277,6 +256,27 @@ export default class Syncing
                     openFile(this.settingsPath);
                 });
             }
+        });
+    }
+
+    /**
+     * Save Syncing's settings to file: `syncing.json`.
+     * @param settings Syncing's Settings.
+     * @param showToast Whether to show error toast. Defaults to `false`.
+     */
+    saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
+    {
+        return new Promise((resolve) =>
+        {
+            const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
+            fs.outputFile(this.settingsPath, content, (err) =>
+            {
+                if (err && showToast)
+                {
+                    Toast.statusError(`Syncing: Cannot save Syncing's settings: ${err}`);
+                }
+                resolve();
+            });
         });
     }
 
