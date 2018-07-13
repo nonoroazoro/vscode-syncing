@@ -2,6 +2,7 @@ import * as jsonc from "jsonc-parser";
 import * as minimatch from "minimatch";
 
 import { SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
+import { getJSONFormatOnSaveSetting } from "./vscodeHelper";
 
 /**
  * The default `ModificationOptions` of `jsonc-parser`.
@@ -42,8 +43,12 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: any, p
 
         if (modified)
         {
-            // Format if the result is modified.
-            result = format(result);
+            const formatOnSave = getJSONFormatOnSaveSetting(settingsJSON);
+            if (formatOnSave == null || formatOnSave)
+            {
+                // Format if the result is modified and formatOnSave is true or undefined.
+                result = format(result);
+            }
         }
     }
     return result;
@@ -91,8 +96,12 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
 
         if (modified)
         {
-            // Format if the result is modified.
-            result = format(result);
+            const formatOnSave = getJSONFormatOnSaveSetting(sSettingsJSON);
+            if (formatOnSave == null || formatOnSave)
+            {
+                // Format if the result is modified and formatOnSave is true or undefined.
+                result = format(result);
+            }
         }
     }
     return result;
