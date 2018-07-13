@@ -115,6 +115,7 @@ export default class VSCodeSetting
                         remoteFilename = localFilename;
                         if (type === SettingTypes.Settings || type === SettingTypes.Keybindings)
                         {
+                            // TODO: Merge settings files into one: The MAC_SUFFIX should be removed in the next release.
                             remoteFilename = this._env.isMac
                                 ? `${type}${VSCodeSetting.MAC_SUFFIX}.json`
                                 : `${type}.json`;
@@ -239,6 +240,24 @@ export default class VSCodeSetting
                         }
                         else
                         {
+                            // TODO: Merge settings files into one: Should be updated in the next release.
+                            if (setting.type === SettingTypes.Settings)
+                            {
+                                const fallbackSettingsRemoteFilename = this._env.isMac
+                                    ? `${setting.type}.json`
+                                    : `${setting.type}${VSCodeSetting.MAC_SUFFIX}.json`;
+                                const fallbackSettings = files[fallbackSettingsRemoteFilename];
+                                if (fallbackSettings)
+                                {
+                                    // Temp fallbackSettings file.
+                                    settingsToSave.push({
+                                        ...setting,
+                                        content: fallbackSettings.content
+                                    });
+                                    existsFileKeys.push(setting.remoteFilename);
+                                }
+                            }
+
                             // File exists in remote, but not exists in local.
                             // Delete if it's a snippet file.
                             if (setting.type === SettingTypes.Snippets)
