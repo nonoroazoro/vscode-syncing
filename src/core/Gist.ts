@@ -122,7 +122,8 @@ export default class Gist
                 Toast.showSpinner("Syncing: Checking remote settings.");
             }
 
-            this._api.gists.get({ id }).then(resolveWrap).catch(({ code }) =>
+            // TODO: Remove "as any" after the @octokit/rest is updated.
+            this._api.gists.get({ gist_id: id } as any).then(resolveWrap).catch(({ code }) =>
             {
                 rejectWrap(this._createError(code));
             });
@@ -157,7 +158,8 @@ export default class Gist
      */
     public delete(id: string): Promise<GitHubTypes.IGist>
     {
-        return this._api.gists.delete({ id }).then((res) => res.data);
+        // TODO: Remove "as any" after the @octokit/rest is updated.
+        return this._api.gists.delete({ gist_id: id } as any).then((res) => res.data);
     }
 
     /**
@@ -279,7 +281,7 @@ export default class Gist
 
             this.exists(id).then((exists) =>
             {
-                const localGist: { id: string, files: any } = { id, files: {} };
+                const localGist: { gist_id: string, files: any } = { gist_id: id, files: {} };
                 for (const item of uploads)
                 {
                     // `null` content will be filtered out, just in case.
@@ -337,7 +339,8 @@ export default class Gist
                                 {
                                     if (selection === okButton)
                                     {
-                                        this.update(localGist).then(resolveWrap).catch(rejectWrap);
+                                        // TODO: Remove "as any" after the @octokit/rest is updated.
+                                        this.update(localGist as any).then(resolveWrap).catch(rejectWrap);
                                     }
                                     else
                                     {
@@ -347,12 +350,14 @@ export default class Gist
                             }
                             else
                             {
-                                this.update(localGist).then(resolveWrap).catch(rejectWrap);
+                                // TODO: Remove "as any" after the @octokit/rest is updated.
+                                this.update(localGist as any).then(resolveWrap).catch(rejectWrap);
                             }
                         }
                         else
                         {
-                            this.update(localGist).then(resolveWrap).catch(rejectWrap);
+                            // TODO: Remove "as any" after the @octokit/rest is updated.
+                            this.update(localGist as any).then(resolveWrap).catch(rejectWrap);
                         }
                     }
                     else
