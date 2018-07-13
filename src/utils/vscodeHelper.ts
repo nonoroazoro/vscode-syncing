@@ -1,6 +1,29 @@
 import * as vscode from "vscode";
 
 /**
+ * Get `editor.formatOnSave` setting from the settings.
+ */
+export function getJSONFormatOnSaveSetting(settingsJSON: any): boolean | undefined
+{
+    let result: boolean | undefined;
+    const key = "editor.formatOnSave";
+    if (settingsJSON)
+    {
+        result = settingsJSON["[json]"] && settingsJSON["[json]"][key];
+        if (result == null)
+        {
+            result = settingsJSON["[jsonc]"] && settingsJSON["[jsonc]"][key];
+        }
+
+        if (result == null)
+        {
+            result = settingsJSON[key];
+        }
+    }
+    return result;
+}
+
+/**
  * Open file in the VSCode editor.
  * @param filepath The full path of file.
  */
