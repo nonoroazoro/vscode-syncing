@@ -21,7 +21,9 @@
 
         具体来说，从这个版本起：
 
-        * 上传时，`VSCode 用户设置` 将始终被上传至 `settings.json` 文件中；
+        * 上传时，`VSCode 用户设置` 将始终被上传至 `settings.json` 文件中，同时上传完毕后会自动删除 `settings-mac.json` 文件；
+
+            > 万一你想查看被删除的 `settings-mac.json` 中的内容，可以在你的 Gist Revisions（历史版本）中找到它。
 
         * 下载时，将会优先检测当前设备对应的配置文件，如果不存在，则尝试下载其他 `settings.json` 文件，以确保本次升不会破坏你现有的配置文件。
 
