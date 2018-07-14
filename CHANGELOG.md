@@ -1,5 +1,11 @@
 # Changelogs
 
+## 1.7.0 - July 13, 2018
+
+- Changed: Merge the `settings.json` and `settings-mac.json` files into one, i.e., the `settings.json` file.
+- Changed: Check the `editor.formatOnSave` setting before formating the settings file during the synchronization.
+
+
 ## 1.6.2 - May 11, 2018
 
 - Changed: Format `VSCode User Settings` file.

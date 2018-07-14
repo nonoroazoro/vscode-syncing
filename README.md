@@ -15,13 +15,17 @@
 
 ## Breaking Changes
 
-* From ***version 1.6.0*** onwards, I've introduced two important changes:
+* From ***version 1.7.0*** onwards:
 
-    1. **Exclude VSCode User Settings.**
+    * **`Syncing` will merge the `settings.json` and `settings-mac.json` files into one, i.e., the `settings.json` file, which will make it easy to sync between Windows/Mac/Linux machines.**
 
-    1. **Mistake-Proofing ([Poka-Yoke](https://en.wikipedia.org/wiki/Poka-yoke)).**
+        More specifically:
 
-    > Please [check out the VSCode User Settings](#vscode-user-settings) for more details.
+        * `VSCode User Settings` will always be uploaded as `settings.json`.
+
+        * And `Syncing` will try to download the `settings.json` corresponding to the current device, to ensure not to break your existing settings.
+
+        > Please note that the `keybindings` will still be synced separately.
 
 
 ## Features
@@ -31,7 +35,7 @@
 1. **Upload VSCode Settings**:
 
     * It will upload the `settings, keybindings, extensions, locales` and `snippets`.
-    * The `settings` and `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
+    * The `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
     * Automatically create a new Gist to store your settings.
     * Use an incremental algorithm to boost the synchronization.
     * You can `exclude some VSCode User Settings` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
@@ -97,7 +101,7 @@ From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Set
 
     You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synced.
 
-    > Note that the settings not listed here will still be synced normally.
+    > Note that the settings not listed here will still be synced.
 
     Take this for example:
 

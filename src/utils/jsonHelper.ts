@@ -1,7 +1,8 @@
 import * as jsonc from "jsonc-parser";
 import * as minimatch from "minimatch";
 
-import { SETTINGS_UPLOAD_EXCLUDE } from "../constants";
+import { SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
+import { getJSONFormatOnSaveSetting } from "./vscodeHelper";
 
 /**
  * The default `ModificationOptions` of `jsonc-parser`.
@@ -26,16 +27,29 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: any, p
     let result = settingsJSONString;
     if (settingsJSON && settingsJSONString)
     {
+        let modified = false;
+        let edits: jsonc.Edit[];
         const excludedKeys = getExcludeKeys(settingsJSON, patterns);
         for (const key of excludedKeys)
         {
             // Remove the listed properties.
-            result = jsonc.applyEdits(
-                result,
-                jsonc.modify(result, [key], void 0, JSONC_MODIFICATION_OPTIONS)
-            );
+            edits = jsonc.modify(result, [key], void 0, JSONC_MODIFICATION_OPTIONS);
+            if (edits.length > 0)
+            {
+                modified = true;
+            }
+            result = jsonc.applyEdits(result, edits);
         }
-        result = format(result);
+
+        if (modified)
+        {
+            const formatOnSave = getJSONFormatOnSaveSetting(settingsJSON);
+            if (formatOnSave == null || formatOnSave)
+            {
+                // Format if the result is modified and formatOnSave is true or undefined.
+                result = format(result);
+            }
+        }
     }
     return result;
 }
@@ -62,6 +76,8 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
 
         // Replace the source properties with the corresponding destination properties values.
         let dValue: any;
+        let modified = false;
+        let edits: jsonc.Edit[];
         for (const key of excludedKeys)
         {
             dValue = dSettingsJSON[key];
@@ -69,10 +85,24 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
             {
                 // Note that `dValue` could be `undefined`, which means removing the property from the source settings,
                 // otherwise replacing with the destination property value.
-                result = jsonc.applyEdits(result, jsonc.modify(result, [key], dValue, JSONC_MODIFICATION_OPTIONS));
+                edits = jsonc.modify(result, [key], dValue, JSONC_MODIFICATION_OPTIONS);
+                if (edits.length > 0)
+                {
+                    modified = true;
+                }
+                result = jsonc.applyEdits(result, edits);
             }
         }
-        result = format(result);
+
+        if (modified)
+        {
+            const formatOnSave = getJSONFormatOnSaveSetting(sSettingsJSON);
+            if (formatOnSave == null || formatOnSave)
+            {
+                // Format if the result is modified and formatOnSave is true or undefined.
+                result = format(result);
+            }
+        }
     }
     return result;
 }

@@ -3,11 +3,11 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
 import * as vscode from "vscode";
 
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../constants";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
+import * as GitHubTypes from "../common/GitHubTypes";
+import { ISetting, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffHelper";
 import { excludeSettings, parse } from "../utils/jsonHelper";
-import { IConfig } from "./Config";
-import * as GitHubTypes from "./GitHubTypes";
 import * as Toast from "./Toast";
 
 /**
@@ -122,7 +122,8 @@ export default class Gist
                 Toast.showSpinner("Syncing: Checking remote settings.");
             }
 
-            this._api.gists.get({ id }).then(resolveWrap).catch(({ code }) =>
+            // TODO: Remove "as any" after the @octokit/rest is updated.
+            this._api.gists.get({ gist_id: id } as any).then(resolveWrap).catch(({ code }) =>
             {
                 rejectWrap(this._createError(code));
             });
@@ -157,7 +158,8 @@ export default class Gist
      */
     public delete(id: string): Promise<GitHubTypes.IGist>
     {
-        return this._api.gists.delete({ id }).then((res) => res.data);
+        // TODO: Remove "as any" after the @octokit/rest is updated.
+        return this._api.gists.delete({ gist_id: id } as any).then((res) => res.data);
     }
 
     /**
@@ -250,7 +252,7 @@ export default class Gist
      * @param upsert Default is `true`, create new if gist not exists.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
-    public findAndUpdate(id: string, uploads: IConfig[], upsert = true, showIndicator = false): Promise<GitHubTypes.IGist>
+    public findAndUpdate(id: string, uploads: ISetting[], upsert = true, showIndicator = false): Promise<GitHubTypes.IGist>
     {
         return new Promise((resolve, reject) =>
         {
@@ -279,13 +281,21 @@ export default class Gist
 
             this.exists(id).then((exists) =>
             {
-                const localGist: { id: string, files: any } = { id, files: {} };
+                const localGist: { gist_id: string, files: any } = { gist_id: id, files: {} };
                 for (const item of uploads)
                 {
                     // `null` content will be filtered out, just in case.
                     if (item.content)
                     {
-                        localGist.files[item.remote] = { content: item.content };
+                        if (item.type === SettingTypes.Settings)
+                        {
+                            // TODO: Merge settings files into one: Should be removed in the next release.
+                            localGist.files["settings.json"] = { content: item.content };
+                        }
+                        else
+                        {
+                            localGist.files[item.remoteFilename] = { content: item.content };
+                        }
                     }
                 }
 
@@ -304,10 +314,10 @@ export default class Gist
                             const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
 
                             // 1. Get the excluded settings.
-                            const settingItem = uploads.find((item) => item.name.includes("settings"));
-                            if (settingItem)
+                            const settingsItem = uploads.find((item) => item.type === SettingTypes.Settings);
+                            if (settingsItem)
                             {
-                                const settingsName = settingItem.remote;
+                                const settingsName = settingsItem.remoteFilename;
                                 const localSettings = localFiles[settingsName];
                                 const remoteSettings = remoteFiles[settingsName];
                                 if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
@@ -337,7 +347,8 @@ export default class Gist
                                 {
                                     if (selection === okButton)
                                     {
-                                        this.update(localGist).then(resolveWrap).catch(rejectWrap);
+                                        // TODO: Remove "as any" after the @octokit/rest is updated.
+                                        this.update(localGist as any).then(resolveWrap).catch(rejectWrap);
                                     }
                                     else
                                     {
@@ -347,12 +358,14 @@ export default class Gist
                             }
                             else
                             {
-                                this.update(localGist).then(resolveWrap).catch(rejectWrap);
+                                // TODO: Remove "as any" after the @octokit/rest is updated.
+                                this.update(localGist as any).then(resolveWrap).catch(rejectWrap);
                             }
                         }
                         else
                         {
-                            this.update(localGist).then(resolveWrap).catch(rejectWrap);
+                            // TODO: Remove "as any" after the @octokit/rest is updated.
+                            this.update(localGist as any).then(resolveWrap).catch(rejectWrap);
                         }
                     }
                     else

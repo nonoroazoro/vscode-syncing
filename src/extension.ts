@@ -1,39 +1,38 @@
-import * as fs from "fs";
 import * as moment from "moment";
 import * as vscode from "vscode";
 
-import Config from "./core/Config";
-import { ISyncStatus } from "./core/Extension";
+import { ISyncedItem } from "./common/types";
 import Gist from "./core/Gist";
-import * as GitHubTypes from "./core/GitHubTypes";
 import Syncing from "./core/Syncing";
 import * as Toast from "./core/Toast";
+import VSCodeSetting from "./core/VSCodeSetting";
 
-let _config: Config;
 let _syncing: Syncing;
 let _isSyncing: boolean;
+let _vscodeSetting: VSCodeSetting;
 
 export function activate(context: vscode.ExtensionContext)
 {
-    _initGlobals(context);
+    _init(context);
+}
+
+/**
+ * Init.
+ */
+function _init(context: vscode.ExtensionContext)
+{
+    _isSyncing = false;
+    _syncing = Syncing.create(context);
+    _vscodeSetting = VSCodeSetting.create(context);
+
+    // TODO: i18n, using vscode.env.language
+    moment.locale("en");
+
     _initCommands(context);
 }
 
 /**
- * Init global variables.
- */
-function _initGlobals(context: vscode.ExtensionContext)
-{
-    _isSyncing = false;
-    _config = Config.create(context);
-    _syncing = Syncing.create(context);
-
-    // TODO: i18n, using vscode.env.language
-    moment.locale("en");
-}
-
-/**
- * Init Syncing's commands.
+ * Init extension commands.
  */
 function _initCommands(context: vscode.ExtensionContext)
 {
@@ -59,20 +58,20 @@ function _uploadSettings()
     if (!_isSyncing)
     {
         _isSyncing = true;
-        _syncing.prepareUploadSettings(true).then((settings) =>
+        _syncing.prepareUploadSettings(true).then((syncingSettings) =>
         {
-            const api = Gist.create(settings.token, _syncing.proxy);
-            return _config.getConfigs({ load: true, showIndicator: true }).then((configs) =>
+            const api = Gist.create(syncingSettings.token, _syncing.proxy);
+            return _vscodeSetting.getSettings(true, true).then((settings) =>
             {
-                return api.findAndUpdate(settings.id, configs, true, true).then((gist: GitHubTypes.IGist) =>
+                return api.findAndUpdate(syncingSettings.id, settings, true, true).then((gist) =>
                 {
-                    if (gist.id === settings.id)
+                    if (gist.id === syncingSettings.id)
                     {
                         Toast.statusInfo("Syncing: Settings uploaded.");
                     }
                     else
                     {
-                        _syncing.saveSettings(Object.assign({}, settings, { id: gist.id })).then(() =>
+                        _syncing.saveSettings({ ...syncingSettings, id: gist.id }).then(() =>
                         {
                             Toast.statusInfo("Syncing: Settings uploaded.");
                         });
@@ -96,16 +95,16 @@ function _downloadSettings()
     if (!_isSyncing)
     {
         _isSyncing = true;
-        _syncing.prepareDownloadSettings(true).then((settings) =>
+        _syncing.prepareDownloadSettings(true).then((syncingSettings) =>
         {
-            const api = Gist.create(settings.token, _syncing.proxy);
-            return api.get(settings.id, true).then((gist) =>
+            const api = Gist.create(syncingSettings.token, _syncing.proxy);
+            return api.get(syncingSettings.id, true).then((gist) =>
             {
-                return _config.saveConfigs(gist.files, true).then((synced) =>
+                return _vscodeSetting.saveSettings(gist.files, true).then((syncedItems) =>
                 {
                     // TODO: log synced files.
                     Toast.statusInfo("Syncing: Settings downloaded.");
-                    if (_isExtensionsSynced(synced))
+                    if (_isExtensionsSynced(syncedItems))
                     {
                         Toast.showReloadBox();
                     }
@@ -133,33 +132,19 @@ function _downloadSettings()
 }
 
 /**
- * Open Syncing's settings.
+ * Open Syncing's settings file in the VSCode editor.
  */
 function _openSettings()
 {
-    if (fs.existsSync(_syncing.settingsPath))
-    {
-        // Upgrade settings file for `Syncing` v1.5.0.
-        _syncing.migrateSettings().then(() =>
-        {
-            _openFile(_syncing.settingsPath);
-        });
-    }
-    else
-    {
-        _syncing.initSettings().then(() =>
-        {
-            _openFile(_syncing.settingsPath);
-        });
-    }
+    _syncing.openSettings();
 }
 
 /**
  * Check if extensions are actually synced.
  */
-function _isExtensionsSynced(items: { updated: ISyncStatus[], removed: ISyncStatus[] }): boolean
+function _isExtensionsSynced(syncedItems: { updated: ISyncedItem[], removed: ISyncedItem[] }): boolean
 {
-    for (const item of items.updated)
+    for (const item of syncedItems.updated)
     {
         if (item.extension && (
             item.extension.added.length > 0
@@ -171,13 +156,4 @@ function _isExtensionsSynced(items: { updated: ISyncStatus[], removed: ISyncStat
         }
     }
     return false;
-}
-
-/**
- * Open file with VSCode.
- * @param filepath Full path of file.
- */
-function _openFile(filepath: string)
-{
-    vscode.commands.executeCommand("vscode.open", vscode.Uri.file(filepath));
 }

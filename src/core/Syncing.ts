@@ -1,15 +1,16 @@
-import * as fs from "fs";
+import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
 
+import { openFile } from "../utils/vscodeHelper";
 import Environment from "./Environment";
 import Gist from "./Gist";
 import * as Toast from "./Toast";
 
 /**
- * Represent the settings of `Syncing`.
+ * Represent the `Syncing Settings`.
  */
-export interface ISyncingSettings
+interface ISyncingSettings
 {
     /**
      * Store GitHub Gist ID.
@@ -223,7 +224,7 @@ export default class Syncing
         {
             Object.assign(
                 settings,
-                JSON.parse(fs.readFileSync(this.settingsPath, "utf8"))
+                fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
             );
         }
         catch (err)
@@ -231,6 +232,31 @@ export default class Syncing
             console.error(`Syncing: Error loading Syncing's settings: ${err}`);
         }
         return settings;
+    }
+
+    /**
+     * Open Syncing's settings file (`syncing.json`) in the VSCode editor.
+     */
+    openSettings()
+    {
+        fs.pathExists(this.settingsPath).then((exists) =>
+        {
+            if (exists)
+            {
+                // Upgrade settings file for `Syncing` v1.5.0.
+                this.migrateSettings().then(() =>
+                {
+                    openFile(this.settingsPath);
+                });
+            }
+            else
+            {
+                this.initSettings().then(() =>
+                {
+                    openFile(this.settingsPath);
+                });
+            }
+        });
     }
 
     /**
@@ -242,8 +268,8 @@ export default class Syncing
     {
         return new Promise((resolve) =>
         {
-            const content = JSON.stringify(settings, null, 4) || "{}";
-            fs.writeFile(this.settingsPath, content, (err) =>
+            const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
+            fs.outputFile(this.settingsPath, content, (err) =>
             {
                 if (err && showToast)
                 {
