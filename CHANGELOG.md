@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.7.2 - July 14, 2018
+
+- Fixed: An error during the uploading.
+
+
 ## 1.7.1 - July 14, 2018
 
 - Changed: Delete the `settings-mac.json` file automatically after uploading.
