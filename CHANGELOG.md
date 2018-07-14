@@ -2,7 +2,7 @@
 
 ## 1.7.0 - July 13, 2018
 
-- Changed: Merge `settings.json`, `settings-mac.json` into one single file, i.e., the `settings.json` file.
+- Changed: Merge the `settings.json` and `settings-mac.json` files into one, i.e., the `settings.json` file.
 - Changed: Check the `editor.formatOnSave` setting before formating the settings file during the synchronization.
 
 
