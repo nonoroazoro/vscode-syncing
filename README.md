@@ -23,7 +23,7 @@
 
         * `VSCode User Settings` will always be uploaded as `settings.json`, and **the `settings-mac.json` file will be deleted automatically**.
 
-            > In case you may still need the deleted `settings-mac.json` file, you can find it in your Gist revisions,
+            > In case you may still need the `settings-mac.json` file, you will find it in the `revisions` of your `Gist`.
 
         * And `Syncing` will try to download the `settings.json` corresponding to the current device, to ensure not to break your existing settings.
 
