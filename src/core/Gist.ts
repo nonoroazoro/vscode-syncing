@@ -307,7 +307,10 @@ export default class Gist
                     if (localGist.files)
                     {
                         // TODO: Should be removed in the next release.
-                        localGist.files["settings-mac.json"] = null;
+                        if (remoteGist.files["settings-mac.json"])
+                        {
+                            localGist.files["settings-mac.json"] = null;
+                        }
 
                         // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
                         const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
