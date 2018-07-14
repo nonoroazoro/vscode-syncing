@@ -15,13 +15,17 @@
 
 ## 重要变更
 
-* `Syncing` 从 ***1.6.0*** 版本开始将会带来以下两个重要变更：
+* 从 ***1.7.0*** 版本开始起：
 
-    1. **在同步时允许忽略指定的 VSCode 配置项；**
+    * **`Syncing` 将不再按照操作系统来分开同步 `VSCode 用户设置`文件，即 Windows、Mac 和 Linux 都将使用同一个 `settings.json` 文件。**
 
-    1. **加入了[防呆设计](https://zh.wikipedia.org/wiki/%E9%98%B2%E5%91%86)。**
+        具体来说，从这个版本起：
 
-    > 具体请参考 `Syncing` 新增的 [VSCode 配置项](#vscode-配置项)。
+        * 上传时，`VSCode 用户设置` 将始终被上传至 `settings.json` 文件中；
+
+        * 下载时，将会优先检测当前设备对应的配置文件，如果不存在，则尝试下载其他 `settings.json` 文件，以确保本次升不会破坏你现有的配置文件。
+
+        > 注意：`keybindings`（即快捷键配置）依然会分开同步。
 
 
 ## 功能
@@ -31,7 +35,7 @@
 1. **上传 VSCode 配置**:
 
     * 上传的配置包括： `settings, keybindings, extensions, locales` 以及所有 `snippets`；
-    * 因为 `Mac` 和`非 Mac` 设备的配置通常会有一些差异，所以 `settings` 和 `keybindings` 将会按照设备类型分别上传；
+    * 因为 `Mac` 和`非 Mac` 设备的配置通常会有一些差异，所以 `keybindings` 将会按照设备类型分别上传；
     * 自动帮你创建新的 `Gist` 来保存 VSCode 配置，例如当你第一次使用这个插件上传配置时；
     * 为了加快同步速度，整个同步过程都是`增量`的；
     * 你可以`忽略某些 VSCode 配置项`，以防止它们被上传，具体请参考[这里](#vscode-配置项)。
