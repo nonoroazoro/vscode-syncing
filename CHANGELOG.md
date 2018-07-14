@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.7.1 - July 14, 2018
+
+- Changed: Delete the `settings-mac.json` file automatically after uploading.
+
+
 ## 1.7.0 - July 13, 2018
 
 - Changed: Merge the `settings.json` and `settings-mac.json` files into one, i.e., the `settings.json` file.
