@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "Syncing",
     "description": "Sync all of your VSCode settings across multiple devices.",
-    "version": "1.7.2",
+    "version": "1.7.3",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
