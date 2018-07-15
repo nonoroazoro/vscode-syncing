@@ -17,7 +17,7 @@
 
 * From ***version 1.7.0*** onwards:
 
-    * **`Syncing` will merge the `settings.json` and `settings-mac.json` files into one, i.e., the `settings.json` file, which will make it easy to sync between Windows/Mac/Linux machines.**
+    * `Syncing` will **merge the `settings.json` and `settings-mac.json` files into one**, i.e., the `settings.json` file, which will make it easy to sync between Windows/Mac/Linux devices.
 
         More specifically:
 
@@ -25,7 +25,7 @@
 
             > In case you may still need the `settings-mac.json` file, you will find it in the `revisions` of your `Gist`.
 
-        * And `Syncing` will try to download the `settings.json` corresponding to the current device, to ensure not to break your existing settings.
+        * `Syncing` will try to download the `settings.json` corresponding to the current device, to ensure this upgrade will not break your existing settings.
 
         > Please note that the `keybindings` will still be synced separately.
 
