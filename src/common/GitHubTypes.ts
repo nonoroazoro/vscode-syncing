@@ -1,5 +1,5 @@
 /**
- * Represent the GitHub Gist.
+ * Represents the GitHub Gist.
  */
 export interface IGist
 {
@@ -23,7 +23,7 @@ export interface IGist
 }
 
 /**
- * Represent the `files` of GitHub Gist.
+ * Represents the `files` of GitHub Gist.
  */
 export interface IGistFiles
 {
@@ -31,7 +31,7 @@ export interface IGistFiles
 }
 
 /**
- * Represent the `file` of GitHub Gist.
+ * Represents the `file` of GitHub Gist.
  */
 export interface IGistFile
 {
@@ -45,7 +45,7 @@ export interface IGistFile
 }
 
 /**
- * Represent the `owner` of GitHub Gist.
+ * Represents the `owner` of GitHub Gist.
  */
 export interface IGistOwner
 {

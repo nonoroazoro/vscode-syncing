@@ -1,5 +1,5 @@
 /**
- * Represent the types of various `VSCode Setting`, such as `Extensions`, `Keybindings`...
+ * Represents the types of the various `VSCode Settings`, such as `Extensions`, `Keybindings`...
  */
 export enum SettingTypes
 {
@@ -11,7 +11,7 @@ export enum SettingTypes
 }
 
 /**
- * Represent a `VSCode Setting`.
+ * Represents a `VSCode Setting`.
  */
 export interface ISetting
 {
@@ -37,7 +37,7 @@ export interface ISetting
 }
 
 /**
- * Represent a VSCode extension.
+ * Represents a VSCode extension.
  */
 export interface IExtension
 {
@@ -78,7 +78,7 @@ export interface IExtension
 }
 
 /**
- * Represent the currently synced item.
+ * Represents the currently synced item.
  */
 export interface ISyncedItem
 {
