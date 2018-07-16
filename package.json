@@ -1,7 +1,7 @@
 {
     "name": "syncing",
     "displayName": "Syncing",
-    "description": "Sync all of your VSCode settings across multiple devices.",
+    "description": "Synchronize all of your VSCode settings across multiple devices.",
     "version": "1.7.3",
     "publisher": "nonoroazoro",
     "author": {
@@ -28,9 +28,10 @@
         "Other"
     ],
     "keywords": [
-        "sync-settings",
         "sync",
+        "sync-settings",
         "syncing",
+        "vscode-sync",
         "vscode-syncing"
     ],
     "activationEvents": [
