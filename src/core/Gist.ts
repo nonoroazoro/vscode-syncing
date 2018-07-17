@@ -425,7 +425,7 @@ export default class Gist
             else
             {
                 // remove remote file (don't remove remote keybindings and settings).
-                if (!key.includes("keybindings") && !key.includes("settings"))
+                if (!key.includes(SettingTypes.Keybindings) && !key.includes(SettingTypes.Settings))
                 {
                     result[key] = null;
                 }
