@@ -372,7 +372,7 @@ export default class VSCodeSetting
                         done();
                     }).catch((err) =>
                     {
-                        done(new Error(`Cannot save file: ${item.remoteFilename} : ${err.message}`));
+                        done(new Error(`Cannot remove settings file: ${item.remoteFilename} : ${err.message}`));
                     });
                 },
                 (err) =>
