@@ -1,13 +1,12 @@
 import * as async from "async";
 import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
-import * as https from "https";
-import * as HttpsProxyAgent from "https-proxy-agent";
 import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
 import { IExtension, ISyncedItem } from "../common/types";
+import { downloadFile } from "../utils/ajax";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
 import * as Toast from "./Toast";
@@ -76,20 +75,17 @@ export default class Extension
     {
         let item: IExtension;
         const result: IExtension[] = [];
-        for (const ext of vscode.extensions.all)
+        for (const { packageJSON } of vscode.extensions.all)
         {
-            if (includeBuiltin || !ext.packageJSON.isBuiltin)
+            if (includeBuiltin || !packageJSON.isBuiltin)
             {
                 item = {
-                    id: `${ext.packageJSON.publisher}.${ext.packageJSON.name}`,
-                    name: ext.packageJSON.name,
-                    publisher: ext.packageJSON.publisher,
-                    version: ext.packageJSON.version
+                    id: packageJSON.id,
+                    uuid: packageJSON.uuid,
+                    name: packageJSON.name,
+                    publisher: packageJSON.publisher,
+                    version: packageJSON.version
                 };
-                if (ext.packageJSON.__metadata)
-                {
-                    item.__metadata = ext.packageJSON.__metadata;
-                }
                 result.push(item);
             }
         }
@@ -173,31 +169,15 @@ export default class Extension
                 }
 
                 const file = fs.createWriteStream(filepath);
-                file.on("finish", () =>
+                downloadFile(
+                    // tslint:disable-next-line
+                    `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`,
+                    file,
+                    this._syncing.proxy
+                ).then(() =>
                 {
                     resolve({ ...extension, zip: filepath });
-                }).on("error", reject);
-
-                const options: https.RequestOptions = {
-                    host: `${extension.publisher}.gallery.vsassets.io`,
-                    path: `/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
-                };
-                const proxy = this._syncing.proxy;
-                if (proxy)
-                {
-                    options.agent = new HttpsProxyAgent(proxy);
-                }
-                https.get(options, (res) =>
-                {
-                    if (res.statusCode === 200)
-                    {
-                        res.pipe(file);
-                    }
-                    else
-                    {
-                        reject();
-                    }
-                }).on("error", reject);
+                }).catch(reject);
             });
         });
     }
@@ -255,31 +235,6 @@ export default class Extension
     }
 
     /**
-     * Update extension's __metadata (post-process).
-     */
-    updateMetadata(extension: IExtension): Promise<void>
-    {
-        return new Promise((resolve, reject) =>
-        {
-            if (extension && extension.__metadata && extension.path)
-            {
-                const filepath = path.join(extension.path, "package.json");
-                fs.readJson(filepath, { encoding: "utf8" })
-                    .then((packageJSON) =>
-                    {
-                        return fs.outputJson(filepath, { ...packageJSON, __metadata: extension.__metadata });
-                    })
-                    .then(resolve)
-                    .catch(() => reject(`Cannot update extension's metadata: ${extension.id}.`));
-            }
-            else
-            {
-                resolve();
-            }
-        });
-    }
-
-    /**
      * Uninstall extension.
      */
     uninstallExtension(extension: IExtension): Promise<IExtension>
@@ -325,6 +280,7 @@ export default class Extension
             };
             if (extensions)
             {
+                // TODO: Query extensions and auto-upgrade (add to updated array).
                 let localExtension: vscode.Extension<any>;
                 const reservedExtensionIDs: string[] = [];
 
@@ -397,10 +353,6 @@ export default class Extension
                             }
                             return this.extractExtension(extension);
                         })
-                        .then((extension) =>
-                        {
-                            return this.updateMetadata(extension);
-                        })
                         .then(() =>
                         {
                             result.added.push(item);
@@ -458,10 +410,6 @@ export default class Extension
                                 Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
                             }
                             return this.extractExtension(extension);
-                        })
-                        .then((extension) =>
-                        {
-                            return this.updateMetadata(extension);
                         })
                         .then(() =>
                         {
