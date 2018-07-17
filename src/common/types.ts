@@ -47,6 +47,11 @@ export interface IExtension
     id: string;
 
     /**
+     * The extension's UUID.
+     */
+    uuid: string;
+
+    /**
      * The extension's name.
      */
     name: string;
@@ -62,19 +67,14 @@ export interface IExtension
     version: string;
 
     /**
-     * The extension's metadata.
+     * The installed extension's folder path.
      */
-    __metadata?: string;
+    path?: string;
 
     /**
      * The downloaded extension's zip file path.
      */
     zip?: string;
-
-    /**
-     * The installed extension's folder path.
-     */
-    path?: string;
 }
 
 /**
