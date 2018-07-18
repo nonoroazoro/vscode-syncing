@@ -210,7 +210,7 @@ export default class Extension
                             }
                             else
                             {
-                                const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
+                                const extPath = this._env.getExtensionPath(extension);
                                 fs.emptyDir(extPath)
                                     .then(() =>
                                     {
