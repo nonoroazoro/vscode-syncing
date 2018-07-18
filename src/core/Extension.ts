@@ -6,7 +6,9 @@ import * as tmp from "tmp";
 import * as vscode from "vscode";
 
 import { IExtension, ISyncedItem } from "../common/types";
+import { IExtensionMeta } from "../common/vscodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
+import { queryExtensions } from "../utils/vscodeWebAPI";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
 import * as Toast from "./Toast";
@@ -260,66 +262,83 @@ export default class Extension
     /**
      * Get extensions that are added/updated/removed.
      */
-    private _getDifferentExtensions(extensions: IExtension[]): Promise<{
+    private async _getDifferentExtensions(extensions: IExtension[]): Promise<{
         added: IExtension[],
         removed: IExtension[],
         updated: IExtension[],
         total: number
     }>
     {
-        return new Promise((resolve) =>
-        {
-            const result = {
-                added: [] as IExtension[],
-                removed: [] as IExtension[],
-                updated: [] as IExtension[],
-                get total()
-                {
-                    return this.added.length + this.removed.length + this.updated.length;
-                }
-            };
-            if (extensions)
+        const result = {
+            added: [] as IExtension[],
+            removed: [] as IExtension[],
+            updated: [] as IExtension[],
+            get total()
             {
-                // TODO: Query extensions and auto-upgrade (add to updated array).
-                let localExtension: vscode.Extension<any>;
-                const reservedExtensionIDs: string[] = [];
+                return this.added.length + this.removed.length + this.updated.length;
+            }
+        };
+        if (extensions)
+        {
+            // Query latest extensions meta data.
+            const ids = extensions.map((ext) => ext.uuid).filter((id) => id != null);
+            const extensionMetaMap = await queryExtensions(ids, this._syncing.proxy);
 
-                // Find added & updated extensions.
-                for (const ext of extensions)
+            let latestVersion: string | undefined;
+            let extensionMeta: IExtensionMeta | undefined;
+            let localExtension: vscode.Extension<any>;
+            const reservedExtensionIDs: string[] = [];
+
+            // Find added & updated extensions.
+            for (const ext of extensions)
+            {
+                // Upgrade to the latest version if available.
+                extensionMeta = extensionMetaMap.get(ext.uuid);
+                if (extensionMeta)
                 {
-                    localExtension = vscode.extensions.getExtension(ext.id);
-                    if (localExtension)
+                    latestVersion = extensionMeta.versions[0] && extensionMeta.versions[0].version;
+                    if (latestVersion && latestVersion !== ext.version)
                     {
-                        if (localExtension.packageJSON.version === ext.version)
-                        {
-                            // Reserved.
-                            reservedExtensionIDs.push(ext.id);
-                        }
-                        else
-                        {
-                            // Updated.
-                            result.updated.push(ext);
-                        }
+                        ext.version = latestVersion;
+                    }
+                }
+
+                localExtension = vscode.extensions.getExtension(ext.id);
+                if (localExtension)
+                {
+                    if (localExtension.packageJSON.version === ext.version)
+                    {
+                        // Reserved.
+                        reservedExtensionIDs.push(ext.id);
                     }
                     else
                     {
-                        // Added.
-                        result.added.push(ext);
+                        // Updated.
+                        result.updated.push(ext);
                     }
                 }
-
-                const localExtensions: IExtension[] = this.getAll();
-                for (const ext of localExtensions)
+                else
                 {
-                    if (reservedExtensionIDs.indexOf(ext.id) === -1)
-                    {
-                        // Removed.
-                        result.removed.push(ext);
-                    }
+                    // Added.
+                    result.added.push(ext);
                 }
             }
-            resolve(result);
-        });
+
+            // Find removed extensions.
+            const localExtensions: IExtension[] = this.getAll();
+            for (const ext of localExtensions)
+            {
+                if (reservedExtensionIDs.indexOf(ext.id) === -1)
+                {
+                    // Removed.
+                    result.removed.push(ext);
+                }
+            }
+
+            // Clear map.
+            extensionMetaMap.clear();
+        }
+        return result;
     }
 
     /**
