@@ -2,6 +2,8 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
+import { IExtension } from "../common/types";
+
 /**
  * VSCode environment wrapper.
  */
@@ -97,6 +99,14 @@ export default class Environment
     public getSnippetFilePath(filename: string): string
     {
         return path.join(this.snippetsPath, filename);
+    }
+
+    /**
+     * Get the path of an extension.
+     */
+    public getExtensionPath(extension: IExtension): string
+    {
+        return path.join(this.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
     }
 
     private _getCodeBasePath(isInsiders: boolean): string
