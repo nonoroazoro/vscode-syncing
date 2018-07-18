@@ -9,6 +9,11 @@ import { post } from "./ajax";
  */
 export function queryExtensions(ids: string[], proxy?: string): Promise<IExtensionMeta[]>
 {
+    if (ids.length === 0)
+    {
+        return Promise.resolve([]);
+    }
+
     const api = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery";
     const headers = {
         Accept: "application/json;api-version=3.0-preview.1"
