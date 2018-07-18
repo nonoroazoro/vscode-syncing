@@ -3,6 +3,9 @@ import { post } from "./ajax";
 
 /**
  * Query extensions.
+ *
+ * @param {string[]} ids The UUID of the extensions.
+ * @param {string} [proxy] The proxy settings.
  */
 export function queryExtensions(ids: string[], proxy?: string): Promise<IExtensionMeta[]>
 {
