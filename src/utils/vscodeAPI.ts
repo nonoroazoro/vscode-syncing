@@ -3,6 +3,14 @@ import * as vscode from "vscode";
 /**
  * Get `editor.formatOnSave` setting from the settings.
  */
+export function getVSCodeSetting<T>(section: string, key: string, defaultValue?: T): T
+{
+    return vscode.workspace.getConfiguration(section).get<T>(key, defaultValue);
+}
+
+/**
+ * Get `editor.formatOnSave` setting from the settings.
+ */
 export function getJSONFormatOnSaveSetting(settingsJSON: any): boolean | undefined
 {
     let result: boolean | undefined;
