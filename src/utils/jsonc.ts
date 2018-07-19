@@ -29,7 +29,7 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: any, p
     {
         let modified = false;
         let edits: jsonc.Edit[];
-        const excludedKeys = getExcludeKeys(settingsJSON, patterns);
+        const excludedKeys = getExcludedKeys(settingsJSON, patterns);
         for (const key of excludedKeys)
         {
             // Remove the listed properties.
@@ -70,8 +70,8 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
     {
         // Get all of the matched properties from the source and destination settings.
         const sPatterns = sSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
-        const sExcludedKeys = getExcludeKeys(sSettingsJSON, sPatterns);
-        const dExcludedKeys = getExcludeKeys(dSettingsJSON, sPatterns);
+        const sExcludedKeys = getExcludedKeys(sSettingsJSON, sPatterns);
+        const dExcludedKeys = getExcludedKeys(dSettingsJSON, sPatterns);
         const excludedKeys = Array.from<string>(new Set([...sExcludedKeys, ...dExcludedKeys])).sort();
 
         // Replace the source properties with the corresponding destination properties values.
@@ -110,7 +110,7 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
 /**
  * Get JSON property keys based on the exclude list (glob patterns) of Syncing.
  */
-export function getExcludeKeys(settingsJSON: { [key: string]: any }, patterns: string[]): string[]
+export function getExcludedKeys(settingsJSON: { [key: string]: any }, patterns: string[]): string[]
 {
     const excludeKeys: string[] = [];
     const keys = Object.keys(settingsJSON);
