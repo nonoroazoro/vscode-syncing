@@ -61,7 +61,7 @@ export default class Environment
     }
 
     /**
-     * Get VSCode extensions base path.
+     * Get VSCode extensions base folder path.
      */
     public get extensionsPath(): string
     {
@@ -69,7 +69,7 @@ export default class Environment
     }
 
     /**
-     * Get VSCode settings base path.
+     * Get VSCode settings base folder path.
      */
     public get codeBasePath(): string
     {
@@ -77,7 +77,7 @@ export default class Environment
     }
 
     /**
-     * Get VSCode settings `User` path.
+     * Get VSCode settings `User` folder path.
      */
     public get codeUserPath(): string
     {
@@ -85,7 +85,7 @@ export default class Environment
     }
 
     /**
-     * Get VSCode settings `snippets` path.
+     * Get VSCode settings `snippets` folder path.
      */
     public get snippetsPath(): string
     {
@@ -102,15 +102,23 @@ export default class Environment
     }
 
     /**
-     * Get the path of an extension.
+     * Get the folder name of an extension.
      */
-    public getExtensionPath(extension: IExtension): string
+    public getExtensionFolderName(extension: IExtension): string
     {
-        return path.join(this.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
+        return `${extension.publisher}.${extension.name}-${extension.version}`;
     }
 
     /**
-     * Get the path of the `.obsolete` file, it's a JSON file in fact.
+     * Get the folder path of an extension.
+     */
+    public getExtensionPath(extension: IExtension): string
+    {
+        return path.join(this.extensionsPath, this.getExtensionFolderName(extension));
+    }
+
+    /**
+     * Get the path of the `.obsolete` file.
      */
     public getObsoleteFilePath(): string
     {
