@@ -10,6 +10,7 @@ import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE,
 import { IExtension, ISyncedItem } from "../common/types";
 import { IExtensionMeta } from "../common/vscodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
+import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { queryExtensions } from "../utils/vscodeWebAPI";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
@@ -330,7 +331,7 @@ export default class Extension
         {
             // Automatically update extensions: Query latest extensions meta data.
             let extensionMetaMap: Map<string, IExtensionMeta> | undefined;
-            const autoUpdateExtensions = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<boolean>(CONFIGURATION_EXTENSIONS_AUTOUPDATE);
+            const autoUpdateExtensions = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_EXTENSIONS_AUTOUPDATE);
             if (autoUpdateExtensions)
             {
                 const ids = extensions.map((ext) => ext.uuid).filter((id) => id != null);
@@ -383,9 +384,7 @@ export default class Extension
             // Find removed extensions, but don't remove the extensions that are excluded.
             // Here's the trick: since the `extensions.json` are always synchronized after the `settings.json`,
             // We can safely get the patterns from VSCode.
-            const patterns = vscode.workspace
-                .getConfiguration(CONFIGURATION_KEY)
-                .get<string[]>(CONFIGURATION_EXCLUDED_EXTENSIONS);
+            const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_EXTENSIONS);
             const localExtensions: IExtension[] = this.getAll(patterns);
             for (const ext of localExtensions)
             {

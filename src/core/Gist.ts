@@ -1,13 +1,13 @@
 import * as Github from "@octokit/rest";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
-import * as vscode from "vscode";
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../common/constants";
 import * as GitHubTypes from "../common/GitHubTypes";
 import { ISetting, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffPatch";
 import { parse } from "../utils/jsonc";
+import { getVSCodeSetting } from "../utils/vscodeAPI";
 import * as Toast from "./Toast";
 
 /**
@@ -299,7 +299,7 @@ export default class Gist
                     if (localGist.files)
                     {
                         // poka-yoke - check if there have been two much changes since the last uploading.
-                        const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
+                        const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
                         if (threshold > 0)
                         {
                             // Note that the local settings here have already been excluded.
