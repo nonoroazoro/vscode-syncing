@@ -91,14 +91,6 @@ export default class Syncing
     }
 
     /**
-     * Migrate settings file of `Syncing`(upgrade to `Syncing` v1.5.0).
-     */
-    migrateSettings(): Promise<void>
-    {
-        return this.saveSettings(this.loadSettings());
-    }
-
-    /**
      * Clear GitHub Personal Access Token and save to file.
      */
     clearGitHubToken(): Promise<void>
@@ -237,26 +229,14 @@ export default class Syncing
     /**
      * Open Syncing's settings file (`syncing.json`) in the VSCode editor.
      */
-    openSettings()
+    async openSettings()
     {
-        fs.pathExists(this.settingsPath).then((exists) =>
+        const exists = await fs.pathExists(this.settingsPath);
+        if (!exists)
         {
-            if (exists)
-            {
-                // Upgrade settings file for `Syncing` v1.5.0.
-                this.migrateSettings().then(() =>
-                {
-                    openFile(this.settingsPath);
-                });
-            }
-            else
-            {
-                this.initSettings().then(() =>
-                {
-                    openFile(this.settingsPath);
-                });
-            }
-        });
+            await this.initSettings();
+        }
+        openFile(this.settingsPath);
     }
 
     /**
