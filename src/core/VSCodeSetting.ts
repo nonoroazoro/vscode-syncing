@@ -473,14 +473,13 @@ export default class VSCodeSetting
             }
             else if (setting.type === SettingTypes.Settings && setting.content)
             {
-                // TODO: refactor.
-                // Merge settings.
                 let { content } = setting;
                 this._loadContent([setting], false).then((value) =>
                 {
                     const localSettings = value[0].content;
                     if (localSettings)
                     {
+                        // Merge remote and local settings.
                         content = mergeSettings(content, localSettings);
                     }
 
