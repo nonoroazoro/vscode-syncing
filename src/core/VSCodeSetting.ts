@@ -4,7 +4,7 @@ import * as junk from "junk";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTING_EXCLUDED_SETTINGS } from "../common/constants";
 import * as GitHubTypes from "../common/GitHubTypes";
 import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffPatch";
@@ -456,7 +456,7 @@ export default class VSCodeSetting
                         content = excludeSettings(
                             content,
                             settingsJSON,
-                            (settingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [])
+                            (settingsJSON[SETTING_EXCLUDED_SETTINGS] || [])
                         );
                     }
                 }
@@ -545,7 +545,7 @@ export default class VSCodeSetting
                         const remoteSettingsJSON = parse(remoteSettings.content);
                         if (localSettingsJSON && remoteSettingsJSON)
                         {
-                            const patterns = remoteSettingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [];
+                            const patterns = remoteSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
                             remoteSettings.content = excludeSettings(remoteSettings.content, remoteSettingsJSON, patterns);
                             localSettings.content = excludeSettings(localSettings.content, localSettingsJSON, patterns);
                         }
