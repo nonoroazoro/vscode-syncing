@@ -109,6 +109,14 @@ export default class Environment
         return path.join(this.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
     }
 
+    /**
+     * Get the path of the `.obsolete` file, it's a JSON file in fact.
+     */
+    public getObsoleteFilePath(): string
+    {
+        return path.join(this.extensionsPath, ".obsolete");
+    }
+
     private _getCodeBasePath(isInsiders: boolean): string
     {
         let basePath: string;
