@@ -27,7 +27,7 @@
 
         * `Syncing` will try to download the `settings.json` corresponding to the current device, to ensure this upgrade will not break your existing settings.
 
-        > Please note that the `keybindings` will still be synced separately.
+        > Please note that the `keybindings` will still be synchronized separately.
 
 
 ## Features
@@ -37,7 +37,7 @@
 1. **Upload VSCode Settings**:
 
     * It will upload the `settings, keybindings, extensions, locales` and `snippets`.
-    * The `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
+    * The `keybindings` of `Macintosh` and `non-Macintosh` will be synchronized separately, in case you have multiple devices.
     * Automatically create a new Gist to store your settings.
     * Use an incremental algorithm to boost the synchronization.
     * You can `exclude some VSCode User Settings` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
@@ -101,9 +101,9 @@ From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Set
 
 1. ***`syncing.upload.exclude`***
 
-    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synced.
+    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synchronized.
 
-    > Note that the settings not listed here will still be synced.
+    > Note that the settings not listed here will still be synchronized.
 
     Take this for example:
 
@@ -114,7 +114,7 @@ From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Set
     ]
     ```
 
-    Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synced.
+    Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synchronized.
 
 1. ***`syncing.pokaYokeThreshold`***
 
