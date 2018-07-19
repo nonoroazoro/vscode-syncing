@@ -18,6 +18,7 @@ import * as GitHubTypes from "../common/GitHubTypes";
 import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffPatch";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
+import { getVSCodeSetting } from "../utils/vscodeAPI";
 import Environment from "./Environment";
 import Extension from "./Extension";
 import * as Toast from "./Toast";
@@ -429,9 +430,7 @@ export default class VSCodeSetting
                         let extensions = this._ext.getAll();
                         if (exclude && extensions.length > 0)
                         {
-                            const patterns = vscode.workspace
-                                .getConfiguration(CONFIGURATION_KEY)
-                                .get<string[]>(CONFIGURATION_EXCLUDED_EXTENSIONS);
+                            const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_EXTENSIONS);
                             extensions = this._getExcludedExtensions(extensions, patterns);
                         }
                         content = JSON.stringify(extensions, null, 4);
@@ -446,9 +445,7 @@ export default class VSCodeSetting
                             const settingsJSON = parse(content);
                             if (settingsJSON)
                             {
-                                const patterns = vscode.workspace
-                                    .getConfiguration(CONFIGURATION_KEY)
-                                    .get<string[]>(CONFIGURATION_EXCLUDED_SETTINGS);
+                                const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_SETTINGS);
                                 content = excludeSettings(content, settingsJSON, patterns);
                             }
                         }
@@ -527,7 +524,7 @@ export default class VSCodeSetting
     {
         return new Promise((resolve) =>
         {
-            const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
+            const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
             if (threshold > 0)
             {
                 this._loadContent(settings, false).then((localSettings) =>
