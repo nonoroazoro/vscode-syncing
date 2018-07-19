@@ -1,10 +1,19 @@
 import * as async from "async";
 import * as fs from "fs-extra";
 import * as junk from "junk";
+import * as minimatch from "minimatch";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTING_EXCLUDED_SETTINGS } from "../common/constants";
+import
+{
+    CONFIGURATION_EXCLUDED_EXTENSIONS,
+    CONFIGURATION_EXCLUDED_SETTINGS,
+    CONFIGURATION_KEY,
+    CONFIGURATION_POKA_YOKE_THRESHOLD,
+    SETTING_EXCLUDED_EXTENSIONS,
+    SETTING_EXCLUDED_SETTINGS
+} from "../common/constants";
 import * as GitHubTypes from "../common/GitHubTypes";
 import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffPatch";
@@ -416,25 +425,31 @@ export default class VSCodeSetting
                 {
                     if (setting.type === SettingTypes.Extensions)
                     {
-                        content = JSON.stringify(this._ext.getAll(), null, 4);
-
-                        // TODO: Exclude extensions.
+                        // Exclude extensions.
+                        let extensions = this._ext.getAll();
+                        if (exclude && extensions.length > 0)
+                        {
+                            const patterns = vscode.workspace
+                                .getConfiguration(CONFIGURATION_KEY)
+                                .get<string[]>(CONFIGURATION_EXCLUDED_EXTENSIONS);
+                            extensions = this._getExcludedExtensions(extensions, patterns);
+                        }
+                        content = JSON.stringify(extensions, null, 4);
                     }
                     else
                     {
                         content = fs.readFileSync(setting.filepath, "utf8");
 
                         // Exclude settings.
-                        if (exclude && setting.type === SettingTypes.Settings && content)
+                        if (exclude && content && setting.type === SettingTypes.Settings)
                         {
                             const settingsJSON = parse(content);
                             if (settingsJSON)
                             {
-                                content = excludeSettings(
-                                    content,
-                                    settingsJSON,
-                                    (settingsJSON[SETTING_EXCLUDED_SETTINGS] || [])
-                                );
+                                const patterns = vscode.workspace
+                                    .getConfiguration(CONFIGURATION_KEY)
+                                    .get<string[]>(CONFIGURATION_EXCLUDED_SETTINGS);
+                                content = excludeSettings(content, settingsJSON, patterns);
                             }
                         }
                     }
@@ -518,15 +533,22 @@ export default class VSCodeSetting
                 this._loadContent(settings, false).then((localSettings) =>
                 {
                     // poka-yoke - check if there have been two much changes since the last uploading.
-                    // 1. Get the excluded settings. Here clone the settings to avoid manipulation.
-                    const excludedSettings = this._getExcludedSettings(
+                    // 1. Excluded settings.
+                    // Here clone the settings to avoid manipulation.
+                    let excludedSettings = this._excludeSettings(
                         localSettings,
-                        settingsToSave.map((setting) => ({ ...setting }))
+                        settingsToSave.map((setting) => ({ ...setting })),
+                        SettingTypes.Settings
                     );
 
-                    // TODO: Exclude extensions.
+                    // 2. Excluded extensions.
+                    excludedSettings = this._excludeSettings(
+                        excludedSettings.localSettings,
+                        excludedSettings.remoteSettings,
+                        SettingTypes.Extensions
+                    );
 
-                    // 2. Diff settings.
+                    // 3. Diff settings.
                     const changes = settingsToRemove.length + this._diffSettings(
                         excludedSettings.localSettings,
                         excludedSettings.remoteSettings
@@ -554,24 +576,54 @@ export default class VSCodeSetting
     }
 
     /**
-     * Get excluded settings based on the `syncing.excludedSettings` setting of remote settings.
+     * Excludes settings based on the excluded setting of remote settings.
      */
-    private _getExcludedSettings(localSettings: ISetting[], remoteSettings: ISetting[])
+    private _excludeSettings(localSettings: ISetting[], remoteSettings: ISetting[], type: SettingTypes)
     {
-        const lSettings = localSettings.find((setting) => (setting.type === SettingTypes.Settings));
-        const rSettings = remoteSettings.find((setting) => (setting.type === SettingTypes.Settings));
-        if (lSettings && lSettings.content && rSettings && rSettings.content)
+        const lSetting = localSettings.find((setting) => (setting.type === type));
+        const rSetting = remoteSettings.find((setting) => (setting.type === type));
+        if (lSetting && lSetting.content && rSetting && rSetting.content)
         {
-            const lSettingsJSON = parse(lSettings.content);
-            const rSettingsJSON = parse(rSettings.content);
-            if (lSettingsJSON && rSettingsJSON)
+            const lSettingJSON = parse(lSetting.content);
+            const rSettingJSON = parse(rSetting.content);
+            if (lSettingJSON && rSettingJSON)
             {
-                const patterns = rSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
-                lSettings.content = excludeSettings(lSettings.content, lSettingsJSON, patterns);
-                rSettings.content = excludeSettings(rSettings.content, rSettingsJSON, patterns);
+                if (type === SettingTypes.Settings)
+                {
+                    // Exclude settings.
+                    const patterns = rSettingJSON[SETTING_EXCLUDED_SETTINGS] || [];
+                    lSetting.content = excludeSettings(lSetting.content, lSettingJSON, patterns);
+                    rSetting.content = excludeSettings(rSetting.content, rSettingJSON, patterns);
+                }
+                else if (type === SettingTypes.Extensions)
+                {
+                    // Exclude extensions.
+                    const rVSCodeSettings = remoteSettings.find((setting) => (setting.type === SettingTypes.Settings));
+                    if (rVSCodeSettings && rVSCodeSettings.content)
+                    {
+                        const rVSCodeSettingsJSON = parse(rVSCodeSettings.content);
+                        if (rVSCodeSettingsJSON)
+                        {
+                            const patterns: string[] = rVSCodeSettingsJSON[SETTING_EXCLUDED_EXTENSIONS] || [];
+                            lSetting.content = JSON.stringify(this._getExcludedExtensions(lSettingJSON, patterns));
+                            rSetting.content = JSON.stringify(this._getExcludedExtensions(rSettingJSON, patterns));
+                        }
+                    }
+                }
             }
         }
         return { localSettings, remoteSettings };
+    }
+
+    /**
+     * get excluded extensions based on the excluded setting of remote settings.
+     */
+    private _getExcludedExtensions(extensions: IExtension[], patterns: string[])
+    {
+        return extensions.filter((ext) =>
+        {
+            return !patterns.some((pattern) => minimatch(ext.id, pattern));
+        });
     }
 
     /**
