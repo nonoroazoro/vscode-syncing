@@ -61,10 +61,15 @@
                         "default": 10,
                         "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing). Each time you start a synchronization, Syncing will display a confirm dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
                     },
-                    "syncing.upload.exclude": {
+                    "syncing.excludedSettings": {
                         "type": "array",
                         "default": [],
-                        "description": "Configure glob patterns for excluding VSCode settings from being synced. For example:\n[\n    \"editor.*\",\n    \"workbench.colorTheme\"\n]\nNow the \"workbench.colorTheme\" setting and all the settings of \"editor\" will no longer be synced."
+                        "description": "Configure glob patterns for excluding VSCode settings from being synchronized. For example:\n[\n    \"editor.*\",\n    \"workbench.colorTheme\"\n]\nNow the setting \"workbench.colorTheme\" and all the settings of \"editor\" will no longer be synchronized."
+                    },
+                    "syncing.excludedExtensions": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Configure glob patterns for excluding VSCode extensions from being synchronized. For example:\n[\n    \"somepublisher.*\",\n    \"nonoroazoro.syncing\"\n]\nNow the extension \"nonoroazoro.syncing\" and all the extensions of the author \"somepublisher\" will no longer be synchronized."
                     }
                 }
             }
