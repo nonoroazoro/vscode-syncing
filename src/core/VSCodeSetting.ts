@@ -421,26 +421,26 @@ export default class VSCodeSetting
                     else
                     {
                         content = fs.readFileSync(setting.filepath, "utf8");
+
+                        // Exclude settings.
+                        if (exclude && setting.type === SettingTypes.Settings && content)
+                        {
+                            const settingsJSON = parse(content);
+                            if (settingsJSON)
+                            {
+                                content = excludeSettings(
+                                    content,
+                                    settingsJSON,
+                                    (settingsJSON[SETTING_EXCLUDED_SETTINGS] || [])
+                                );
+                            }
+                        }
                     }
                 }
                 catch (err)
                 {
                     content = undefined;
                     console.error(`Syncing: Error loading VSCode settings file: ${setting.type}.\n${err}`);
-                }
-
-                // Exclude settings.
-                if (exclude && setting.type === SettingTypes.Settings && content)
-                {
-                    const settingsJSON = parse(content);
-                    if (settingsJSON)
-                    {
-                        content = excludeSettings(
-                            content,
-                            settingsJSON,
-                            (settingsJSON[SETTING_EXCLUDED_SETTINGS] || [])
-                        );
-                    }
                 }
 
                 return { ...setting, content };
