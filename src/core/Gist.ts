@@ -287,15 +287,7 @@ export default class Gist
                     // `null` content will be filtered out, just in case.
                     if (item.content)
                     {
-                        if (item.type === SettingTypes.Settings)
-                        {
-                            // TODO: Merge settings files into one: Should be removed in the next release.
-                            localGist.files["settings.json"] = { content: item.content };
-                        }
-                        else
-                        {
-                            localGist.files[item.remoteFilename] = { content: item.content };
-                        }
+                        localGist.files[item.remoteFilename] = { content: item.content };
                     }
                 }
 
@@ -306,12 +298,6 @@ export default class Gist
                     localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
                     if (localGist.files)
                     {
-                        // TODO: Should be removed in the next release.
-                        if (remoteGist.files["settings-mac.json"])
-                        {
-                            localGist.files["settings-mac.json"] = null;
-                        }
-
                         // poka-yoke - check if there have been two much changes since the last uploading.
                         const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
                         if (threshold > 0)
