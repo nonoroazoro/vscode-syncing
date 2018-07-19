@@ -97,9 +97,9 @@ The keybindings **are unassigned by default**, but you can easily turn them on b
 
 ## VSCode User Settings
 
-From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Settings` in your `VSCode User Settings`.
+You can find the following `Syncing Settings` in your `VSCode User Settings`.
 
-1. ***`syncing.upload.exclude`***
+1. ***`syncing.excludedSettings`***
 
     You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synchronized.
 
@@ -108,13 +108,36 @@ From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Set
     Take this for example:
 
     ```json
-    "syncing.upload.exclude" : [
+    "syncing.excludedSettings" : [
         "editor.*",
         "workbench.colorTheme"
     ]
     ```
 
     Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synchronized.
+
+1. ***`syncing.excludedExtensions`***
+
+    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode Extensions` from being synchronized.
+
+    > Note that the extensions not listed here will still be synchronized.
+
+    Take this for example:
+
+    ```json
+    "syncing.excludedExtensions" : [
+        "somepublisher.*",
+        "nonoroazoro.syncing"
+    ]
+    ```
+
+    Now the extension `nonoroazoro.syncing` (i.e., `Syncing`) and all the extensions of the author `somepublisher` will no longer be synchronized.
+
+1. ***`syncing.extensions.autoUpdate`***
+
+    You can configure this setting to let `Syncing` automatically update your extensions during the synchronization.
+
+    This is `enabled by default` but you can turn it off in your `VSCode User Settings`.
 
 1. ***`syncing.pokaYokeThreshold`***
 
