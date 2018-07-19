@@ -1,7 +1,7 @@
 import * as jsonc from "jsonc-parser/lib/umd/main";
 import * as minimatch from "minimatch";
 
-import { SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
+import { SETTING_EXCLUDED_SETTINGS } from "../common/constants";
 import { getJSONFormatOnSaveSetting } from "./vscodeAPI";
 
 /**
@@ -69,7 +69,7 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
     if (sSettingsJSON && dSettingsJSON)
     {
         // Get all of the matched properties from the source and destination settings.
-        const sPatterns = sSettingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [];
+        const sPatterns = sSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
         const sExcludedKeys = getExcludeKeys(sSettingsJSON, sPatterns);
         const dExcludedKeys = getExcludeKeys(dSettingsJSON, sPatterns);
         const excludedKeys = Array.from<string>(new Set([...sExcludedKeys, ...dExcludedKeys])).sort();

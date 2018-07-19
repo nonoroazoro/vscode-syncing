@@ -3,7 +3,7 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
 import * as vscode from "vscode";
 
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTING_EXCLUDED_SETTINGS } from "../common/constants";
 import * as GitHubTypes from "../common/GitHubTypes";
 import { ISetting, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffPatch";
@@ -329,7 +329,7 @@ export default class Gist
                                 if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
                                 {
                                     const localSettingsJSON = parse(localSettings.content);
-                                    const patterns = localSettingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [];
+                                    const patterns = localSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
                                     localFiles[settingsName] = {
                                         ...localSettings,
                                         content: excludeSettings(localSettings.content, localSettingsJSON, patterns)
