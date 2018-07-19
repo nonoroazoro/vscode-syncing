@@ -2,7 +2,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { openFile } from "../utils/vscodeHelper";
+import { openFile } from "../utils/vscodeAPI";
 import Environment from "./Environment";
 import Gist from "./Gist";
 import * as Toast from "./Toast";

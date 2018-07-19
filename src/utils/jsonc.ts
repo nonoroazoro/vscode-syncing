@@ -2,7 +2,7 @@ import * as jsonc from "jsonc-parser/lib/umd/main";
 import * as minimatch from "minimatch";
 
 import { SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
-import { getJSONFormatOnSaveSetting } from "./vscodeHelper";
+import { getJSONFormatOnSaveSetting } from "./vscodeAPI";
 
 /**
  * The default `ModificationOptions` of `jsonc-parser`.
