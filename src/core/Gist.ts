@@ -3,11 +3,11 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
 import * as vscode from "vscode";
 
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTING_EXCLUDED_SETTINGS } from "../common/constants";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../common/constants";
 import * as GitHubTypes from "../common/GitHubTypes";
 import { ISetting, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffPatch";
-import { excludeSettings, parse } from "../utils/jsonc";
+import { parse } from "../utils/jsonc";
 import * as Toast from "./Toast";
 
 /**
@@ -293,7 +293,7 @@ export default class Gist
 
                 if (exists)
                 {
-                    // only update when files are modified.
+                    // Upload if the files are modified.
                     const remoteGist = exists as GitHubTypes.IGist;
                     localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
                     if (localGist.files)
@@ -302,36 +302,11 @@ export default class Gist
                         const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
                         if (threshold > 0)
                         {
+                            // Note that the local settings here have already been excluded.
                             const localFiles = { ...localGist.files };
                             const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
 
-                            // 1. Get the excluded settings.
-                            const settingsItem = uploads.find((item) => item.type === SettingTypes.Settings);
-                            if (settingsItem)
-                            {
-                                const settingsName = settingsItem.remoteFilename;
-                                const localSettings = localFiles[settingsName];
-                                const remoteSettings = remoteFiles[settingsName];
-                                if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
-                                {
-                                    const localSettingsJSON = parse(localSettings.content);
-                                    const patterns = localSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
-                                    localFiles[settingsName] = {
-                                        ...localSettings,
-                                        content: excludeSettings(localSettings.content, localSettingsJSON, patterns)
-                                    };
-
-                                    const remoteSettingsJSON = parse(remoteSettings.content);
-                                    remoteFiles[settingsName] = {
-                                        ...remoteSettings,
-                                        content: excludeSettings(remoteSettings.content, remoteSettingsJSON, patterns)
-                                    };
-                                }
-                            }
-
-                            // TODO: Exclude extensions.
-
-                            // 2. Diff settings.
+                            // Diff settings.
                             const changes = this._diffSettings(localFiles, remoteFiles);
                             if (changes >= threshold)
                             {
