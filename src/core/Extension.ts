@@ -6,7 +6,7 @@ import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
-import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_KEY } from "../common/constants";
+import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE, CONFIGURATION_KEY } from "../common/constants";
 import { IExtension, ISyncedItem } from "../common/types";
 import { IExtensionMeta } from "../common/vscodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
@@ -328,9 +328,14 @@ export default class Extension
         };
         if (extensions)
         {
-            // Query latest extensions meta data.
-            const ids = extensions.map((ext) => ext.uuid).filter((id) => id != null);
-            const extensionMetaMap = await queryExtensions(ids, this._syncing.proxy);
+            // Automatically update extensions: Query latest extensions meta data.
+            let extensionMetaMap: Map<string, IExtensionMeta> | undefined;
+            const autoUpdateExtensions = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<boolean>(CONFIGURATION_EXTENSIONS_AUTOUPDATE);
+            if (autoUpdateExtensions)
+            {
+                const ids = extensions.map((ext) => ext.uuid).filter((id) => id != null);
+                extensionMetaMap = await queryExtensions(ids, this._syncing.proxy);
+            }
 
             let latestVersion: string | undefined;
             let extensionMeta: IExtensionMeta | undefined;
@@ -341,13 +346,16 @@ export default class Extension
             for (const ext of extensions)
             {
                 // Upgrade to the latest version if available.
-                extensionMeta = extensionMetaMap.get(ext.uuid);
-                if (extensionMeta)
+                if (autoUpdateExtensions && extensionMetaMap)
                 {
-                    latestVersion = extensionMeta.versions[0] && extensionMeta.versions[0].version;
-                    if (latestVersion && latestVersion !== ext.version)
+                    extensionMeta = extensionMetaMap.get(ext.uuid);
+                    if (extensionMeta)
                     {
-                        ext.version = latestVersion;
+                        latestVersion = extensionMeta.versions[0] && extensionMeta.versions[0].version;
+                        if (latestVersion && latestVersion !== ext.version)
+                        {
+                            ext.version = latestVersion;
+                        }
                     }
                 }
 
@@ -389,7 +397,10 @@ export default class Extension
             }
 
             // Clear map.
-            extensionMetaMap.clear();
+            if (autoUpdateExtensions && extensionMetaMap)
+            {
+                extensionMetaMap.clear();
+            }
         }
         return result;
     }

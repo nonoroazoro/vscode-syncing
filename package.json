@@ -56,11 +56,6 @@
             {
                 "title": "Syncing",
                 "properties": {
-                    "syncing.pokaYokeThreshold": {
-                        "type": "number",
-                        "default": 10,
-                        "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing). Each time you start a synchronization, Syncing will display a confirm dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
-                    },
                     "syncing.excludedSettings": {
                         "type": "array",
                         "default": [],
@@ -70,6 +65,16 @@
                         "type": "array",
                         "default": [],
                         "description": "Configure glob patterns for excluding VSCode extensions from being synchronized. For example:\n[\n    \"somepublisher.*\",\n    \"nonoroazoro.syncing\"\n]\nNow the extension \"nonoroazoro.syncing\" and all the extensions of the author \"somepublisher\" will no longer be synchronized."
+                    },
+                    "syncing.pokaYokeThreshold": {
+                        "type": "number",
+                        "default": 10,
+                        "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing). Each time you start a synchronization, Syncing will display a confirm dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
+                    },
+                    "syncing.extensions.autoUpdate": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Automatically update extensions during the synchronization."
                     }
                 }
             }
