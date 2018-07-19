@@ -515,29 +515,22 @@ export default class VSCodeSetting
             const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
             if (threshold > 0)
             {
-                this._loadContent(settings, false).then((localConfigs) =>
+                this._loadContent(settings, false).then((localSettings) =>
                 {
                     // poka-yoke - check if there have been two much changes since the last uploading.
-                    // 1. Get the excluded settings.
-                    const remoteConfigs = settingsToSave.map((setting) => ({ ...setting }));
-                    const remoteSettings = remoteConfigs.find((setting) => (setting.type === SettingTypes.Settings));
-                    const localSettings = localConfigs.find((setting) => (setting.type === SettingTypes.Settings));
-                    if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
-                    {
-                        const localSettingsJSON = parse(localSettings.content);
-                        const remoteSettingsJSON = parse(remoteSettings.content);
-                        if (localSettingsJSON && remoteSettingsJSON)
-                        {
-                            const patterns = remoteSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
-                            remoteSettings.content = excludeSettings(remoteSettings.content, remoteSettingsJSON, patterns);
-                            localSettings.content = excludeSettings(localSettings.content, localSettingsJSON, patterns);
-                        }
-                    }
+                    // 1. Get the excluded settings. Here clone the settings to avoid manipulation.
+                    const excludedSettings = this._getExcludedSettings(
+                        localSettings,
+                        settingsToSave.map((setting) => ({ ...setting }))
+                    );
 
                     // TODO: Exclude extensions.
 
                     // 2. Diff settings.
-                    const changes = this._diffSettings(localConfigs, remoteConfigs) + settingsToRemove.length;
+                    const changes = settingsToRemove.length + this._diffSettings(
+                        excludedSettings.localSettings,
+                        excludedSettings.remoteSettings
+                    );
                     if (changes >= threshold)
                     {
                         const okButton = "Continue to download";
@@ -558,6 +551,27 @@ export default class VSCodeSetting
                 resolve(true);
             }
         });
+    }
+
+    /**
+     * Get excluded settings based on the `syncing.excludedSettings` setting of remote settings.
+     */
+    private _getExcludedSettings(localSettings: ISetting[], remoteSettings: ISetting[])
+    {
+        const lSettings = localSettings.find((setting) => (setting.type === SettingTypes.Settings));
+        const rSettings = remoteSettings.find((setting) => (setting.type === SettingTypes.Settings));
+        if (lSettings && lSettings.content && rSettings && rSettings.content)
+        {
+            const lSettingsJSON = parse(lSettings.content);
+            const rSettingsJSON = parse(rSettings.content);
+            if (lSettingsJSON && rSettingsJSON)
+            {
+                const patterns = rSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
+                lSettings.content = excludeSettings(lSettings.content, lSettingsJSON, patterns);
+                rSettings.content = excludeSettings(rSettings.content, rSettingsJSON, patterns);
+            }
+        }
+        return { localSettings, remoteSettings };
     }
 
     /**
