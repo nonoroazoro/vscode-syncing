@@ -146,8 +146,7 @@ export default class Extension
                         }
 
                         // Fixed: Remove ".obsolete" file (added from VSCode v1.20) after the synchronization.
-                        fs.remove(path.join(this._env.extensionsPath, ".obsolete"))
-                            .then(() => resolve(result)).catch(() => resolve(result));
+                        this.upgradeObsolete(added, updated, removed).then(() => resolve(result));
                     }
                 );
             });
@@ -257,6 +256,50 @@ export default class Extension
                 }
             });
         });
+    }
+
+    /**
+     * Upgrade VSCode's '.obsolete' file.
+     */
+    async upgradeObsolete(added: IExtension[] = [], removed: IExtension[] = [], updated: IExtension[] = []): Promise<void>
+    {
+        const filepath = this._env.getObsoleteFilePath();
+        let obsolete: { [extensionFolderName: string]: boolean; } | undefined;
+        try
+        {
+            obsolete = await fs.readJson(filepath);
+        }
+        catch (err)
+        {
+        }
+
+        if (obsolete)
+        {
+            for (const ext of [...added, ...updated])
+            {
+                delete obsolete[this._env.getExtensionFolderName(ext)];
+            }
+
+            for (const ext of removed)
+            {
+                obsolete[this._env.getExtensionFolderName(ext)] = true;
+            }
+
+            try
+            {
+                if (Object.keys(obsolete).length > 0)
+                {
+                    await fs.outputJson(filepath, obsolete);
+                }
+                else
+                {
+                    await fs.remove(filepath);
+                }
+            }
+            catch (err)
+            {
+            }
+        }
     }
 
     /**
