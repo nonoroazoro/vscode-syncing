@@ -1,10 +1,12 @@
 import * as async from "async";
 import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
+import * as minimatch from "minimatch";
 import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
+import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_KEY } from "../common/constants";
 import { IExtension, ISyncedItem } from "../common/types";
 import { IExtensionMeta } from "../common/vscodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
@@ -71,22 +73,25 @@ export default class Extension
 
     /**
      * Get all installed extensions (Disabled extensions aren't included).
-     * @param includeBuiltin Whether to include builtin extensions. Defaults to `false`.
+     * @param excludedExtensions The extensions that should be excluded from the result.
      */
-    public getAll(includeBuiltin = false): IExtension[]
+    public getAll(excludedExtensions: string[] = []): IExtension[]
     {
         let item: IExtension;
         const result: IExtension[] = [];
-        for (const { packageJSON } of vscode.extensions.all)
+        for (const ext of vscode.extensions.all)
         {
-            if (includeBuiltin || !packageJSON.isBuiltin)
+            if (
+                !ext.packageJSON.isBuiltin
+                && !excludedExtensions.some((pattern) => minimatch(ext.id, pattern))
+            )
             {
                 item = {
-                    id: packageJSON.id,
-                    uuid: packageJSON.uuid,
-                    name: packageJSON.name,
-                    publisher: packageJSON.publisher,
-                    version: packageJSON.version
+                    id: ext.packageJSON.id,
+                    uuid: ext.packageJSON.uuid,
+                    name: ext.packageJSON.name,
+                    publisher: ext.packageJSON.publisher,
+                    version: ext.packageJSON.version
                 };
                 result.push(item);
             }
@@ -367,8 +372,13 @@ export default class Extension
                 }
             }
 
-            // Find removed extensions.
-            const localExtensions: IExtension[] = this.getAll();
+            // Find removed extensions, but don't remove the extensions that are excluded.
+            // Here's the trick: since the `extensions.json` are always synchronized after the `settings.json`,
+            // We can safely get the patterns from VSCode.
+            const patterns = vscode.workspace
+                .getConfiguration(CONFIGURATION_KEY)
+                .get<string[]>(CONFIGURATION_EXCLUDED_EXTENSIONS);
+            const localExtensions: IExtension[] = this.getAll(patterns);
             for (const ext of localExtensions)
             {
                 if (reservedExtensionIDs.indexOf(ext.id) === -1)
