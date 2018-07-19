@@ -17,17 +17,13 @@
 
 * From ***version 1.7.0*** onwards:
 
-    * `Syncing` will **merge the `settings.json` and `settings-mac.json` files into one**, i.e., the `settings.json` file, which will make it easy to sync between Windows/Mac/Linux devices.
+    1. **You can exclude VSCode extensions from being synchronized.**
 
-        More specifically:
+    1. **`Syncing` will now automatically update your extensions during the synchronization.**
 
-        * `VSCode User Settings` will always be uploaded as `settings.json`, and **the `settings-mac.json` file will be deleted automatically**.
+    1. **In addition, I've changed some settings of `Syncing` in order to meet the demands of scalability。**
 
-            > In case you may still need the `settings-mac.json` file, you will find it in the `revisions` of your `Gist`.
-
-        * `Syncing` will try to download the `settings.json` corresponding to the current device, to ensure this upgrade will not break your existing settings.
-
-        > Please note that the `keybindings` will still be synchronized separately.
+    > Please [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
 
 ## Features
@@ -99,23 +95,6 @@ The keybindings **are unassigned by default**, but you can easily turn them on b
 
 You can find the following `Syncing Settings` in your `VSCode User Settings`.
 
-1. ***`syncing.excludedSettings`***
-
-    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synchronized.
-
-    > Note that the settings not listed here will still be synchronized.
-
-    Take this for example:
-
-    ```json
-    "syncing.excludedSettings" : [
-        "editor.*",
-        "workbench.colorTheme"
-    ]
-    ```
-
-    Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synchronized.
-
 1. ***`syncing.excludedExtensions`***
 
     You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode Extensions` from being synchronized.
@@ -132,6 +111,23 @@ You can find the following `Syncing Settings` in your `VSCode User Settings`.
     ```
 
     Now the extension `nonoroazoro.syncing` (i.e., `Syncing`) and all the extensions of the author `somepublisher` will no longer be synchronized.
+
+1. ***`syncing.excludedSettings` (Formerly `syncing.upload.exclude`)***
+
+    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synchronized.
+
+    > Note that the settings not listed here will still be synchronized.
+
+    Take this for example:
+
+    ```json
+    "syncing.excludedSettings" : [
+        "editor.*",
+        "workbench.colorTheme"
+    ]
+    ```
+
+    Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synchronized.
 
 1. ***`syncing.extensions.autoUpdate`***
 
