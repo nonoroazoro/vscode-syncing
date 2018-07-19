@@ -329,6 +329,8 @@ export default class Gist
                                 }
                             }
 
+                            // TODO: Exclude extensions.
+
                             // 2. Diff settings.
                             const changes = this._diffSettings(localFiles, remoteFiles);
                             if (changes >= threshold)

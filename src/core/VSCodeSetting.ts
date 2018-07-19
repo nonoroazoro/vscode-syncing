@@ -417,6 +417,8 @@ export default class VSCodeSetting
                     if (setting.type === SettingTypes.Extensions)
                     {
                         content = JSON.stringify(this._ext.getAll(), null, 4);
+
+                        // TODO: Exclude extensions.
                     }
                     else
                     {
@@ -531,6 +533,8 @@ export default class VSCodeSetting
                             localSettings.content = excludeSettings(localSettings.content, localSettingsJSON, patterns);
                         }
                     }
+
+                    // TODO: Exclude extensions.
 
                     // 2. Diff settings.
                     const changes = this._diffSettings(localConfigs, remoteConfigs) + settingsToRemove.length;
