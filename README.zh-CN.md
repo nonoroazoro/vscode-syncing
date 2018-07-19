@@ -97,9 +97,9 @@
 
 ## VSCode 配置项
 
-从 ***1.6.0*** 版本开始，`Syncing` 在 `VSCode 用户设置`中新增了以下两个配置项。
+你可以在 `VSCode 用户设置`中找到以下 `Syncing` 配置项。
 
-1. ***`syncing.upload.exclude`***
+1. ***`syncing.excludedSettings`***
 
     通过这个配置项，你可以`忽略某些指定的 VSCode 配置项`，以防止它们被同步。当然其他配置项不受影响，依然会正常同步。
 
@@ -108,13 +108,36 @@
     举个栗子：
 
     ```json
-    "syncing.upload.exclude" : [
+    "syncing.excludedSettings" : [
         "editor.*",
         "workbench.colorTheme"
     ]
     ```
 
     这样一来你的 VSCode 主题（`workbench.colorTheme`）以及所有与编辑器（`editor`）相关的配置项就不会再被同步啦。
+
+1. ***`syncing.excludedExtensions`***
+
+    通过这个配置项，你可以`忽略某些指定的 VSCode 插件`，以防止它们被同步。当然其他插件不受影响，依然会正常同步。
+
+    > 配置规则可以参考 [Glob Patterns](https://github.com/isaacs/minimatch)。
+
+    举个栗子：
+
+    ```json
+    "syncing.excludedExtensions" : [
+        "somepublisher.*",
+        "nonoroazoro.syncing"
+    ]
+    ```
+
+    这样一来 `nonoroazoro.syncing`（也就是本插件）以及所有属于 `somepublisher` 这个作者的插件就不会再被同步啦。
+
+1. ***`syncing.extensions.autoUpdate`***
+
+    通过这个配置项，你可以让 `Syncing` 在同步时自动升级你的 VSCode 插件。
+
+    这个功能是`默认开启`的，当然你也可以在 `VSCode 用户设置` 中关掉它。
 
 1. ***`syncing.pokaYokeThreshold`***
 
