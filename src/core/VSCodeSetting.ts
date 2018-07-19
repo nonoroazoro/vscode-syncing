@@ -289,7 +289,7 @@ export default class VSCodeSetting
                             }
                             else
                             {
-                                // Unknown files, do not process.
+                                // Unknown files, don't care.
                             }
                         }
                     }
@@ -300,7 +300,7 @@ export default class VSCodeSetting
                         settingsToSave.push(extensionsSetting);
                     }
 
-                    // poka-yoke - check if there have been two much changes (more than 10 changes) since the last downloading.
+                    // poka-yoke - check if there have been two much changes since the last downloading.
                     this._shouldContinue(settings, settingsToSave, settingsToRemove).then((value) =>
                     {
                         if (value)
@@ -534,7 +534,7 @@ export default class VSCodeSetting
             {
                 this._loadContent(settings, false).then((localConfigs) =>
                 {
-                    // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
+                    // poka-yoke - check if there have been two much changes since the last uploading.
                     // 1. Get the excluded settings.
                     const remoteConfigs = settingsToSave.map((setting) => ({ ...setting }));
                     const remoteSettings = remoteConfigs.find((setting) => (setting.type === SettingTypes.Settings));

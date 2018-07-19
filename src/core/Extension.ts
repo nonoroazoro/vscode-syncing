@@ -96,7 +96,7 @@ export default class Extension
 
     /**
      * Sync extensions (add/update/remove).
-     * @param extensions Extensions list.
+     * @param extensions Extensions to be synced.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
     sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
@@ -145,7 +145,7 @@ export default class Extension
                             Toast.clearSpinner("");
                         }
 
-                        // Fixed: Remove ".obsolete" file (added from VSCode v1.20) after the synchronization.
+                        // Added since VSCode v1.20.
                         this.upgradeObsolete(added, updated, removed).then(() => resolve(result));
                     }
                 );
@@ -259,7 +259,7 @@ export default class Extension
     }
 
     /**
-     * Upgrade VSCode's '.obsolete' file.
+     * Upgrade VSCode '.obsolete' file.
      */
     async upgradeObsolete(added: IExtension[] = [], removed: IExtension[] = [], updated: IExtension[] = []): Promise<void>
     {

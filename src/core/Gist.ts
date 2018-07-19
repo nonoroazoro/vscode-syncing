@@ -172,7 +172,7 @@ export default class Gist
     }
 
     /**
-     * Check if gist exists of the currently authenticated user.
+     * Check if the gist of the currently authenticated user is exists.
      * @param id Gist id.
      */
     public exists(id: string): Promise<GitHubTypes.IGist | boolean>
@@ -312,7 +312,7 @@ export default class Gist
                             localGist.files["settings-mac.json"] = null;
                         }
 
-                        // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
+                        // poka-yoke - check if there have been two much changes since the last uploading.
                         const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
                         if (threshold > 0)
                         {
