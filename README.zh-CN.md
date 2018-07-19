@@ -15,19 +15,15 @@
 
 ## 重要变更
 
-* 从 ***1.7.0*** 版本开始：
+* 从 ***1.8.0*** 版本开始：
 
-    * `Syncing` 将**不再按照操作系统来分开同步 `VSCode 用户设置`文件**，即 Windows、Mac 和 Linux 都将使用同一个 `settings.json` 文件。
+    1. **在同步时允许忽略指定的 VSCode 插件；**
 
-        具体来说：
+    1. **在同步时将会自动升级 VSCode 插件，你也可以在 VSCode 用户设置中关闭该功能；**
 
-        * 上传时，`VSCode 用户设置` 将始终被上传至 `settings.json` 文件中，同时上传完毕后会自动删除 `settings-mac.json` 文件；
+    1. **同时，为了应对后续扩展，修改了部分 `Syncing` 配置项的名称。**
 
-            > 万一你想查看被删除的 `settings-mac.json` 文件，可以在你的 Gist Revisions（历史版本）中找到它。
-
-        * 下载时，将会优先检测当前设备对应的配置文件，如果不存在，则尝试下载其他 `settings.json` 文件，以确保本次升级不会破坏你现有的配置文件。
-
-        > 注意：`keybindings`（即快捷键配置）依然会分开同步。
+    > 具体请参考 `Syncing` 的 [VSCode 配置项](#vscode-配置项)。
 
 
 ## 功能
@@ -99,23 +95,6 @@
 
 你可以在 `VSCode 用户设置`中找到以下 `Syncing` 配置项。
 
-1. ***`syncing.excludedSettings`***
-
-    通过这个配置项，你可以`忽略某些指定的 VSCode 配置项`，以防止它们被同步。当然其他配置项不受影响，依然会正常同步。
-
-    > 配置规则可以参考 [Glob Patterns](https://github.com/isaacs/minimatch)。
-
-    举个栗子：
-
-    ```json
-    "syncing.excludedSettings" : [
-        "editor.*",
-        "workbench.colorTheme"
-    ]
-    ```
-
-    这样一来你的 VSCode 主题（`workbench.colorTheme`）以及所有与编辑器（`editor`）相关的配置项就不会再被同步啦。
-
 1. ***`syncing.excludedExtensions`***
 
     通过这个配置项，你可以`忽略某些指定的 VSCode 插件`，以防止它们被同步。当然其他插件不受影响，依然会正常同步。
@@ -132,6 +111,23 @@
     ```
 
     这样一来 `nonoroazoro.syncing`（也就是本插件）以及所有属于 `somepublisher` 这个作者的插件就不会再被同步啦。
+
+1. ***`syncing.excludedSettings`（即原来的 `syncing.upload.exclude`）***
+
+    通过这个配置项，你可以`忽略某些指定的 VSCode 配置项`，以防止它们被同步。当然其他配置项不受影响，依然会正常同步。
+
+    > 配置规则可以参考 [Glob Patterns](https://github.com/isaacs/minimatch)。
+
+    举个栗子：
+
+    ```json
+    "syncing.excludedSettings" : [
+        "editor.*",
+        "workbench.colorTheme"
+    ]
+    ```
+
+    这样一来你的 VSCode 主题（`workbench.colorTheme`）以及所有与编辑器（`editor`）相关的配置项就不会再被同步啦。
 
 1. ***`syncing.extensions.autoUpdate`***
 
