@@ -1,7 +1,7 @@
 // Dot-separated identifiers, same as the sections of VSCode, see `vscode.workspace.getConfiguration`.
 export const CONFIGURATION_KEY = "syncing";
 export const CONFIGURATION_POKA_YOKE_THRESHOLD = "pokaYokeThreshold";
-export const CONFIGURATION_EXCLUDED_SETTINGS = "upload.exclude";
+export const CONFIGURATION_EXCLUDED_SETTINGS = "excludedSettings";
 export const CONFIGURATION_EXCLUDED_EXTENSIONS = "excludedExtensions";
 
 // Dot-separated identifiers, used to access the properties of Syncing's VSCode settings.
