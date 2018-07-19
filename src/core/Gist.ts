@@ -7,7 +7,7 @@ import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_E
 import * as GitHubTypes from "../common/GitHubTypes";
 import { ISetting, SettingTypes } from "../common/types";
 import { diff } from "../utils/diffPatch";
-import { excludeSettings, parse } from "../utils/jsonHelper";
+import { excludeSettings, parse } from "../utils/jsonc";
 import * as Toast from "./Toast";
 
 /**
