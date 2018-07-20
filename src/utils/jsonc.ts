@@ -139,5 +139,6 @@ export function format(jsonString: string, formattingOptions: jsonc.FormattingOp
  */
 export function parse(text: string)
 {
+    // Evaluates in a fault tolerant fashion and never throw exceptions.
     return jsonc.parse(text);
 }
