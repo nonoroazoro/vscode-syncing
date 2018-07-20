@@ -108,7 +108,7 @@
         "@octokit/rest": "^15.9.4",
         "async": "^2.6.1",
         "extract-zip": "^1.6.7",
-        "fs-extra": "^6.0.1",
+        "fs-extra": "^7.0.0",
         "https-proxy-agent": "^2.2.1",
         "jsonc-parser": "^2.0.1",
         "jsondiffpatch": "^0.3.11",
@@ -131,7 +131,7 @@
         "mocha": "^5.2.0",
         "rimraf": "^2.6.2",
         "should": "^13.2.1",
-        "tslint": "^5.10.0",
+        "tslint": "^5.11.0",
         "typescript": "^2.9.2",
         "vscode": "^1.1.18"
     },
