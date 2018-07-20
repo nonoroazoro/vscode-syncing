@@ -105,7 +105,7 @@ export default class Extension
      * @param extensions Extensions to be synced.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
+    public sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
     {
         return new Promise((resolve) =>
         {
@@ -162,7 +162,7 @@ export default class Extension
     /**
      * Download extension from VSCode marketplace.
      */
-    downloadExtension(extension: IExtension): Promise<IExtension>
+    public downloadExtension(extension: IExtension): Promise<IExtension>
     {
         return new Promise((resolve, reject) =>
         {
@@ -192,7 +192,7 @@ export default class Extension
     /**
      * Extract extension zip file to VSCode extensions folder.
      */
-    extractExtension(extension: IExtension): Promise<IExtension>
+    public extractExtension(extension: IExtension): Promise<IExtension>
     {
         return new Promise((resolve, reject) =>
         {
@@ -244,30 +244,25 @@ export default class Extension
     /**
      * Uninstall extension.
      */
-    uninstallExtension(extension: IExtension): Promise<IExtension>
+    public async uninstallExtension(extension: IExtension): Promise<IExtension>
     {
-        return new Promise((resolve, reject) =>
+        const localExtension = vscode.extensions.getExtension(extension.id);
+        const extensionPath = localExtension ? localExtension.extensionPath : this._env.getExtensionPath(extension);
+        try
         {
-            const localExtension = vscode.extensions.getExtension(extension.id);
-            const version = localExtension ? localExtension.packageJSON.version : extension.version;
-            fs.remove(path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${version}`), (err) =>
-            {
-                if (err)
-                {
-                    reject(new Error(`Cannot uninstall extension: ${extension.id}`));
-                }
-                else
-                {
-                    resolve(extension);
-                }
-            });
-        });
+            await fs.remove(extensionPath);
+        }
+        catch (err)
+        {
+            throw new Error(`Cannot uninstall extension: ${extension.id}`);
+        }
+        return extension;
     }
 
     /**
      * Upgrade VSCode '.obsolete' file.
      */
-    async upgradeObsolete(added: IExtension[] = [], removed: IExtension[] = [], updated: IExtension[] = []): Promise<void>
+    public async upgradeObsolete(added: IExtension[] = [], removed: IExtension[] = [], updated: IExtension[] = []): Promise<void>
     {
         const filepath = this._env.getObsoleteFilePath();
         let obsolete: { [extensionFolderName: string]: boolean; } | undefined;
