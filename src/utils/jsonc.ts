@@ -1,4 +1,4 @@
-import * as jsonc from "jsonc-parser/lib/umd/main";
+import * as jsonc from "jsonc-parser";
 import * as minimatch from "minimatch";
 
 import { SETTING_EXCLUDED_SETTINGS } from "../common/constants";
