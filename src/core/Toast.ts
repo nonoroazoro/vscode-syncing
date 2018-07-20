@@ -215,7 +215,7 @@ export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Pro
  */
 export function showReloadBox(): void
 {
-    const reloadButton = "Reload";
+    const reloadButton = "Reload Now";
     const message = "Settings are successfully synced. Please reload VSCode to take effect.";
     vscode.window.showInformationMessage(message, reloadButton).then((selection) =>
     {
