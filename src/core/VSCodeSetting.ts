@@ -182,7 +182,7 @@ export default class VSCodeSetting
      * @param files `VSCode Settings` from GitHub Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    saveSettings(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
+    public saveSettings(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
         updated: ISyncedItem[],
         removed: ISyncedItem[]
     }>
@@ -349,7 +349,7 @@ export default class VSCodeSetting
      * Delete the physical files corresponding to the `VSCode Settings`.
      * @param settings `VSCode Settings`.
      */
-    removeSettings(settings: ISetting[]): Promise<ISyncedItem[]>
+    public removeSettings(settings: ISetting[]): Promise<ISyncedItem[]>
     {
         return new Promise((resolve, reject) =>
         {
