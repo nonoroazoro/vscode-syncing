@@ -468,45 +468,34 @@ export default class VSCodeSetting
      *
      * @param setting `VSCode Setting`.
      */
-    private _saveSetting(setting: ISetting): Promise<ISyncedItem>
+    private async _saveSetting(setting: ISetting): Promise<ISyncedItem>
     {
-        return new Promise((resolve, reject) =>
+        let result: ISyncedItem;
+        if (setting.type === SettingTypes.Extensions)
         {
-            if (setting.type === SettingTypes.Extensions)
+            // Sync extensions.
+            const extensions: IExtension[] = parse(setting.content || "[]");
+            result = await this._ext.sync(extensions, true);
+        }
+        else
+        {
+            let settingsToSave = setting.content;
+            if (setting.type === SettingTypes.Settings && settingsToSave)
             {
-                try
+                // Sync settings.
+                const localFiles = await this._loadContent([setting], false);
+                const localSettings = localFiles[0] && localFiles[0].content;
+                if (localSettings)
                 {
-                    // Sync extensions.
-                    const extensions: IExtension[] = parse(setting.content || "[]");
-                    this._ext.sync(extensions, true).then(resolve).catch(reject);
-                }
-                catch (err)
-                {
-                    reject(new Error(`The extension list is broken: ${err.message}`));
+                    // Merge remote and local settings.
+                    settingsToSave = mergeSettings(settingsToSave, localSettings);
                 }
             }
-            else if (setting.type === SettingTypes.Settings && setting.content)
-            {
-                let { content } = setting;
-                this._loadContent([setting], false).then((value) =>
-                {
-                    const localSettings = value[0].content;
-                    if (localSettings)
-                    {
-                        // Merge remote and local settings.
-                        content = mergeSettings(content, localSettings);
-                    }
 
-                    // Save to disk.
-                    this._saveToFile({ ...setting, content }).then(resolve).catch(reject);
-                });
-            }
-            else
-            {
-                // Save to disk.
-                this._saveToFile(setting).then(resolve).catch(reject);
-            }
-        });
+            // Save to disk.
+            result = await this._saveToFile({ ...setting, content: settingsToSave });
+        }
+        return result;
     }
 
     /**
