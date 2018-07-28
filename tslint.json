@@ -4,6 +4,7 @@
         "tslint:recommended"
     ],
     "rules": {
+        "import-spacing": false,
         "indent": [
             true,
             "spaces",

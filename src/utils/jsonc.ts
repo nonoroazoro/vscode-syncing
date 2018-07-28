@@ -1,8 +1,8 @@
 import * as jsonc from "jsonc-parser";
 import * as minimatch from "minimatch";
 
-import { SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
-import { getJSONFormatOnSaveSetting } from "./vscodeHelper";
+import { SETTING_EXCLUDED_SETTINGS } from "../common/constants";
+import { getJSONFormatOnSaveSetting } from "./vscodeAPI";
 
 /**
  * The default `ModificationOptions` of `jsonc-parser`.
@@ -29,7 +29,7 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: any, p
     {
         let modified = false;
         let edits: jsonc.Edit[];
-        const excludedKeys = getExcludeKeys(settingsJSON, patterns);
+        const excludedKeys = getExcludedKeys(settingsJSON, patterns);
         for (const key of excludedKeys)
         {
             // Remove the listed properties.
@@ -69,9 +69,9 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
     if (sSettingsJSON && dSettingsJSON)
     {
         // Get all of the matched properties from the source and destination settings.
-        const sPatterns = sSettingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [];
-        const sExcludedKeys = getExcludeKeys(sSettingsJSON, sPatterns);
-        const dExcludedKeys = getExcludeKeys(dSettingsJSON, sPatterns);
+        const sPatterns = sSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
+        const sExcludedKeys = getExcludedKeys(sSettingsJSON, sPatterns);
+        const dExcludedKeys = getExcludedKeys(dSettingsJSON, sPatterns);
         const excludedKeys = Array.from<string>(new Set([...sExcludedKeys, ...dExcludedKeys])).sort();
 
         // Replace the source properties with the corresponding destination properties values.
@@ -110,7 +110,7 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
 /**
  * Get JSON property keys based on the exclude list (glob patterns) of Syncing.
  */
-export function getExcludeKeys(settingsJSON: { [key: string]: any }, patterns: string[]): string[]
+export function getExcludedKeys(settingsJSON: { [key: string]: any }, patterns: string[]): string[]
 {
     const excludeKeys: string[] = [];
     const keys = Object.keys(settingsJSON);
@@ -139,5 +139,6 @@ export function format(jsonString: string, formattingOptions: jsonc.FormattingOp
  */
 export function parse(text: string)
 {
+    // Evaluates in a fault tolerant fashion and never throw exceptions.
     return jsonc.parse(text);
 }

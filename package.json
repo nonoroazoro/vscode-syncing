@@ -1,8 +1,8 @@
 {
     "name": "syncing",
     "displayName": "Syncing",
-    "description": "Sync all of your VSCode settings across multiple devices.",
-    "version": "1.7.3",
+    "description": "Synchronize all of your VSCode settings across multiple devices.",
+    "version": "1.8.0",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -28,9 +28,10 @@
         "Other"
     ],
     "keywords": [
-        "sync-settings",
         "sync",
+        "sync-settings",
         "syncing",
+        "vscode-sync",
         "vscode-syncing"
     ],
     "activationEvents": [
@@ -55,15 +56,25 @@
             {
                 "title": "Syncing",
                 "properties": {
+                    "syncing.excludedExtensions": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Configure glob patterns for excluding VSCode extensions from being synchronized. For example:\n[\n    \"somepublisher.*\",\n    \"nonoroazoro.syncing\"\n]\nNow the extension \"nonoroazoro.syncing\" and all the extensions of the author \"somepublisher\" will no longer be synchronized."
+                    },
+                    "syncing.excludedSettings": {
+                        "type": "array",
+                        "default": [],
+                        "description": "Configure glob patterns for excluding VSCode settings from being synchronized. For example:\n[\n    \"editor.*\",\n    \"workbench.colorTheme\"\n]\nNow the setting \"workbench.colorTheme\" and all the settings of \"editor\" will no longer be synchronized."
+                    },
+                    "syncing.extensions.autoUpdate": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Automatically update extensions during the synchronization."
+                    },
                     "syncing.pokaYokeThreshold": {
                         "type": "number",
                         "default": 10,
                         "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing). Each time you start a synchronization, Syncing will display a confirm dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
-                    },
-                    "syncing.upload.exclude": {
-                        "type": "array",
-                        "default": [],
-                        "description": "Configure glob patterns for excluding VSCode settings from being synced. For example:\n[\n    \"editor.*\",\n    \"workbench.colorTheme\"\n]\nNow the \"workbench.colorTheme\" setting and all the settings of \"editor\" will no longer be synced."
                     }
                 }
             }
@@ -97,7 +108,7 @@
         "@octokit/rest": "^15.9.4",
         "async": "^2.6.1",
         "extract-zip": "^1.6.7",
-        "fs-extra": "^6.0.1",
+        "fs-extra": "^7.0.0",
         "https-proxy-agent": "^2.2.1",
         "jsonc-parser": "^2.0.1",
         "jsondiffpatch": "^0.3.11",
@@ -120,7 +131,7 @@
         "mocha": "^5.2.0",
         "rimraf": "^2.6.2",
         "should": "^13.2.1",
-        "tslint": "^5.10.0",
+        "tslint": "^5.11.0",
         "typescript": "^2.9.2",
         "vscode": "^1.1.18"
     },

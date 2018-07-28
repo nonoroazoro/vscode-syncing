@@ -102,7 +102,6 @@ function _downloadSettings()
             {
                 return _vscodeSetting.saveSettings(gist.files, true).then((syncedItems) =>
                 {
-                    // TODO: log synced files.
                     Toast.statusInfo("Syncing: Settings downloaded.");
                     if (_isExtensionsSynced(syncedItems))
                     {

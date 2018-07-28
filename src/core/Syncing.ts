@@ -2,7 +2,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 import * as vscode from "vscode";
 
-import { openFile } from "../utils/vscodeHelper";
+import { openFile } from "../utils/vscodeAPI";
 import Environment from "./Environment";
 import Gist from "./Gist";
 import * as Toast from "./Toast";
@@ -85,23 +85,15 @@ export default class Syncing
     /**
      * Init settings file of `Syncing`.
      */
-    initSettings(): Promise<void>
+    public initSettings(): Promise<void>
     {
         return this.saveSettings(Syncing.DEFAULT_SETTINGS);
     }
 
     /**
-     * Migrate settings file of `Syncing`(upgrade to `Syncing` v1.5.0).
-     */
-    migrateSettings(): Promise<void>
-    {
-        return this.saveSettings(this.loadSettings());
-    }
-
-    /**
      * Clear GitHub Personal Access Token and save to file.
      */
-    clearGitHubToken(): Promise<void>
+    public clearGitHubToken(): Promise<void>
     {
         const settings: ISyncingSettings = this.loadSettings();
         settings.token = "";
@@ -111,7 +103,7 @@ export default class Syncing
     /**
      * Clear Gist ID and save to file.
      */
-    clearGistID(): Promise<void>
+    public clearGistID(): Promise<void>
     {
         const settings: ISyncingSettings = this.loadSettings();
         settings.id = "";
@@ -122,7 +114,7 @@ export default class Syncing
      * Prepare `Syncing`'s settings for uploading.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    prepareUploadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
+    public prepareUploadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
     {
         // GitHub Token must exist, but Gist ID could be none.
         return this.prepareSettings(true, showIndicator);
@@ -132,7 +124,7 @@ export default class Syncing
      * Prepare `Syncing`'s settings for downloading.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    prepareDownloadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
+    public prepareDownloadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
     {
         // GitHub Token could be none, but Gist ID must exist.
         return this.prepareSettings(false, showIndicator);
@@ -143,7 +135,7 @@ export default class Syncing
      * @param forUpload Whether to show messages for upload. Defaults to `true`.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    prepareSettings(forUpload: boolean = true, showIndicator: boolean = false): Promise<ISyncingSettings>
+    public prepareSettings(forUpload: boolean = true, showIndicator: boolean = false): Promise<ISyncingSettings>
     {
         return new Promise((resolve, reject) =>
         {
@@ -217,7 +209,7 @@ export default class Syncing
     /**
      * Load Syncing's settings (load from settings file: `syncing.json`).
      */
-    loadSettings(): ISyncingSettings
+    public loadSettings(): ISyncingSettings
     {
         const settings: ISyncingSettings = { ...Syncing.DEFAULT_SETTINGS };
         try
@@ -237,26 +229,14 @@ export default class Syncing
     /**
      * Open Syncing's settings file (`syncing.json`) in the VSCode editor.
      */
-    openSettings()
+    public async openSettings()
     {
-        fs.pathExists(this.settingsPath).then((exists) =>
+        const exists = await fs.pathExists(this.settingsPath);
+        if (!exists)
         {
-            if (exists)
-            {
-                // Upgrade settings file for `Syncing` v1.5.0.
-                this.migrateSettings().then(() =>
-                {
-                    openFile(this.settingsPath);
-                });
-            }
-            else
-            {
-                this.initSettings().then(() =>
-                {
-                    openFile(this.settingsPath);
-                });
-            }
-        });
+            await this.initSettings();
+        }
+        openFile(this.settingsPath);
     }
 
     /**
@@ -264,7 +244,7 @@ export default class Syncing
      * @param settings Syncing's Settings.
      * @param showToast Whether to show error toast. Defaults to `false`.
      */
-    saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
+    public saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
     {
         return new Promise((resolve) =>
         {

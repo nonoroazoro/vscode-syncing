@@ -1,5 +1,5 @@
 /**
- * Represent the types of various `VSCode Setting`, such as `Extensions`, `Keybindings`...
+ * Represents the types of the various `VSCode Settings`, such as `Extensions`, `Keybindings`...
  */
 export enum SettingTypes
 {
@@ -11,7 +11,7 @@ export enum SettingTypes
 }
 
 /**
- * Represent a `VSCode Setting`.
+ * Represents a `VSCode Setting`.
  */
 export interface ISetting
 {
@@ -37,7 +37,7 @@ export interface ISetting
 }
 
 /**
- * Represent a VSCode extension.
+ * Represents a VSCode extension.
  */
 export interface IExtension
 {
@@ -45,6 +45,11 @@ export interface IExtension
      * The extension's identifier in the form of: `publisher.name`.
      */
     id: string;
+
+    /**
+     * The extension's UUID.
+     */
+    uuid: string;
 
     /**
      * The extension's name.
@@ -62,23 +67,18 @@ export interface IExtension
     version: string;
 
     /**
-     * The extension's metadata.
+     * The installed extension's folder path.
      */
-    __metadata?: string;
+    path?: string;
 
     /**
      * The downloaded extension's zip file path.
      */
     zip?: string;
-
-    /**
-     * The installed extension's folder path.
-     */
-    path?: string;
 }
 
 /**
- * Represent the currently synced item.
+ * Represents the currently synced item.
  */
 export interface ISyncedItem
 {

@@ -1,13 +1,13 @@
 import * as Github from "@octokit/rest";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
-import * as vscode from "vscode";
 
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, SETTINGS_UPLOAD_EXCLUDE } from "../common/constants";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../common/constants";
 import * as GitHubTypes from "../common/GitHubTypes";
 import { ISetting, SettingTypes } from "../common/types";
-import { diff } from "../utils/diffHelper";
-import { excludeSettings, parse } from "../utils/jsonHelper";
+import { diff } from "../utils/diffPatch";
+import { parse } from "../utils/jsonc";
+import { getVSCodeSetting } from "../utils/vscodeAPI";
 import * as Toast from "./Toast";
 
 /**
@@ -172,7 +172,7 @@ export default class Gist
     }
 
     /**
-     * Check if gist exists of the currently authenticated user.
+     * Check if the gist of the currently authenticated user is exists.
      * @param id Gist id.
      */
     public exists(id: string): Promise<GitHubTypes.IGist | boolean>
@@ -287,63 +287,26 @@ export default class Gist
                     // `null` content will be filtered out, just in case.
                     if (item.content)
                     {
-                        if (item.type === SettingTypes.Settings)
-                        {
-                            // TODO: Merge settings files into one: Should be removed in the next release.
-                            localGist.files["settings.json"] = { content: item.content };
-                        }
-                        else
-                        {
-                            localGist.files[item.remoteFilename] = { content: item.content };
-                        }
+                        localGist.files[item.remoteFilename] = { content: item.content };
                     }
                 }
 
                 if (exists)
                 {
-                    // only update when files are modified.
+                    // Upload if the files are modified.
                     const remoteGist = exists as GitHubTypes.IGist;
                     localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
                     if (localGist.files)
                     {
-                        // TODO: Should be removed in the next release.
-                        if (remoteGist.files["settings-mac.json"])
-                        {
-                            localGist.files["settings-mac.json"] = null;
-                        }
-
-                        // poka-yoke - check if there have been two much changes (more than 10 changes) since the last uploading.
-                        const threshold = vscode.workspace.getConfiguration(CONFIGURATION_KEY).get<number>(CONFIGURATION_POKA_YOKE_THRESHOLD);
+                        // poka-yoke - check if there have been two much changes since the last uploading.
+                        const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
                         if (threshold > 0)
                         {
+                            // Note that the local settings here have already been excluded.
                             const localFiles = { ...localGist.files };
                             const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
 
-                            // 1. Get the excluded settings.
-                            const settingsItem = uploads.find((item) => item.type === SettingTypes.Settings);
-                            if (settingsItem)
-                            {
-                                const settingsName = settingsItem.remoteFilename;
-                                const localSettings = localFiles[settingsName];
-                                const remoteSettings = remoteFiles[settingsName];
-                                if (remoteSettings && remoteSettings.content && localSettings && localSettings.content)
-                                {
-                                    const localSettingsJSON = parse(localSettings.content);
-                                    const patterns = localSettingsJSON[SETTINGS_UPLOAD_EXCLUDE] || [];
-                                    localFiles[settingsName] = {
-                                        ...localSettings,
-                                        content: excludeSettings(localSettings.content, localSettingsJSON, patterns)
-                                    };
-
-                                    const remoteSettingsJSON = parse(remoteSettings.content);
-                                    remoteFiles[settingsName] = {
-                                        ...remoteSettings,
-                                        content: excludeSettings(remoteSettings.content, remoteSettingsJSON, patterns)
-                                    };
-                                }
-                            }
-
-                            // 2. Diff settings.
+                            // Diff settings.
                             const changes = this._diffSettings(localFiles, remoteFiles);
                             if (changes >= threshold)
                             {
@@ -425,7 +388,7 @@ export default class Gist
             else
             {
                 // remove remote file (don't remove remote keybindings and settings).
-                if (!key.includes("keybindings") && !key.includes("settings"))
+                if (!key.includes(SettingTypes.Keybindings) && !key.includes(SettingTypes.Settings))
                 {
                     result[key] = null;
                 }

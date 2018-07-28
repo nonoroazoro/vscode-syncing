@@ -2,6 +2,8 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
+import { IExtension } from "../common/types";
+
 /**
  * VSCode environment wrapper.
  */
@@ -59,7 +61,7 @@ export default class Environment
     }
 
     /**
-     * Get VSCode extensions base path.
+     * Get VSCode extensions base folder path.
      */
     public get extensionsPath(): string
     {
@@ -67,7 +69,7 @@ export default class Environment
     }
 
     /**
-     * Get VSCode settings base path.
+     * Get VSCode settings base folder path.
      */
     public get codeBasePath(): string
     {
@@ -75,7 +77,7 @@ export default class Environment
     }
 
     /**
-     * Get VSCode settings `User` path.
+     * Get VSCode settings `User` folder path.
      */
     public get codeUserPath(): string
     {
@@ -83,7 +85,7 @@ export default class Environment
     }
 
     /**
-     * Get VSCode settings `snippets` path.
+     * Get VSCode settings `snippets` folder path.
      */
     public get snippetsPath(): string
     {
@@ -97,6 +99,30 @@ export default class Environment
     public getSnippetFilePath(filename: string): string
     {
         return path.join(this.snippetsPath, filename);
+    }
+
+    /**
+     * Get the folder name of an extension.
+     */
+    public getExtensionFolderName(extension: IExtension): string
+    {
+        return `${extension.publisher}.${extension.name}-${extension.version}`;
+    }
+
+    /**
+     * Get the folder path of an extension.
+     */
+    public getExtensionPath(extension: IExtension): string
+    {
+        return path.join(this.extensionsPath, this.getExtensionFolderName(extension));
+    }
+
+    /**
+     * Get the path of the `.obsolete` file.
+     */
+    public getObsoleteFilePath(): string
+    {
+        return path.join(this.extensionsPath, ".obsolete");
     }
 
     private _getCodeBasePath(isInsiders: boolean): string

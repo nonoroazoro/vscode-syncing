@@ -1,13 +1,17 @@
 import * as async from "async";
 import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
-import * as https from "https";
-import * as HttpsProxyAgent from "https-proxy-agent";
+import * as minimatch from "minimatch";
 import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
+import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE, CONFIGURATION_KEY } from "../common/constants";
 import { IExtension, ISyncedItem } from "../common/types";
+import { IExtensionMeta } from "../common/vscodeWebAPITypes";
+import { downloadFile } from "../utils/ajax";
+import { getVSCodeSetting } from "../utils/vscodeAPI";
+import { queryExtensions } from "../utils/vscodeWebAPI";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
 import * as Toast from "./Toast";
@@ -70,26 +74,26 @@ export default class Extension
 
     /**
      * Get all installed extensions (Disabled extensions aren't included).
-     * @param includeBuiltin Whether to include builtin extensions. Defaults to `false`.
+     * @param excludedExtensions The extensions that should be excluded from the result.
      */
-    public getAll(includeBuiltin = false): IExtension[]
+    public getAll(excludedExtensions: string[] = []): IExtension[]
     {
         let item: IExtension;
         const result: IExtension[] = [];
         for (const ext of vscode.extensions.all)
         {
-            if (includeBuiltin || !ext.packageJSON.isBuiltin)
+            if (
+                !ext.packageJSON.isBuiltin
+                && !excludedExtensions.some((pattern) => minimatch(ext.id, pattern))
+            )
             {
                 item = {
-                    id: `${ext.packageJSON.publisher}.${ext.packageJSON.name}`,
+                    id: ext.packageJSON.id,
+                    uuid: ext.packageJSON.uuid,
                     name: ext.packageJSON.name,
                     publisher: ext.packageJSON.publisher,
                     version: ext.packageJSON.version
                 };
-                if (ext.packageJSON.__metadata)
-                {
-                    item.__metadata = ext.packageJSON.__metadata;
-                }
                 result.push(item);
             }
         }
@@ -98,10 +102,10 @@ export default class Extension
 
     /**
      * Sync extensions (add/update/remove).
-     * @param extensions Extensions list.
+     * @param extensions Extensions to be synced.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
+    public sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
     {
         return new Promise((resolve) =>
         {
@@ -147,9 +151,8 @@ export default class Extension
                             Toast.clearSpinner("");
                         }
 
-                        // Fixed: Remove ".obsolete" file (added from VSCode v1.20) after the synchronization.
-                        fs.remove(path.join(this._env.extensionsPath, ".obsolete"))
-                            .then(() => resolve(result)).catch(() => resolve(result));
+                        // Added since VSCode v1.20.
+                        this.upgradeObsolete(added, updated, removed).then(() => resolve(result));
                     }
                 );
             });
@@ -159,7 +162,7 @@ export default class Extension
     /**
      * Download extension from VSCode marketplace.
      */
-    downloadExtension(extension: IExtension): Promise<IExtension>
+    public downloadExtension(extension: IExtension): Promise<IExtension>
     {
         return new Promise((resolve, reject) =>
         {
@@ -173,31 +176,15 @@ export default class Extension
                 }
 
                 const file = fs.createWriteStream(filepath);
-                file.on("finish", () =>
+                downloadFile(
+                    // tslint:disable-next-line
+                    `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`,
+                    file,
+                    this._syncing.proxy
+                ).then(() =>
                 {
                     resolve({ ...extension, zip: filepath });
-                }).on("error", reject);
-
-                const options: https.RequestOptions = {
-                    host: `${extension.publisher}.gallery.vsassets.io`,
-                    path: `/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`
-                };
-                const proxy = this._syncing.proxy;
-                if (proxy)
-                {
-                    options.agent = new HttpsProxyAgent(proxy);
-                }
-                https.get(options, (res) =>
-                {
-                    if (res.statusCode === 200)
-                    {
-                        res.pipe(file);
-                    }
-                    else
-                    {
-                        reject();
-                    }
-                }).on("error", reject);
+                }).catch(reject);
             });
         });
     }
@@ -205,7 +192,7 @@ export default class Extension
     /**
      * Extract extension zip file to VSCode extensions folder.
      */
-    extractExtension(extension: IExtension): Promise<IExtension>
+    public extractExtension(extension: IExtension): Promise<IExtension>
     {
         return new Promise((resolve, reject) =>
         {
@@ -228,7 +215,7 @@ export default class Extension
                             }
                             else
                             {
-                                const extPath = path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${extension.version}`);
+                                const extPath = this._env.getExtensionPath(extension);
                                 fs.emptyDir(extPath)
                                     .then(() =>
                                     {
@@ -255,115 +242,161 @@ export default class Extension
     }
 
     /**
-     * Update extension's __metadata (post-process).
+     * Uninstall extension.
      */
-    updateMetadata(extension: IExtension): Promise<void>
+    public async uninstallExtension(extension: IExtension): Promise<IExtension>
     {
-        return new Promise((resolve, reject) =>
+        const localExtension = vscode.extensions.getExtension(extension.id);
+        const extensionPath = localExtension ? localExtension.extensionPath : this._env.getExtensionPath(extension);
+        try
         {
-            if (extension && extension.__metadata && extension.path)
-            {
-                const filepath = path.join(extension.path, "package.json");
-                fs.readJson(filepath, { encoding: "utf8" })
-                    .then((packageJSON) =>
-                    {
-                        return fs.outputJson(filepath, { ...packageJSON, __metadata: extension.__metadata });
-                    })
-                    .then(resolve)
-                    .catch(() => reject(`Cannot update extension's metadata: ${extension.id}.`));
-            }
-            else
-            {
-                resolve();
-            }
-        });
+            await fs.remove(extensionPath);
+        }
+        catch (err)
+        {
+            throw new Error(`Cannot uninstall extension: ${extension.id}`);
+        }
+        return extension;
     }
 
     /**
-     * Uninstall extension.
+     * Upgrade VSCode '.obsolete' file.
      */
-    uninstallExtension(extension: IExtension): Promise<IExtension>
+    public async upgradeObsolete(added: IExtension[] = [], removed: IExtension[] = [], updated: IExtension[] = []): Promise<void>
     {
-        return new Promise((resolve, reject) =>
+        const filepath = this._env.getObsoleteFilePath();
+        let obsolete: { [extensionFolderName: string]: boolean; } | undefined;
+        try
         {
-            const localExtension = vscode.extensions.getExtension(extension.id);
-            const version = localExtension ? localExtension.packageJSON.version : extension.version;
-            fs.remove(path.join(this._env.extensionsPath, `${extension.publisher}.${extension.name}-${version}`), (err) =>
+            obsolete = await fs.readJson(filepath);
+        }
+        catch (err)
+        {
+        }
+
+        if (obsolete)
+        {
+            for (const ext of [...added, ...updated])
             {
-                if (err)
+                delete obsolete[this._env.getExtensionFolderName(ext)];
+            }
+
+            for (const ext of removed)
+            {
+                obsolete[this._env.getExtensionFolderName(ext)] = true;
+            }
+
+            try
+            {
+                if (Object.keys(obsolete).length > 0)
                 {
-                    reject(new Error(`Cannot uninstall extension: ${extension.id}`));
+                    await fs.outputJson(filepath, obsolete);
                 }
                 else
                 {
-                    resolve(extension);
+                    await fs.remove(filepath);
                 }
-            });
-        });
+            }
+            catch (err)
+            {
+            }
+        }
     }
 
     /**
      * Get extensions that are added/updated/removed.
      */
-    private _getDifferentExtensions(extensions: IExtension[]): Promise<{
+    private async _getDifferentExtensions(extensions: IExtension[]): Promise<{
         added: IExtension[],
         removed: IExtension[],
         updated: IExtension[],
         total: number
     }>
     {
-        return new Promise((resolve) =>
-        {
-            const result = {
-                added: [] as IExtension[],
-                removed: [] as IExtension[],
-                updated: [] as IExtension[],
-                get total()
-                {
-                    return this.added.length + this.removed.length + this.updated.length;
-                }
-            };
-            if (extensions)
+        const result = {
+            added: [] as IExtension[],
+            removed: [] as IExtension[],
+            updated: [] as IExtension[],
+            get total()
             {
-                let localExtension: vscode.Extension<any>;
-                const reservedExtensionIDs: string[] = [];
+                return this.added.length + this.removed.length + this.updated.length;
+            }
+        };
+        if (extensions)
+        {
+            // Automatically update extensions: Query latest extensions meta data.
+            let extensionMetaMap: Map<string, IExtensionMeta> | undefined;
+            const autoUpdateExtensions = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_EXTENSIONS_AUTOUPDATE);
+            if (autoUpdateExtensions)
+            {
+                const ids = extensions.map((ext) => ext.uuid).filter((id) => id != null);
+                extensionMetaMap = await queryExtensions(ids, this._syncing.proxy);
+            }
 
-                // Find added & updated extensions.
-                for (const ext of extensions)
+            let latestVersion: string | undefined;
+            let extensionMeta: IExtensionMeta | undefined;
+            let localExtension: vscode.Extension<any>;
+            const reservedExtensionIDs: string[] = [];
+
+            // Find added & updated extensions.
+            for (const ext of extensions)
+            {
+                // Upgrade to the latest version if available.
+                if (autoUpdateExtensions && extensionMetaMap)
                 {
-                    localExtension = vscode.extensions.getExtension(ext.id);
-                    if (localExtension)
+                    extensionMeta = extensionMetaMap.get(ext.uuid);
+                    if (extensionMeta)
                     {
-                        if (localExtension.packageJSON.version === ext.version)
+                        latestVersion = extensionMeta.versions[0] && extensionMeta.versions[0].version;
+                        if (latestVersion && latestVersion !== ext.version)
                         {
-                            // Reserved.
-                            reservedExtensionIDs.push(ext.id);
+                            ext.version = latestVersion;
                         }
-                        else
-                        {
-                            // Updated.
-                            result.updated.push(ext);
-                        }
+                    }
+                }
+
+                localExtension = vscode.extensions.getExtension(ext.id);
+                if (localExtension)
+                {
+                    if (localExtension.packageJSON.version === ext.version)
+                    {
+                        // Reserved.
+                        reservedExtensionIDs.push(ext.id);
                     }
                     else
                     {
-                        // Added.
-                        result.added.push(ext);
+                        // Updated.
+                        result.updated.push(ext);
                     }
                 }
-
-                const localExtensions: IExtension[] = this.getAll();
-                for (const ext of localExtensions)
+                else
                 {
-                    if (reservedExtensionIDs.indexOf(ext.id) === -1)
-                    {
-                        // Removed.
-                        result.removed.push(ext);
-                    }
+                    // Added.
+                    result.added.push(ext);
                 }
             }
-            resolve(result);
-        });
+
+            // Find removed extensions, but don't remove the extensions that are excluded.
+            // Here's the trick: since the `extensions.json` are always synchronized after the `settings.json`,
+            // We can safely get the patterns from VSCode.
+            const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_EXTENSIONS);
+            const localExtensions: IExtension[] = this.getAll(patterns);
+            for (const ext of localExtensions)
+            {
+                if (reservedExtensionIDs.indexOf(ext.id) === -1)
+                {
+                    // Removed.
+                    result.removed.push(ext);
+                }
+            }
+
+            // Clear map.
+            if (autoUpdateExtensions && extensionMetaMap)
+            {
+                extensionMetaMap.clear();
+            }
+        }
+        return result;
     }
 
     /**
@@ -396,10 +429,6 @@ export default class Extension
                                 Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
                             }
                             return this.extractExtension(extension);
-                        })
-                        .then((extension) =>
-                        {
-                            return this.updateMetadata(extension);
                         })
                         .then(() =>
                         {
@@ -458,10 +487,6 @@ export default class Extension
                                 Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
                             }
                             return this.extractExtension(extension);
-                        })
-                        .then((extension) =>
-                        {
-                            return this.updateMetadata(extension);
                         })
                         .then(() =>
                         {

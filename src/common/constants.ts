@@ -1,8 +1,12 @@
-// Dot-separated identifiers, same as the secions of VSCode, see `vscode.workspace.getConfiguration`.
+// Dot-separated identifiers, same as the sections of VSCode, see `vscode.workspace.getConfiguration`.
 export const CONFIGURATION_KEY = "syncing";
+export const CONFIGURATION_EXCLUDED_EXTENSIONS = "excludedExtensions";
+export const CONFIGURATION_EXCLUDED_SETTINGS = "excludedSettings";
+export const CONFIGURATION_EXTENSIONS_AUTOUPDATE = "extensions.autoUpdate";
 export const CONFIGURATION_POKA_YOKE_THRESHOLD = "pokaYokeThreshold";
-export const CONFIGURATION_UPLOAD_EXCLUDE = "upload.exclude";
 
-// Dot-separated identifiers, used to access the properties of VSCode settings file.
-export const SETTINGS_POKA_YOKE_THRESHOLD = `${CONFIGURATION_KEY}.${CONFIGURATION_POKA_YOKE_THRESHOLD}`;
-export const SETTINGS_UPLOAD_EXCLUDE = `${CONFIGURATION_KEY}.${CONFIGURATION_UPLOAD_EXCLUDE}`;
+// Dot-separated identifiers, used to access the properties of Syncing's VSCode settings.
+export const SETTING_EXCLUDED_EXTENSIONS = `${CONFIGURATION_KEY}.${CONFIGURATION_EXCLUDED_EXTENSIONS}`;
+export const SETTING_EXCLUDED_SETTINGS = `${CONFIGURATION_KEY}.${CONFIGURATION_EXCLUDED_SETTINGS}`;
+export const SETTING_EXTENSIONS_AUTOUPDATE = `${CONFIGURATION_KEY}.${CONFIGURATION_EXTENSIONS_AUTOUPDATE}`;
+export const SETTING_POKA_YOKE_THRESHOLD = `${CONFIGURATION_KEY}.${CONFIGURATION_POKA_YOKE_THRESHOLD}`;

@@ -6,7 +6,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-**Syncing** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **sync all of your VSCode settings across multiple devices** with GitHub Gist.
+**Syncing** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **synchronize all of your VSCode settings across multiple devices** with GitHub Gist.
 
 [Getting started](#getting-started) or [check out the examples](#examples).
 
@@ -15,19 +15,15 @@
 
 ## Breaking Changes
 
-* From ***version 1.7.0*** onwards:
+* From ***version 1.8.0*** onwards:
 
-    * `Syncing` will **merge the `settings.json` and `settings-mac.json` files into one**, i.e., the `settings.json` file, which will make it easy to sync between Windows/Mac/Linux devices.
+    1. **You can exclude VSCode extensions from being synchronized.**
 
-        More specifically:
+    1. **`Syncing` will now automatically update your extensions during the synchronization.**
 
-        * `VSCode User Settings` will always be uploaded as `settings.json`, and **the `settings-mac.json` file will be deleted automatically**.
+    1. **In addition, I've changed some settings of `Syncing` to improve the scalability.**
 
-            > In case you may still need the `settings-mac.json` file, you will find it in the `revisions` of your `Gist`.
-
-        * `Syncing` will try to download the `settings.json` corresponding to the current device, to ensure this upgrade will not break your existing settings.
-
-        > Please note that the `keybindings` will still be synced separately.
+    > Please [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
 
 ## Features
@@ -37,7 +33,7 @@
 1. **Upload VSCode Settings**:
 
     * It will upload the `settings, keybindings, extensions, locales` and `snippets`.
-    * The `keybindings` of `Macintosh` and `non-Macintosh` will be synced separately, in case you have multiple devices.
+    * The `keybindings` of `Macintosh` and `non-Macintosh` will be synchronized separately, in case you have multiple devices.
     * Automatically create a new Gist to store your settings.
     * Use an incremental algorithm to boost the synchronization.
     * You can `exclude some VSCode User Settings` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
@@ -97,24 +93,51 @@ The keybindings **are unassigned by default**, but you can easily turn them on b
 
 ## VSCode User Settings
 
-From ***version 1.6.0*** onwards, you'll find these two newly added `Syncing Settings` in your `VSCode User Settings`.
+You can find the following `Syncing Settings` in your `VSCode User Settings`.
 
-1. ***`syncing.upload.exclude`***
+1. ***`syncing.excludedExtensions`***
 
-    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synced.
+    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode Extensions` from being synchronized.
 
-    > Note that the settings not listed here will still be synced.
+    > Note that the extensions not listed here will still be synchronized.
 
     Take this for example:
 
     ```json
-    "syncing.upload.exclude" : [
+    "syncing.excludedExtensions" : [
+        "somepublisher.*",
+        "nonoroazoro.syncing"
+    ]
+    ```
+
+    Note that the excluded `extension name` is actually the `extension id` (you can find it in the `VSCode Extensions View`), such as:
+
+    ![exclude extensions](docs/png/Exclude-Extensions.png)
+
+    Now the extension `nonoroazoro.syncing` (i.e., `Syncing`) and all the extensions of the author `somepublisher` will no longer be synchronized.
+
+1. ***`syncing.excludedSettings`*** *(Formerly `syncing.upload.exclude`)*
+
+    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synchronized.
+
+    > Note that the settings not listed here will still be synchronized.
+
+    Take this for example:
+
+    ```json
+    "syncing.excludedSettings" : [
         "editor.*",
         "workbench.colorTheme"
     ]
     ```
 
-    Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synced.
+    Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synchronized.
+
+1. ***`syncing.extensions.autoUpdate`***
+
+    You can configure this setting to let `Syncing` automatically update your extensions during the synchronization.
+
+    This is `enabled by default` but you can turn it off in your `VSCode User Settings`.
 
 1. ***`syncing.pokaYokeThreshold`***
 
