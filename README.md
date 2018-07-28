@@ -116,7 +116,7 @@ You can find the following `Syncing Settings` in your `VSCode User Settings`.
 
     Now the extension `nonoroazoro.syncing` (i.e., `Syncing`) and all the extensions of the author `somepublisher` will no longer be synchronized.
 
-1. ***`syncing.excludedSettings` (Formerly `syncing.upload.exclude`)***
+1. ***`syncing.excludedSettings`*** *(Formerly `syncing.upload.exclude`)*
 
     You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synchronized.
 
