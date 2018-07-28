@@ -21,7 +21,7 @@
 
     1. **`Syncing` will now automatically update your extensions during the synchronization.**
 
-    1. **In addition, I've changed some settings of `Syncing` to improve the scalability。**
+    1. **In addition, I've changed some settings of `Syncing` to improve the scalability.**
 
     > Please [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
