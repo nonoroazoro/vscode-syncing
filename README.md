@@ -15,13 +15,13 @@
 
 ## Breaking Changes
 
-* From ***version 1.7.0*** onwards:
+* From ***version 1.8.0*** onwards:
 
     1. **You can exclude VSCode extensions from being synchronized.**
 
     1. **`Syncing` will now automatically update your extensions during the synchronization.**
 
-    1. **In addition, I've changed some settings of `Syncing` in order to meet the demands of scalability。**
+    1. **In addition, I've changed some settings of `Syncing` to improve the scalability。**
 
     > Please [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
@@ -109,6 +109,10 @@ You can find the following `Syncing Settings` in your `VSCode User Settings`.
         "nonoroazoro.syncing"
     ]
     ```
+
+    Note that the excluded `extension name` is actually the `extension id` (you can find it in the `VSCode Extensions View`), such as:
+
+    ![exclude extensions](docs/png/Exclude-Extensions.png)
 
     Now the extension `nonoroazoro.syncing` (i.e., `Syncing`) and all the extensions of the author `somepublisher` will no longer be synchronized.
 
