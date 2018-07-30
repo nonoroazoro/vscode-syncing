@@ -32,7 +32,7 @@
 
 1. **Upload VSCode Settings**:
 
-    * It will upload the `settings, keybindings, extensions, locales` and `snippets`.
+    * Including your `User Settings`, `Keybindings`, `Extensions`, `Locales` and `Snippets`.
     * The `keybindings` of `Macintosh` and `non-Macintosh` will be synchronized separately, in case you have multiple devices.
     * Automatically create a new Gist to store your settings.
     * Use an incremental algorithm to boost the synchronization.
