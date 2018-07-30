@@ -6,7 +6,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-**Syncing** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **synchronize all of your VSCode settings across multiple devices** with GitHub Gist.
+**Syncing** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **synchronize all of your VSCode settings across multiple devices** with your [GitHub Gist](https://gist.github.com).
 
 [Getting started](#getting-started) or [check out the examples](#examples).
 
