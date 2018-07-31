@@ -176,8 +176,9 @@ export default class Extension
                 }
 
                 // tslint:disable-next-line
-                // `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`,
-                const zipURI = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${extension.publisher}/vsextensions/${extension.name}/${extension.version}/vspackage`;
+                // `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${extension.publisher}/vsextensions/${extension.name}/${extension.version}/vspackage`
+                // tslint:disable-next-line
+                const zipURI = `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
                 downloadFile(zipURI, filepath, this._syncing.proxy).then(() =>
                 {
                     resolve({ ...extension, zip: filepath });
