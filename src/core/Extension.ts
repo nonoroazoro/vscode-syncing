@@ -175,13 +175,10 @@ export default class Extension
                     return;
                 }
 
-                const file = fs.createWriteStream(filepath);
-                downloadFile(
-                    // tslint:disable-next-line
-                    `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`,
-                    file,
-                    this._syncing.proxy
-                ).then(() =>
+                // tslint:disable-next-line
+                // `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`,
+                const zipURI = `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${extension.publisher}/vsextensions/${extension.name}/${extension.version}/vspackage`;
+                downloadFile(zipURI, filepath, this._syncing.proxy).then(() =>
                 {
                     resolve({ ...extension, zip: filepath });
                 }).catch(reject);
@@ -278,12 +275,12 @@ export default class Extension
         {
             for (const ext of [...added, ...updated])
             {
-                delete obsolete[this._env.getExtensionFolderName(ext)];
+                delete obsolete[this._env.getExtensionFolderName(ext).toLowerCase()];
             }
 
             for (const ext of removed)
             {
-                obsolete[this._env.getExtensionFolderName(ext)] = true;
+                obsolete[this._env.getExtensionFolderName(ext).toLowerCase()] = true;
             }
 
             try

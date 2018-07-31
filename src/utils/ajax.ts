@@ -1,6 +1,8 @@
+import * as fs from "fs-extra";
 import * as https from "https";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import * as url from "url";
+import * as zlib from "zlib";
 
 /**
  * Post.
@@ -69,15 +71,15 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
 /**
  * Download file.
  *
- * @param {string} api The resource url.
- * @param {NodeJS.WritableStream} fs The stream where the file will be wrote;
+ * @param {string} uri The resource uri.
+ * @param {string} savepath The path where the file will be saved;
  * @param {string} [proxy] The proxy settings.
  */
-export function downloadFile(api: string, fs: NodeJS.WritableStream, proxy?: string): Promise<void>
+export function downloadFile(uri: string, savepath: string, proxy?: string): Promise<void>
 {
     return new Promise((resolve, reject) =>
     {
-        const { hostname, path, port } = url.parse(api);
+        const { hostname, path, port } = url.parse(uri);
         const options: https.RequestOptions = {
             host: hostname,
             path
@@ -93,17 +95,45 @@ export function downloadFile(api: string, fs: NodeJS.WritableStream, proxy?: str
             options.agent = new HttpsProxyAgent(proxy);
         }
 
-        fs.on("finish", resolve).on("error", reject);
+        const file = fs.createWriteStream(savepath);
+        file.on("finish", () =>
+        {
+            file.close();
+            resolve();
+        });
         https.get(options, (res) =>
         {
             if (res.statusCode === 200)
             {
-                res.pipe(fs);
+                let intermediate: zlib.Gunzip | zlib.Inflate | undefined;
+                const contentEncoding = res.headers["content-encoding"];
+                if (contentEncoding === "gzip")
+                {
+                    intermediate = zlib.createGunzip();
+                }
+                else if (contentEncoding === "deflate")
+                {
+                    intermediate = zlib.createInflate();
+                }
+
+                if (intermediate)
+                {
+                    res.pipe(intermediate).pipe(file);
+                }
+                else
+                {
+                    res.pipe(file);
+                }
             }
             else
             {
                 reject();
             }
-        }).on("error", reject);
+        }).on("error", (err) =>
+        {
+            fs.remove(savepath)
+                .then(() => reject(err))
+                .catch(() => reject(err));
+        });
     });
 }
