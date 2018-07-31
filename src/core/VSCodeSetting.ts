@@ -233,9 +233,14 @@ export default class VSCodeSetting
                             if (setting.type === SettingTypes.Extensions)
                             {
                                 // Temp extensions file.
+
+                                // TODO: remove the next line in the next release.
+                                setting.content = (setting.content || "[]").toLowerCase();
+
+                                // TODO: remove || "[]").toLowerCase() in the next release.
                                 extensionsSetting = {
                                     ...setting,
-                                    content: gistFile.content
+                                    content: (gistFile.content || "[]").toLowerCase()
                                 };
                             }
                             else

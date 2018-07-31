@@ -379,6 +379,16 @@ export default class Gist
             remoteFile = remoteFiles[key];
             if (localFile)
             {
+                // TODO: remove in the next release.
+                if (localFile.content && key === "extensions.json")
+                {
+                    localFile.content = localFile.content.toLowerCase();
+                }
+                if (remoteFile.content && key === "extensions.json")
+                {
+                    remoteFile.content = remoteFile.content.toLowerCase();
+                }
+
                 // ignore null local file.
                 if (localFile.content && localFile.content !== remoteFile.content)
                 {
