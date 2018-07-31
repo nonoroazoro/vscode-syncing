@@ -1,12 +1,19 @@
 # Changelogs
 
+## 1.8.1 - July 31, 2018
+
+- Changed: Use lowercase extension metadata.
+
+- Changed: Narrow the scope of diff down to improve user experience.
+
+
 ## 1.8.0 - July 28, 2018
 
 - Added: Exclude VSCode extensions from being synchronized.
 
 - Added: Automatically update your extensions during the synchronization.
 
-- Changed: Changed some settings of `Syncing` to improve the scalability.
+- Changed: Change some settings of `Syncing` to improve the scalability.
 
 
 ## 1.7.3 - July 15, 2018
