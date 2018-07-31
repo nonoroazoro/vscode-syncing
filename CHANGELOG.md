@@ -4,7 +4,7 @@
 
 - Changed: Use lowercase extension metadata.
 
-- Changed: Narrow the scope of diff down to improve user experience.
+- Changed: Narrow the scope of diff down to improve the user experience.
 
 
 ## 1.8.0 - July 28, 2018
