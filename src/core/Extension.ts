@@ -84,7 +84,7 @@ export default class Extension
         {
             if (
                 !ext.packageJSON.isBuiltin
-                && !excludedExtensions.some((pattern) => minimatch(ext.id, pattern))
+                && !excludedExtensions.some((pattern) => minimatch((ext.packageJSON.id || "").toLowerCase(), pattern))
             )
             {
                 item = {
