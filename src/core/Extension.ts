@@ -84,14 +84,14 @@ export default class Extension
         {
             if (
                 !ext.packageJSON.isBuiltin
-                && !excludedExtensions.some((pattern) => minimatch(ext.id, pattern))
+                && !excludedExtensions.some((pattern) => minimatch((ext.packageJSON.id || "").toLowerCase(), pattern))
             )
             {
                 item = {
-                    id: ext.packageJSON.id,
-                    uuid: ext.packageJSON.uuid,
-                    name: ext.packageJSON.name,
-                    publisher: ext.packageJSON.publisher,
+                    id: (ext.packageJSON.id || "").toLowerCase(),
+                    uuid: (ext.packageJSON.uuid || "").toLowerCase(),
+                    name: (ext.packageJSON.name || "").toLowerCase(),
+                    publisher: (ext.packageJSON.publisher || "").toLowerCase(),
                     version: ext.packageJSON.version
                 };
                 result.push(item);
@@ -175,13 +175,11 @@ export default class Extension
                     return;
                 }
 
-                const file = fs.createWriteStream(filepath);
-                downloadFile(
-                    // tslint:disable-next-line
-                    `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`,
-                    file,
-                    this._syncing.proxy
-                ).then(() =>
+                // tslint:disable-next-line
+                // `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${extension.publisher}/vsextensions/${extension.name}/${extension.version}/vspackage`
+                // tslint:disable-next-line
+                const zipURI = `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
+                downloadFile(zipURI, filepath, this._syncing.proxy).then(() =>
                 {
                     resolve({ ...extension, zip: filepath });
                 }).catch(reject);
@@ -246,7 +244,7 @@ export default class Extension
      */
     public async uninstallExtension(extension: IExtension): Promise<IExtension>
     {
-        const localExtension = vscode.extensions.getExtension(extension.id);
+        const localExtension = this._getExtension(extension.id);
         const extensionPath = localExtension ? localExtension.extensionPath : this._env.getExtensionPath(extension);
         try
         {
@@ -335,7 +333,7 @@ export default class Extension
 
             let latestVersion: string | undefined;
             let extensionMeta: IExtensionMeta | undefined;
-            let localExtension: vscode.Extension<any>;
+            let localExtension: vscode.Extension<any> | undefined;
             const reservedExtensionIDs: string[] = [];
 
             // Find added & updated extensions.
@@ -355,7 +353,7 @@ export default class Extension
                     }
                 }
 
-                localExtension = vscode.extensions.getExtension(ext.id);
+                localExtension = this._getExtension(ext.id);
                 if (localExtension)
                 {
                     if (localExtension.packageJSON.version === ext.version)
@@ -545,5 +543,20 @@ export default class Extension
                 }
             );
         });
+    }
+
+    /**
+     * TODO: should be removed in the next release.
+     */
+    private _getExtension(id: string)
+    {
+        if (id)
+        {
+            return vscode.extensions.all.find((ext) =>
+            {
+                return (ext.packageJSON.id || "").toLowerCase() === id.toLowerCase();
+            });
+        }
+        return;
     }
 }

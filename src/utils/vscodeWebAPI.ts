@@ -13,7 +13,7 @@ export async function queryExtensions(ids: string[], proxy?: string): Promise<Ma
     if (ids.length > 0)
     {
         const api = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery";
-        const headers = { Accept: "application/json;api-version=3.0-preview.1" };
+        const headers = { Accept: "application/json; api-version=5.0-preview.1" };
         const data = {
             filters: [
                 {

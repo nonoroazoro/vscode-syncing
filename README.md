@@ -6,7 +6,7 @@
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-**Syncing** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **synchronize all of your VSCode settings across multiple devices** with GitHub Gist.
+**Syncing** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **synchronize all of your VSCode settings across multiple devices** with your [GitHub Gist](https://gist.github.com).
 
 [Getting started](#getting-started) or [check out the examples](#examples).
 
@@ -32,18 +32,18 @@
 
 1. **Upload VSCode Settings**:
 
-    * It will upload the `settings, keybindings, extensions, locales` and `snippets`.
+    * Including your `User Settings`, `Keybindings`, `Extensions`, `Locales` and `Snippets`.
     * The `keybindings` of `Macintosh` and `non-Macintosh` will be synchronized separately, in case you have multiple devices.
     * Automatically create a new Gist to store your settings.
     * Use an incremental algorithm to boost the synchronization.
-    * You can `exclude some VSCode User Settings` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
+    * You can `exclude some VSCode User Settings and Extensions` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
 1. **Download VSCode Settings**:
 
     * **Always overwrite** local settings.
     * Automatically `install, update` and `remove` extensions.
     * You can download settings from `a public Gist`, such as your friend's VSCode settings, [check out here](#getting-started) for more details.
-    * You can `exclude some VSCode User Settings` from being downloaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
+    * You can `exclude some VSCode User Settings and Extensions` from being downloaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
 Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of course, you'll have a `progress indicator` during the synchronization :).
 
@@ -158,13 +158,13 @@ You can set up a proxy to accelerate the synchronization. Here are the steps:
 
 1. Type `"Syncing: Open Syncing Settings"` (or just `"opensync"`) in `VSCode Command Palette` to open `Syncing`'s own settings file (i.e. `syncing.json`).
 
-1. Change the `"http_proxy"` setting (From ***version 1.5.0*** onwards, `Syncing` will no longer read `http.proxy` from `VSCode User Settings`), for example:
+1. Change the `"http_proxy"` setting, for example:
 
     ```json
     "http_proxy": "http://127.0.0.1:1080"
     ```
 
-Moreover, if you don't set `"http_proxy"`, `Syncing` will try to use the `http_proxy` and `https_proxy` environment variables.
+Moreover, if the `"http_proxy"` is unset, `Syncing` will try to read the `http_proxy` and `https_proxy` environment variables as a fallback.
 
 > Please note that unlike the settings in [VSCode User Settings](#vscode-user-settings), `Syncing` **will not upload** its own settings file because it contains your personal information.
 

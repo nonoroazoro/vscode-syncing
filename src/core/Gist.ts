@@ -379,6 +379,16 @@ export default class Gist
             remoteFile = remoteFiles[key];
             if (localFile)
             {
+                // TODO: remove in the next release.
+                if (localFile.content && key === "extensions.json")
+                {
+                    localFile.content = localFile.content.toLowerCase();
+                }
+                if (remoteFile.content && key === "extensions.json")
+                {
+                    remoteFile.content = remoteFile.content.toLowerCase();
+                }
+
                 // ignore null local file.
                 if (localFile.content && localFile.content !== remoteFile.content)
                 {
@@ -448,13 +458,27 @@ export default class Gist
     private _parseToJSON(files: GitHubTypes.IGistFiles): any
     {
         let file: any;
+        let parsed: any;
         const result = {};
         for (const key of Object.keys(files))
         {
             file = files[key];
             if (file)
             {
-                result[key] = parse(file.content || "");
+                parsed = parse(file.content || "");
+
+                // Only compare extension's id and version.
+                if (key === "extensions.json" && Array.isArray(parsed))
+                {
+                    for (const ext of parsed)
+                    {
+                        delete ext["uuid"];
+                        delete ext["name"];
+                        delete ext["publisher"];
+                    }
+                }
+
+                result[key] = parsed;
             }
             else
             {
