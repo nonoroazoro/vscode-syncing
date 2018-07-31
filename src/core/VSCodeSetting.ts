@@ -632,12 +632,26 @@ export default class VSCodeSetting
      */
     private _parseToJSON(settings: ISetting[]): any
     {
-        const result = {};
+        let parsed: any;
         let content: string;
+        const result = {};
         for (const setting of settings)
         {
             content = setting.content || "";
-            result[setting.remoteFilename] = parse(content) || content;
+            parsed = parse(content);
+
+            // Only compare extension's id and version.
+            if (setting.type === SettingTypes.Extensions && Array.isArray(parsed))
+            {
+                for (const ext of parsed)
+                {
+                    delete ext["uuid"];
+                    delete ext["name"];
+                    delete ext["publisher"];
+                }
+            }
+
+            result[setting.remoteFilename] = parsed || content;
         }
         return result;
     }
