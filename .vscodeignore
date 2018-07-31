@@ -12,3 +12,4 @@ tslint.json
 docs/**
 src/**
 test/**
+yarn.lock
