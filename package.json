@@ -97,12 +97,15 @@
     "scripts": {
         "vscode:prepublish": "npm run build",
         "precommit": "lint-staged",
-        "prebuild": "npm run clean",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "prebuild": "npm run clean && npm run cleanCov",
         "build": "tsc -p ./tsconfig.json --sourceMap false",
         "watch": "tsc -p ./tsconfig.json -w",
-        "test": "mocha",
         "clean": "rimraf dist/*",
-        "postinstall": "node ./node_modules/vscode/bin/install"
+        "cleanCov": "rimraf @coverage",
+        "test": "jest --config ./jest.config.js",
+        "test:watch": "npm test -- --watch",
+        "test:cov": "npm run cleanCov && npm test -- --coverage"
     },
     "dependencies": {
         "@octokit/rest": "^15.9.4",
@@ -122,15 +125,16 @@
         "@types/async": "^2.0.49",
         "@types/extract-zip": "^1.6.2",
         "@types/fs-extra": "^5.0.4",
+        "@types/jest": "^23.3.2",
         "@types/lodash.pick": "^4.4.3",
         "@types/minimatch": "^3.0.3",
         "@types/node": "^10.5.2",
         "@types/tmp": "0.0.33",
         "husky": "^0.14.3",
+        "jest": "^23.6.0",
         "lint-staged": "^7.2.0",
-        "mocha": "^5.2.0",
         "rimraf": "^2.6.2",
-        "should": "^13.2.1",
+        "ts-jest": "^23.1.4",
         "tslint": "^5.11.0",
         "typescript": "^2.9.2",
         "vscode": "^1.1.18"

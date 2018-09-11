@@ -4,6 +4,7 @@
 # Configuration files
 .editorconfig
 .gitignore
+jest.config.js
 tsconfig.json
 tslint.json
 
@@ -11,5 +12,4 @@ tslint.json
 .github/**
 docs/**
 src/**
-test/**
 yarn.lock
