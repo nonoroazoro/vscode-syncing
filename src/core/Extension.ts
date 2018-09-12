@@ -82,6 +82,7 @@ export default class Extension
         const result: IExtension[] = [];
         for (const ext of vscode.extensions.all)
         {
+            // TODO: `toLowerCase` should be double checked.
             if (
                 !ext.packageJSON.isBuiltin
                 && !excludedExtensions.some((pattern) => minimatch((ext.packageJSON.id || "").toLowerCase(), pattern))
