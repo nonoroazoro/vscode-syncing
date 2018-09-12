@@ -8,7 +8,7 @@ import * as vscode from "vscode";
 
 import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE, CONFIGURATION_KEY } from "../common/constants";
 import { IExtension, ISyncedItem } from "../common/types";
-import { IExtensionMeta } from "../common/WebAPITypes";
+import { IExtensionMeta } from "../common/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { queryExtensions } from "../utils/vscodeWebAPI";
