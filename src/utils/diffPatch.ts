@@ -22,7 +22,7 @@ export function diff(left: any, right: any): number
                     // Filter out the keys of the items moved inside the array.
                     if (!_isArrayItemMoved(value))
                     {
-                        return prev++;
+                        return prev + 1;
                     }
                 }
                 else
