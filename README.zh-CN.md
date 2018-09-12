@@ -15,13 +15,9 @@
 
 ## 重要变更
 
-* 从 ***1.8.0*** 版本开始：
+* 从 ***1.8.2*** 版本开始：
 
-    1. **在同步时允许排除指定的 VSCode 扩展；**
-
-    1. **在同步时 `Syncing` 默认会自动升级你的 VSCode 扩展，你可以在 `VSCode 用户设置`中关闭该功能；**
-
-    1. **同时，为了应对后续功能扩展，修改了部分 `Syncing` 配置项的名称。**
+    1. `VSCode` 从 `1.27` 版本开始提供了 [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) 功能，因此我新增了一个配置项 `syncing.separateKeybindings`，这样你就可以选择用`单个文件`来同步所有`快捷键`了。
 
     > 具体请参考 `Syncing` 的 [VSCode 配置项](#vscode-配置项)。
 
@@ -32,8 +28,8 @@
 
 1. **上传 VSCode 配置**:
 
-    * 包括你的 `用户设置`, `快捷键`, `扩展`, `语言设置` 以及所有 `代码片段（Snippets）`；
-    * 因为 `Mac` 和`非 Mac` 设备的配置通常会有一些差异，所以 `快捷键` 将会按照设备类型分别上传；
+    * 包括你的`用户设置`，`快捷键`，`扩展`，`语言设置`以及所有`代码片段（Snippets）`；
+    * 因为 `Mac` 和`非 Mac` 设备的配置通常会有一些差异，所以`快捷键`将会按照操作系统的不同分别上传；
     * 自动帮你创建新的 `Gist` 来保存 VSCode 配置，例如当你第一次使用这个扩展上传配置时；
     * 为了加快同步速度，整个同步过程都是`增量`的；
     * 你可以`排除某些 VSCode 配置项和扩展`，以防它们被上传，具体请参考[这里](#vscode-配置项)。
@@ -135,7 +131,7 @@
 
 1. ***`syncing.extensions.autoUpdate`***
 
-    通过这个配置项，你可以让 `Syncing` 在同步时自动升级你的 VSCode 扩展。
+    通过这个配置项，可以让 `Syncing` 在同步时自动升级你的 VSCode 扩展。
 
     这个功能是`默认开启`的，当然你也可以在 `VSCode 用户设置` 中关掉它。
 
@@ -152,6 +148,14 @@
     ```
 
     这样一来每次你同步时，`Syncing` 都会检查本地和云端的配置差异量，并决定是否需要向你显示确认对话框。
+
+1. ***`syncing.separateKeybindings`***
+
+    通过这个配置项，可以决定是否让 `Syncing` 按照设备`操作系统`的不同来分开同步你的`快捷键`配置。
+
+    因为 `VSCode` 在 `1.27` 版本开始提供了 [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) 功能，你现在可以禁用这个配置。注意：在禁用之前，请务必确保你已经手动合并了现有的`快捷键`配置。
+
+    这个功能是`默认开启`的，当然你也可以在 `VSCode 用户设置` 中关掉它。
 
 
 ## 代理设置

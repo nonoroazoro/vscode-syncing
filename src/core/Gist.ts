@@ -42,6 +42,7 @@ export default class Gist
 
     /**
      * Create an instance of class `Gist`, only create new when params are changed.
+     *
      * @param token GitHub Personal Access Token.
      * @param proxy Proxy url.
      */
@@ -73,15 +74,18 @@ export default class Gist
     /**
      * Get the currently authenticated GitHub user.
      */
-    public user(): Promise<{ name: string, id: number } | null>
+    public user(): Promise<{ id: number, name: string } | null>
     {
         return new Promise((resolve) =>
         {
-            this._api.users
-                .get({})
-                .then(({ data }: { data: GitHubTypes.IGistOwner }) =>
+            this._api.users.get({})
+                .then((res) =>
                 {
-                    resolve({ name: data.login, id: data.id });
+                    const data: GitHubTypes.IGistOwner = res.data;
+                    resolve({
+                        id: data.id,
+                        name: data.login
+                    });
                 })
                 .catch(() =>
                 {
@@ -92,6 +96,7 @@ export default class Gist
 
     /**
      * Get gist of the authenticated user.
+     *
      * @param id Gist id.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
@@ -122,8 +127,7 @@ export default class Gist
                 Toast.showSpinner("Syncing: Checking remote settings.");
             }
 
-            // TODO: Remove "as any" after the @octokit/rest is updated.
-            this._api.gists.get({ gist_id: id } as any).then(resolveWrap).catch(({ code }) =>
+            this._api.gists.get({ gist_id: id }).then(resolveWrap).catch(({ code }) =>
             {
                 rejectWrap(this._createError(code));
             });
@@ -139,11 +143,12 @@ export default class Gist
         {
             this._api.gists.getAll({}).then((res) =>
             {
-                // filter out the VSCode settings.
-                const gists: GitHubTypes.IGist[] = res.data;
-                resolve(gists
-                    .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files["extensions.json"]))
-                    .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime())
+                // Filter out VSCode settings.
+                const gists: GitHubTypes.IGist[] = res.data as any;
+                resolve(
+                    gists
+                        .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files["extensions.json"]))
+                        .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime())
                 );
             }).catch(({ code }) =>
             {
@@ -154,25 +159,27 @@ export default class Gist
 
     /**
      * Delete gist.
+     *
      * @param id Gist id.
      */
-    public delete(id: string): Promise<GitHubTypes.IGist>
+    public async delete(id: string): Promise<void>
     {
-        // TODO: Remove "as any" after the @octokit/rest is updated.
-        return this._api.gists.delete({ gist_id: id } as any).then((res) => res.data);
+        await this._api.gists.delete({ gist_id: id });
     }
 
     /**
      * Update gist.
+     *
      * @param content Gist content.
      */
     public update(content: Github.GistsEditParams): Promise<GitHubTypes.IGist>
     {
-        return this._api.gists.edit(content).then((res) => res.data);
+        return this._api.gists.edit(content).then((res) => res.data as any as GitHubTypes.IGist);
     }
 
     /**
      * Check if the gist of the currently authenticated user is exists.
+     *
      * @param id Gist id.
      */
     public exists(id: string): Promise<GitHubTypes.IGist | boolean>
@@ -188,7 +195,7 @@ export default class Gist
                         {
                             this.user().then((user) =>
                             {
-                                // check if the Gist's owner is the currently authenticated user.
+                                // Check if the Gist's owner is the currently authenticated user.
                                 if (user && user.id === gist.owner.id)
                                 {
                                     resolve(gist);
@@ -215,6 +222,7 @@ export default class Gist
 
     /**
      * Create gist.
+     *
      * @param content Gist content.
      */
     public create(content: Github.GistsCreateParams): Promise<GitHubTypes.IGist>
@@ -223,7 +231,7 @@ export default class Gist
         {
             this._api.gists.create(content).then((res) =>
             {
-                resolve(res.data);
+                resolve(res.data as any as GitHubTypes.IGist);
             }).catch(({ code }) =>
             {
                 reject(this._createError(code));
@@ -233,6 +241,7 @@ export default class Gist
 
     /**
      * Create settings gist.
+     *
      * @param files Settings files.
      * @param isPublic Defaults to `false`, gist is set to private.
      */
@@ -247,6 +256,7 @@ export default class Gist
 
     /**
      * Find and update gist.
+     *
      * @param id Gist id.
      * @param uploads Settings that will be uploaded.
      * @param upsert Default is `true`, create new if gist not exists.
@@ -316,8 +326,7 @@ export default class Gist
                                 {
                                     if (selection === okButton)
                                     {
-                                        // TODO: Remove "as any" after the @octokit/rest is updated.
-                                        this.update(localGist as any).then(resolveWrap).catch(rejectWrap);
+                                        this.update(localGist).then(resolveWrap).catch(rejectWrap);
                                     }
                                     else
                                     {
@@ -327,14 +336,12 @@ export default class Gist
                             }
                             else
                             {
-                                // TODO: Remove "as any" after the @octokit/rest is updated.
-                                this.update(localGist as any).then(resolveWrap).catch(rejectWrap);
+                                this.update(localGist).then(resolveWrap).catch(rejectWrap);
                             }
                         }
                         else
                         {
-                            // TODO: Remove "as any" after the @octokit/rest is updated.
-                            this.update(localGist as any).then(resolveWrap).catch(rejectWrap);
+                            this.update(localGist).then(resolveWrap).catch(rejectWrap);
                         }
                     }
                     else
@@ -346,7 +353,7 @@ export default class Gist
                 {
                     if (upsert)
                     {
-                        // TODO: pass gist public.
+                        // TODO: Pass gist public option.
                         this.createSettings(localGist.files).then(resolveWrap).catch(rejectWrap);
                     }
                     else
@@ -360,9 +367,8 @@ export default class Gist
 
     /**
      * Get modified files list.
-     * @returns {} or `null`.
      */
-    private _getModifiedFiles(localFiles: any, remoteFiles?: GitHubTypes.IGistFiles): any
+    private _getModifiedFiles(localFiles: any, remoteFiles?: GitHubTypes.IGistFiles): object | null
     {
         if (!remoteFiles)
         {
@@ -379,7 +385,7 @@ export default class Gist
             remoteFile = remoteFiles[key];
             if (localFile)
             {
-                // TODO: remove in the next release.
+                // TODO: Remove in the next release.
                 if (localFile.content && key === "extensions.json")
                 {
                     localFile.content = localFile.content.toLowerCase();
@@ -389,7 +395,7 @@ export default class Gist
                     remoteFile.content = remoteFile.content.toLowerCase();
                 }
 
-                // ignore null local file.
+                // Ignore null local file.
                 if (localFile.content && localFile.content !== remoteFile.content)
                 {
                     result[key] = localFile;
@@ -397,7 +403,7 @@ export default class Gist
             }
             else
             {
-                // remove remote file (don't remove remote keybindings and settings).
+                // Remove remote file except keybindings and settings.
                 if (!key.includes(SettingTypes.Keybindings) && !key.includes(SettingTypes.Settings))
                 {
                     result[key] = null;
@@ -406,12 +412,12 @@ export default class Gist
             recordedKeys.push(key);
         }
 
-        // add rest local files.
+        // Add rest local files.
         for (const key of Object.keys(localFiles))
         {
             if (recordedKeys.indexOf(key) === -1)
             {
-                // ignore null local file.
+                // Ignore null local file.
                 localFile = localFiles[key];
                 if (localFile.content)
                 {
@@ -455,7 +461,7 @@ export default class Gist
     /**
      * Converts the `content` of `GitHubTypes.IGistFiles` into a `JSON object`.
      */
-    private _parseToJSON(files: GitHubTypes.IGistFiles): any
+    private _parseToJSON(files: GitHubTypes.IGistFiles): object
     {
         let file: any;
         let parsed: any;

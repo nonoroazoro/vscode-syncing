@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "Syncing",
     "description": "Synchronize all of your VSCode settings across multiple devices.",
-    "version": "1.8.1",
+    "version": "1.8.2",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -74,7 +74,12 @@
                     "syncing.pokaYokeThreshold": {
                         "type": "number",
                         "default": 10,
-                        "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing). Each time you start a synchronization, Syncing will display a confirm dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
+                        "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing).\nEach time you start a synchronization, Syncing will display a confirm dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
+                    },
+                    "syncing.separateKeybindings": {
+                        "type": "boolean",
+                        "default": true,
+                        "description": "Synchronize the \"keybindings\" separately for different operating systems.\nYou may disable it since the VSCode has introduced the \"Platform Specific Keybindings\" from version 1.27. But please make sure you've already merged your keybindings before disabling this setting."
                     }
                 }
             }
@@ -97,20 +102,23 @@
     "scripts": {
         "vscode:prepublish": "npm run build",
         "precommit": "lint-staged",
-        "prebuild": "npm run clean",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "prebuild": "npm run clean && npm run cleanCov",
         "build": "tsc -p ./tsconfig.json --sourceMap false",
         "watch": "tsc -p ./tsconfig.json -w",
-        "test": "mocha",
         "clean": "rimraf dist/*",
-        "postinstall": "node ./node_modules/vscode/bin/install"
+        "cleanCov": "rimraf @coverage",
+        "test": "jest --config ./jest.config.js",
+        "test:watch": "npm test -- --watch",
+        "test:cov": "npm run cleanCov && npm test -- --coverage"
     },
     "dependencies": {
-        "@octokit/rest": "^15.9.4",
+        "@octokit/rest": "^15.11.1",
         "async": "^2.6.1",
         "extract-zip": "^1.6.7",
         "fs-extra": "^7.0.0",
         "https-proxy-agent": "^2.2.1",
-        "jsonc-parser": "^2.0.1",
+        "jsonc-parser": "^2.0.2",
         "jsondiffpatch": "^0.3.11",
         "junk": "^2.1.0",
         "lodash.pick": "^4.4.0",
@@ -122,18 +130,19 @@
         "@types/async": "^2.0.49",
         "@types/extract-zip": "^1.6.2",
         "@types/fs-extra": "^5.0.4",
-        "@types/lodash.pick": "^4.4.3",
+        "@types/jest": "^23.3.2",
+        "@types/lodash.pick": "^4.4.4",
         "@types/minimatch": "^3.0.3",
-        "@types/node": "^10.5.2",
+        "@types/node": "^10.9.4",
         "@types/tmp": "0.0.33",
         "husky": "^0.14.3",
-        "lint-staged": "^7.2.0",
-        "mocha": "^5.2.0",
+        "jest": "^23.6.0",
+        "lint-staged": "^7.2.2",
         "rimraf": "^2.6.2",
-        "should": "^13.2.1",
+        "ts-jest": "^23.1.4",
         "tslint": "^5.11.0",
-        "typescript": "^2.9.2",
-        "vscode": "^1.1.18"
+        "typescript": "^3.0.3",
+        "vscode": "^1.1.21"
     },
     "lint-staged": {
         "./src/**/*.ts": [

@@ -1,4 +1,4 @@
-import { IExtensionMeta } from "../common/vscodeWebAPITypes";
+import { IExtensionMeta } from "../common/VSCodeWebAPITypes";
 import { post } from "./ajax";
 
 /**

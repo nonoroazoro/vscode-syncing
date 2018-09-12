@@ -8,7 +8,7 @@ import * as vscode from "vscode";
 
 import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE, CONFIGURATION_KEY } from "../common/constants";
 import { IExtension, ISyncedItem } from "../common/types";
-import { IExtensionMeta } from "../common/vscodeWebAPITypes";
+import { IExtensionMeta } from "../common/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { queryExtensions } from "../utils/vscodeWebAPI";
@@ -82,6 +82,7 @@ export default class Extension
         const result: IExtension[] = [];
         for (const ext of vscode.extensions.all)
         {
+            // TODO: `toLowerCase` should be double checked.
             if (
                 !ext.packageJSON.isBuiltin
                 && !excludedExtensions.some((pattern) => minimatch((ext.packageJSON.id || "").toLowerCase(), pattern))
@@ -327,7 +328,7 @@ export default class Extension
             const autoUpdateExtensions = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_EXTENSIONS_AUTOUPDATE);
             if (autoUpdateExtensions)
             {
-                const ids = extensions.map((ext) => ext.uuid).filter((id) => id != null);
+                const ids = extensions.map((ext) => ext.uuid).filter((id) => (id != null && id !== ""));
                 extensionMetaMap = await queryExtensions(ids, this._syncing.proxy);
             }
 
