@@ -108,12 +108,12 @@
         "test:cov": "npm run cleanCov && npm test -- --coverage"
     },
     "dependencies": {
-        "@octokit/rest": "^15.9.4",
+        "@octokit/rest": "^15.11.1",
         "async": "^2.6.1",
         "extract-zip": "^1.6.7",
         "fs-extra": "^7.0.0",
         "https-proxy-agent": "^2.2.1",
-        "jsonc-parser": "^2.0.1",
+        "jsonc-parser": "^2.0.2",
         "jsondiffpatch": "^0.3.11",
         "junk": "^2.1.0",
         "lodash.pick": "^4.4.0",
@@ -126,18 +126,18 @@
         "@types/extract-zip": "^1.6.2",
         "@types/fs-extra": "^5.0.4",
         "@types/jest": "^23.3.2",
-        "@types/lodash.pick": "^4.4.3",
+        "@types/lodash.pick": "^4.4.4",
         "@types/minimatch": "^3.0.3",
-        "@types/node": "^10.5.2",
+        "@types/node": "^10.9.4",
         "@types/tmp": "0.0.33",
         "husky": "^0.14.3",
         "jest": "^23.6.0",
-        "lint-staged": "^7.2.0",
+        "lint-staged": "^7.2.2",
         "rimraf": "^2.6.2",
         "ts-jest": "^23.1.4",
         "tslint": "^5.11.0",
-        "typescript": "^2.9.2",
-        "vscode": "^1.1.18"
+        "typescript": "^3.0.3",
+        "vscode": "^1.1.21"
     },
     "lint-staged": {
         "./src/**/*.ts": [
