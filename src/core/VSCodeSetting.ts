@@ -11,6 +11,7 @@ import
     CONFIGURATION_EXCLUDED_SETTINGS,
     CONFIGURATION_KEY,
     CONFIGURATION_POKA_YOKE_THRESHOLD,
+    CONFIGURATION_SEPARATE_KEYBINDINGS,
     SETTING_EXCLUDED_EXTENSIONS,
     SETTING_EXCLUDED_SETTINGS
 } from "../common/constants";
@@ -126,9 +127,17 @@ export default class VSCodeSetting
                         if (type === SettingTypes.Keybindings)
                         {
                             // Separate the keybindings.
-                            remoteFilename = this._env.isMac
-                                ? `${type}${VSCodeSetting.MAC_SUFFIX}.json`
-                                : `${type}.json`;
+                            const separateKeybindings = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_SEPARATE_KEYBINDINGS);
+                            if (separateKeybindings)
+                            {
+                                remoteFilename = this._env.isMac
+                                    ? `${type}${VSCodeSetting.MAC_SUFFIX}.json`
+                                    : `${type}.json`;
+                            }
+                            else
+                            {
+                                remoteFilename = `${type}.json`;
+                            }
                         }
 
                         tempSettings = [

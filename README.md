@@ -15,13 +15,9 @@
 
 ## Breaking Changes
 
-* From ***version 1.8.0*** onwards:
+* From ***version 1.8.2*** onwards:
 
-    1. **You can exclude VSCode extensions from being synchronized.**
-
-    1. **`Syncing` will now automatically update your extensions during the synchronization.**
-
-    1. **In addition, I've changed some settings of `Syncing` to improve the scalability.**
+    1. Since `VSCode` has introduced the [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) from `version 1.27`, I added the `syncing.separateKeybindings` setting so that you can decide whether to synchronize the `keybindings` through `one single file`.
 
     > Please [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
@@ -33,7 +29,7 @@
 1. **Upload VSCode Settings**:
 
     * Including your `User Settings`, `Keybindings`, `Extensions`, `Locales` and `Snippets`.
-    * The `keybindings` of `Macintosh` and `non-Macintosh` will be synchronized separately, in case you have multiple devices.
+    * The `keybindings` of `Macintosh` and `non-Macintosh` will be synchronized separately, in case you have multiple devices of different operating systems.
     * Automatically create a new Gist to store your settings.
     * Use an incremental algorithm to boost the synchronization.
     * You can `exclude some VSCode User Settings and Extensions` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
@@ -150,6 +146,14 @@ You can find the following `Syncing Settings` in your `VSCode User Settings`.
     ```json
     "syncing.pokaYokeThreshold" : 10
     ```
+
+1. ***`syncing.separateKeybindings`***
+
+    Synchronize the `keybindings` separately for different operating systems.
+
+    You may disable it since `VSCode` has introduced the [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) from `version 1.27`. But please make sure you've already `merged your keybindings` before disabling this setting.
+
+    This is `enabled by default` but you can turn it off in your `VSCode User Settings`.
 
 
 ## Proxy Settings
