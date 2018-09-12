@@ -43,4 +43,18 @@ describe("Syncing/utils/diffPatch", () =>
         const right = { items: [item2Change, item1] };
         expect(diff(left, right)).toBe(1);
     });
+
+    it("normal diff (Record)", () =>
+    {
+        const left = { id: "1", name: "Item1" };
+        const right = { id: "2", name: "Item2" };
+        expect(diff(left, right)).toBe(2);
+    });
+
+    it("normal diff (Array)", () =>
+    {
+        const left = [{ id: "1", name: "Item1" }, { id: "2", name: "Item2" }, { id: "3", name: "Item3" }];
+        const right = [{ id: "3", name: "Item3" }, { id: "1", name: "Item2" }, { id: "2", name: "Item1" }];
+        expect(diff(left, right)).toBe(2);
+    });
 });
