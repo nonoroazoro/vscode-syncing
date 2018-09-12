@@ -327,7 +327,7 @@ export default class Extension
             const autoUpdateExtensions = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_EXTENSIONS_AUTOUPDATE);
             if (autoUpdateExtensions)
             {
-                const ids = extensions.map((ext) => ext.uuid).filter((id) => id != null);
+                const ids = extensions.map((ext) => ext.uuid).filter((id) => (id != null && id !== ""));
                 extensionMetaMap = await queryExtensions(ids, this._syncing.proxy);
             }
 
