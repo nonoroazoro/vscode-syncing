@@ -1,5 +1,14 @@
 # Changelogs
 
+## 1.8.2 - September 12, 2018
+
+- Added: A new setting: `syncing.separateKeybindings`, so that you can decide whether to synchronize the `keybindings` through `one single file`.
+
+- Fixed: The diff algorithm (Thank [@agross](https://github.com/agross) for the feedback).
+
+- Fixed: A bug of extensions auto-update function.
+
+
 ## 1.8.1 - July 31, 2018
 
 - Changed: Use lowercase extension metadata.
