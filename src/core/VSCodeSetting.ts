@@ -51,7 +51,7 @@ export class VSCodeSetting
     }
 
     /**
-     * Create an instance of singleton class `VSCodeSetting`.
+     * Creates an instance of singleton class `VSCodeSetting`.
      */
     public static create(context: vscode.ExtensionContext): VSCodeSetting
     {
@@ -63,7 +63,7 @@ export class VSCodeSetting
     }
 
     /**
-     * Get `VSCode Settings` (will be uploaded or downloaded, anyway).
+     * Gets `VSCode Settings` (which will be uploaded or downloaded, anyway).
      * For example:
      *    [
      *        {
@@ -188,6 +188,7 @@ export class VSCodeSetting
 
     /**
      * Save `VSCode Settings` to files.
+     *
      * @param files `VSCode Settings` from GitHub Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
@@ -238,14 +239,13 @@ export class VSCodeSetting
                         gistFile = files[setting.remoteFilename];
                         if (gistFile)
                         {
-                            // File exists in remote and local, sync it.
+                            // If the file exists in both remote and local, it should be synchronized.
                             if (setting.type === SettingTypes.Extensions)
                             {
                                 // Temp extensions file.
-                                // TODO: remove || "[]").toLowerCase() in the next release.
                                 extensionsSetting = {
                                     ...setting,
-                                    content: (gistFile.content || "[]").toLowerCase()
+                                    content: gistFile.content
                                 };
                             }
                             else
@@ -302,7 +302,7 @@ export class VSCodeSetting
                         settingsToSave.push(extensionsSetting);
                     }
 
-                    // poka-yoke - check if there have been two much changes since the last downloading.
+                    // poka-yoke - Check if there have been two much changes since the last downloading.
                     this._shouldContinue(settings, settingsToSave, settingsToRemove).then((value) =>
                     {
                         if (value)
@@ -357,6 +357,7 @@ export class VSCodeSetting
 
     /**
      * Delete the physical files corresponding to the `VSCode Settings`.
+     *
      * @param settings `VSCode Settings`.
      */
     public removeSettings(settings: ISetting[]): Promise<ISyncedItem[]>
@@ -393,7 +394,8 @@ export class VSCodeSetting
     }
 
     /**
-     * Get all local snippet files.
+     * Gets all local snippet files.
+     *
      * @param snippetsDir Snippets dir.
      */
     private _getSnippets(snippetsDir: string): ISetting[]
@@ -610,7 +612,7 @@ export class VSCodeSetting
     }
 
     /**
-     * get excluded extensions based on the excluded setting of remote settings.
+     * Gets excluded extensions based on the excluded setting of remote settings.
      */
     private _getExcludedExtensions(extensions: IExtension[], patterns: string[])
     {
