@@ -1,5 +1,16 @@
 # Changelogs
 
+## 1.9.0 - September 13, 2018
+
+- Added: Added `CaseInsensitiveMap` and `CaseInsensitiveSet` to fix the inconsistency of VSCode extension's id.
+
+- Changed: `Improve the performance` of the synchronization process, and use a new CDN to install extensions, which should significantly accelerate the synchronization.
+
+- Changed: Simplify the `extensions.json` file.
+
+- Fixed: Added `CaseInsensitiveMap` and `CaseInsensitiveSet` to fix the inconsistency of VSCode extension's id.
+
+
 ## 1.8.2 - September 12, 2018
 
 - Added: A new setting: `syncing.separateKeybindings`, so that you can decide whether to synchronize the `keybindings` through `one single file`.
