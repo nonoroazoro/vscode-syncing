@@ -242,10 +242,6 @@ export class VSCodeSetting
                             if (setting.type === SettingTypes.Extensions)
                             {
                                 // Temp extensions file.
-
-                                // TODO: remove the next line in the next release.
-                                setting.content = (setting.content || "[]").toLowerCase();
-
                                 // TODO: remove || "[]").toLowerCase() in the next release.
                                 extensionsSetting = {
                                     ...setting,
@@ -549,10 +545,8 @@ export class VSCodeSetting
                     );
 
                     // 3. Diff settings.
-                    const changes = settingsToRemove.length + this._diffSettings(
-                        excludedSettings.localSettings,
-                        excludedSettings.remoteSettings
-                    );
+                    const changes = settingsToRemove.length
+                        + this._diffSettings(excludedSettings.localSettings, excludedSettings.remoteSettings);
                     if (changes >= threshold)
                     {
                         const okButton = "Continue to download";
@@ -654,9 +648,13 @@ export class VSCodeSetting
             {
                 for (const ext of parsed)
                 {
-                    delete ext["uuid"];
+                    ext["id"] = ext["id"].toLocaleLowerCase();
+
+                    // Only compares id and version.
                     delete ext["name"];
+                    delete ext["path"];
                     delete ext["publisher"];
+                    delete ext["uuid"];
                 }
             }
 
