@@ -42,7 +42,7 @@ export interface ISetting
 export interface IExtension
 {
     /**
-     * The extension's identifier in the form of: `publisher.name`.
+     * The extension's identifier is in the form of: `publisher.name`.
      */
     id: string;
 
@@ -75,6 +75,11 @@ export interface IExtension
      * The downloaded extension's zip file path.
      */
     zip?: string;
+
+    /**
+     * The extension's download url in marketplace.
+     */
+    downloadURL?: string;
 }
 
 /**
