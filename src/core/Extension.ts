@@ -155,7 +155,7 @@ export class Extension
                         }
 
                         // Added since VSCode v1.20.
-                        this.upgradeObsolete(added, updated, removed).then(() => resolve(result));
+                        this.updateObsolete(added, updated, removed).then(() => resolve(result));
                     }
                 );
             });
@@ -264,9 +264,13 @@ export class Extension
     }
 
     /**
-     * Upgrade VSCode '.obsolete' file.
+     * Updates the VSCode '.obsolete' file.
      */
-    public async upgradeObsolete(added: IExtension[] = [], removed: IExtension[] = [], updated: IExtension[] = []): Promise<void>
+    public async updateObsolete(
+        added: IExtension[] = [],
+        removed: IExtension[] = [],
+        updated: IExtension[] = []
+    ): Promise<void>
     {
         const filepath = this._env.getObsoleteFilePath();
         let obsolete: { [extensionFolderName: string]: boolean; } | undefined;
