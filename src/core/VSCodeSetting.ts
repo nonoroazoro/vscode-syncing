@@ -652,7 +652,6 @@ export class VSCodeSetting
 
                     // Only compares id and version.
                     delete ext["name"];
-                    delete ext["path"];
                     delete ext["publisher"];
                     delete ext["uuid"];
                 }
