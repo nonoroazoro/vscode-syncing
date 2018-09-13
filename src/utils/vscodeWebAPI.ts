@@ -1,10 +1,17 @@
-import { IExtensionMeta } from "../common/VSCodeWebAPITypes";
+import
+{
+    ExtensionAssetType,
+    IExtensionMeta,
+    IExtensionVersion,
+    QueryFilterType,
+    QueryFlag
+} from "../common/VSCodeWebAPITypes";
 import { post } from "./ajax";
 
 /**
  * Query extensions.
  *
- * @param {string[]} ids The UUID of the extensions.
+ * @param {string[]} ids The id list of extensions. The id is in the form of: `publisher.name`.
  * @param {string} [proxy] The proxy settings.
  */
 export async function queryExtensions(ids: string[], proxy?: string): Promise<Map<string, IExtensionMeta>>
@@ -13,20 +20,20 @@ export async function queryExtensions(ids: string[], proxy?: string): Promise<Ma
     if (ids.length > 0)
     {
         const api = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery";
-        const headers = { Accept: "application/json; api-version=5.0-preview.1" };
+        const headers = { Accept: "application/json;api-version=3.0-preview.1" };
         const data = {
             filters: [
                 {
-                    criteria: ids.map((id) =>
+                    criteria: ids.map((name) =>
                     {
                         return {
-                            filterType: 4,
-                            value: id
+                            filterType: QueryFilterType.NAME,
+                            value: name
                         };
                     })
                 }
             ],
-            flags: 133
+            flags: QueryFlag.LATEST_VERSION_WITH_FILES
         };
 
         try
@@ -37,7 +44,11 @@ export async function queryExtensions(ids: string[], proxy?: string): Promise<Ma
             {
                 (results[0].extensions || []).forEach((extension: IExtensionMeta) =>
                 {
-                    result.set(extension.extensionId, extension);
+                    // The key is the extension's id.
+                    result.set(
+                        `${extension.publisher.publisherName}.${extension.extensionName}`,
+                        extension
+                    );
                 });
             }
         }
@@ -46,4 +57,23 @@ export async function queryExtensions(ids: string[], proxy?: string): Promise<Ma
         }
     }
     return result;
+}
+
+/**
+ * Gets VSIX package URL.
+ *
+ * @param {IExtensionVersion} version An extension version object.
+ */
+export function getVSIXPackageURL(version: IExtensionVersion): string | undefined
+{
+    const files = version.files;
+    if (files)
+    {
+        const file = files.find((f) => (f.assetType === ExtensionAssetType.SERVICES_VSIXPACKAGE));
+        if (file)
+        {
+            return file.source;
+        }
+    }
+    return undefined;
 }
