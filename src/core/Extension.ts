@@ -264,7 +264,7 @@ export class Extension
     }
 
     /**
-     * Updates the VSCode '.obsolete' file.
+     * Updates the VSCode `.obsolete` file.
      */
     public async updateObsolete(
         added: IExtension[] = [],
