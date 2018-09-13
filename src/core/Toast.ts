@@ -7,7 +7,7 @@ import * as vscode from "vscode";
 
 import * as GitHubTypes from "../common/GitHubTypes";
 import { reloadWindow } from "../utils/vscodeAPI";
-import Gist from "./Gist";
+import { Gist } from "./Gist";
 
 /**
  * Represents the item of GistListBox.

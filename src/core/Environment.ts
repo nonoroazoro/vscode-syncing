@@ -7,7 +7,7 @@ import { IExtension } from "../common/types";
 /**
  * VSCode environment wrapper.
  */
-export default class Environment
+export class Environment
 {
     private static _instance: Environment;
 

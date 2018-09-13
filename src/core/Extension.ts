@@ -14,8 +14,8 @@ import { IExtensionMeta } from "../common/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
 import { getVSIXPackageURL, queryExtensions } from "../utils/vscodeWebAPI";
-import Environment from "./Environment";
-import Syncing from "./Syncing";
+import { Environment } from "./Environment";
+import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
 
 tmp.setGracefulCleanup();
@@ -49,7 +49,7 @@ interface ISyncOptions
 /**
  * VSCode extension wrapper.
  */
-export default class Extension
+export class Extension
 {
     private static _instance: Extension;
 

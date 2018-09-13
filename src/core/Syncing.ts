@@ -3,8 +3,8 @@ import * as path from "path";
 import * as vscode from "vscode";
 
 import { openFile } from "../utils/vscodeAPI";
-import Environment from "./Environment";
-import Gist from "./Gist";
+import { Environment } from "./Environment";
+import { Gist } from "./Gist";
 import * as Toast from "./Toast";
 
 /**
@@ -31,7 +31,7 @@ interface ISyncingSettings
 /**
  * `Syncing` wrapper.
  */
-export default class Syncing
+export class Syncing
 {
     private static _instance: Syncing;
 

@@ -20,14 +20,14 @@ import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../common/types
 import { diff } from "../utils/diffPatch";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
-import Environment from "./Environment";
-import Extension from "./Extension";
+import { Environment } from "./Environment";
+import { Extension } from "./Extension";
 import * as Toast from "./Toast";
 
 /**
  * `VSCode Settings` wrapper.
  */
-export default class VSCodeSetting
+export class VSCodeSetting
 {
     private static _instance: VSCodeSetting;
 
