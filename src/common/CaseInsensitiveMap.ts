@@ -10,6 +10,15 @@ import isString = require("lodash.isstring");
  */
 export class CaseInsensitiveMap<K, V> extends Map<K, V>
 {
+    delete(key: K): boolean
+    {
+        if (isString(key))
+        {
+            return super.delete(key.toLocaleLowerCase() as any as K);
+        }
+        return super.delete(key);
+    }
+
     get(key: K)
     {
         if (isString(key))
