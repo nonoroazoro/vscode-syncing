@@ -5,17 +5,17 @@ import * as vscode from "vscode";
  */
 export function getExtensionById(id: string, ignoreCase = true)
 {
-    if (id)
+    if (id != null)
     {
         if (ignoreCase)
         {
             const targetId = id.toLowerCase();
             return vscode.extensions.all.find((ext) =>
             {
-                return (ext.packageJSON.id || "").toLowerCase() === targetId;
+                return ext.id.toLowerCase() === targetId;
             });
         }
-        return vscode.extensions.all.find((ext) => (ext.packageJSON.id === id));
+        return vscode.extensions.getExtension(id);
     }
     return;
 }
