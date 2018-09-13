@@ -94,8 +94,7 @@ export class Extension
                     id: ext.id,
                     name: ext.packageJSON.name,
                     publisher: ext.packageJSON.publisher,
-                    version: ext.packageJSON.version,
-                    path: ext.extensionPath
+                    version: ext.packageJSON.version
                 };
                 result.push(item);
             }
