@@ -13,7 +13,7 @@ import * as Toast from "./Toast";
 /**
  * GitHub Gist utils.
  */
-export default class Gist
+export class Gist
 {
     private static _instance: Gist;
 
