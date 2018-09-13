@@ -113,7 +113,7 @@
         "test:cov": "npm run cleanCov && npm test -- --coverage"
     },
     "dependencies": {
-        "@octokit/rest": "^15.11.1",
+        "@octokit/rest": "^15.11.2",
         "async": "^2.6.1",
         "extract-zip": "^1.6.7",
         "fs-extra": "^7.0.0",

@@ -16,9 +16,9 @@
     esutils "^2.0.2"
     js-tokens "^4.0.0"
 
-"@octokit/rest@^15.11.1":
-  version "15.11.1"
-  resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-15.11.1.tgz#ef4e7462ec8f94e535a82220f7b5212111fc2647"
+"@octokit/rest@^15.11.2":
+  version "15.11.2"
+  resolved "https://registry.yarnpkg.com/@octokit/rest/-/rest-15.11.2.tgz#61bbfb6fa572eff0643cbe62ef695adac194ca8a"
   dependencies:
     before-after-hook "^1.1.0"
     btoa-lite "^1.0.0"
