@@ -1,11 +1,9 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
-import { ISyncedItem } from "./common/types";
-import { Gist } from "./core/Gist";
-import { Syncing } from "./core/Syncing";
+import { Gist, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
-import { VSCodeSetting } from "./core/VSCodeSetting";
+import { ISyncedItem } from "./types/SyncingTypes";
 
 let _syncing: Syncing;
 let _isSyncing: boolean;

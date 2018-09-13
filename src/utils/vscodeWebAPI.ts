@@ -1,4 +1,4 @@
-import { CaseInsensitiveMap } from "../common/CaseInsensitiveMap";
+import { CaseInsensitiveMap } from "../collections";
 import
 {
     ExtensionAssetType,
@@ -6,7 +6,7 @@ import
     IExtensionVersion,
     QueryFilterType,
     QueryFlag
-} from "../common/VSCodeWebAPITypes";
+} from "../types/VSCodeWebAPITypes";
 import { post } from "./ajax";
 
 /**

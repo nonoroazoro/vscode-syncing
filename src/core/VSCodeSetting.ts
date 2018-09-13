@@ -15,8 +15,8 @@ import
     SETTING_EXCLUDED_EXTENSIONS,
     SETTING_EXCLUDED_SETTINGS
 } from "../common/constants";
-import * as GitHubTypes from "../common/GitHubTypes";
-import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../common/types";
+import * as GitHubTypes from "../types/GitHubTypes";
+import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
 import { getVSCodeSetting } from "../utils/vscodeAPI";

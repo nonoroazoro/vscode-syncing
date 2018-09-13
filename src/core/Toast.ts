@@ -5,7 +5,7 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
-import * as GitHubTypes from "../common/GitHubTypes";
+import * as GitHubTypes from "../types/GitHubTypes";
 import { reloadWindow } from "../utils/vscodeAPI";
 import { Gist } from "./Gist";
 
