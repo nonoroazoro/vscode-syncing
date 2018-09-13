@@ -92,7 +92,6 @@ export default class Extension
             {
                 item = {
                     id: ext.id,
-                    uuid: ext.packageJSON.uuid,
                     name: ext.packageJSON.name,
                     publisher: ext.packageJSON.publisher,
                     version: ext.packageJSON.version,
