@@ -1,3 +1,4 @@
+import { CaseInsensitiveMap } from "../common/CaseInsensitiveMap";
 import
 {
     ExtensionAssetType,
@@ -14,9 +15,9 @@ import { post } from "./ajax";
  * @param {string[]} ids The id list of extensions. The id is in the form of: `publisher.name`.
  * @param {string} [proxy] The proxy settings.
  */
-export async function queryExtensions(ids: string[], proxy?: string): Promise<Map<string, IExtensionMeta>>
+export async function queryExtensions(ids: string[], proxy?: string): Promise<CaseInsensitiveMap<string, IExtensionMeta>>
 {
-    const result = new Map<string, IExtensionMeta>();
+    const result = new CaseInsensitiveMap<string, IExtensionMeta>();
     if (ids.length > 0)
     {
         const api = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery";
@@ -44,7 +45,7 @@ export async function queryExtensions(ids: string[], proxy?: string): Promise<Ma
             {
                 (results[0].extensions || []).forEach((extension: IExtensionMeta) =>
                 {
-                    // The key is the extension's id.
+                    // Use extension's id as the key.
                     result.set(
                         `${extension.publisher.publisherName}.${extension.extensionName}`,
                         extension
