@@ -2,6 +2,9 @@ import * as vscode from "vscode";
 
 /**
  * Gets VSCode extension by its id.
+ *
+ * The id is `case-insensitive` by default.
+ *
  */
 export function getExtensionById(id: string, ignoreCase = true)
 {
@@ -9,11 +12,8 @@ export function getExtensionById(id: string, ignoreCase = true)
     {
         if (ignoreCase)
         {
-            const targetId = id.toLowerCase();
-            return vscode.extensions.all.find((ext) =>
-            {
-                return ext.id.toLowerCase() === targetId;
-            });
+            const targetId = id.toLocaleLowerCase();
+            return vscode.extensions.all.find((ext) => (ext.id.toLocaleLowerCase() === targetId));
         }
         return vscode.extensions.getExtension(id);
     }
