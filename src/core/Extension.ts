@@ -186,7 +186,7 @@ export class Extension
                 }
                 downloadFile(extension.downloadURL, filepath, this._syncing.proxy).then(() =>
                 {
-                    resolve({ ...extension, zip: filepath });
+                    resolve({ ...extension, vsixFilepath: filepath });
                 }).catch(reject);
             });
         });
@@ -199,8 +199,8 @@ export class Extension
     {
         return new Promise((resolve, reject) =>
         {
-            const zipFilepath = extension.zip;
-            if (zipFilepath)
+            const { vsixFilepath } = extension;
+            if (vsixFilepath)
             {
                 tmp.dir({ postfix: `.${extension.id}`, unsafeCleanup: true }, (err1, dirPath: string) =>
                 {
@@ -210,7 +210,7 @@ export class Extension
                     }
                     else
                     {
-                        extractZip(zipFilepath, { dir: dirPath }, (err2) =>
+                        extractZip(vsixFilepath, { dir: dirPath }, (err2) =>
                         {
                             if (err2)
                             {
@@ -226,7 +226,7 @@ export class Extension
                                     })
                                     .then(() =>
                                     {
-                                        resolve({ ...extension, path: extPath });
+                                        resolve(extension);
                                     })
                                     .catch((err3) =>
                                     {

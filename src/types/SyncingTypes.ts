@@ -62,14 +62,9 @@ export interface IExtension
     version: string;
 
     /**
-     * The installed extension's folder path.
+     * The downloaded extension's vsix file path.
      */
-    path?: string;
-
-    /**
-     * The downloaded extension's zip file path.
-     */
-    zip?: string;
+    vsixFilepath?: string;
 
     /**
      * The extension's download url in marketplace.
