@@ -47,11 +47,6 @@ export interface IExtension
     id: string;
 
     /**
-     * The extension's UUID.
-     */
-    uuid: string;
-
-    /**
      * The extension's name.
      */
     name: string;
