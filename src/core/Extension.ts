@@ -6,11 +6,10 @@ import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
-import { CaseInsensitiveMap } from "../common/CaseInsensitiveMap";
-import { CaseInsensitiveSet } from "../common/CaseInsensitiveSet";
+import { CaseInsensitiveMap, CaseInsensitiveSet } from "../collections";
 import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE, CONFIGURATION_KEY } from "../common/constants";
-import { IExtension, ISyncedItem } from "../common/types";
-import { IExtensionMeta } from "../common/VSCodeWebAPITypes";
+import { IExtension, ISyncedItem } from "../types/SyncingTypes";
+import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
 import { getVSIXPackageURL, queryExtensions } from "../utils/vscodeWebAPI";

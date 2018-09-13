@@ -3,8 +3,8 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../common/constants";
-import * as GitHubTypes from "../common/GitHubTypes";
-import { ISetting, SettingTypes } from "../common/types";
+import * as GitHubTypes from "../types/GitHubTypes";
+import { ISetting, SettingTypes } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
 import { parse } from "../utils/jsonc";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
