@@ -1,7 +1,27 @@
 import * as vscode from "vscode";
 
 /**
- * Get `editor.formatOnSave` setting from the settings.
+ * Gets VSCode extension by its id.
+ */
+export function getExtensionById(id: string, ignoreCase = true)
+{
+    if (id)
+    {
+        if (ignoreCase)
+        {
+            const targetId = id.toLowerCase();
+            return vscode.extensions.all.find((ext) =>
+            {
+                return (ext.packageJSON.id || "").toLowerCase() === targetId;
+            });
+        }
+        return vscode.extensions.all.find((ext) => (ext.packageJSON.id === id));
+    }
+    return;
+}
+
+/**
+ * Gets `editor.formatOnSave` setting from `VSCode User Settings`.
  */
 export function getVSCodeSetting<T>(section: string, key: string, defaultValue?: T): T
 {
@@ -9,7 +29,7 @@ export function getVSCodeSetting<T>(section: string, key: string, defaultValue?:
 }
 
 /**
- * Get `editor.formatOnSave` setting from the settings.
+ * Gets `editor.formatOnSave` setting from settings JSON.
  */
 export function getJSONFormatOnSaveSetting(settingsJSON: any): boolean | undefined
 {
@@ -33,6 +53,7 @@ export function getJSONFormatOnSaveSetting(settingsJSON: any): boolean | undefin
 
 /**
  * Open file in the VSCode editor.
+ *
  * @param filepath The full path of file.
  */
 export function openFile(filepath: string)
