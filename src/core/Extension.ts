@@ -6,12 +6,14 @@ import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
+import { CaseInsensitiveMap } from "../common/CaseInsensitiveMap";
+import { CaseInsensitiveSet } from "../common/CaseInsensitiveSet";
 import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE, CONFIGURATION_KEY } from "../common/constants";
 import { IExtension, ISyncedItem } from "../common/types";
 import { IExtensionMeta } from "../common/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
-import { getVSCodeSetting } from "../utils/vscodeAPI";
-import { queryExtensions } from "../utils/vscodeWebAPI";
+import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
+import { getVSIXPackageURL, queryExtensions } from "../utils/vscodeWebAPI";
 import Environment from "./Environment";
 import Syncing from "./Syncing";
 import * as Toast from "./Toast";
@@ -19,7 +21,7 @@ import * as Toast from "./Toast";
 tmp.setGracefulCleanup();
 
 /**
- * Represent the options of synchronization.
+ * Represents the options of synchronization.
  */
 interface ISyncOptions
 {
@@ -61,7 +63,7 @@ export default class Extension
     }
 
     /**
-     * Create an instance of singleton class `Extension`.
+     * Creates an instance of singleton class `Extension`.
      */
     public static create(context: vscode.ExtensionContext): Extension
     {
@@ -73,7 +75,8 @@ export default class Extension
     }
 
     /**
-     * Get all installed extensions (Disabled extensions aren't included).
+     * Gets all installed extensions (Disabled extensions aren't included).
+     *
      * @param excludedExtensions The extensions that should be excluded from the result.
      */
     public getAll(excludedExtensions: string[] = []): IExtension[]
@@ -82,18 +85,18 @@ export default class Extension
         const result: IExtension[] = [];
         for (const ext of vscode.extensions.all)
         {
-            // TODO: `toLowerCase` should be double checked.
             if (
                 !ext.packageJSON.isBuiltin
-                && !excludedExtensions.some((pattern) => minimatch((ext.packageJSON.id || "").toLowerCase(), pattern))
+                && !excludedExtensions.some((pattern) => minimatch(ext.id, pattern, { nocase: true }))
             )
             {
                 item = {
-                    id: (ext.packageJSON.id || "").toLowerCase(),
-                    uuid: (ext.packageJSON.uuid || "").toLowerCase(),
-                    name: (ext.packageJSON.name || "").toLowerCase(),
-                    publisher: (ext.packageJSON.publisher || "").toLowerCase(),
-                    version: ext.packageJSON.version
+                    id: ext.id,
+                    uuid: ext.packageJSON.uuid,
+                    name: ext.packageJSON.name,
+                    publisher: ext.packageJSON.publisher,
+                    version: ext.packageJSON.version,
+                    path: ext.extensionPath
                 };
                 result.push(item);
             }
@@ -103,6 +106,7 @@ export default class Extension
 
     /**
      * Sync extensions (add/update/remove).
+     *
      * @param extensions Extensions to be synced.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
@@ -161,7 +165,7 @@ export default class Extension
     }
 
     /**
-     * Download extension from VSCode marketplace.
+     * Downloads extension from VSCode marketplace.
      */
     public downloadExtension(extension: IExtension): Promise<IExtension>
     {
@@ -176,11 +180,14 @@ export default class Extension
                     return;
                 }
 
-                // tslint:disable-next-line
-                // `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${extension.publisher}/vsextensions/${extension.name}/${extension.version}/vspackage`
-                // tslint:disable-next-line
-                const zipURI = `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
-                downloadFile(zipURI, filepath, this._syncing.proxy).then(() =>
+                // Fallback to normal package.
+                if (!extension.downloadURL)
+                {
+                    extension.downloadURL = `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
+                        + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}`
+                        + `/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
+                }
+                downloadFile(extension.downloadURL, filepath, this._syncing.proxy).then(() =>
                 {
                     resolve({ ...extension, zip: filepath });
                 }).catch(reject);
@@ -189,7 +196,7 @@ export default class Extension
     }
 
     /**
-     * Extract extension zip file to VSCode extensions folder.
+     * Extracts extension zip file to VSCode extensions folder.
      */
     public extractExtension(extension: IExtension): Promise<IExtension>
     {
@@ -245,7 +252,7 @@ export default class Extension
      */
     public async uninstallExtension(extension: IExtension): Promise<IExtension>
     {
-        const localExtension = this._getExtension(extension.id);
+        const localExtension = getExtensionById(extension.id);
         const extensionPath = localExtension ? localExtension.extensionPath : this._env.getExtensionPath(extension);
         try
         {
@@ -303,7 +310,7 @@ export default class Extension
     }
 
     /**
-     * Get extensions that are added/updated/removed.
+     * Gets extensions that are added/updated/removed.
      */
     private async _getDifferentExtensions(extensions: IExtension[]): Promise<{
         added: IExtension[],
@@ -323,44 +330,44 @@ export default class Extension
         };
         if (extensions)
         {
-            // Automatically update extensions: Query latest extensions meta data.
-            let extensionMetaMap: Map<string, IExtensionMeta> | undefined;
+            // 1. Automatically update extensions: Query the latest extensions.
+            let queriedExtensions: CaseInsensitiveMap<string, IExtensionMeta> = new CaseInsensitiveMap();
             const autoUpdateExtensions = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_EXTENSIONS_AUTOUPDATE);
             if (autoUpdateExtensions)
             {
-                const ids = extensions.map((ext) => ext.uuid).filter((id) => (id != null && id !== ""));
-                extensionMetaMap = await queryExtensions(ids, this._syncing.proxy);
+                queriedExtensions = await queryExtensions(extensions.map((ext) => ext.id), this._syncing.proxy);
             }
 
-            let latestVersion: string | undefined;
-            let extensionMeta: IExtensionMeta | undefined;
-            let localExtension: vscode.Extension<any> | undefined;
-            const reservedExtensionIDs: string[] = [];
-
             // Find added & updated extensions.
+            const reservedExtensionIDs = new CaseInsensitiveSet<string>();
             for (const ext of extensions)
             {
-                // Upgrade to the latest version if available.
-                if (autoUpdateExtensions && extensionMetaMap)
+                // 2. Automatically update extensions: Update to the latest version.
+                if (autoUpdateExtensions)
                 {
-                    extensionMeta = extensionMetaMap.get(ext.uuid);
+                    const extensionMeta = queriedExtensions.get(ext.id);
                     if (extensionMeta)
                     {
-                        latestVersion = extensionMeta.versions[0] && extensionMeta.versions[0].version;
-                        if (latestVersion && latestVersion !== ext.version)
+                        const versionMeta = extensionMeta.versions[0];
+                        if (versionMeta)
                         {
-                            ext.version = latestVersion;
+                            const version = versionMeta.version;
+                            const vsixPackageURL = getVSIXPackageURL(versionMeta);
+                            if (version && vsixPackageURL)
+                            {
+                                ext.version = version;
+                                ext.downloadURL = vsixPackageURL;
+                            }
                         }
                     }
                 }
-
-                localExtension = this._getExtension(ext.id);
+                const localExtension = getExtensionById(ext.id);
                 if (localExtension)
                 {
                     if (localExtension.packageJSON.version === ext.version)
                     {
                         // Reserved.
-                        reservedExtensionIDs.push(ext.id);
+                        reservedExtensionIDs.add(ext.id);
                     }
                     else
                     {
@@ -382,24 +389,22 @@ export default class Extension
             const localExtensions: IExtension[] = this.getAll(patterns);
             for (const ext of localExtensions)
             {
-                if (reservedExtensionIDs.indexOf(ext.id) === -1)
+                if (!reservedExtensionIDs.has(ext.id))
                 {
                     // Removed.
                     result.removed.push(ext);
                 }
             }
 
-            // Clear map.
-            if (autoUpdateExtensions && extensionMetaMap)
-            {
-                extensionMetaMap.clear();
-            }
+            // Release resources.
+            queriedExtensions.clear();
+            reservedExtensionIDs.clear();
         }
         return result;
     }
 
     /**
-     * Add extensions.
+     * Adds extensions.
      */
     private _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
     {
@@ -449,7 +454,7 @@ export default class Extension
     }
 
     /**
-     * Update extensions.
+     * Updates extensions.
      */
     private _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
     {
@@ -507,7 +512,7 @@ export default class Extension
     }
 
     /**
-     * Remove extensions.
+     * Removes extensions.
      */
     private _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
     {
@@ -544,20 +549,5 @@ export default class Extension
                 }
             );
         });
-    }
-
-    /**
-     * TODO: should be removed in the next release.
-     */
-    private _getExtension(id: string)
-    {
-        if (id)
-        {
-            return vscode.extensions.all.find((ext) =>
-            {
-                return (ext.packageJSON.id || "").toLowerCase() === id.toLowerCase();
-            });
-        }
-        return;
     }
 }
