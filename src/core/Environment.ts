@@ -33,7 +33,7 @@ export class Environment
     }
 
     /**
-     * Create an instance of singleton class `Environment`.
+     * Creates an instance of singleton class `Environment`.
      */
     public static create(context: vscode.ExtensionContext): Environment
     {
@@ -45,7 +45,7 @@ export class Environment
     }
 
     /**
-     * Check if `Macintosh`.
+     * Gets a value indicating whether the current operating system is `MacOS`.
      */
     public get isMac(): boolean
     {
@@ -53,7 +53,7 @@ export class Environment
     }
 
     /**
-     * Check if VSCode is an `Insiders` version.
+     * Gets a value indicating whether the current VSCode is an `Insiders` version.
      */
     public get isInsiders(): boolean
     {
@@ -61,7 +61,7 @@ export class Environment
     }
 
     /**
-     * Get VSCode extensions base folder path.
+     * Gets the full path of VSCode `extensions directory`.
      */
     public get extensionsPath(): string
     {
@@ -69,7 +69,7 @@ export class Environment
     }
 
     /**
-     * Get VSCode settings base folder path.
+     * Gets the full path of VSCode `settings directory`.
      */
     public get codeBasePath(): string
     {
@@ -77,7 +77,7 @@ export class Environment
     }
 
     /**
-     * Get VSCode settings `User` folder path.
+     * Gets the full path of VSCode settings `User directory`.
      */
     public get codeUserPath(): string
     {
@@ -85,7 +85,7 @@ export class Environment
     }
 
     /**
-     * Get VSCode settings `snippets` folder path.
+     * Gets the full path of VSCode settings `snippets directory`.
      */
     public get snippetsPath(): string
     {
@@ -93,8 +93,9 @@ export class Environment
     }
 
     /**
-     * Get local snippet filepath from filename.
-     * @param filename Snippet filename.
+     * Gets the full path of the snippet from a filename.
+     *
+     * @param filename The snippet's filename.
      */
     public getSnippetFilePath(filename: string): string
     {
@@ -102,23 +103,23 @@ export class Environment
     }
 
     /**
-     * Get the folder name of an extension.
+     * Gets the directory name of the extension.
      */
-    public getExtensionFolderName(extension: IExtension): string
+    public getExtensionDirectoryName(extension: IExtension): string
     {
         return `${extension.publisher}.${extension.name}-${extension.version}`;
     }
 
     /**
-     * Get the folder path of an extension.
+     * Gets the full path of the extension.
      */
     public getExtensionPath(extension: IExtension): string
     {
-        return path.join(this.extensionsPath, this.getExtensionFolderName(extension));
+        return path.join(this.extensionsPath, this.getExtensionDirectoryName(extension));
     }
 
     /**
-     * Get the path of the `.obsolete` file.
+     * Gets the full path of the `.obsolete` file.
      */
     public getObsoleteFilePath(): string
     {
