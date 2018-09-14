@@ -112,7 +112,7 @@
 
     这样一来 `nonoroazoro.syncing`（也就是本扩展）以及所有属于 `somepublisher` 这个作者的扩展就不会再被同步啦。
 
-1. ***`syncing.excludedSettings`（即原来的 `syncing.upload.exclude`）***
+1. ***`syncing.excludedSettings`***
 
     通过这个配置项，你可以`排除某些指定的 VSCode 配置项`，以防止它们被同步。当然其他配置项不受影响，依然会正常同步。
 
