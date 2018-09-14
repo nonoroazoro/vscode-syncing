@@ -12,7 +12,7 @@ import { IExtension, ISyncedItem } from "../types/SyncingTypes";
 import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
-import { getVSIXPackageURL, queryExtensions } from "../utils/vscodeWebAPI";
+import { getVSIXDownloadURL, queryExtensions } from "../utils/vscodeWebAPI";
 import { Environment } from "./Environment";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
@@ -62,7 +62,7 @@ export class Extension
     }
 
     /**
-     * Creates an instance of singleton class `Extension`.
+     * Creates an instance of the singleton class `Extension`.
      */
     public static create(context: vscode.ExtensionContext): Extension
     {
@@ -354,11 +354,11 @@ export class Extension
                         if (versionMeta)
                         {
                             const version = versionMeta.version;
-                            const vsixPackageURL = getVSIXPackageURL(versionMeta);
-                            if (version && vsixPackageURL)
+                            const downloadURL = getVSIXDownloadURL(versionMeta);
+                            if (version && downloadURL)
                             {
                                 ext.version = version;
-                                ext.downloadURL = vsixPackageURL;
+                                ext.downloadURL = downloadURL;
                             }
                         }
                     }

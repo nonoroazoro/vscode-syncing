@@ -18,7 +18,7 @@ export class Gist
     private static _instance: Gist;
 
     /**
-     * Description of Gists.
+     * The description of Syncing's gists.
      */
     private static readonly GIST_DESCRIPTION: string = "VSCode's Settings - Syncing";
 
@@ -41,7 +41,7 @@ export class Gist
     }
 
     /**
-     * Create an instance of class `Gist`, only create new when params are changed.
+     * Creates an instance of the class `Gist`, only create a new instance if the params are changed.
      *
      * @param token GitHub Personal Access Token.
      * @param proxy Proxy url.
@@ -56,7 +56,7 @@ export class Gist
     }
 
     /**
-     * Get GitHub Personal Access Token.
+     * Gets the GitHub Personal Access Token.
      */
     public get token()
     {
@@ -64,7 +64,7 @@ export class Gist
     }
 
     /**
-     * Get proxy url.
+     * Gets the proxy url.
      */
     public get proxy()
     {
@@ -72,7 +72,7 @@ export class Gist
     }
 
     /**
-     * Get the currently authenticated GitHub user.
+     * Gets the currently authenticated GitHub user.
      */
     public user(): Promise<{ id: number, name: string } | null>
     {
@@ -95,7 +95,7 @@ export class Gist
     }
 
     /**
-     * Get gist of the authenticated user.
+     * Gets the gist of the currently authenticated user.
      *
      * @param id Gist id.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
@@ -135,7 +135,7 @@ export class Gist
     }
 
     /**
-     * Get all gists of the authenticated user.
+     * Gets all the gists of the currently authenticated user.
      */
     public getAll(): Promise<GitHubTypes.IGist[]>
     {
@@ -178,7 +178,7 @@ export class Gist
     }
 
     /**
-     * Check if the gist of the currently authenticated user is exists.
+     * Determines whether the specified gist exists.
      *
      * @param id Gist id.
      */
@@ -195,7 +195,7 @@ export class Gist
                         {
                             this.user().then((user) =>
                             {
-                                // Check if the Gist's owner is the currently authenticated user.
+                                // Determines whether the owner of the gist is the currently authenticated user.
                                 if (user && user.id === gist.owner.id)
                                 {
                                     resolve(gist);
@@ -221,7 +221,7 @@ export class Gist
     }
 
     /**
-     * Create gist.
+     * Creates a new gist.
      *
      * @param content Gist content.
      */
@@ -240,10 +240,10 @@ export class Gist
     }
 
     /**
-     * Create settings gist.
+     * Creates a new settings gist.
      *
      * @param files Settings files.
-     * @param isPublic Defaults to `false`, gist is set to private.
+     * @param isPublic Defaults to `false`, the gist is set to private.
      */
     public createSettings(files = {}, isPublic = false): Promise<GitHubTypes.IGist>
     {
@@ -255,7 +255,7 @@ export class Gist
     }
 
     /**
-     * Find and update gist.
+     * Updates the gist.
      *
      * @param id Gist id.
      * @param uploads Settings that will be uploaded.
@@ -308,7 +308,7 @@ export class Gist
                     localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
                     if (localGist.files)
                     {
-                        // poka-yoke - check if there have been two much changes since the last uploading.
+                        // poka-yoke - Determines whether there're too much changes since the last uploading.
                         const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
                         if (threshold > 0)
                         {
@@ -366,7 +366,7 @@ export class Gist
     }
 
     /**
-     * Get modified files list.
+     * Gets the modified files list.
      */
     private _getModifiedFiles(localFiles: any, remoteFiles?: GitHubTypes.IGistFiles): object | null
     {
@@ -420,7 +420,7 @@ export class Gist
     }
 
     /**
-     * Create error from error code.
+     * Creates the error from an error code.
      */
     private _createError(code: number)
     {
@@ -453,8 +453,8 @@ export class Gist
      */
     private _parseToJSON(files: GitHubTypes.IGistFiles): object
     {
-        let file: any;
-        let parsed: any;
+        let file: GitHubTypes.IGistFile;
+        let parsed: object;
         const result = {};
         for (const key of Object.keys(files))
         {
@@ -463,7 +463,6 @@ export class Gist
             {
                 parsed = parse(file.content || "");
 
-                // Only compare extension's id and version.
                 if (key === "extensions.json" && Array.isArray(parsed))
                 {
                     for (const ext of parsed)

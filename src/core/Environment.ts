@@ -33,7 +33,7 @@ export class Environment
     }
 
     /**
-     * Creates an instance of singleton class `Environment`.
+     * Creates an instance of the singleton class `Environment`.
      */
     public static create(context: vscode.ExtensionContext): Environment
     {
