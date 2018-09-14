@@ -25,22 +25,22 @@ tmp.setGracefulCleanup();
 interface ISyncOptions
 {
     /**
-     * Extensions to add/update/remove.
+     * The extensions to add, update or remove.
      */
     extensions: IExtension[];
 
     /**
-     * Progress of the synchronization of all extensions.
+     * The current progress of this synchronization process.
      */
     progress: number;
 
     /**
-     * Total progress of the synchronization of all extensions.
+     * The total progress of this synchronization process.
      */
     total: number;
 
     /**
-     * Whether to show the progress indicator. Defaults to `false`.
+     * Sets a value indicating whether `Syncing` should show the progress indicator. Defaults to `false`.
      */
     showIndicator?: boolean;
 }
@@ -76,9 +76,9 @@ export class Extension
     /**
      * Gets all installed extensions (Disabled extensions aren't included).
      *
-     * @param excludedExtensions The extensions that should be excluded from the result.
+     * @param excludedPatterns The glob patterns of the extensions that should be excluded.
      */
-    public getAll(excludedExtensions: string[] = []): IExtension[]
+    public getAll(excludedPatterns: string[] = []): IExtension[]
     {
         let item: IExtension;
         const result: IExtension[] = [];
@@ -86,7 +86,7 @@ export class Extension
         {
             if (
                 !ext.packageJSON.isBuiltin
-                && !excludedExtensions.some((pattern) => minimatch(ext.id, pattern, { nocase: true }))
+                && !excludedPatterns.some((pattern) => minimatch(ext.id, pattern, { nocase: true }))
             )
             {
                 item = {
@@ -102,7 +102,7 @@ export class Extension
     }
 
     /**
-     * Sync extensions (add/update/remove).
+     * Synchronize extensions (add, update or remove).
      *
      * @param extensions Extensions to be synced.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
@@ -113,7 +113,7 @@ export class Extension
         {
             this._getDifferentExtensions(extensions).then((diff) =>
             {
-                // Add/update/remove extensions.
+                // Add, update or remove extensions.
                 const { added, updated, removed, total } = diff;
                 const result = { extension: {} } as ISyncedItem;
                 const tasks = [
@@ -177,12 +177,13 @@ export class Extension
                     return;
                 }
 
-                // Fallback to normal package.
+                // Fallback to normal package in case the extension query service is down.
                 if (!extension.downloadURL)
                 {
-                    extension.downloadURL = `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
-                        + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}`
-                        + `/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
+                    extension.downloadURL =
+                        `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
+                        + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
+                        + `assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
                 }
                 downloadFile(extension.downloadURL, filepath, this._syncing.proxy).then(() =>
                 {
@@ -193,7 +194,7 @@ export class Extension
     }
 
     /**
-     * Extracts extension zip file to VSCode extensions folder.
+     * Extracts (install) extension vsix package.
      */
     public extractExtension(extension: IExtension): Promise<IExtension>
     {
@@ -311,7 +312,7 @@ export class Extension
     }
 
     /**
-     * Gets extensions that are added/updated/removed.
+     * Gets the extensions that will be added, updated or removed.
      */
     private async _getDifferentExtensions(extensions: IExtension[]): Promise<{
         added: IExtension[],
@@ -331,7 +332,7 @@ export class Extension
         };
         if (extensions)
         {
-            // 1. Automatically update extensions: Query the latest extensions.
+            // 1. Auto update extensions: Query the latest extensions.
             let queriedExtensions: CaseInsensitiveMap<string, IExtensionMeta> = new CaseInsensitiveMap();
             const autoUpdateExtensions = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_EXTENSIONS_AUTOUPDATE);
             if (autoUpdateExtensions)
@@ -343,7 +344,7 @@ export class Extension
             const reservedExtensionIDs = new CaseInsensitiveSet<string>();
             for (const ext of extensions)
             {
-                // 2. Automatically update extensions: Update to the latest version.
+                // 2. Auto update extensions: Update to the latest version.
                 if (autoUpdateExtensions)
                 {
                     const extensionMeta = queriedExtensions.get(ext.id);
