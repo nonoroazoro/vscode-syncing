@@ -30,7 +30,7 @@ function _init(context: vscode.ExtensionContext)
 }
 
 /**
- * Init extension commands.
+ * Init the extension's commands.
  */
 function _initCommands(context: vscode.ExtensionContext)
 {
@@ -49,7 +49,7 @@ function _registerCommand(context: vscode.ExtensionContext, command: string, cal
 }
 
 /**
- * Upload settings.
+ * Uploads your settings.
  */
 function _uploadSettings()
 {
@@ -86,7 +86,7 @@ function _uploadSettings()
 }
 
 /**
- * download settings.
+ * Downloads your settings.
  */
 function _downloadSettings()
 {
@@ -129,7 +129,7 @@ function _downloadSettings()
 }
 
 /**
- * Open Syncing's settings file in the VSCode editor.
+ * Opens the Syncing's settings file in a VSCode editor.
  */
 function _openSettings()
 {
@@ -137,7 +137,7 @@ function _openSettings()
 }
 
 /**
- * Check if extensions are actually synced.
+ * Determines whether the extensions are actually synchronized.
  */
 function _isExtensionsSynced(syncedItems: { updated: ISyncedItem[], removed: ISyncedItem[] }): boolean
 {

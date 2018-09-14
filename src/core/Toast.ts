@@ -15,13 +15,14 @@ import { Gist } from "./Gist";
 interface IGistListBoxItem extends vscode.QuickPickItem
 {
     /**
-     * Payload of the item.
+     * The payload of the item.
      */
     data: string;
 }
 
 /**
- * Set a message to the VSCode status bar.
+ * Displays a message to the VSCode status bar.
+ *
  * @param message The message to show.
  * @param hideAfterTimeout Timeout in milliseconds after which the message will be cleared.
  */
@@ -41,7 +42,8 @@ export function status(message: string, hideAfterTimeout?: number): void
 }
 
 /**
- * Set an `info` message to the VSCode status bar and auto-hide after `4000` milliseconds.
+ * Displays an `info` message to the VSCode status bar and auto-hide after `4000` milliseconds.
+ *
  * @param message The message to show.
  */
 export function statusInfo(message: string): void
@@ -50,7 +52,8 @@ export function statusInfo(message: string): void
 }
 
 /**
- * Set an `error` message to the VSCode status bar and auto-hide after `8000` milliseconds.
+ * Displays an `error` message to the VSCode status bar and auto-hide after `8000` milliseconds.
+ *
  * @param message The message to show.
  */
 export function statusError(message: string): void
@@ -59,7 +62,8 @@ export function statusError(message: string): void
 }
 
 /**
- * Set an `fatal` message to the VSCode status bar and auto-hide after `12000` milliseconds.
+ * Displays an `fatal` message to the VSCode status bar and auto-hide after `12000` milliseconds.
+ *
  * @param message The message to show.
  */
 export function statusFatal(message: string): void
@@ -68,7 +72,8 @@ export function statusFatal(message: string): void
 }
 
 /**
- * Show GitHub Personal Access Token input box.
+ * Shows the GitHub Personal Access Token input box.
+ *
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
 export function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: string }>
@@ -109,7 +114,8 @@ export function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ to
 }
 
 /**
- * Show Gist ID input box.
+ * Shows the Gist ID input box.
+ *
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
 export function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
@@ -149,7 +155,8 @@ export function showGistInputBox(forUpload: boolean = true): Promise<{ id: strin
 }
 
 /**
- * Show remote Gist list box.
+ * Shows the remote Gist list box.
+ *
  * @param api GitHub Gist utils.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
@@ -211,7 +218,7 @@ export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Pro
 }
 
 /**
- * Show a "Reload VSCode" prompt dialog.
+ * Shows a `Reload VSCode` prompt dialog.
  */
 export function showReloadBox(): void
 {
@@ -227,7 +234,7 @@ export function showReloadBox(): void
 }
 
 /**
- * Show a confirm prompt dialog.
+ * Shows a confirm prompt dialog.
  */
 export function showConfirmBox(message: string, ...buttons: string[])
 {
@@ -241,7 +248,8 @@ const spinner = {
 };
 
 /**
- * Show a message with spinner and progress.
+ * Displays a message with spinner and progress.
+ *
  * @param message Message to display after spinner.
  * @param progress Current progress.
  * @param total Total progress.
@@ -277,7 +285,8 @@ export function showSpinner(message: string, progress?: number, total?: number):
 }
 
 /**
- * Clear spinner and show message, do nothing if currently no spinner is exist.
+ * Clears the spinner and displays the message, do nothing if currently there's no any spinner.
+ *
  * @param message The message to show.
  */
 export function clearSpinner(message?: string): void

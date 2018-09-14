@@ -10,7 +10,7 @@ import
 import { post } from "./ajax";
 
 /**
- * Query extensions.
+ * Query the extensions' meta data.
  *
  * @param {string[]} ids The id list of extensions. The id is in the form of: `publisher.name`.
  * @param {string} [proxy] The proxy settings.
@@ -61,11 +61,11 @@ export async function queryExtensions(ids: string[], proxy?: string): Promise<Ca
 }
 
 /**
- * Gets VSIX package URL.
+ * Gets the VSIX download URL.
  *
- * @param {IExtensionVersion} version An extension version object.
+ * @param {IExtensionVersion} version The extension's version object.
  */
-export function getVSIXPackageURL(version: IExtensionVersion): string | undefined
+export function getVSIXDownloadURL(version: IExtensionVersion): string | undefined
 {
     const files = version.files;
     if (files)

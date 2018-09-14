@@ -42,6 +42,7 @@ export function diff(left: any, right: any): number
 
 /**
  * Detects if the value represents the item moved inside the array.
+ *
  * See https://github.com/benjamine/jsondiffpatch/issues/79#issuecomment-250468970.
  */
 function _isArrayItemMoved(value: any)

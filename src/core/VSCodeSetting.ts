@@ -155,7 +155,7 @@ export class VSCodeSetting
                         {
                             values.forEach((value: ISetting) =>
                             {
-                                // Check for success.
+                                // Success if the content is not null.
                                 if (value.content)
                                 {
                                     results.push(value);
@@ -302,7 +302,7 @@ export class VSCodeSetting
                         settingsToSave.push(extensionsSetting);
                     }
 
-                    // poka-yoke - Check if there have been two much changes since the last downloading.
+                    // poka-yoke - Determines whether there're too much changes since the last downloading.
                     this._shouldContinue(settings, settingsToSave, settingsToRemove).then((value) =>
                     {
                         if (value)
@@ -519,7 +519,7 @@ export class VSCodeSetting
     }
 
     /**
-     * Check if the downloading should be continued.
+     * Determines whether the downloading should continue.
      */
     private _shouldContinue(settings: ISetting[], settingsToSave: ISetting[], settingsToRemove: ISetting[])
     {
@@ -530,7 +530,7 @@ export class VSCodeSetting
             {
                 this._loadContent(settings, false).then((localSettings) =>
                 {
-                    // poka-yoke - check if there have been two much changes since the last uploading.
+                    // poka-yoke - Determines whether there're too much changes since the last uploading.
                     // 1. Excluded settings.
                     // Here clone the settings to avoid manipulation.
                     let excludedSettings = this._excludeSettings(
@@ -635,9 +635,9 @@ export class VSCodeSetting
     /**
      * Converts the `content` of `ISetting[]` into a `JSON object`.
      */
-    private _parseToJSON(settings: ISetting[]): any
+    private _parseToJSON(settings: ISetting[]): object
     {
-        let parsed: any;
+        let parsed: object;
         let content: string;
         const result = {};
         for (const setting of settings)
@@ -645,7 +645,6 @@ export class VSCodeSetting
             content = setting.content || "";
             parsed = parse(content);
 
-            // Only compare extension's id and version.
             if (setting.type === SettingTypes.Extensions && Array.isArray(parsed))
             {
                 for (const ext of parsed)
