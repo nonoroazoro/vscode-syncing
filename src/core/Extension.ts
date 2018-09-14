@@ -285,12 +285,12 @@ export class Extension
         {
             for (const ext of [...added, ...updated])
             {
-                delete obsolete[this._env.getExtensionFolderName(ext)];
+                delete obsolete[this._env.getExtensionDirectoryName(ext)];
             }
 
             for (const ext of removed)
             {
-                obsolete[this._env.getExtensionFolderName(ext)] = true;
+                obsolete[this._env.getExtensionDirectoryName(ext)] = true;
             }
 
             try
