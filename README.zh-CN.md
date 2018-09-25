@@ -15,11 +15,11 @@
 
 ## 重要变更
 
-* 从 ***1.8.2*** 版本开始：
+* 从 ***1.9.0*** 版本开始：
 
-    1. `VSCode` 从 `1.27` 版本开始提供了 [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) 功能，因此我新增了一个配置项 `syncing.separateKeybindings`，这样你就可以选择用`单个文件`来同步所有`快捷键`了。
+    1. 支持 VSCode [便携模式](https://code.visualstudio.com/docs/editor/portable)。
 
-    > 具体请参考 `Syncing` 的 [VSCode 配置项](#vscode-配置项)。
+    1. 将会从一个全新的 `CDN` 下载插件，以加速同步过程（对于那些不使用代理的用户来说效果应该更为显著）。
 
 
 ## 功能
