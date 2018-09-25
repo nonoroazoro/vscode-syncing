@@ -1,6 +1,5 @@
 import * as fs from "fs-extra";
 import * as path from "path";
-import * as vscode from "vscode";
 
 import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
@@ -43,20 +42,20 @@ export class Syncing
     private _env: Environment;
     private _settingsPath: string;
 
-    private constructor(context: vscode.ExtensionContext)
+    private constructor()
     {
-        this._env = Environment.create(context);
-        this._settingsPath = path.join(this._env.codeUserPath, "syncing.json");
+        this._env = Environment.create();
+        this._settingsPath = path.join(this._env.codeUserDirectory, "syncing.json");
     }
 
     /**
      * Creates an instance of singleton class `Syncing`.
      */
-    public static create(context: vscode.ExtensionContext): Syncing
+    public static create(): Syncing
     {
         if (!Syncing._instance)
         {
-            Syncing._instance = new Syncing(context);
+            Syncing._instance = new Syncing();
         }
         return Syncing._instance;
     }

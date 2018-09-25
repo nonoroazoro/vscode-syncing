@@ -20,8 +20,8 @@ export function activate(context: vscode.ExtensionContext)
 function _init(context: vscode.ExtensionContext)
 {
     _isSynchronizing = false;
-    _syncing = Syncing.create(context);
-    _vscodeSetting = VSCodeSetting.create(context);
+    _syncing = Syncing.create();
+    _vscodeSetting = VSCodeSetting.create();
 
     // TODO: i18n, using vscode.env.language
     moment.locale("en");
