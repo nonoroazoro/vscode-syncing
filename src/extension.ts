@@ -6,8 +6,8 @@ import * as Toast from "./core/Toast";
 import { ISyncedItem } from "./types/SyncingTypes";
 
 let _syncing: Syncing;
-let _isSyncing: boolean;
 let _vscodeSetting: VSCodeSetting;
+let _isSynchronizing: boolean;
 
 export function activate(context: vscode.ExtensionContext)
 {
@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext)
  */
 function _init(context: vscode.ExtensionContext)
 {
-    _isSyncing = false;
+    _isSynchronizing = false;
     _syncing = Syncing.create(context);
     _vscodeSetting = VSCodeSetting.create(context);
 
@@ -53,9 +53,9 @@ function _registerCommand(context: vscode.ExtensionContext, command: string, cal
  */
 function _uploadSettings()
 {
-    if (!_isSyncing)
+    if (!_isSynchronizing)
     {
-        _isSyncing = true;
+        _isSynchronizing = true;
         _syncing.prepareUploadSettings(true).then((syncingSettings) =>
         {
             const api = Gist.create(syncingSettings.token, _syncing.proxy);
@@ -75,12 +75,12 @@ function _uploadSettings()
                         });
                     }
 
-                    _isSyncing = false;
+                    _isSynchronizing = false;
                 });
             });
         }).catch(() =>
         {
-            _isSyncing = false;
+            _isSynchronizing = false;
         });
     }
 }
@@ -90,9 +90,9 @@ function _uploadSettings()
  */
 function _downloadSettings()
 {
-    if (!_isSyncing)
+    if (!_isSynchronizing)
     {
-        _isSyncing = true;
+        _isSynchronizing = true;
         _syncing.prepareDownloadSettings(true).then((syncingSettings) =>
         {
             const api = Gist.create(syncingSettings.token, _syncing.proxy);
@@ -106,7 +106,7 @@ function _downloadSettings()
                         Toast.showReloadBox();
                     }
 
-                    _isSyncing = false;
+                    _isSynchronizing = false;
                 });
             }).catch((err) =>
             {
@@ -119,11 +119,11 @@ function _downloadSettings()
                     _syncing.clearGistID();
                 }
 
-                _isSyncing = false;
+                _isSynchronizing = false;
             });
         }).catch(() =>
         {
-            _isSyncing = false;
+            _isSynchronizing = false;
         });
     }
 }
