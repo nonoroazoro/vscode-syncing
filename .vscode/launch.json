@@ -6,15 +6,20 @@
             "type": "extensionHost",
             "request": "launch",
             "runtimeExecutable": "${execPath}",
-            "preLaunchTask": "tsc-watch",
             "args": [
                 "--extensionDevelopmentPath=${workspaceFolder}"
             ],
+            "env": {
+                "DEBUG_SYNCING_EXTENSION": "true"
+            },
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
             "smartStep": true,
-            "sourceMaps": true
+            "sourceMaps": true,
+            "osx": {
+                "preLaunchTask": "tsc-watch"
+            },
         }
     ]
 }
