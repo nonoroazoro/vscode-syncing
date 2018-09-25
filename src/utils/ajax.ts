@@ -5,7 +5,7 @@ import * as url from "url";
 import * as zlib from "zlib";
 
 /**
- * Post.
+ * Posts a request.
  *
  * @param {string} api The post url.
  * @param {any} data The post data.
@@ -69,7 +69,7 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
 }
 
 /**
- * Download file.
+ * Downloads a file.
  *
  * @param {string} uri The resource uri.
  * @param {string} savepath The path where the file will be saved;

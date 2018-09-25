@@ -3,7 +3,6 @@ import * as fs from "fs-extra";
 import * as junk from "junk";
 import * as minimatch from "minimatch";
 import * as path from "path";
-import * as vscode from "vscode";
 
 import
 {
@@ -15,19 +14,19 @@ import
     SETTING_EXCLUDED_EXTENSIONS,
     SETTING_EXCLUDED_SETTINGS
 } from "../common/constants";
-import * as GitHubTypes from "../common/GitHubTypes";
-import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../common/types";
+import * as GitHubTypes from "../types/GitHubTypes";
+import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
-import Environment from "./Environment";
-import Extension from "./Extension";
+import { Environment } from "./Environment";
+import { Extension } from "./Extension";
 import * as Toast from "./Toast";
 
 /**
  * `VSCode Settings` wrapper.
  */
-export default class VSCodeSetting
+export class VSCodeSetting
 {
     private static _instance: VSCodeSetting;
 
@@ -44,26 +43,26 @@ export default class VSCodeSetting
     private _env: Environment;
     private _ext: Extension;
 
-    private constructor(context: vscode.ExtensionContext)
+    private constructor()
     {
-        this._env = Environment.create(context);
-        this._ext = Extension.create(context);
+        this._env = Environment.create();
+        this._ext = Extension.create();
     }
 
     /**
-     * Create an instance of singleton class `VSCodeSetting`.
+     * Creates an instance of singleton class `VSCodeSetting`.
      */
-    public static create(context: vscode.ExtensionContext): VSCodeSetting
+    public static create(): VSCodeSetting
     {
         if (!VSCodeSetting._instance)
         {
-            VSCodeSetting._instance = new VSCodeSetting(context);
+            VSCodeSetting._instance = new VSCodeSetting();
         }
         return VSCodeSetting._instance;
     }
 
     /**
-     * Get `VSCode Settings` (will be uploaded or downloaded, anyway).
+     * Gets `VSCode Settings` (which will be uploaded or downloaded, anyway).
      * For example:
      *    [
      *        {
@@ -118,7 +117,7 @@ export default class VSCodeSetting
                     if (type === SettingTypes.Snippets)
                     {
                         // Attention: Snippets may be empty.
-                        tempSettings = this._getSnippets(this._env.snippetsPath);
+                        tempSettings = this._getSnippets(this._env.snippetsDirectory);
                     }
                     else
                     {
@@ -142,7 +141,7 @@ export default class VSCodeSetting
 
                         tempSettings = [
                             {
-                                filepath: path.join(this._env.codeUserPath, localFilename),
+                                filepath: path.join(this._env.codeUserDirectory, localFilename),
                                 remoteFilename,
                                 type
                             }
@@ -155,7 +154,7 @@ export default class VSCodeSetting
                         {
                             values.forEach((value: ISetting) =>
                             {
-                                // Check for success.
+                                // Success if the content is not null.
                                 if (value.content)
                                 {
                                     results.push(value);
@@ -188,6 +187,7 @@ export default class VSCodeSetting
 
     /**
      * Save `VSCode Settings` to files.
+     *
      * @param files `VSCode Settings` from GitHub Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
@@ -238,18 +238,13 @@ export default class VSCodeSetting
                         gistFile = files[setting.remoteFilename];
                         if (gistFile)
                         {
-                            // File exists in remote and local, sync it.
+                            // If the file exists in both remote and local, it should be synchronized.
                             if (setting.type === SettingTypes.Extensions)
                             {
                                 // Temp extensions file.
-
-                                // TODO: remove the next line in the next release.
-                                setting.content = (setting.content || "[]").toLowerCase();
-
-                                // TODO: remove || "[]").toLowerCase() in the next release.
                                 extensionsSetting = {
                                     ...setting,
-                                    content: (gistFile.content || "[]").toLowerCase()
+                                    content: gistFile.content
                                 };
                             }
                             else
@@ -306,7 +301,7 @@ export default class VSCodeSetting
                         settingsToSave.push(extensionsSetting);
                     }
 
-                    // poka-yoke - check if there have been two much changes since the last downloading.
+                    // poka-yoke - Determines whether there're too much changes since the last downloading.
                     this._shouldContinue(settings, settingsToSave, settingsToRemove).then((value) =>
                     {
                         if (value)
@@ -361,6 +356,7 @@ export default class VSCodeSetting
 
     /**
      * Delete the physical files corresponding to the `VSCode Settings`.
+     *
      * @param settings `VSCode Settings`.
      */
     public removeSettings(settings: ISetting[]): Promise<ISyncedItem[]>
@@ -397,7 +393,8 @@ export default class VSCodeSetting
     }
 
     /**
-     * Get all local snippet files.
+     * Gets all local snippet files.
+     *
      * @param snippetsDir Snippets dir.
      */
     private _getSnippets(snippetsDir: string): ISetting[]
@@ -521,7 +518,7 @@ export default class VSCodeSetting
     }
 
     /**
-     * Check if the downloading should be continued.
+     * Determines whether the downloading should continue.
      */
     private _shouldContinue(settings: ISetting[], settingsToSave: ISetting[], settingsToRemove: ISetting[])
     {
@@ -532,7 +529,7 @@ export default class VSCodeSetting
             {
                 this._loadContent(settings, false).then((localSettings) =>
                 {
-                    // poka-yoke - check if there have been two much changes since the last uploading.
+                    // poka-yoke - Determines whether there're too much changes since the last uploading.
                     // 1. Excluded settings.
                     // Here clone the settings to avoid manipulation.
                     let excludedSettings = this._excludeSettings(
@@ -549,10 +546,8 @@ export default class VSCodeSetting
                     );
 
                     // 3. Diff settings.
-                    const changes = settingsToRemove.length + this._diffSettings(
-                        excludedSettings.localSettings,
-                        excludedSettings.remoteSettings
-                    );
+                    const changes = settingsToRemove.length
+                        + this._diffSettings(excludedSettings.localSettings, excludedSettings.remoteSettings);
                     if (changes >= threshold)
                     {
                         const okButton = "Continue to download";
@@ -616,7 +611,7 @@ export default class VSCodeSetting
     }
 
     /**
-     * get excluded extensions based on the excluded setting of remote settings.
+     * Gets excluded extensions based on the excluded setting of remote settings.
      */
     private _getExcludedExtensions(extensions: IExtension[], patterns: string[])
     {
@@ -639,9 +634,9 @@ export default class VSCodeSetting
     /**
      * Converts the `content` of `ISetting[]` into a `JSON object`.
      */
-    private _parseToJSON(settings: ISetting[]): any
+    private _parseToJSON(settings: ISetting[]): object
     {
-        let parsed: any;
+        let parsed: object;
         let content: string;
         const result = {};
         for (const setting of settings)
@@ -649,14 +644,16 @@ export default class VSCodeSetting
             content = setting.content || "";
             parsed = parse(content);
 
-            // Only compare extension's id and version.
             if (setting.type === SettingTypes.Extensions && Array.isArray(parsed))
             {
                 for (const ext of parsed)
                 {
-                    delete ext["uuid"];
+                    ext["id"] = ext["id"].toLocaleLowerCase();
+
+                    // Only compares id and version.
                     delete ext["name"];
                     delete ext["publisher"];
+                    delete ext["uuid"];
                 }
             }
 

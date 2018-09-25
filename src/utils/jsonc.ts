@@ -15,14 +15,15 @@ const JSONC_MODIFICATION_OPTIONS: jsonc.ModificationOptions = {
 };
 
 /**
- * Remove the excluded properties based on the exclude list (glob patterns).
- * Create and return the new settings JSON string.
+ * Removes the excluded properties based on the exclude list (glob patterns).
+ *
+ * Creates and returns the new settings JSON string.
  *
  * @param {string} settingsJSONString VSCode settings in `JSON string` format.
- * @param {any} settingsJSON VSCode settings in `JSON object` format.
+ * @param {object} settingsJSON VSCode settings in `JSON object` format.
  * @param {string[]} patterns The exclude list (glob patterns).
  */
-export function excludeSettings(settingsJSONString: string, settingsJSON: any, patterns: string[]): string
+export function excludeSettings(settingsJSONString: string, settingsJSON: object, patterns: string[]): string
 {
     let result = settingsJSONString;
     if (settingsJSON && settingsJSONString)
@@ -55,8 +56,9 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: any, p
 }
 
 /**
- * Merge the source VSCode settings with the destination settings, based on the exclude list (glob patterns) of source settings.
- * Create and return the new source settings JSON string.
+ * Merges the source VSCode settings with the destination settings, based on the exclude list (glob patterns) of source settings.
+ *
+ * Creates and returns the new source settings JSON string.
  *
  * @param {string} sSettingsJSONString The source settings.
  * @param {string} dSettingsJSONString The destination settings.
@@ -108,9 +110,9 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
 }
 
 /**
- * Get JSON property keys based on the exclude list (glob patterns) of Syncing.
+ * Gets the JSON property keys based on the exclude list (`glob patterns`) of Syncing.
  */
-export function getExcludedKeys(settingsJSON: { [key: string]: any }, patterns: string[]): string[]
+export function getExcludedKeys(settingsJSON: object, patterns: string[]): string[]
 {
     const excludeKeys: string[] = [];
     const keys = Object.keys(settingsJSON);
@@ -126,7 +128,7 @@ export function getExcludedKeys(settingsJSON: { [key: string]: any }, patterns: 
 }
 
 /**
- * Format the given JSON string.
+ * Formats the given JSON string.
  */
 export function format(jsonString: string, formattingOptions: jsonc.FormattingOptions = JSONC_MODIFICATION_OPTIONS.formattingOptions): string
 {
@@ -135,7 +137,7 @@ export function format(jsonString: string, formattingOptions: jsonc.FormattingOp
 }
 
 /**
- * Parse the given text and returns the object the JSON content represents.
+ * Parses the given text and returns the object the JSON content represents.
  */
 export function parse(text: string)
 {

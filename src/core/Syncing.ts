@@ -1,29 +1,28 @@
 import * as fs from "fs-extra";
 import * as path from "path";
-import * as vscode from "vscode";
 
 import { openFile } from "../utils/vscodeAPI";
-import Environment from "./Environment";
-import Gist from "./Gist";
+import { Environment } from "./Environment";
+import { Gist } from "./Gist";
 import * as Toast from "./Toast";
 
 /**
- * Represent the `Syncing Settings`.
+ * Represents the `Syncing Settings`.
  */
 interface ISyncingSettings
 {
     /**
-     * Store GitHub Gist ID.
+     * Store the GitHub Gist ID.
      */
     id: string;
 
     /**
-     * Store GitHub Personal Access Token.
+     * Store the GitHub Personal Access Token.
      */
     token: string;
 
     /**
-     * Store http proxy setting.
+     * Store the http proxy setting.
      */
     http_proxy?: string;
 }
@@ -31,38 +30,38 @@ interface ISyncingSettings
 /**
  * `Syncing` wrapper.
  */
-export default class Syncing
+export class Syncing
 {
     private static _instance: Syncing;
 
     /**
-     * Default settings of `Syncing`.
+     * The default settings of `Syncing`.
      */
     private static readonly DEFAULT_SETTINGS: ISyncingSettings = { id: "", token: "", http_proxy: "" };
 
     private _env: Environment;
     private _settingsPath: string;
 
-    private constructor(context: vscode.ExtensionContext)
+    private constructor()
     {
-        this._env = Environment.create(context);
-        this._settingsPath = path.join(this._env.codeUserPath, "syncing.json");
+        this._env = Environment.create();
+        this._settingsPath = path.join(this._env.codeUserDirectory, "syncing.json");
     }
 
     /**
-     * Create an instance of singleton class `Syncing`.
+     * Creates an instance of singleton class `Syncing`.
      */
-    public static create(context: vscode.ExtensionContext): Syncing
+    public static create(): Syncing
     {
         if (!Syncing._instance)
         {
-            Syncing._instance = new Syncing(context);
+            Syncing._instance = new Syncing();
         }
         return Syncing._instance;
     }
 
     /**
-     * Get settings file path of `Syncing`.
+     * Gets the full path of `Syncing`'s `settings file`.
      */
     public get settingsPath(): string
     {
@@ -70,7 +69,9 @@ export default class Syncing
     }
 
     /**
-     * Get proxy settings of Syncing, picked from `Syncing`'s `http_proxy` setting. If not set, picked from `http_proxy` and `https_proxy` environment variables.
+     * Gets the proxy setting from `Syncing`'s `http_proxy` setting.
+     *
+     * If the proxy setting is not set, it will read from the `http_proxy` and `https_proxy` environment variables.
      */
     public get proxy(): string | undefined
     {
@@ -83,7 +84,7 @@ export default class Syncing
     }
 
     /**
-     * Init settings file of `Syncing`.
+     * Init the `Syncing`'s settings file.
      */
     public initSettings(): Promise<void>
     {
@@ -91,7 +92,7 @@ export default class Syncing
     }
 
     /**
-     * Clear GitHub Personal Access Token and save to file.
+     * Clears the GitHub Personal Access Token and save to `Syncing`'s settings file.
      */
     public clearGitHubToken(): Promise<void>
     {
@@ -101,7 +102,7 @@ export default class Syncing
     }
 
     /**
-     * Clear Gist ID and save to file.
+     * Clears the Gist ID and save to `Syncing`'s settings file.
      */
     public clearGistID(): Promise<void>
     {
@@ -111,7 +112,8 @@ export default class Syncing
     }
 
     /**
-     * Prepare `Syncing`'s settings for uploading.
+     * Prepares the `Syncing`'s settings for uploading.
+     *
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
     public prepareUploadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
@@ -121,7 +123,8 @@ export default class Syncing
     }
 
     /**
-     * Prepare `Syncing`'s settings for downloading.
+     * Prepares the `Syncing`'s settings for downloading.
+     *
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
     public prepareDownloadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
@@ -131,7 +134,8 @@ export default class Syncing
     }
 
     /**
-     * Prepare `Syncing`'s settings, will ask for settings if not exist.
+     * Prepare `Syncing`'s settings, will ask for settings if the settings are not existed.
+     *
      * @param forUpload Whether to show messages for upload. Defaults to `true`.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
@@ -207,7 +211,7 @@ export default class Syncing
     }
 
     /**
-     * Load Syncing's settings (load from settings file: `syncing.json`).
+     * Loads the `Syncing`'s settings from the settings file (`syncing.json`).
      */
     public loadSettings(): ISyncingSettings
     {
@@ -227,7 +231,7 @@ export default class Syncing
     }
 
     /**
-     * Open Syncing's settings file (`syncing.json`) in the VSCode editor.
+     * Open `Syncing`'s settings file in a VSCode editor.
      */
     public async openSettings()
     {
@@ -240,7 +244,8 @@ export default class Syncing
     }
 
     /**
-     * Save Syncing's settings to file: `syncing.json`.
+     * Save `Syncing`'s settings to disk.
+     *
      * @param settings Syncing's Settings.
      * @param showToast Whether to show error toast. Defaults to `false`.
      */

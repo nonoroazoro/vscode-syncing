@@ -1,15 +1,13 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
-import { ISyncedItem } from "./common/types";
-import Gist from "./core/Gist";
-import Syncing from "./core/Syncing";
+import { Gist, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
-import VSCodeSetting from "./core/VSCodeSetting";
+import { ISyncedItem } from "./types/SyncingTypes";
 
 let _syncing: Syncing;
-let _isSyncing: boolean;
 let _vscodeSetting: VSCodeSetting;
+let _isSynchronizing: boolean;
 
 export function activate(context: vscode.ExtensionContext)
 {
@@ -21,9 +19,9 @@ export function activate(context: vscode.ExtensionContext)
  */
 function _init(context: vscode.ExtensionContext)
 {
-    _isSyncing = false;
-    _syncing = Syncing.create(context);
-    _vscodeSetting = VSCodeSetting.create(context);
+    _isSynchronizing = false;
+    _syncing = Syncing.create();
+    _vscodeSetting = VSCodeSetting.create();
 
     // TODO: i18n, using vscode.env.language
     moment.locale("en");
@@ -32,7 +30,7 @@ function _init(context: vscode.ExtensionContext)
 }
 
 /**
- * Init extension commands.
+ * Init the extension's commands.
  */
 function _initCommands(context: vscode.ExtensionContext)
 {
@@ -51,13 +49,13 @@ function _registerCommand(context: vscode.ExtensionContext, command: string, cal
 }
 
 /**
- * Upload settings.
+ * Uploads your settings.
  */
 function _uploadSettings()
 {
-    if (!_isSyncing)
+    if (!_isSynchronizing)
     {
-        _isSyncing = true;
+        _isSynchronizing = true;
         _syncing.prepareUploadSettings(true).then((syncingSettings) =>
         {
             const api = Gist.create(syncingSettings.token, _syncing.proxy);
@@ -77,24 +75,24 @@ function _uploadSettings()
                         });
                     }
 
-                    _isSyncing = false;
+                    _isSynchronizing = false;
                 });
             });
         }).catch(() =>
         {
-            _isSyncing = false;
+            _isSynchronizing = false;
         });
     }
 }
 
 /**
- * download settings.
+ * Downloads your settings.
  */
 function _downloadSettings()
 {
-    if (!_isSyncing)
+    if (!_isSynchronizing)
     {
-        _isSyncing = true;
+        _isSynchronizing = true;
         _syncing.prepareDownloadSettings(true).then((syncingSettings) =>
         {
             const api = Gist.create(syncingSettings.token, _syncing.proxy);
@@ -108,7 +106,7 @@ function _downloadSettings()
                         Toast.showReloadBox();
                     }
 
-                    _isSyncing = false;
+                    _isSynchronizing = false;
                 });
             }).catch((err) =>
             {
@@ -121,17 +119,17 @@ function _downloadSettings()
                     _syncing.clearGistID();
                 }
 
-                _isSyncing = false;
+                _isSynchronizing = false;
             });
         }).catch(() =>
         {
-            _isSyncing = false;
+            _isSynchronizing = false;
         });
     }
 }
 
 /**
- * Open Syncing's settings file in the VSCode editor.
+ * Opens the Syncing's settings file in a VSCode editor.
  */
 function _openSettings()
 {
@@ -139,7 +137,7 @@ function _openSettings()
 }
 
 /**
- * Check if extensions are actually synced.
+ * Determines whether the extensions are actually synchronized.
  */
 function _isExtensionsSynced(syncedItems: { updated: ISyncedItem[], removed: ISyncedItem[] }): boolean
 {

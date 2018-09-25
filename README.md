@@ -15,11 +15,11 @@
 
 ## Breaking Changes
 
-* From ***version 1.8.2*** onwards:
+* From ***version 1.9.0*** onwards:
 
-    1. Since `VSCode` has introduced the [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) from `version 1.27`, I added the `syncing.separateKeybindings` setting so that you can decide whether to synchronize the `keybindings` through `one single file`.
+    1. Support VSCode [Portable Mode](https://code.visualstudio.com/docs/editor/portable).
 
-    > Please [check out the VSCode User Settings](#vscode-user-settings) for more details.
+    1. Use a new `CDN` to install extensions, which should significantly accelerate the synchronization, especially if you don't behind any [proxy](#proxy-settings).
 
 
 ## Features
@@ -29,7 +29,7 @@
 1. **Upload VSCode Settings**:
 
     * Including your `User Settings`, `Keybindings`, `Extensions`, `Locales` and `Snippets`.
-    * The `keybindings` of `Macintosh` and `non-Macintosh` will be synchronized separately, in case you have multiple devices of different operating systems.
+    * The `keybindings` of `MacOS` and `non-MacOS` will be synchronized separately, in case you have multiple devices of different operating systems.
     * Automatically create a new Gist to store your settings.
     * Use an incremental algorithm to boost the synchronization.
     * You can `exclude some VSCode User Settings and Extensions` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
@@ -112,7 +112,7 @@ You can find the following `Syncing Settings` in your `VSCode User Settings`.
 
     Now the extension `nonoroazoro.syncing` (i.e., `Syncing`) and all the extensions of the author `somepublisher` will no longer be synchronized.
 
-1. ***`syncing.excludedSettings`*** *(Formerly `syncing.upload.exclude`)*
+1. ***`syncing.excludedSettings`***
 
     You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synchronized.
 

@@ -6,40 +6,41 @@ import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
 
+import { CaseInsensitiveMap, CaseInsensitiveSet } from "../collections";
 import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE, CONFIGURATION_KEY } from "../common/constants";
-import { IExtension, ISyncedItem } from "../common/types";
-import { IExtensionMeta } from "../common/VSCodeWebAPITypes";
+import { IExtension, ISyncedItem } from "../types/SyncingTypes";
+import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
-import { getVSCodeSetting } from "../utils/vscodeAPI";
-import { queryExtensions } from "../utils/vscodeWebAPI";
-import Environment from "./Environment";
-import Syncing from "./Syncing";
+import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
+import { getVSIXDownloadURL, queryExtensions } from "../utils/vscodeWebAPI";
+import { Environment } from "./Environment";
+import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
 
 tmp.setGracefulCleanup();
 
 /**
- * Represent the options of synchronization.
+ * Represents the options of synchronization.
  */
 interface ISyncOptions
 {
     /**
-     * Extensions to add/update/remove.
+     * The extensions to add, update or remove.
      */
     extensions: IExtension[];
 
     /**
-     * Progress of the synchronization of all extensions.
+     * The current progress of this synchronization process.
      */
     progress: number;
 
     /**
-     * Total progress of the synchronization of all extensions.
+     * The total progress of this synchronization process.
      */
     total: number;
 
     /**
-     * Whether to show the progress indicator. Defaults to `false`.
+     * Sets a value indicating whether `Syncing` should show the progress indicator. Defaults to `false`.
      */
     showIndicator?: boolean;
 }
@@ -47,52 +48,51 @@ interface ISyncOptions
 /**
  * VSCode extension wrapper.
  */
-export default class Extension
+export class Extension
 {
     private static _instance: Extension;
 
     private _env: Environment;
     private _syncing: Syncing;
 
-    private constructor(context: vscode.ExtensionContext)
+    private constructor()
     {
-        this._env = Environment.create(context);
-        this._syncing = Syncing.create(context);
+        this._env = Environment.create();
+        this._syncing = Syncing.create();
     }
 
     /**
-     * Create an instance of singleton class `Extension`.
+     * Creates an instance of the singleton class `Extension`.
      */
-    public static create(context: vscode.ExtensionContext): Extension
+    public static create(): Extension
     {
         if (!Extension._instance)
         {
-            Extension._instance = new Extension(context);
+            Extension._instance = new Extension();
         }
         return Extension._instance;
     }
 
     /**
-     * Get all installed extensions (Disabled extensions aren't included).
-     * @param excludedExtensions The extensions that should be excluded from the result.
+     * Gets all installed extensions (Disabled extensions aren't included).
+     *
+     * @param excludedPatterns The glob patterns of the extensions that should be excluded.
      */
-    public getAll(excludedExtensions: string[] = []): IExtension[]
+    public getAll(excludedPatterns: string[] = []): IExtension[]
     {
         let item: IExtension;
         const result: IExtension[] = [];
         for (const ext of vscode.extensions.all)
         {
-            // TODO: `toLowerCase` should be double checked.
             if (
                 !ext.packageJSON.isBuiltin
-                && !excludedExtensions.some((pattern) => minimatch((ext.packageJSON.id || "").toLowerCase(), pattern))
+                && !excludedPatterns.some((pattern) => minimatch(ext.id, pattern, { nocase: true }))
             )
             {
                 item = {
-                    id: (ext.packageJSON.id || "").toLowerCase(),
-                    uuid: (ext.packageJSON.uuid || "").toLowerCase(),
-                    name: (ext.packageJSON.name || "").toLowerCase(),
-                    publisher: (ext.packageJSON.publisher || "").toLowerCase(),
+                    id: ext.id,
+                    name: ext.packageJSON.name,
+                    publisher: ext.packageJSON.publisher,
                     version: ext.packageJSON.version
                 };
                 result.push(item);
@@ -102,7 +102,8 @@ export default class Extension
     }
 
     /**
-     * Sync extensions (add/update/remove).
+     * Synchronize extensions (add, update or remove).
+     *
      * @param extensions Extensions to be synced.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
@@ -112,7 +113,7 @@ export default class Extension
         {
             this._getDifferentExtensions(extensions).then((diff) =>
             {
-                // Add/update/remove extensions.
+                // Add, update or remove extensions.
                 const { added, updated, removed, total } = diff;
                 const result = { extension: {} } as ISyncedItem;
                 const tasks = [
@@ -153,7 +154,7 @@ export default class Extension
                         }
 
                         // Added since VSCode v1.20.
-                        this.upgradeObsolete(added, updated, removed).then(() => resolve(result));
+                        this.updateObsolete(added, updated, removed).then(() => resolve(result));
                     }
                 );
             });
@@ -161,7 +162,7 @@ export default class Extension
     }
 
     /**
-     * Download extension from VSCode marketplace.
+     * Downloads extension from VSCode marketplace.
      */
     public downloadExtension(extension: IExtension): Promise<IExtension>
     {
@@ -176,27 +177,31 @@ export default class Extension
                     return;
                 }
 
-                // tslint:disable-next-line
-                // `https://marketplace.visualstudio.com/_apis/public/gallery/publishers/${extension.publisher}/vsextensions/${extension.name}/${extension.version}/vspackage`
-                // tslint:disable-next-line
-                const zipURI = `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
-                downloadFile(zipURI, filepath, this._syncing.proxy).then(() =>
+                // Fallback to normal package in case the extension query service is down.
+                if (!extension.downloadURL)
                 {
-                    resolve({ ...extension, zip: filepath });
+                    extension.downloadURL =
+                        `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
+                        + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
+                        + `assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
+                }
+                downloadFile(extension.downloadURL, filepath, this._syncing.proxy).then(() =>
+                {
+                    resolve({ ...extension, vsixFilepath: filepath });
                 }).catch(reject);
             });
         });
     }
 
     /**
-     * Extract extension zip file to VSCode extensions folder.
+     * Extracts (install) extension vsix package.
      */
     public extractExtension(extension: IExtension): Promise<IExtension>
     {
         return new Promise((resolve, reject) =>
         {
-            const zipFilepath = extension.zip;
-            if (zipFilepath)
+            const { vsixFilepath } = extension;
+            if (vsixFilepath)
             {
                 tmp.dir({ postfix: `.${extension.id}`, unsafeCleanup: true }, (err1, dirPath: string) =>
                 {
@@ -206,7 +211,7 @@ export default class Extension
                     }
                     else
                     {
-                        extractZip(zipFilepath, { dir: dirPath }, (err2) =>
+                        extractZip(vsixFilepath, { dir: dirPath }, (err2) =>
                         {
                             if (err2)
                             {
@@ -214,7 +219,7 @@ export default class Extension
                             }
                             else
                             {
-                                const extPath = this._env.getExtensionPath(extension);
+                                const extPath = this._env.getExtensionDirectory(extension);
                                 fs.emptyDir(extPath)
                                     .then(() =>
                                     {
@@ -222,7 +227,7 @@ export default class Extension
                                     })
                                     .then(() =>
                                     {
-                                        resolve({ ...extension, path: extPath });
+                                        resolve(extension);
                                     })
                                     .catch((err3) =>
                                     {
@@ -245,8 +250,8 @@ export default class Extension
      */
     public async uninstallExtension(extension: IExtension): Promise<IExtension>
     {
-        const localExtension = this._getExtension(extension.id);
-        const extensionPath = localExtension ? localExtension.extensionPath : this._env.getExtensionPath(extension);
+        const localExtension = getExtensionById(extension.id);
+        const extensionPath = localExtension ? localExtension.extensionPath : this._env.getExtensionDirectory(extension);
         try
         {
             await fs.remove(extensionPath);
@@ -259,9 +264,13 @@ export default class Extension
     }
 
     /**
-     * Upgrade VSCode '.obsolete' file.
+     * Updates the VSCode `.obsolete` file.
      */
-    public async upgradeObsolete(added: IExtension[] = [], removed: IExtension[] = [], updated: IExtension[] = []): Promise<void>
+    public async updateObsolete(
+        added: IExtension[] = [],
+        removed: IExtension[] = [],
+        updated: IExtension[] = []
+    ): Promise<void>
     {
         const filepath = this._env.getObsoleteFilePath();
         let obsolete: { [extensionFolderName: string]: boolean; } | undefined;
@@ -277,12 +286,12 @@ export default class Extension
         {
             for (const ext of [...added, ...updated])
             {
-                delete obsolete[this._env.getExtensionFolderName(ext)];
+                delete obsolete[this._env.getExtensionDirectoryName(ext)];
             }
 
             for (const ext of removed)
             {
-                obsolete[this._env.getExtensionFolderName(ext)] = true;
+                obsolete[this._env.getExtensionDirectoryName(ext)] = true;
             }
 
             try
@@ -303,7 +312,7 @@ export default class Extension
     }
 
     /**
-     * Get extensions that are added/updated/removed.
+     * Gets the extensions that will be added, updated or removed.
      */
     private async _getDifferentExtensions(extensions: IExtension[]): Promise<{
         added: IExtension[],
@@ -323,44 +332,44 @@ export default class Extension
         };
         if (extensions)
         {
-            // Automatically update extensions: Query latest extensions meta data.
-            let extensionMetaMap: Map<string, IExtensionMeta> | undefined;
+            // 1. Auto update extensions: Query the latest extensions.
+            let queriedExtensions: CaseInsensitiveMap<string, IExtensionMeta> = new CaseInsensitiveMap();
             const autoUpdateExtensions = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_EXTENSIONS_AUTOUPDATE);
             if (autoUpdateExtensions)
             {
-                const ids = extensions.map((ext) => ext.uuid).filter((id) => (id != null && id !== ""));
-                extensionMetaMap = await queryExtensions(ids, this._syncing.proxy);
+                queriedExtensions = await queryExtensions(extensions.map((ext) => ext.id), this._syncing.proxy);
             }
 
-            let latestVersion: string | undefined;
-            let extensionMeta: IExtensionMeta | undefined;
-            let localExtension: vscode.Extension<any> | undefined;
-            const reservedExtensionIDs: string[] = [];
-
             // Find added & updated extensions.
+            const reservedExtensionIDs = new CaseInsensitiveSet<string>();
             for (const ext of extensions)
             {
-                // Upgrade to the latest version if available.
-                if (autoUpdateExtensions && extensionMetaMap)
+                // 2. Auto update extensions: Update to the latest version.
+                if (autoUpdateExtensions)
                 {
-                    extensionMeta = extensionMetaMap.get(ext.uuid);
+                    const extensionMeta = queriedExtensions.get(ext.id);
                     if (extensionMeta)
                     {
-                        latestVersion = extensionMeta.versions[0] && extensionMeta.versions[0].version;
-                        if (latestVersion && latestVersion !== ext.version)
+                        const versionMeta = extensionMeta.versions[0];
+                        if (versionMeta)
                         {
-                            ext.version = latestVersion;
+                            const version = versionMeta.version;
+                            const downloadURL = getVSIXDownloadURL(versionMeta);
+                            if (version && downloadURL)
+                            {
+                                ext.version = version;
+                                ext.downloadURL = downloadURL;
+                            }
                         }
                     }
                 }
-
-                localExtension = this._getExtension(ext.id);
+                const localExtension = getExtensionById(ext.id);
                 if (localExtension)
                 {
                     if (localExtension.packageJSON.version === ext.version)
                     {
                         // Reserved.
-                        reservedExtensionIDs.push(ext.id);
+                        reservedExtensionIDs.add(ext.id);
                     }
                     else
                     {
@@ -382,24 +391,22 @@ export default class Extension
             const localExtensions: IExtension[] = this.getAll(patterns);
             for (const ext of localExtensions)
             {
-                if (reservedExtensionIDs.indexOf(ext.id) === -1)
+                if (!reservedExtensionIDs.has(ext.id))
                 {
                     // Removed.
                     result.removed.push(ext);
                 }
             }
 
-            // Clear map.
-            if (autoUpdateExtensions && extensionMetaMap)
-            {
-                extensionMetaMap.clear();
-            }
+            // Release resources.
+            queriedExtensions.clear();
+            reservedExtensionIDs.clear();
         }
         return result;
     }
 
     /**
-     * Add extensions.
+     * Adds extensions.
      */
     private _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
     {
@@ -449,7 +456,7 @@ export default class Extension
     }
 
     /**
-     * Update extensions.
+     * Updates extensions.
      */
     private _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
     {
@@ -507,7 +514,7 @@ export default class Extension
     }
 
     /**
-     * Remove extensions.
+     * Removes extensions.
      */
     private _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
     {
@@ -544,20 +551,5 @@ export default class Extension
                 }
             );
         });
-    }
-
-    /**
-     * TODO: should be removed in the next release.
-     */
-    private _getExtension(id: string)
-    {
-        if (id)
-        {
-            return vscode.extensions.all.find((ext) =>
-            {
-                return (ext.packageJSON.id || "").toLowerCase() === id.toLowerCase();
-            });
-        }
-        return;
     }
 }

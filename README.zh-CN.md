@@ -15,11 +15,11 @@
 
 ## 重要变更
 
-* 从 ***1.8.2*** 版本开始：
+* 从 ***1.9.0*** 版本开始：
 
-    1. `VSCode` 从 `1.27` 版本开始提供了 [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) 功能，因此我新增了一个配置项 `syncing.separateKeybindings`，这样你就可以选择用`单个文件`来同步所有`快捷键`了。
+    1. 支持 VSCode [便携模式](https://code.visualstudio.com/docs/editor/portable)。
 
-    > 具体请参考 `Syncing` 的 [VSCode 配置项](#vscode-配置项)。
+    1. 将会从一个全新的 `CDN` 下载插件，以加速同步过程（对于那些不使用代理的用户来说效果应该更为显著）。
 
 
 ## 功能
@@ -112,7 +112,7 @@
 
     这样一来 `nonoroazoro.syncing`（也就是本扩展）以及所有属于 `somepublisher` 这个作者的扩展就不会再被同步啦。
 
-1. ***`syncing.excludedSettings`（即原来的 `syncing.upload.exclude`）***
+1. ***`syncing.excludedSettings`***
 
     通过这个配置项，你可以`排除某些指定的 VSCode 配置项`，以防止它们被同步。当然其他配置项不受影响，依然会正常同步。
 

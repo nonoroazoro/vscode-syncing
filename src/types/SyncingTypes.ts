@@ -42,14 +42,9 @@ export interface ISetting
 export interface IExtension
 {
     /**
-     * The extension's identifier in the form of: `publisher.name`.
+     * The extension's identifier is in the form of: `publisher.name`.
      */
     id: string;
-
-    /**
-     * The extension's UUID.
-     */
-    uuid: string;
 
     /**
      * The extension's name.
@@ -67,14 +62,14 @@ export interface IExtension
     version: string;
 
     /**
-     * The installed extension's folder path.
+     * The downloaded extension's vsix file path.
      */
-    path?: string;
+    vsixFilepath?: string;
 
     /**
-     * The downloaded extension's zip file path.
+     * The extension's download url in marketplace.
      */
-    zip?: string;
+    downloadURL?: string;
 }
 
 /**
