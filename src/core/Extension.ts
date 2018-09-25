@@ -55,20 +55,20 @@ export class Extension
     private _env: Environment;
     private _syncing: Syncing;
 
-    private constructor(context: vscode.ExtensionContext)
+    private constructor()
     {
-        this._env = Environment.create(context);
-        this._syncing = Syncing.create(context);
+        this._env = Environment.create();
+        this._syncing = Syncing.create();
     }
 
     /**
      * Creates an instance of the singleton class `Extension`.
      */
-    public static create(context: vscode.ExtensionContext): Extension
+    public static create(): Extension
     {
         if (!Extension._instance)
         {
-            Extension._instance = new Extension(context);
+            Extension._instance = new Extension();
         }
         return Extension._instance;
     }
@@ -219,7 +219,7 @@ export class Extension
                             }
                             else
                             {
-                                const extPath = this._env.getExtensionPath(extension);
+                                const extPath = this._env.getExtensionDirectory(extension);
                                 fs.emptyDir(extPath)
                                     .then(() =>
                                     {
@@ -251,7 +251,7 @@ export class Extension
     public async uninstallExtension(extension: IExtension): Promise<IExtension>
     {
         const localExtension = getExtensionById(extension.id);
-        const extensionPath = localExtension ? localExtension.extensionPath : this._env.getExtensionPath(extension);
+        const extensionPath = localExtension ? localExtension.extensionPath : this._env.getExtensionDirectory(extension);
         try
         {
             await fs.remove(extensionPath);

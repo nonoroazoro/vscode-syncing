@@ -3,7 +3,6 @@ import * as fs from "fs-extra";
 import * as junk from "junk";
 import * as minimatch from "minimatch";
 import * as path from "path";
-import * as vscode from "vscode";
 
 import
 {
@@ -44,20 +43,20 @@ export class VSCodeSetting
     private _env: Environment;
     private _ext: Extension;
 
-    private constructor(context: vscode.ExtensionContext)
+    private constructor()
     {
-        this._env = Environment.create(context);
-        this._ext = Extension.create(context);
+        this._env = Environment.create();
+        this._ext = Extension.create();
     }
 
     /**
      * Creates an instance of singleton class `VSCodeSetting`.
      */
-    public static create(context: vscode.ExtensionContext): VSCodeSetting
+    public static create(): VSCodeSetting
     {
         if (!VSCodeSetting._instance)
         {
-            VSCodeSetting._instance = new VSCodeSetting(context);
+            VSCodeSetting._instance = new VSCodeSetting();
         }
         return VSCodeSetting._instance;
     }
@@ -118,7 +117,7 @@ export class VSCodeSetting
                     if (type === SettingTypes.Snippets)
                     {
                         // Attention: Snippets may be empty.
-                        tempSettings = this._getSnippets(this._env.snippetsPath);
+                        tempSettings = this._getSnippets(this._env.snippetsDirectory);
                     }
                     else
                     {
@@ -142,7 +141,7 @@ export class VSCodeSetting
 
                         tempSettings = [
                             {
-                                filepath: path.join(this._env.codeUserPath, localFilename),
+                                filepath: path.join(this._env.codeUserDirectory, localFilename),
                                 remoteFilename,
                                 type
                             }

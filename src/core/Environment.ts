@@ -11,35 +11,35 @@ export class Environment
 {
     private static _instance: Environment;
 
-    private _codeBasePath: string;
-    private _codeUserPath: string;
-    private _extensionsPath: string;
+    private _codeDataDirectory: string;
+    private _codeUserDirectory: string;
+    private _extensionsDirectory: string;
     private _isInsiders: boolean;
     private _isMac: boolean;
-    private _snippetsPath: string;
+    private _isPortable: boolean;
+    private _snippetsDirectory: string;
 
-    private constructor(context: vscode.ExtensionContext)
+    private constructor()
     {
+        // Note that the followings are order-sensitive.
         this._isMac = process.platform === "darwin";
-        this._isInsiders = context.extensionPath.includes("insider");
-        this._extensionsPath = path.join(
-            os.homedir(),
-            this._isInsiders ? ".vscode-insiders" : ".vscode",
-            "extensions"
-        );
-        this._codeBasePath = this._getCodeBasePath(this._isInsiders);
-        this._codeUserPath = path.join(this._codeBasePath, "User");
-        this._snippetsPath = path.join(this._codeUserPath, "snippets");
+        this._isInsiders = vscode.version.indexOf("insider") >= 0;
+        this._isPortable = process.env.VSCODE_PORTABLE != null;
+
+        this._extensionsDirectory = this._getCodeExtensionsDirectory();
+        this._codeDataDirectory = this._getCodeDataDirectory();
+        this._codeUserDirectory = path.join(this._codeDataDirectory, "User");
+        this._snippetsDirectory = path.join(this._codeUserDirectory, "snippets");
     }
 
     /**
      * Creates an instance of the singleton class `Environment`.
      */
-    public static create(context: vscode.ExtensionContext): Environment
+    public static create(): Environment
     {
         if (!Environment._instance)
         {
-            Environment._instance = new Environment(context);
+            Environment._instance = new Environment();
         }
         return Environment._instance;
     }
@@ -53,7 +53,7 @@ export class Environment
     }
 
     /**
-     * Gets a value indicating whether the current VSCode is an `Insiders` version.
+     * Gets a value indicating whether the VSCode is an `Insiders` version.
      */
     public get isInsiders(): boolean
     {
@@ -61,35 +61,43 @@ export class Environment
     }
 
     /**
+     * Gets a value indicating whether the VSCode is running in `Portable Mode`.
+     */
+    public get isPortable(): boolean
+    {
+        return this._isPortable;
+    }
+
+    /**
      * Gets the full path of VSCode `extensions directory`.
      */
-    public get extensionsPath(): string
+    public get extensionsDirectory(): string
     {
-        return this._extensionsPath;
+        return this._extensionsDirectory;
     }
 
     /**
-     * Gets the full path of VSCode `settings directory`.
+     * Gets the full path of VSCode `data directory`.
      */
-    public get codeBasePath(): string
+    public get codeDataDirectory(): string
     {
-        return this._codeBasePath;
+        return this._codeDataDirectory;
     }
 
     /**
-     * Gets the full path of VSCode settings `User directory`.
+     * Gets the full path of VSCode settings `user directory`.
      */
-    public get codeUserPath(): string
+    public get codeUserDirectory(): string
     {
-        return this._codeUserPath;
+        return this._codeUserDirectory;
     }
 
     /**
      * Gets the full path of VSCode settings `snippets directory`.
      */
-    public get snippetsPath(): string
+    public get snippetsDirectory(): string
     {
-        return this._snippetsPath;
+        return this._snippetsDirectory;
     }
 
     /**
@@ -99,7 +107,15 @@ export class Environment
      */
     public getSnippetFilePath(filename: string): string
     {
-        return path.join(this.snippetsPath, filename);
+        return path.join(this.snippetsDirectory, filename);
+    }
+
+    /**
+     * Gets the full path of the extension.
+     */
+    public getExtensionDirectory(extension: IExtension): string
+    {
+        return path.join(this.extensionsDirectory, this.getExtensionDirectoryName(extension));
     }
 
     /**
@@ -111,41 +127,54 @@ export class Environment
     }
 
     /**
-     * Gets the full path of the extension.
-     */
-    public getExtensionPath(extension: IExtension): string
-    {
-        return path.join(this.extensionsPath, this.getExtensionDirectoryName(extension));
-    }
-
-    /**
      * Gets the full path of the `.obsolete` file.
      */
     public getObsoleteFilePath(): string
     {
-        return path.join(this.extensionsPath, ".obsolete");
+        return path.join(this.extensionsDirectory, ".obsolete");
     }
 
-    private _getCodeBasePath(isInsiders: boolean): string
+    private _getCodeExtensionsDirectory()
     {
-        let basePath: string;
+        if (this.isPortable)
+        {
+            // Such as the "/Applications/code-portable-data/extensions" directory in MacOS.
+            return path.join(process.env.VSCODE_PORTABLE!, "extensions");
+        }
+        return path.join(
+            os.homedir(),
+            this.isInsiders ? ".vscode-insiders" : ".vscode",
+            "extensions"
+        );
+    }
+
+    private _getCodeDataDirectory(): string
+    {
+        if (this.isPortable)
+        {
+            // Such as the "/Applications/code-portable-data/user-data" directory in MacOS.
+            return path.join(process.env.VSCODE_PORTABLE!, "user-data");
+        }
+
+        let baseDirectory: string;
         switch (process.platform)
         {
             case "win32":
-                basePath = process.env.APPDATA!;
+                baseDirectory = process.env.APPDATA!;
                 break;
 
             case "darwin":
-                basePath = path.join(os.homedir(), "Library/Application Support");
+                baseDirectory = path.join(os.homedir(), "Library", "Application Support");
                 break;
 
             case "linux":
-                basePath = path.join(os.homedir(), ".config");
+                baseDirectory = path.join(os.homedir(), ".config");
                 break;
 
             default:
-                basePath = "/var/local";
+                // Unknown platform.
+                throw new Error("Your operating system is not supported yet.");
         }
-        return path.join(basePath, isInsiders ? "Code - Insiders" : "Code");
+        return path.join(baseDirectory, this.isInsiders ? "Code - Insiders" : "Code");
     }
 }
