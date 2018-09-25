@@ -15,11 +15,11 @@
 
 ## Breaking Changes
 
-* From ***version 1.8.2*** onwards:
+* From ***version 1.9.0*** onwards:
 
-    1. Since `VSCode` has introduced the [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) from `version 1.27`, I added the `syncing.separateKeybindings` setting so that you can decide whether to synchronize the `keybindings` through `one single file`.
+    1. Support VSCode [Portable Mode](https://code.visualstudio.com/docs/editor/portable).
 
-    > Please [check out the VSCode User Settings](#vscode-user-settings) for more details.
+    1. Use a new `CDN` to install extensions, which should significantly accelerate the synchronization, especially if you don't behind any [proxy](#proxy-settings).
 
 
 ## Features

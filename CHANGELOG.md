@@ -1,8 +1,8 @@
 # Changelogs
 
-## 1.9.0 - September 13, 2018
+## 1.9.0 - September 25, 2018
 
-- Added: Added `CaseInsensitiveMap` and `CaseInsensitiveSet` to fix the inconsistency of VSCode extension's id.
+- Added: Support VSCode [Portable Mode](https://code.visualstudio.com/docs/editor/portable).
 
 - Changed: `Improve the performance` of the synchronization process, and use a new CDN to install extensions, which should significantly accelerate the synchronization.
 
