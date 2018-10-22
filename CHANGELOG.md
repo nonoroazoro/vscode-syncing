@@ -1,5 +1,10 @@
 # Changelogs
 
+## 1.9.1 - October 22, 2018
+
+- Changed: Improve the startup performance (Thank [@fabiospampinato](https://github.com/fabiospampinato) for the advice).
+
+
 ## 1.9.0 - September 25, 2018
 
 - Added: Support VSCode [Portable Mode](https://code.visualstudio.com/docs/editor/portable).
