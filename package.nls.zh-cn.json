@@ -1,0 +1,8 @@
+{
+    "displayName": "Syncing",
+    "description": "Synchronize all of your VSCode settings across multiple devices.",
+    "configuration.title": "Syncing",
+    "commands.uploadSettings": "Syncing: 上传设置",
+    "commands.downloadSettings": "Syncing: 下载设置",
+    "commands.openSettings": "Syncing: 打开设置文件"
+}
