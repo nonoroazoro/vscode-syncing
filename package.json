@@ -1,7 +1,7 @@
 {
     "name": "syncing",
-    "displayName": "Syncing",
-    "description": "Synchronize all of your VSCode settings across multiple devices.",
+    "displayName": "%displayName%",
+    "description": "%description%",
     "version": "1.9.0",
     "publisher": "nonoroazoro",
     "author": {
@@ -41,20 +41,20 @@
         "commands": [
             {
                 "command": "syncing.uploadSettings",
-                "title": "Syncing: Upload Settings"
+                "title": "%commands.uploadSettings%"
             },
             {
                 "command": "syncing.downloadSettings",
-                "title": "Syncing: Download Settings"
+                "title": "%commands.downloadSettings%"
             },
             {
                 "command": "syncing.openSettings",
-                "title": "Syncing: Open Syncing Settings"
+                "title": "%commands.openSettings%"
             }
         ],
         "configuration": [
             {
-                "title": "Syncing",
+                "title": "%configuration.title%",
                 "properties": {
                     "syncing.excludedExtensions": {
                         "type": "array",
