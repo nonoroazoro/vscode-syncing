@@ -3,8 +3,10 @@ import * as vscode from "vscode";
 
 import { Gist, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
+import { I18n } from "./i18n";
 import { ISyncedItem } from "./types/SyncingTypes";
 
+let _i18n: I18n;
 let _syncing: Syncing;
 let _vscodeSetting: VSCodeSetting;
 let _isSynchronizing: boolean;
@@ -20,6 +22,7 @@ export function activate(context: vscode.ExtensionContext)
 function _init(context: vscode.ExtensionContext)
 {
     _isSynchronizing = false;
+    _i18n = I18n.create();
     _syncing = Syncing.create();
     _vscodeSetting = VSCodeSetting.create();
 
