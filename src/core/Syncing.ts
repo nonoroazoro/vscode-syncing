@@ -229,7 +229,7 @@ export class Syncing
         }
         catch (err)
         {
-            console.error(localize("error.load.syncing.settings"), err);
+            console.error(localize("error.loading.syncing.settings"), err);
         }
         return settings;
     }

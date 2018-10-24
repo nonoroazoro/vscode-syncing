@@ -14,6 +14,7 @@ import
     SETTING_EXCLUDED_EXTENSIONS,
     SETTING_EXCLUDED_SETTINGS
 } from "../common/constants";
+import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
 import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
@@ -92,7 +93,7 @@ export class VSCodeSetting
 
             if (showIndicator)
             {
-                Toast.showSpinner("Syncing: Gathering local settings.");
+                Toast.showSpinner(localize("toast.settings.gathering.local"));
             }
 
             // Note that this is an ordered list, to ensure that the smaller files (such as `settings.json`, `keybindings.json`) are synced first.
@@ -177,7 +178,7 @@ export class VSCodeSetting
                 {
                     if (errorFiles.length > 0)
                     {
-                        console.error(`Some of VSCode settings are invalid, which will be ignored: ${errorFiles.join(" ")}`);
+                        console.error(localize("error.invalid.settings", errorFiles.join(" ")));
                     }
                     resolveWrap(results);
                 }
@@ -214,14 +215,14 @@ export class VSCodeSetting
             {
                 if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: Downloading failed. ${error.message}`);
+                    Toast.statusError(localize("toast.settings.downloading.failed", error.message));
                 }
                 reject(error);
             }
 
             if (showIndicator)
             {
-                Toast.showSpinner("Syncing: Downloading settings.");
+                Toast.showSpinner(localize("toast.settings.downloading"));
             }
 
             if (files)
@@ -320,7 +321,7 @@ export class VSCodeSetting
                                         done();
                                     }).catch((err) =>
                                     {
-                                        done(new Error(`Cannot save file: ${setting.remoteFilename} : ${err.message}`));
+                                        done(new Error(localize("error.save.file", setting.remoteFilename, err.message)));
                                     });
                                 },
                                 (err) =>
@@ -342,14 +343,14 @@ export class VSCodeSetting
                         }
                         else
                         {
-                            rejectWrap(new Error("You abort the synchronization."));
+                            rejectWrap(new Error(localize("error.abort.synchronization")));
                         }
                     });
                 });
             }
             else
             {
-                rejectWrap(new Error("Cannot find any files in your Gist."));
+                rejectWrap(new Error(localize("error.gist.files.notfound")));
             }
         });
     }
@@ -374,7 +375,7 @@ export class VSCodeSetting
                         done();
                     }).catch((err) =>
                     {
-                        done(new Error(`Cannot remove settings file: ${item.remoteFilename} : ${err.message}`));
+                        done(new Error(localize("error.remove.file", item.remoteFilename, err.message)));
                     });
                 },
                 (err) =>
@@ -415,7 +416,7 @@ export class VSCodeSetting
         }
         catch (err)
         {
-            console.error("Syncing: Error loading snippets.");
+            console.error(localize("error.loading.snippets"));
         }
         return results;
     }
@@ -465,7 +466,7 @@ export class VSCodeSetting
                 catch (err)
                 {
                     content = undefined;
-                    console.error(`Syncing: Error loading VSCode settings file: ${setting.type}.\n${err}`);
+                    console.error(localize("error.loading.settings", setting.type, err));
                 }
 
                 return { ...setting, content };
@@ -550,9 +551,9 @@ export class VSCodeSetting
                         + this._diffSettings(excludedSettings.localSettings, excludedSettings.remoteSettings);
                     if (changes >= threshold)
                     {
-                        const okButton = "Continue to download";
-                        const message = "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE LOCAL SETTINGS?";
-                        Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
+                        const okButton = localize("pokaYoke.continue.download");
+                        const message = localize("pokaYoke.continue.download.message");
+                        Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel")).then((selection) =>
                         {
                             resolve(selection === okButton);
                         });
