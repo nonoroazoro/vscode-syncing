@@ -21,7 +21,7 @@
     "toast.box.enter.github.token.upload": "请输入您的 GitHub Personal Access Token",
     "toast.box.gist.last.uploaded": "最后上传时间 {0}",
     "toast.box.reload": "重新加载窗口",
-    "toast.box.reload.message": "配置已成功同步，请重新加载 VSCode 从而让配置生效。",
+    "toast.box.reload.message": "配置已成功同步，请重新加载 VSCode 以让配置生效。",
     "toast.settings.checking.remote": "Syncing: 正在检查云端配置",
     "toast.settings.checking.remote.gists": "Syncing: 正在检查云端配置",
     "toast.settings.gathering.local": "Syncing: 正在收集本地配置",
