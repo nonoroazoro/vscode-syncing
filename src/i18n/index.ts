@@ -1,7 +1,9 @@
+let instance: I18n;
+
 /**
  * I18n.
  */
-export class I18n
+class I18n
 {
     private static _instance: I18n;
     private static DEFAULT_LOCALE: string = "en-us";
@@ -10,9 +12,9 @@ export class I18n
     private _locale: string;
     private _bundle: Record<string, string>;
 
-    private constructor(locale: string)
+    private constructor(currentLocale: string)
     {
-        this._locale = locale;
+        this._locale = currentLocale;
         this._prepare();
     }
 
@@ -21,19 +23,19 @@ export class I18n
      */
     public static create(): I18n
     {
-        let locale: string | undefined;
+        let currentLocale: string | undefined;
         try
         {
-            locale = JSON.parse(process.env.VSCODE_NLS_CONFIG || "{}").locale;
+            currentLocale = JSON.parse(process.env.VSCODE_NLS_CONFIG || "{}").locale;
         }
         catch (err)
         {
         }
-        locale = locale || I18n.DEFAULT_LOCALE;
+        currentLocale = currentLocale || I18n.DEFAULT_LOCALE;
 
-        if (!I18n._instance || I18n._instance.locale !== locale)
+        if (!I18n._instance || I18n._instance.locale !== currentLocale)
         {
-            I18n._instance = new I18n(locale);
+            I18n._instance = new I18n(currentLocale);
         }
         return I18n._instance;
     }
@@ -71,4 +73,30 @@ export class I18n
             this._bundle = require(`../../${I18n.DEFAULT_LOCALE_FILENAME}`);
         }
     }
+}
+
+/**
+ * Gets the locale of VSCode.
+ */
+export function locale(): string
+{
+    if (!instance)
+    {
+        instance = I18n.create();
+    }
+    return instance.locale;
+}
+
+/**
+ * Gets the localized message.
+ *
+ * @param {string} key The key of the message.
+ */
+export function localize(key: string): string
+{
+    if (!instance)
+    {
+        instance = I18n.create();
+    }
+    return instance.localize(key);
 }
