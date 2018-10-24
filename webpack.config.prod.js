@@ -35,8 +35,8 @@ module.exports = {
                 exclude: /node_modules/
             },
             {
-                type: "javascript/auto",
                 test: /\.mjs$/,
+                type: "javascript/auto",
                 use: []
             }
         ]
