@@ -2,6 +2,8 @@
 
 ## 1.9.1 - October 22, 2018
 
+- Added: I18n, including `en-US` and `zh-CN`.
+
 - Changed: Improve the startup performance (Thank [@fabiospampinato](https://github.com/fabiospampinato) for the advice).
 
 
