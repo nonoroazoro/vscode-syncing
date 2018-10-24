@@ -93,7 +93,7 @@
 
 1. ***`syncing.excludedExtensions`***
 
-    通过这个配置项，你可以`排除某些指定的 VSCode 扩展`，以防止它们被同步。当然其他扩展不受影响，依然会正常同步。
+    通过这个配置项，你可以`排除特定的 VSCode 扩展`，以防它们被同步。那些不在此列表中的 VSCode 扩展将不受影响，依然会正常同步。
 
     > 配置规则可以参考 [Glob Patterns](https://github.com/isaacs/minimatch)。
 
@@ -114,7 +114,7 @@
 
 1. ***`syncing.excludedSettings`***
 
-    通过这个配置项，你可以`排除某些指定的 VSCode 配置项`，以防止它们被同步。当然其他配置项不受影响，依然会正常同步。
+    通过这个配置项，你可以`排除特定的 VSCode 配置项`，以防它们被同步。那些不在此列表中的 VSCode 配置项将不受影响，依然会正常同步。
 
     > 配置规则可以参考 [Glob Patterns](https://github.com/isaacs/minimatch)。
 
@@ -137,9 +137,9 @@
 
 1. ***`syncing.pokaYokeThreshold`***
 
-    同步配置时，`Syncing` 会检查你的本地和云端配置间的`差异数量`，如果超出这个阈值，就会显示一个确认对话框，以防错误的覆盖你的配置。
+    通过配置这个阈值，每次同步配置时，`Syncing` 都会检查你的本地和云端配置间的差异量。如果超出这个阈值，就会显示一个确认对话框，以防错误的覆盖你的配置。
 
-    这个配置项的默认值是 `10`，当然你也可以将其设置为一个`小于等于 0 的值`来关闭这个功能（不再检查和显示确认对话框）。
+    这个配置项的默认值是 `10`。你可以将其设置为 `0` 来关闭这个功能（不再检查和显示确认对话框）。
 
     举个栗子：
 
@@ -147,15 +147,13 @@
     "syncing.pokaYokeThreshold" : 10
     ```
 
-    这样一来每次你同步时，`Syncing` 都会检查本地和云端的配置差异量，并决定是否需要向你显示确认对话框。
-
 1. ***`syncing.separateKeybindings`***
 
     通过这个配置项，可以决定是否让 `Syncing` 按照设备`操作系统`的不同来分开同步你的`快捷键`配置。
 
-    因为 `VSCode` 在 `1.27` 版本开始提供了 [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) 功能，你现在可以禁用这个配置。注意：在禁用之前，请务必确保你已经手动合并了现有的`快捷键`配置。
+    鉴于 `VSCode` 从 `1.27` 版本开始提供了 [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) 功能，你现在可以关闭这个功能。注意：在关闭该功能之前，请务必确保你已经手动合并了现有的`快捷键`配置。
 
-    这个功能是`默认开启`的，当然你也可以在 `VSCode 用户设置` 中关掉它。
+    这个功能是`默认开启`的。你可以在 `VSCode 用户设置` 中关掉它。
 
 
 ## 代理设置
