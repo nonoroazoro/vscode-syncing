@@ -2,6 +2,14 @@ import { format } from "../../utils/template";
 
 describe("Syncing/utils/template", () =>
 {
+    it("replace single template with values", () =>
+    {
+        const template = "Hello {0}!";
+        const values = ["Jack"];
+        const target = "Hello Jack!";
+        expect(format(template, ...values)).toBe(target);
+    });
+
     it("replace unique templates with values", () =>
     {
         const template = "Hello {0} and {1}!";
