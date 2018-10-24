@@ -3,6 +3,7 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../common/constants";
+import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
 import { ISetting, SettingTypes } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
@@ -117,14 +118,14 @@ export class Gist
             {
                 if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: Downloading failed. ${error.message}`);
+                    Toast.statusError(localize("toast.settings.downloading.failed", error.message));
                 }
                 reject(error);
             }
 
             if (showIndicator)
             {
-                Toast.showSpinner("Syncing: Checking remote settings.");
+                Toast.showSpinner(localize("toast.settings.checking.remote"));
             }
 
             this._api.gists.get({ gist_id: id }).then(resolveWrap).catch(({ code }) =>
@@ -279,14 +280,14 @@ export class Gist
             {
                 if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: Uploading failed. ${error.message}`);
+                    Toast.statusError(localize("toast.settings.uploading.failed", error.message));
                 }
                 reject(error);
             }
 
             if (showIndicator)
             {
-                Toast.showSpinner("Syncing: Uploading settings.");
+                Toast.showSpinner(localize("toast.settings.uploading"));
             }
 
             this.exists(id).then((exists) =>
@@ -320,9 +321,9 @@ export class Gist
                             const changes = this._diffSettings(localFiles, remoteFiles);
                             if (changes >= threshold)
                             {
-                                const okButton = "Continue to upload";
-                                const message = "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE REMOTE SETTINGS?";
-                                Toast.showConfirmBox(message, okButton, "Cancel").then((selection) =>
+                                const okButton = localize("pokaYoke.continue.upload");
+                                const message = localize("pokaYoke.continue.upload.message");
+                                Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel")).then((selection) =>
                                 {
                                     if (selection === okButton)
                                     {
@@ -330,7 +331,7 @@ export class Gist
                                     }
                                     else
                                     {
-                                        rejectWrap(new Error("You abort the synchronization."));
+                                        rejectWrap(new Error(localize("error.abort.synchronization")));
                                     }
                                 });
                             }
@@ -358,7 +359,7 @@ export class Gist
                     }
                     else
                     {
-                        rejectWrap(new Error(`No such ID in Gist: ${id}`));
+                        rejectWrap(new Error(localize("error.gist.notfound", id)));
                     }
                 }
             });
@@ -424,14 +425,14 @@ export class Gist
      */
     private _createError(code: number)
     {
-        let message = "Please check your Internet connection or proxy settings.";
+        let message = localize("error.check.internet");
         if (code === 401)
         {
-            message = "Please check your GitHub Personal Access Token.";
+            message = localize("error.check.github.token");
         }
         else if (code === 404)
         {
-            message = "Please check your Gist ID.";
+            message = localize("error.check.gist.id");
         }
         const error = new Error(message);
         Object.assign(error, { code });
