@@ -3,10 +3,9 @@ import * as vscode from "vscode";
 
 import { Gist, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
-import { I18n } from "./i18n";
+import { locale, localize } from "./i18n";
 import { ISyncedItem } from "./types/SyncingTypes";
 
-let _i18n: I18n;
 let _syncing: Syncing;
 let _vscodeSetting: VSCodeSetting;
 let _isSynchronizing: boolean;
@@ -21,12 +20,11 @@ export function activate(context: vscode.ExtensionContext)
  */
 function _init(context: vscode.ExtensionContext)
 {
+    moment.locale(locale());
+
     _isSynchronizing = false;
-    _i18n = I18n.create();
     _syncing = Syncing.create();
     _vscodeSetting = VSCodeSetting.create();
-
-    moment.locale(_i18n.locale);
 
     _initCommands(context);
 }
@@ -67,13 +65,13 @@ function _uploadSettings()
                 {
                     if (gist.id === syncingSettings.id)
                     {
-                        Toast.statusInfo("Syncing: Settings uploaded.");
+                        Toast.statusInfo(localize("toast.settings.uploaded"));
                     }
                     else
                     {
                         _syncing.saveSettings({ ...syncingSettings, id: gist.id }).then(() =>
                         {
-                            Toast.statusInfo("Syncing: Settings uploaded.");
+                            Toast.statusInfo(localize("toast.settings.uploaded"));
                         });
                     }
 
@@ -102,7 +100,7 @@ function _downloadSettings()
             {
                 return _vscodeSetting.saveSettings(gist.files, true).then((syncedItems) =>
                 {
-                    Toast.statusInfo("Syncing: Settings downloaded.");
+                    Toast.statusInfo(localize("toast.settings.downloaded"));
                     if (_isExtensionsSynced(syncedItems))
                     {
                         Toast.showReloadBox();
