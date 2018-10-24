@@ -1,8 +1,8 @@
 # Changelogs
 
-## 1.9.1 - October 22, 2018
+## 2.0.0 - October 24, 2018
 
-- Added: Support I18n, including `en-US` and `zh-CN`.
+- Added: Support i18n, currently including `English` and `Simplified Chinese` locales.
 
 - Changed: Improve the startup performance (Thank [@fabiospampinato](https://github.com/fabiospampinato) for the advice).
 

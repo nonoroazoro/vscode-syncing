@@ -15,11 +15,11 @@
 
 ## Breaking Changes
 
-* From ***version 1.9.0*** onwards:
+* From ***version 2.0.0*** onwards:
 
-    1. Support VSCode [Portable Mode](https://code.visualstudio.com/docs/editor/portable).
+    1. Support `i18n`, currently including `English` and `Simplified Chinese` locales.
 
-    1. Use a new `CDN` to install extensions, which should significantly accelerate the synchronization, especially if you don't behind any [proxy](#proxy-settings).
+    1. Boost the startup speed of `Syncing`, almost `3 times faster`.
 
 
 ## Features
