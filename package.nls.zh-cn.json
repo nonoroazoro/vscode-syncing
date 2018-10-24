@@ -9,5 +9,8 @@
     "configuration.syncing.separateKeybindings": "通过该配置项，可以决定是否让 Syncing 按照设备操作系统的不同来分开同步你的`快捷键配置`。\n鉴于 VSCode 从 1.27 版本开始提供了 `Platform Specific Keybindings` 功能，你现在可以关闭该功能了。\n注意：在关闭该功能之前，请务必确保你已经手动合并了现有的快捷键配置。",
     "commands.uploadSettings": "Syncing: 上传配置",
     "commands.downloadSettings": "Syncing: 下载配置",
-    "commands.openSettings": "Syncing: 打开配置文件"
+    "commands.openSettings": "Syncing: 打开配置文件",
+    "toast.settings.uploaded": "Syncing: 上传完毕",
+    "toast.settings.downloaded": "Syncing: 下载完毕",
+    "error.not.supported": "暂时还不支持您的操作系统"
 }
