@@ -12,5 +12,13 @@
     "commands.openSettings": "Syncing: Open Syncing Settings",
     "toast.settings.uploaded": "Syncing: Settings uploaded.",
     "toast.settings.downloaded": "Syncing: Settings downloaded.",
-    "error.not.supported": "Your operating system is not supported yet."
+    "toast.settings.downloading.extension": "Syncing: Downloading extension: {0}",
+    "toast.settings.installing.extension": "Syncing: Installing extension: {0}",
+    "toast.settings.uninstalling.extension": "Syncing: Uninstalling extension: {0}",
+    "toast.settings.removing.outdated.extension": "Syncing: Removing outdated extension: {0}",
+    "error.not.supported": "Your operating system is not supported yet.",
+    "error.extract.extension-1": "Cannot extract extension: {0}. {1}",
+    "error.extract.extension-2": "Cannot extract extension: {0}. Access temporary directory denied.",
+    "error.extract.extension-3": "Cannot extract extension: {0}. Extension zip file not found.",
+    "error.uninstall.extension": "Cannot uninstall extension: {0}."
 }
