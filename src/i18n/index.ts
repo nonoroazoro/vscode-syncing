@@ -1,5 +1,3 @@
-let instance: I18n;
-
 /**
  * I18n.
  */
@@ -12,9 +10,9 @@ class I18n
     private _locale: string;
     private _bundle: Record<string, string>;
 
-    private constructor(currentLocale: string)
+    private constructor(vscodeLocale: string)
     {
-        this._locale = currentLocale;
+        this._locale = vscodeLocale;
         this._prepare();
     }
 
@@ -23,19 +21,18 @@ class I18n
      */
     public static create(): I18n
     {
-        let currentLocale: string | undefined;
-        try
+        if (!I18n._instance)
         {
-            currentLocale = JSON.parse(process.env.VSCODE_NLS_CONFIG || "{}").locale;
-        }
-        catch (err)
-        {
-        }
-        currentLocale = currentLocale || I18n.DEFAULT_LOCALE;
-
-        if (!I18n._instance || I18n._instance.locale !== currentLocale)
-        {
-            I18n._instance = new I18n(currentLocale);
+            let vscodeLocale: string | undefined;
+            try
+            {
+                vscodeLocale = JSON.parse(process.env.VSCODE_NLS_CONFIG || "{}").locale;
+            }
+            catch (err)
+            {
+            }
+            vscodeLocale = vscodeLocale || I18n.DEFAULT_LOCALE;
+            I18n._instance = new I18n(vscodeLocale);
         }
         return I18n._instance;
     }
@@ -80,11 +77,7 @@ class I18n
  */
 export function locale(): string
 {
-    if (!instance)
-    {
-        instance = I18n.create();
-    }
-    return instance.locale;
+    return I18n.create().locale;
 }
 
 /**
@@ -94,9 +87,5 @@ export function locale(): string
  */
 export function localize(key: string): string
 {
-    if (!instance)
-    {
-        instance = I18n.create();
-    }
-    return instance.localize(key);
+    return I18n.create().localize(key);
 }
