@@ -1,3 +1,5 @@
+import { format } from "../utils/template";
+
 /**
  * I18n.
  */
@@ -49,10 +51,16 @@ class I18n
      * Gets the localized message.
      *
      * @param {string} key The key of the message.
+     * @param {...any[]} templateValues If the message is a template string, these args will be used to replace the templates.
      */
-    public localize(key: string): string
+    public localize(key: string, ...templateValues: any[]): string
     {
-        return this._bundle[key];
+        const message = this._bundle[key];
+        if (templateValues.length > 0)
+        {
+            return format(message, ...templateValues);
+        }
+        return message;
     }
 
     private _prepare()
@@ -84,8 +92,9 @@ export function locale(): string
  * Gets the localized message.
  *
  * @param {string} key The key of the message.
+ * @param {...any[]} templateValues If the message is a template string, these args will be used to replace the templates.
  */
-export function localize(key: string): string
+export function localize(key: string, ...templateValues: any[]): string
 {
-    return I18n.create().localize(key);
+    return I18n.create().localize(key, ...templateValues);
 }
