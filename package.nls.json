@@ -9,5 +9,8 @@
     "configuration.syncing.separateKeybindings": "Synchronize the `keybindings` separately for different operating systems.\nYou may disable it since the VSCode has introduced the `Platform Specific Keybindings` from version 1.27. But please make sure you've already merged your keybindings before disabling this setting.",
     "commands.uploadSettings": "Syncing: Upload Settings",
     "commands.downloadSettings": "Syncing: Download Settings",
-    "commands.openSettings": "Syncing: Open Syncing Settings"
+    "commands.openSettings": "Syncing: Open Syncing Settings",
+    "toast.settings.uploaded": "Syncing: Settings uploaded.",
+    "toast.settings.downloaded": "Syncing: Settings downloaded.",
+    "error.not.supported": "Your operating system is not supported yet."
 }
