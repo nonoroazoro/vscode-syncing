@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 
 import { Gist, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
-import { locale, localize } from "./i18n";
+import { locale, localize, setup } from "./i18n";
 import { ISyncedItem } from "./types/SyncingTypes";
 
 let _syncing: Syncing;
@@ -20,6 +20,10 @@ export function activate(context: vscode.ExtensionContext)
  */
 function _init(context: vscode.ExtensionContext)
 {
+    // Config i18n.
+    setup(context.extensionPath);
+
+    // Config moment's locale.
     moment.locale(locale());
 
     _isSynchronizing = false;
