@@ -5,6 +5,7 @@ export class I18n
 {
     private static _instance: I18n;
     private static DEFAULT_LOCALE: string = "en-us";
+    private static DEFAULT_LOCALE_FILENAME: string = "package.nls.json";
 
     private _locale: string;
     private _bundle: Record<string, string>;
@@ -57,16 +58,17 @@ export class I18n
 
     private _prepare()
     {
-        const filename = (this.locale.toLowerCase() === I18n.DEFAULT_LOCALE)
-            ? "package.nls.json"
-            : `package.nls.${this.locale}.json`;
+        const lowerCaseLocale = this.locale.toLowerCase();
+        const filename = (lowerCaseLocale === I18n.DEFAULT_LOCALE)
+            ? I18n.DEFAULT_LOCALE_FILENAME
+            : `package.nls.${lowerCaseLocale}.json`;
         try
         {
             this._bundle = require(`../../${filename}`);
         }
         catch (err)
         {
-            this._bundle = require("../../package.nls.json");
+            this._bundle = require(`../../${I18n.DEFAULT_LOCALE_FILENAME}`);
         }
     }
 }
