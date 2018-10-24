@@ -167,7 +167,7 @@ export class Syncing
 
             if (showIndicator)
             {
-                Toast.showSpinner(localize("toast.settings.checking.syncing"));
+                Toast.showSpinner(localize("toast.syncing.checking.settings"));
             }
 
             const settings: ISyncingSettings = this.loadSettings();
@@ -262,7 +262,7 @@ export class Syncing
             {
                 if (err && showToast)
                 {
-                    Toast.statusError(localize("toast.settings.save.syncing", err));
+                    Toast.statusError(localize("toast.syncing.save.settings", err));
                 }
                 resolve();
             });
