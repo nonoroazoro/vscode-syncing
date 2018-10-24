@@ -1,3 +1,6 @@
+import { readJsonSync } from "fs-extra";
+import * as path from "path";
+
 import { format } from "../utils/template";
 
 /**
@@ -71,11 +74,11 @@ class I18n
             : `package.nls.${lowerCaseLocale}.json`;
         try
         {
-            this._bundle = require(`../../${filename}`);
+            this._bundle = readJsonSync(path.resolve(__dirname, `../../${filename}`), { encoding: "utf8" });
         }
         catch (err)
         {
-            this._bundle = require(`../../${I18n.DEFAULT_LOCALE_FILENAME}`);
+            this._bundle = readJsonSync(path.resolve(__dirname, `../../${I18n.DEFAULT_LOCALE_FILENAME}`), { encoding: "utf8" });
         }
     }
 }
