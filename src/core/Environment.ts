@@ -2,6 +2,7 @@ import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 
+import { localize } from "../i18n";
 import { IExtension } from "../types/SyncingTypes";
 
 /**
@@ -173,7 +174,7 @@ export class Environment
 
             default:
                 // Unknown platform.
-                throw new Error("Your operating system is not supported yet.");
+                throw new Error(localize("error.not.supported"));
         }
         return path.join(baseDirectory, this.isInsiders ? "Code - Insiders" : "Code");
     }
