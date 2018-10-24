@@ -1,6 +1,7 @@
 import * as fs from "fs-extra";
 import * as path from "path";
 
+import { localize } from "../i18n";
 import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
@@ -156,14 +157,17 @@ export class Syncing
             {
                 if (showIndicator)
                 {
-                    Toast.statusError(`Syncing: ${forUpload ? "Uploading" : "Downloading"} canceled. ${error.message}`);
+                    Toast.statusError(forUpload
+                        ? localize("toast.settings.uploading.canceled", error.message)
+                        : localize("toast.settings.downloading.canceled", error.message)
+                    );
                 }
                 reject(error);
             }
 
             if (showIndicator)
             {
-                Toast.showSpinner("Syncing: Checking Syncing's settings.");
+                Toast.showSpinner(localize("toast.settings.checking.syncing"));
             }
 
             const settings: ISyncingSettings = this.loadSettings();
@@ -225,7 +229,7 @@ export class Syncing
         }
         catch (err)
         {
-            console.error(`Syncing: Error loading Syncing's settings: ${err}`);
+            console.error(localize("error.load.syncing.settings"), err);
         }
         return settings;
     }
@@ -258,7 +262,7 @@ export class Syncing
             {
                 if (err && showToast)
                 {
-                    Toast.statusError(`Syncing: Cannot save Syncing's settings: ${err}`);
+                    Toast.statusError(localize("toast.settings.save.syncing", err));
                 }
                 resolve();
             });
