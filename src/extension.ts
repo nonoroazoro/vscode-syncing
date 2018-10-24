@@ -26,8 +26,7 @@ function _init(context: vscode.ExtensionContext)
     _syncing = Syncing.create();
     _vscodeSetting = VSCodeSetting.create();
 
-    // TODO: i18n, using vscode.env.language
-    moment.locale("en");
+    moment.locale(_i18n.locale);
 
     _initCommands(context);
 }
