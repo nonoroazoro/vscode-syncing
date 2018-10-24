@@ -3,6 +3,8 @@ import * as path from "path";
 
 import { format } from "../utils/template";
 
+let instance: I18n;
+
 /**
  * I18n.
  */
@@ -12,11 +14,13 @@ class I18n
     private static DEFAULT_LOCALE: string = "en-us";
     private static DEFAULT_LOCALE_FILENAME: string = "package.nls.json";
 
-    private _locale: string;
     private _bundle: Record<string, string>;
+    private _extensionPath: string;
+    private _locale: string;
 
-    private constructor(vscodeLocale: string)
+    private constructor(extensionPath: string, vscodeLocale: string)
     {
+        this._extensionPath = extensionPath;
         this._locale = vscodeLocale;
         this._prepare();
     }
@@ -24,9 +28,9 @@ class I18n
     /**
      * Creates an instance of the singleton class `I18n`.
      */
-    public static create(): I18n
+    public static create(extensionPath: string): I18n
     {
-        if (!I18n._instance)
+        if (!I18n._instance || I18n._instance._extensionPath !== extensionPath)
         {
             let vscodeLocale: string | undefined;
             try
@@ -37,7 +41,7 @@ class I18n
             {
             }
             vscodeLocale = vscodeLocale || I18n.DEFAULT_LOCALE;
-            I18n._instance = new I18n(vscodeLocale);
+            I18n._instance = new I18n(extensionPath, vscodeLocale);
         }
         return I18n._instance;
     }
@@ -74,13 +78,27 @@ class I18n
             : `package.nls.${lowerCaseLocale}.json`;
         try
         {
-            this._bundle = readJsonSync(path.resolve(__dirname, `../../${filename}`), { encoding: "utf8" });
+            this._bundle = readJsonSync(
+                path.resolve(this._extensionPath, filename),
+                { encoding: "utf8" }
+            );
         }
         catch (err)
         {
-            this._bundle = readJsonSync(path.resolve(__dirname, `../../${I18n.DEFAULT_LOCALE_FILENAME}`), { encoding: "utf8" });
+            this._bundle = readJsonSync(
+                path.resolve(this._extensionPath, I18n.DEFAULT_LOCALE_FILENAME),
+                { encoding: "utf8" }
+            );
         }
     }
+}
+
+/**
+ * Setup the i18n module.
+ */
+export function setup(extensionPath: string): void
+{
+    instance = I18n.create(extensionPath);
 }
 
 /**
@@ -88,7 +106,7 @@ class I18n
  */
 export function locale(): string
 {
-    return I18n.create().locale;
+    return instance.locale;
 }
 
 /**
@@ -99,5 +117,5 @@ export function locale(): string
  */
 export function localize(key: string, ...templateValues: any[]): string
 {
-    return I18n.create().localize(key, ...templateValues);
+    return instance.localize(key, ...templateValues);
 }
