@@ -60,7 +60,7 @@
     "error.uninstall.extension": "无法卸载扩展: {0}",
     "pokaYoke.cancel": "取消",
     "pokaYoke.continue.download": "继续下载",
-    "pokaYoke.continue.download.message": "检测到将要下载的配置与本地配置之间存在较大差异，确定要继续下载并覆盖本地配置吗?",
+    "pokaYoke.continue.download.message": "即将下载的配置与本地配置之间存在较大差异，确定要继续下载并覆盖本地配置吗?",
     "pokaYoke.continue.upload": "继续上传",
-    "pokaYoke.continue.upload.message": "检测到将要上传的配置与云端配置之间存在较大差异，确定要继续上传并覆盖云端配置吗?"
+    "pokaYoke.continue.upload.message": "即将上传的配置与云端配置之间存在较大差异，确定要继续上传并覆盖云端配置吗?"
 }
