@@ -19,6 +19,8 @@
 
     1. 支持`多国语言`，目前包括：`英语`和`简体中文`。
 
+        > 注意：切换为`简体中文`时请务必安装微软官方提供的[简体中文语言包](https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-zh-hans)。
+
     1. 将 `Syncing` 的启动速度提高至 `3 倍左右`。
 
 
