@@ -40,5 +40,9 @@ module.exports = {
                 use: []
             }
         ]
+    },
+    stats: {
+        children: false,
+        modules: false
     }
 };
