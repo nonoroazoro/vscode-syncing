@@ -75,24 +75,21 @@ export class Gist
     /**
      * Gets the currently authenticated GitHub user.
      */
-    public user(): Promise<{ id: number, name: string } | null>
+    public async user(): Promise<{ id: number, name: string } | undefined>
     {
-        return new Promise((resolve) =>
+        try
         {
-            this._api.users.get({})
-                .then((res) =>
-                {
-                    const data: GitHubTypes.IGistOwner = res.data;
-                    resolve({
-                        id: data.id,
-                        name: data.login
-                    });
-                })
-                .catch(() =>
-                {
-                    resolve();
-                });
-        });
+            const res = await this._api.users.get({});
+            const data = res.data as GitHubTypes.IGistOwner;
+            return {
+                id: data.id,
+                name: data.login
+            };
+        }
+        catch (err)
+        {
+            return;
+        }
     }
 
     /**
