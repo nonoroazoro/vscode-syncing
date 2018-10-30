@@ -1,5 +1,12 @@
 # Changelogs
 
+## 2.0.0 - October 30, 2018
+
+- Added: Support for `i18n (internationalization)`, and currently is shipped with `English` and `Simplified Chinese`.
+
+- Changed: Improve the startup performance (Thank [@fabiospampinato](https://github.com/fabiospampinato) for the advice).
+
+
 ## 1.9.0 - September 25, 2018
 
 - Added: Support VSCode [Portable Mode](https://code.visualstudio.com/docs/editor/portable).

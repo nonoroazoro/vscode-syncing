@@ -25,7 +25,7 @@ export function getExtensionById(id: string, ignoreCase = true)
  */
 export function getVSCodeSetting<T>(section: string, key: string, defaultValue?: T): T
 {
-    return vscode.workspace.getConfiguration(section).get<T>(key, defaultValue);
+    return vscode.workspace.getConfiguration(section).get<T>(key, defaultValue as T);
 }
 
 /**

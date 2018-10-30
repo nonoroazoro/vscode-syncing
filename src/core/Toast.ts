@@ -5,6 +5,7 @@
 import * as moment from "moment";
 import * as vscode from "vscode";
 
+import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
 import { reloadWindow } from "../utils/vscodeAPI";
 import { Gist } from "./Gist";
@@ -80,21 +81,21 @@ export function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ to
 {
     return new Promise((resolve, reject) =>
     {
-        const placeHolder = forUpload ?
-            "Enter GitHub Personal Access Token." :
-            "Enter GitHub Personal Access Token (Leave it blank to download from a public Gist).";
+        const placeHolder = forUpload
+            ? localize("toast.box.enter.github.token.upload")
+            : localize("toast.box.enter.github.token.download");
         const options = {
             ignoreFocusOut: true,
             password: false,
             placeHolder,
-            prompt: "Used for authenticating to your GitHub Gist."
+            prompt: localize("toast.box.enter.github.token.description")
         };
         vscode.window.showInputBox(options).then((value) =>
         {
             if (value === undefined)
             {
                 // Reject if cancelled.
-                reject(new Error("You abort the synchronization."));
+                reject(new Error(localize("error.abort.synchronization")));
             }
             else
             {
@@ -102,7 +103,7 @@ export function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ to
                 if (forUpload && !token)
                 {
                     // Only reject when uploading.
-                    reject(new Error("The GitHub Personal Access Token is not set."));
+                    reject(new Error(localize("error.no.github.token")));
                 }
                 else
                 {
@@ -123,19 +124,19 @@ export function showGistInputBox(forUpload: boolean = true): Promise<{ id: strin
     return new Promise((resolve, reject) =>
     {
         const placeHolder = forUpload
-            ? "Enter Gist ID (Leave it blank to create a new Gist automatically)."
-            : "Enter Gist ID.";
+            ? localize("toast.box.enter.gist.id.upload")
+            : localize("toast.box.enter.gist.id.download");
         vscode.window.showInputBox({
             ignoreFocusOut: true,
             password: false,
             placeHolder,
-            prompt: "Used for synchronizing your settings with Gist."
+            prompt: localize("toast.box.enter.gist.id.description")
         }).then((value) =>
         {
             if (value === undefined)
             {
                 // Reject if cancelled.
-                reject(new Error("You abort the synchronization."));
+                reject(new Error(localize("error.abort.synchronization")));
             }
             else
             {
@@ -143,7 +144,7 @@ export function showGistInputBox(forUpload: boolean = true): Promise<{ id: strin
                 if (!forUpload && !id)
                 {
                     // Only reject when downloading.
-                    reject(new Error("The Gist ID is not set."));
+                    reject(new Error(localize("error.no.gist.id")));
                 }
                 else
                 {
@@ -164,7 +165,7 @@ export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Pro
 {
     return new Promise((resolve, reject) =>
     {
-        showSpinner("Syncing: Checking remote Gists.");
+        showSpinner(localize("toast.settings.checking.remote.gists"));
         return api.getAll()
             .then((gists: GitHubTypes.IGist[]) =>
             {
@@ -173,7 +174,7 @@ export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Pro
                 const manualItem: IGistListBoxItem = {
                     data: "@@manual",
                     description: "",
-                    label: `Enter Gist ID manually...`
+                    label: localize("toast.box.enter.gist.id.manually")
                 };
 
                 // Show quick pick dialog only if the gists is not empty.
@@ -181,14 +182,16 @@ export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Pro
                 {
                     const items: IGistListBoxItem[] = gists.map((gist) => ({
                         data: gist.id,
-                        description: `Last uploaded ${moment.duration(new Date(gist.updated_at).getTime() - Date.now()).humanize(true)}.`,
+                        description: localize("toast.box.gist.last.uploaded", moment.duration(new Date(gist.updated_at).getTime() - Date.now()).humanize(true)),
                         label: `Gist ID: ${gist.id}`
                     }));
                     items.unshift(manualItem);
                     return vscode.window.showQuickPick(items, {
                         ignoreFocusOut: true,
                         matchOnDescription: true,
-                        placeHolder: `Choose a Gist to ${forUpload ? "upload" : "download"} your settings.`
+                        placeHolder: forUpload
+                            ? localize("toast.box.choose.gist.upload")
+                            : localize("toast.box.choose.gist.download")
                     });
                 }
                 return manualItem;
@@ -210,7 +213,7 @@ export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Pro
                 else
                 {
                     // Reject if cancelled.
-                    reject(new Error("You abort the synchronization."));
+                    reject(new Error(localize("error.abort.synchronization")));
                 }
             })
             .catch(reject);
@@ -222,8 +225,8 @@ export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Pro
  */
 export function showReloadBox(): void
 {
-    const reloadButton = "Reload Now";
-    const message = "Settings are successfully synced. Please reload VSCode to take effect.";
+    const reloadButton = localize("toast.box.reload");
+    const message = localize("toast.box.reload.message");
     vscode.window.showInformationMessage(message, reloadButton).then((selection) =>
     {
         if (selection === reloadButton)

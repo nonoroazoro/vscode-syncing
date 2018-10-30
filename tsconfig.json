@@ -12,7 +12,7 @@
         "noUnusedParameters": true,
         "outDir": "dist",
         "pretty": true,
-        "rootDir": ".",
+        "rootDir": "src",
         "skipLibCheck": true,
         "sourceMap": true,
         "strictNullChecks": true,

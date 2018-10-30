@@ -1,8 +1,8 @@
 {
     "name": "syncing",
-    "displayName": "Syncing",
-    "description": "Synchronize all of your VSCode settings across multiple devices.",
-    "version": "1.9.0",
+    "displayName": "%displayName%",
+    "description": "%description%",
+    "version": "2.0.0",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -11,7 +11,7 @@
     },
     "homepage": "https://github.com/nonoroazoro/vscode-syncing",
     "license": "MIT",
-    "main": "dist/src/extension",
+    "main": "dist/extension",
     "icon": "resources/logo.png",
     "repository": {
         "type": "git",
@@ -22,7 +22,7 @@
         "email": "xiaochao.k@gmail.com"
     },
     "engines": {
-        "vscode": "^1.5.0"
+        "vscode": "^1.25.0"
     },
     "categories": [
         "Other"
@@ -41,45 +41,45 @@
         "commands": [
             {
                 "command": "syncing.uploadSettings",
-                "title": "Syncing: Upload Settings"
+                "title": "%commands.uploadSettings%"
             },
             {
                 "command": "syncing.downloadSettings",
-                "title": "Syncing: Download Settings"
+                "title": "%commands.downloadSettings%"
             },
             {
                 "command": "syncing.openSettings",
-                "title": "Syncing: Open Syncing Settings"
+                "title": "%commands.openSettings%"
             }
         ],
         "configuration": [
             {
-                "title": "Syncing",
+                "title": "%configuration.title%",
                 "properties": {
                     "syncing.excludedExtensions": {
                         "type": "array",
                         "default": [],
-                        "description": "Configure glob patterns for excluding VSCode extensions from being synchronized. For example:\n[\n    \"somepublisher.*\",\n    \"nonoroazoro.syncing\"\n]\nNow the extension \"nonoroazoro.syncing\" and all the extensions of the author \"somepublisher\" will no longer be synchronized."
+                        "description": "%configuration.syncing.excludedExtensions%"
                     },
                     "syncing.excludedSettings": {
                         "type": "array",
                         "default": [],
-                        "description": "Configure glob patterns for excluding VSCode settings from being synchronized. For example:\n[\n    \"editor.*\",\n    \"workbench.colorTheme\"\n]\nNow the setting \"workbench.colorTheme\" and all the settings of \"editor\" will no longer be synchronized."
+                        "description": "%configuration.syncing.excludedSettings%"
                     },
                     "syncing.extensions.autoUpdate": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Automatically update extensions during the synchronization."
+                        "description": "%configuration.syncing.extensions.autoUpdate%"
                     },
                     "syncing.pokaYokeThreshold": {
                         "type": "number",
                         "default": 10,
-                        "description": "Configure a threshold to enable Poka-Yoke (Mistake-Proofing).\nEach time you start a synchronization, Syncing will display a confirm dialog if the changes between the local and remote setting exceed the threshold.\nThe default value is 10.\nTo disable this feature, just set to a number less than or equal to zero (<= 0)."
+                        "description": "%configuration.syncing.pokaYokeThreshold%"
                     },
                     "syncing.separateKeybindings": {
                         "type": "boolean",
                         "default": true,
-                        "description": "Synchronize the \"keybindings\" separately for different operating systems.\nYou may disable it since the VSCode has introduced the \"Platform Specific Keybindings\" from version 1.27. But please make sure you've already merged your keybindings before disabling this setting."
+                        "description": "%configuration.syncing.separateKeybindings%"
                     }
                 }
             }
@@ -104,7 +104,8 @@
         "precommit": "lint-staged",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "prebuild": "npm run clean && npm run cleanCov",
-        "build": "tsc -p ./tsconfig.json --sourceMap false",
+        "build": "webpack --config ./webpack.config.prod.js",
+        "build:ts": "tsc -p ./tsconfig.json --sourceMap false",
         "watch": "tsc -p ./tsconfig.json -w",
         "clean": "rimraf dist/*",
         "cleanCov": "rimraf @coverage",
@@ -113,7 +114,7 @@
         "test:cov": "npm run cleanCov && npm test -- --coverage"
     },
     "dependencies": {
-        "@octokit/rest": "^15.11.2",
+        "@octokit/rest": "^15.15.1",
         "async": "^2.6.1",
         "extract-zip": "^1.6.7",
         "fs-extra": "^7.0.0",
@@ -128,23 +129,26 @@
         "tmp": "0.0.33"
     },
     "devDependencies": {
-        "@types/async": "^2.0.49",
+        "@types/async": "^2.0.50",
         "@types/extract-zip": "^1.6.2",
         "@types/fs-extra": "^5.0.4",
-        "@types/jest": "^23.3.2",
+        "@types/jest": "^23.3.8",
         "@types/lodash.isstring": "^4.0.4",
         "@types/lodash.pick": "^4.4.4",
         "@types/minimatch": "^3.0.3",
-        "@types/node": "^10.9.4",
+        "@types/node": "^10.12.1",
         "@types/tmp": "0.0.33",
-        "husky": "^0.14.3",
+        "husky": "^1.1.2",
         "jest": "^23.6.0",
-        "lint-staged": "^7.2.2",
+        "lint-staged": "^8.0.2",
         "rimraf": "^2.6.2",
-        "ts-jest": "^23.1.4",
+        "ts-jest": "^23.10.4",
+        "ts-loader": "^5.2.2",
         "tslint": "^5.11.0",
-        "typescript": "^3.0.3",
-        "vscode": "^1.1.21"
+        "typescript": "^3.1.4",
+        "vscode": "^1.1.21",
+        "webpack": "^4.23.1",
+        "webpack-cli": "^3.1.2"
     },
     "lint-staged": {
         "./src/**/*.ts": [

@@ -8,6 +8,7 @@ import * as vscode from "vscode";
 
 import { CaseInsensitiveMap, CaseInsensitiveSet } from "../collections";
 import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE, CONFIGURATION_KEY } from "../common/constants";
+import { localize } from "../i18n";
 import { IExtension, ISyncedItem } from "../types/SyncingTypes";
 import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
@@ -207,7 +208,7 @@ export class Extension
                 {
                     if (err1)
                     {
-                        reject(`Cannot extract extension: ${extension.id}. Access temporary directory denied.`);
+                        reject(localize("error.extract.extension-2", extension.id));
                     }
                     else
                     {
@@ -215,7 +216,7 @@ export class Extension
                         {
                             if (err2)
                             {
-                                reject(`Cannot extract extension: ${extension.id}. ${err2.message}`);
+                                reject(localize("error.extract.extension-1", extension.id, err2.message));
                             }
                             else
                             {
@@ -231,7 +232,7 @@ export class Extension
                                     })
                                     .catch((err3) =>
                                     {
-                                        reject(`Cannot extract extension: ${extension.id}. ${err3.message}`);
+                                        reject(localize("error.extract.extension-1", extension.id, err3.message));
                                     });
                             }
                         });
@@ -240,7 +241,7 @@ export class Extension
             }
             else
             {
-                reject(`Cannot extract extension: ${extension.id}. Extension zip file not found.`);
+                reject(localize("error.extract.extension-3", extension.id));
             }
         });
     }
@@ -258,7 +259,7 @@ export class Extension
         }
         catch (err)
         {
-            throw new Error(`Cannot uninstall extension: ${extension.id}`);
+            throw new Error(localize("error.uninstall.extension", extension.id));
         }
         return extension;
     }
@@ -424,7 +425,7 @@ export class Extension
 
                     if (showIndicator)
                     {
-                        Toast.showSpinner(`Syncing: Downloading extension: ${item.id}`, steps, total);
+                        Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
                     }
 
                     this.downloadExtension(item)
@@ -432,7 +433,7 @@ export class Extension
                         {
                             if (showIndicator)
                             {
-                                Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
+                                Toast.showSpinner(localize("toast.settings.installing.extension", item.id), steps, total);
                             }
                             return this.extractExtension(extension);
                         })
@@ -474,7 +475,7 @@ export class Extension
 
                     if (showIndicator)
                     {
-                        Toast.showSpinner(`Syncing: Downloading extension: ${item.id}`, steps, total);
+                        Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
                     }
 
                     this.downloadExtension(item)
@@ -482,7 +483,7 @@ export class Extension
                         {
                             if (showIndicator)
                             {
-                                Toast.showSpinner(`Syncing: Removing outdated extension: ${item.id}`, steps, total);
+                                Toast.showSpinner(localize("toast.settings.removing.outdated.extension", item.id), steps, total);
                             }
                             return this.uninstallExtension(extension);
                         })
@@ -490,7 +491,7 @@ export class Extension
                         {
                             if (showIndicator)
                             {
-                                Toast.showSpinner(`Syncing: Installing extension: ${item.id}`, steps, total);
+                                Toast.showSpinner(localize("toast.settings.installing.extension", item.id), steps, total);
                             }
                             return this.extractExtension(extension);
                         })
@@ -532,7 +533,7 @@ export class Extension
 
                     if (showIndicator)
                     {
-                        Toast.showSpinner(`Syncing: Uninstalling extension: ${item.id}`, steps, total);
+                        Toast.showSpinner(localize("toast.settings.uninstalling.extension", item.id), steps, total);
                     }
 
                     this.uninstallExtension(item).then(() =>
