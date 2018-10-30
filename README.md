@@ -17,11 +17,11 @@
 
 * From ***version 2.0.0*** onwards:
 
-    1. Support `i18n`, currently including `English` and `Simplified Chinese` locales.
+    1. Add support for `i18n (internationalization)`, and `Syncing` is currently shipped with `English` and `Simplified Chinese`.
 
-        > Don't forget to install the [Chinese (Simplified) Language Pack](https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-zh-hans) if you want to use `Simplified Chinese`.
+        > Don't forget to install the [Chinese (Simplified) Language Pack](https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-zh-hans) if you changed the locale to `Simplified Chinese`.
 
-    1. Boost the startup speed of `Syncing`, almost `3 times faster` than before (may vary depending on your hardware).
+    1. Accelerate the startup speed of `Syncing`, nearly `3 times faster` than before (may vary depending on your hardware).
 
 
 ## Features

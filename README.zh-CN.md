@@ -21,7 +21,7 @@
 
         > 注意：切换为`简体中文`时请务必安装微软官方提供的[简体中文语言包](https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-zh-hans)。
 
-    1. 将 `Syncing` 的启动速度提高至 `3 倍左右`（取决于您的硬件）。
+    1. `Syncing` 的启动速度将会提高 `3 倍左右`（取决于您的硬件）。
 
 
 ## 功能
