@@ -1,8 +1,8 @@
 # Changelogs
 
-## 2.0.0 - October 24, 2018
+## 2.0.0 - October 30, 2018
 
-- Added: Support i18n, currently including `English` and `Simplified Chinese` locales.
+- Added: Support for `i18n (internationalization)`, and currently is shipped with `English` and `Simplified Chinese`.
 
 - Changed: Improve the startup performance (Thank [@fabiospampinato](https://github.com/fabiospampinato) for the advice).
 
