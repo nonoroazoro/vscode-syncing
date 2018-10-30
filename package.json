@@ -22,7 +22,7 @@
         "email": "xiaochao.k@gmail.com"
     },
     "engines": {
-        "vscode": "^1.28.0"
+        "vscode": "^1.25.0"
     },
     "categories": [
         "Other"
