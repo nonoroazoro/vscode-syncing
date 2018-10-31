@@ -406,51 +406,47 @@ export class VSCodeSetting
      * @param settings `VSCode Settings`.
      * @param exclude Default is `true`, exclude some `VSCode Settings` base on the exclude list of `Syncing`.
      */
-    private _loadContent(settings: ISetting[], exclude: boolean = true): Promise<ISetting[]>
+    private async _loadContent(settings: ISetting[], exclude: boolean = true): Promise<ISetting[]>
     {
-        return new Promise((resolve) =>
+        return settings.map((setting: ISetting) =>
         {
             let content: string | undefined;
-            const results: ISetting[] = settings.map((setting: ISetting) =>
+            try
             {
-                try
+                if (setting.type === SettingTypes.Extensions)
                 {
-                    if (setting.type === SettingTypes.Extensions)
+                    // Exclude extensions.
+                    let extensions = this._ext.getAll();
+                    if (exclude && extensions.length > 0)
                     {
-                        // Exclude extensions.
-                        let extensions = this._ext.getAll();
-                        if (exclude && extensions.length > 0)
-                        {
-                            const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_EXTENSIONS);
-                            extensions = this._getExcludedExtensions(extensions, patterns);
-                        }
-                        content = JSON.stringify(extensions, null, 4);
+                        const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_EXTENSIONS);
+                        extensions = this._getExcludedExtensions(extensions, patterns);
                     }
-                    else
-                    {
-                        content = fs.readFileSync(setting.filepath, "utf8");
+                    content = JSON.stringify(extensions, null, 4);
+                }
+                else
+                {
+                    content = fs.readFileSync(setting.filepath, "utf8");
 
-                        // Exclude settings.
-                        if (exclude && content && setting.type === SettingTypes.Settings)
+                    // Exclude settings.
+                    if (exclude && content && setting.type === SettingTypes.Settings)
+                    {
+                        const settingsJSON = parse(content);
+                        if (settingsJSON)
                         {
-                            const settingsJSON = parse(content);
-                            if (settingsJSON)
-                            {
-                                const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_SETTINGS);
-                                content = excludeSettings(content, settingsJSON, patterns);
-                            }
+                            const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_SETTINGS);
+                            content = excludeSettings(content, settingsJSON, patterns);
                         }
                     }
                 }
-                catch (err)
-                {
-                    content = undefined;
-                    console.error(localize("error.loading.settings", setting.type, err));
-                }
+            }
+            catch (err)
+            {
+                content = undefined;
+                console.error(localize("error.loading.settings", setting.type, err));
+            }
 
-                return { ...setting, content };
-            });
-            resolve(results);
+            return { ...setting, content };
         });
     }
 
