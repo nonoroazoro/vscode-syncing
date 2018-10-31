@@ -98,38 +98,31 @@ export class Gist
      * @param id Gist id.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
-    public get(id: string, showIndicator: boolean = false): Promise<GitHubTypes.IGist>
+    public async get(id: string, showIndicator: boolean = false): Promise<GitHubTypes.IGist>
     {
-        return new Promise((resolve, reject) =>
+        if (showIndicator)
         {
-            function resolveWrap(value: Github.AnyResponse)
-            {
-                if (showIndicator)
-                {
-                    Toast.clearSpinner("");
-                }
-                resolve(value.data);
-            }
+            Toast.showSpinner(localize("toast.settings.checking.remote"));
+        }
 
-            function rejectWrap(error: Error)
-            {
-                if (showIndicator)
-                {
-                    Toast.statusError(localize("toast.settings.downloading.failed", error.message));
-                }
-                reject(error);
-            }
-
+        try
+        {
+            const result = await this._api.gists.get({ gist_id: id });
             if (showIndicator)
             {
-                Toast.showSpinner(localize("toast.settings.checking.remote"));
+                Toast.clearSpinner("");
             }
-
-            this._api.gists.get({ gist_id: id }).then(resolveWrap).catch(({ code }) =>
+            return result.data as any;
+        }
+        catch ({ code })
+        {
+            const error = this._createError(code);
+            if (showIndicator)
             {
-                rejectWrap(this._createError(code));
-            });
-        });
+                Toast.statusError(localize("toast.settings.downloading.failed", error.message));
+            }
+            throw error;
+        }
     }
 
     /**
