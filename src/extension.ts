@@ -55,37 +55,28 @@ function _registerCommand(context: vscode.ExtensionContext, command: string, cal
 /**
  * Uploads your settings.
  */
-function _uploadSettings()
+async function _uploadSettings()
 {
     if (!_isSynchronizing)
     {
         _isSynchronizing = true;
-        _syncing.prepareUploadSettings(true).then((syncingSettings) =>
+        try
         {
+            const syncingSettings = await _syncing.prepareUploadSettings(true);
             const api = Gist.create(syncingSettings.token, _syncing.proxy);
-            return _vscodeSetting.getSettings(true, true).then((settings) =>
+            const settings = await _vscodeSetting.getSettings(true, true);
+            const gist = await api.findAndUpdate(syncingSettings.id, settings, true, true);
+            if (gist.id !== syncingSettings.id)
             {
-                return api.findAndUpdate(syncingSettings.id, settings, true, true).then((gist) =>
-                {
-                    if (gist.id === syncingSettings.id)
-                    {
-                        Toast.statusInfo(localize("toast.settings.uploaded"));
-                    }
-                    else
-                    {
-                        _syncing.saveSettings({ ...syncingSettings, id: gist.id }).then(() =>
-                        {
-                            Toast.statusInfo(localize("toast.settings.uploaded"));
-                        });
-                    }
-
-                    _isSynchronizing = false;
-                });
-            });
-        }).catch(() =>
+                await _syncing.saveSettings({ ...syncingSettings, id: gist.id });
+            }
+            Toast.statusInfo(localize("toast.settings.uploaded"));
+        }
+        catch (error) { }
+        finally
         {
             _isSynchronizing = false;
-        });
+        }
     }
 }
 
