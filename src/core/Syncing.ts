@@ -152,8 +152,7 @@ export class Syncing
             const settings: ISyncingSettings = this.loadSettings();
             if (!settings.token)
             {
-                const { token } = await Toast.showGitHubTokenInputBox(forUpload);
-                settings.token = token;
+                settings.token = await Toast.showGitHubTokenInputBox(forUpload);
             }
 
             if (!settings.id)
