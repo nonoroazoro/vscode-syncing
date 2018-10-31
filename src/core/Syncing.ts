@@ -222,10 +222,10 @@ export class Syncing
         const settings: ISyncingSettings = { ...Syncing.DEFAULT_SETTINGS };
         try
         {
-            Object.assign(
-                settings,
-                fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
-            );
+            return {
+                ...settings,
+                ...fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
+            };
         }
         catch (err)
         {
