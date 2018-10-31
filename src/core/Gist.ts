@@ -139,8 +139,9 @@ export class Gist
             const res = await this._api.gists.getAll({});
             // Find and sort VSCode settings gists by time.
             const gists: GitHubTypes.IGist[] = res.data as any;
+            const extensionsRemoteFilename = `${SettingTypes.Extensions}.json`;
             return gists
-                .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files["extensions.json"]))
+                .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
                 .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
         }
         catch ({ code })
@@ -424,6 +425,7 @@ export class Gist
      */
     private _parseToJSON(files: GitHubTypes.IGistFiles): object
     {
+        const extensionsRemoteFilename = `${SettingTypes.Extensions}.json`;
         let file: GitHubTypes.IGistFile;
         let parsed: object;
         const result = {};
@@ -434,7 +436,7 @@ export class Gist
             {
                 parsed = parse(file.content || "");
 
-                if (key === "extensions.json" && Array.isArray(parsed))
+                if (key === extensionsRemoteFilename && Array.isArray(parsed))
                 {
                     for (const ext of parsed)
                     {
