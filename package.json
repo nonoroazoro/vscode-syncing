@@ -115,7 +115,6 @@
     },
     "dependencies": {
         "@octokit/rest": "^15.15.1",
-        "async": "^2.6.1",
         "extract-zip": "^1.6.7",
         "fs-extra": "^7.0.0",
         "https-proxy-agent": "^2.2.1",
@@ -129,7 +128,6 @@
         "tmp": "0.0.33"
     },
     "devDependencies": {
-        "@types/async": "^2.0.50",
         "@types/extract-zip": "^1.6.2",
         "@types/fs-extra": "^5.0.4",
         "@types/jest": "^23.3.8",
