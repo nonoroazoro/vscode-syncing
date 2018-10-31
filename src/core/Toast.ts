@@ -77,41 +77,33 @@ export function statusFatal(message: string): void
  *
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: string }>
+export async function showGitHubTokenInputBox(forUpload: boolean = true): Promise<string>
 {
-    return new Promise((resolve, reject) =>
+    const placeHolder = forUpload
+        ? localize("toast.box.enter.github.token.upload")
+        : localize("toast.box.enter.github.token.download");
+    const options = {
+        ignoreFocusOut: true,
+        password: false,
+        placeHolder,
+        prompt: localize("toast.box.enter.github.token.description")
+    };
+    const value = await vscode.window.showInputBox(options);
+    if (value === undefined)
     {
-        const placeHolder = forUpload
-            ? localize("toast.box.enter.github.token.upload")
-            : localize("toast.box.enter.github.token.download");
-        const options = {
-            ignoreFocusOut: true,
-            password: false,
-            placeHolder,
-            prompt: localize("toast.box.enter.github.token.description")
-        };
-        vscode.window.showInputBox(options).then((value) =>
+        // Cancelled.
+        throw new Error(localize("error.abort.synchronization"));
+    }
+    else
+    {
+        const token = value.trim();
+        if (!token && forUpload)
         {
-            if (value === undefined)
-            {
-                // Reject if cancelled.
-                reject(new Error(localize("error.abort.synchronization")));
-            }
-            else
-            {
-                const token = value.trim();
-                if (forUpload && !token)
-                {
-                    // Only reject when uploading.
-                    reject(new Error(localize("error.no.github.token")));
-                }
-                else
-                {
-                    resolve({ token });
-                }
-            }
-        });
-    });
+            // Only throw when it's uploading.
+            throw new Error(localize("error.no.github.token"));
+        }
+        return token;
+    }
 }
 
 /**
