@@ -157,8 +157,7 @@ export class Syncing
 
             if (!settings.id)
             {
-                const { id } = await this._requestGistID(settings.token, forUpload);
-                settings.id = id;
+                settings.id = await this._requestGistID(settings.token, forUpload);
             }
 
             await this.saveSettings(settings, true);
@@ -243,18 +242,18 @@ export class Syncing
      * @param token GitHub Personal Access Token.
      * @param forUpload Whether to show messages for upload. Defaults to `true`.
      */
-    private async _requestGistID(token: string, forUpload: boolean = true): Promise<{ id: string }>
+    private async _requestGistID(token: string, forUpload: boolean = true): Promise<string>
     {
         if (token)
         {
             const api: Gist = Gist.create(token, this.proxy);
-            const result = await Toast.showRemoteGistListBox(api, forUpload);
-            if (result.id === "")
+            const id = await Toast.showRemoteGistListBox(api, forUpload);
+            if (!id)
             {
-                // Show gist input box when id is still null.
+                // Show gist input box when id is still supplied.
                 return Toast.showGistInputBox(forUpload);
             }
-            return result;
+            return id;
         }
         return Toast.showGistInputBox(forUpload);
     }
