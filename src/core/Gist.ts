@@ -160,9 +160,10 @@ export class Gist
      *
      * @param content Gist content.
      */
-    public update(content: Github.GistsEditParams): Promise<GitHubTypes.IGist>
+    public async update(content: Github.GistsEditParams): Promise<GitHubTypes.IGist>
     {
-        return this._api.gists.edit(content).then((res) => res.data as any as GitHubTypes.IGist);
+        const res = await this._api.gists.edit(content);
+        return res.data as any;
     }
 
     /**
