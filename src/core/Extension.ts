@@ -418,11 +418,13 @@ export class Extension
                 }
 
                 const extension = await this.downloadExtension(item);
+
                 if (showIndicator)
                 {
                     Toast.showSpinner(localize("toast.settings.installing.extension", item.id), steps, total);
                 }
                 await this.extractExtension(extension);
+
                 result.added.push(item);
             }
             catch (error)
@@ -436,59 +438,45 @@ export class Extension
     /**
      * Updates extensions.
      */
-    private _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
+    private async _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
     {
-        return new Promise((resolve) =>
+        const { extensions, progress, showIndicator = false, total } = options;
+
+        let steps: number = progress;
+        const result = { updated: [] as IExtension[], updatedErrors: [] as IExtension[] };
+        for (const item of extensions)
         {
-            const { extensions, progress, showIndicator = false, total } = options;
+            try
+            {
+                steps++;
 
-            let steps: number = progress;
-            const result = { updated: [] as IExtension[], updatedErrors: [] as IExtension[] };
-            async.eachSeries(
-                extensions,
-                (item, done) =>
+                if (showIndicator)
                 {
-                    steps++;
-
-                    if (showIndicator)
-                    {
-                        Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
-                    }
-
-                    this.downloadExtension(item)
-                        .then((extension) =>
-                        {
-                            if (showIndicator)
-                            {
-                                Toast.showSpinner(localize("toast.settings.removing.outdated.extension", item.id), steps, total);
-                            }
-                            return this.uninstallExtension(extension);
-                        })
-                        .then((extension) =>
-                        {
-                            if (showIndicator)
-                            {
-                                Toast.showSpinner(localize("toast.settings.installing.extension", item.id), steps, total);
-                            }
-                            return this.extractExtension(extension);
-                        })
-                        .then(() =>
-                        {
-                            result.updated.push(item);
-                            done();
-                        })
-                        .catch(() =>
-                        {
-                            result.updatedErrors.push(item);
-                            done();
-                        });
-                },
-                () =>
-                {
-                    resolve(result);
+                    Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
                 }
-            );
-        });
+
+                let extension = await this.downloadExtension(item);
+
+                if (showIndicator)
+                {
+                    Toast.showSpinner(localize("toast.settings.removing.outdated.extension", item.id), steps, total);
+                }
+                extension = await this.uninstallExtension(extension);
+
+                if (showIndicator)
+                {
+                    Toast.showSpinner(localize("toast.settings.installing.extension", item.id), steps, total);
+                }
+                await this.extractExtension(extension);
+
+                result.updated.push(item);
+            }
+            catch (error)
+            {
+                result.updatedErrors.push(item);
+            }
+        }
+        return result;
     }
 
     /**
