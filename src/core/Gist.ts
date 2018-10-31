@@ -203,18 +203,17 @@ export class Gist
      *
      * @param content Gist content.
      */
-    public create(content: Github.GistsCreateParams): Promise<GitHubTypes.IGist>
+    public async create(content: Github.GistsCreateParams): Promise<GitHubTypes.IGist>
     {
-        return new Promise((resolve, reject) =>
+        try
         {
-            this._api.gists.create(content).then((res) =>
-            {
-                resolve(res.data as any as GitHubTypes.IGist);
-            }).catch(({ code }) =>
-            {
-                reject(this._createError(code));
-            });
-        });
+            const result = await this._api.gists.create(content);
+            return result.data as any;
+        }
+        catch ({ code })
+        {
+            throw this._createError(code);
+        }
     }
 
     /**
