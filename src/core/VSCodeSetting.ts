@@ -1,4 +1,3 @@
-import * as async from "async";
 import * as fs from "fs-extra";
 import * as junk from "junk";
 import * as minimatch from "minimatch";
