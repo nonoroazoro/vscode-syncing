@@ -175,167 +175,146 @@ export class VSCodeSetting
      * @param files `VSCode Settings` from GitHub Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public saveSettings(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
+    public async saveSettings(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
         updated: ISyncedItem[],
         removed: ISyncedItem[]
     }>
     {
-        return new Promise((resolve, reject) =>
+        if (showIndicator)
         {
-            function resolveWrap(value: {
-                updated: ISyncedItem[],
-                removed: ISyncedItem[]
-            })
-            {
-                if (showIndicator)
-                {
-                    Toast.clearSpinner("");
-                }
-                resolve(value);
-            }
+            Toast.showSpinner(localize("toast.settings.downloading"));
+        }
 
-            function rejectWrap(error: Error)
-            {
-                if (showIndicator)
-                {
-                    Toast.statusError(localize("toast.settings.downloading.failed", error.message));
-                }
-                reject(error);
-            }
-
-            if (showIndicator)
-            {
-                Toast.showSpinner(localize("toast.settings.downloading"));
-            }
-
+        try
+        {
             if (files)
             {
-                let extensionsSetting: ISetting;
-                const settingsToSave: ISetting[] = [];
-                const settingsToRemove: ISetting[] = [];
                 const existsFileKeys: string[] = [];
-                this.getSettings().then((settings: ISetting[]) =>
+                const settingsToRemove: ISetting[] = [];
+                const settingsToSave: ISetting[] = [];
+                let extensionsSetting: ISetting | undefined;
+                let gistFile: GitHubTypes.IGistFile;
+
+                const settings = await this.getSettings();
+                for (const setting of settings)
                 {
-                    let gistFile: GitHubTypes.IGistFile;
-                    for (const setting of settings)
+                    gistFile = files[setting.remoteFilename];
+                    if (gistFile)
                     {
-                        gistFile = files[setting.remoteFilename];
-                        if (gistFile)
+                        // If the file exists in both remote and local, it should be synchronized.
+                        if (setting.type === SettingTypes.Extensions)
                         {
-                            // If the file exists in both remote and local, it should be synchronized.
-                            if (setting.type === SettingTypes.Extensions)
+                            // Temp extensions file.
+                            extensionsSetting = {
+                                ...setting,
+                                content: gistFile.content
+                            };
+                        }
+                        else
+                        {
+                            // Temp other file.
+                            settingsToSave.push({
+                                ...setting,
+                                content: gistFile.content
+                            });
+                        }
+                        existsFileKeys.push(setting.remoteFilename);
+                    }
+                    else
+                    {
+                        // File exists in remote, but not exists in local.
+                        // Delete if it's a snippet file.
+                        if (setting.type === SettingTypes.Snippets)
+                        {
+                            settingsToRemove.push(setting);
+                        }
+                    }
+                }
+
+                let filename: string;
+                for (const key of Object.keys(files))
+                {
+                    if (existsFileKeys.indexOf(key) === -1)
+                    {
+                        gistFile = files[key];
+                        if (gistFile.filename.startsWith(VSCodeSetting.SNIPPET_PREFIX))
+                        {
+                            // Snippets.
+                            filename = gistFile.filename.slice(VSCodeSetting.SNIPPET_PREFIX.length);
+                            if (filename)
                             {
-                                // Temp extensions file.
-                                extensionsSetting = {
-                                    ...setting,
-                                    content: gistFile.content
-                                };
-                            }
-                            else
-                            {
-                                // Temp other file.
                                 settingsToSave.push({
-                                    ...setting,
-                                    content: gistFile.content
+                                    content: gistFile.content,
+                                    filepath: this._env.getSnippetFilePath(filename),
+                                    remoteFilename: gistFile.filename,
+                                    type: SettingTypes.Snippets
                                 });
                             }
-                            existsFileKeys.push(setting.remoteFilename);
                         }
                         else
                         {
-                            // File exists in remote, but not exists in local.
-                            // Delete if it's a snippet file.
-                            if (setting.type === SettingTypes.Snippets)
-                            {
-                                settingsToRemove.push(setting);
-                            }
+                            // Unknown files, don't care.
+                        }
+                    }
+                }
+
+                // Put extensions file to the last.
+                if (extensionsSetting)
+                {
+                    settingsToSave.push(extensionsSetting);
+                }
+
+                // poka-yoke - Determines whether there're too much changes since the last downloading.
+                const value = await this._shouldContinue(settings, settingsToSave, settingsToRemove);
+                if (value)
+                {
+                    const syncedItems: {
+                        updated: ISyncedItem[],
+                        removed: ISyncedItem[]
+                    } = { updated: [], removed: [] };
+
+                    // Save settings.
+                    for (const setting of settingsToSave)
+                    {
+                        try
+                        {
+                            const saved = await this._saveSetting(setting);
+                            syncedItems.updated.push(saved);
+                        }
+                        catch (error)
+                        {
+                            throw new Error(localize("error.save.file", setting.remoteFilename, error.message));
                         }
                     }
 
-                    let filename: string;
-                    for (const key of Object.keys(files))
-                    {
-                        if (existsFileKeys.indexOf(key) === -1)
-                        {
-                            gistFile = files[key];
-                            if (gistFile.filename.startsWith(VSCodeSetting.SNIPPET_PREFIX))
-                            {
-                                // Snippets.
-                                filename = gistFile.filename.slice(VSCodeSetting.SNIPPET_PREFIX.length);
-                                if (filename)
-                                {
-                                    settingsToSave.push({
-                                        content: gistFile.content,
-                                        filepath: this._env.getSnippetFilePath(filename),
-                                        remoteFilename: gistFile.filename,
-                                        type: SettingTypes.Snippets
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                // Unknown files, don't care.
-                            }
-                        }
-                    }
+                    // Remove settings.
+                    const removed = await this.removeSettings(settingsToRemove);
+                    syncedItems.removed = removed;
 
-                    // Put extensions file to the last.
-                    if (extensionsSetting)
+                    if (showIndicator)
                     {
-                        settingsToSave.push(extensionsSetting);
+                        Toast.clearSpinner("");
                     }
-
-                    // poka-yoke - Determines whether there're too much changes since the last downloading.
-                    this._shouldContinue(settings, settingsToSave, settingsToRemove).then((value) =>
-                    {
-                        if (value)
-                        {
-                            const syncedItems: {
-                                updated: ISyncedItem[],
-                                removed: ISyncedItem[]
-                            } = { updated: [], removed: [] };
-                            async.eachSeries(
-                                settingsToSave,
-                                (setting: ISetting, done: async.ErrorCallback<Error>) =>
-                                {
-                                    this._saveSetting(setting).then((saved) =>
-                                    {
-                                        syncedItems.updated.push(saved);
-                                        done();
-                                    }).catch((err) =>
-                                    {
-                                        done(new Error(localize("error.save.file", setting.remoteFilename, err.message)));
-                                    });
-                                },
-                                (err) =>
-                                {
-                                    if (err)
-                                    {
-                                        rejectWrap(err);
-                                    }
-                                    else
-                                    {
-                                        this.removeSettings(settingsToRemove).then((removed) =>
-                                        {
-                                            syncedItems.removed = removed;
-                                            resolveWrap(syncedItems);
-                                        }).catch(rejectWrap);
-                                    }
-                                }
-                            );
-                        }
-                        else
-                        {
-                            rejectWrap(new Error(localize("error.abort.synchronization")));
-                        }
-                    });
-                });
+                    return syncedItems;
+                }
+                else
+                {
+                    throw new Error(localize("error.abort.synchronization"));
+                }
             }
             else
             {
-                rejectWrap(new Error(localize("error.gist.files.notfound")));
+                throw new Error(localize("error.gist.files.notfound"));
             }
-        });
+        }
+        catch (error)
+        {
+            if (showIndicator)
+            {
+                Toast.statusError(localize("toast.settings.downloading.failed", error.message));
+            }
+            throw error;
+        }
     }
 
     /**
