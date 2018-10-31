@@ -108,58 +108,49 @@ export class Extension
      * @param extensions Extensions to be synced.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
+    public async sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
     {
-        return new Promise((resolve) =>
-        {
-            this._getDifferentExtensions(extensions).then((diff) =>
-            {
-                // Add, update or remove extensions.
-                const { added, updated, removed, total } = diff;
-                const result = { extension: {} } as ISyncedItem;
-                const tasks = [
-                    this._addExtensions.bind(this, {
-                        extensions: added,
-                        progress: 0,
-                        total,
-                        showIndicator
-                    }),
-                    this._updateExtensions.bind(this, {
-                        extensions: updated,
-                        progress: added.length,
-                        total,
-                        showIndicator
-                    }),
-                    this._removeExtensions.bind(this, {
-                        extensions: removed,
-                        progress: added.length + updated.length,
-                        total,
-                        showIndicator
-                    })
-                ];
-                async.eachSeries(
-                    tasks,
-                    (task, done) =>
-                    {
-                        task().then((value: any) =>
-                        {
-                            Object.assign(result.extension, value);
-                            done();
-                        });
-                    },
-                    () =>
-                    {
-                        if (showIndicator)
-                        {
-                            Toast.clearSpinner("");
-                        }
+        const diff = await this._getDifferentExtensions(extensions);
 
-                        // Added since VSCode v1.20.
-                        this.updateObsolete(added, updated, removed).then(() => resolve(result));
-                    }
-                );
-            });
-        });
+        // Add, update or remove extensions.
+        const { added, updated, removed, total } = diff;
+        const result = { extension: {} } as ISyncedItem;
+        const tasks = [
+            this._addExtensions.bind(this, {
+                extensions: added,
+                progress: 0,
+                total,
+                showIndicator
+            }),
+            this._updateExtensions.bind(this, {
+                extensions: updated,
+                progress: added.length,
+                total,
+                showIndicator
+            }),
+            this._removeExtensions.bind(this, {
+                extensions: removed,
+                progress: added.length + updated.length,
+                total,
+                showIndicator
+            })
+        ];
+
+        for (const task of tasks)
+        {
+            const value = await task();
+            Object.assign(result.extension, value);
+        }
+
+        if (showIndicator)
+        {
+            Toast.clearSpinner("");
+        }
+
+        // Added since VSCode v1.20.
+        await this.updateObsolete(added, updated, removed);
+
+        return result;
     }
 
     /**
