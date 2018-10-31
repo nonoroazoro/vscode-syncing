@@ -253,20 +253,20 @@ export class Syncing
      * @param settings Syncing's Settings.
      * @param showToast Whether to show error toast. Defaults to `false`.
      */
-    public saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
+    public async saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
     {
-        return new Promise((resolve) =>
+        const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
+        try
         {
-            const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
-            fs.outputFile(this.settingsPath, content, (err) =>
+            await fs.outputFile(this.settingsPath, content);
+        }
+        catch (err)
+        {
+            if (showToast)
             {
-                if (err && showToast)
-                {
-                    Toast.statusError(localize("toast.syncing.save.settings", err));
-                }
-                resolve();
-            });
-        });
+                Toast.statusError(localize("toast.syncing.save.settings", err));
+            }
+        }
     }
 
     /**
