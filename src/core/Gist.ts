@@ -75,7 +75,7 @@ export class Gist
     /**
      * Gets the currently authenticated GitHub user.
      */
-    public async user(): Promise<{ id: number, name: string } | undefined>
+    public async user(): Promise<{ id: number, name: string }>
     {
         try
         {
@@ -86,9 +86,9 @@ export class Gist
                 name: data.login
             };
         }
-        catch (err)
+        catch ({ code })
         {
-            return;
+            throw this._createError(code);
         }
     }
 
@@ -171,42 +171,31 @@ export class Gist
      *
      * @param id Gist id.
      */
-    public exists(id: string): Promise<GitHubTypes.IGist | boolean>
+    public async exists(id: string): Promise<GitHubTypes.IGist | boolean>
     {
-        return new Promise((resolve) =>
+        if (id != null && id.trim() !== "")
         {
-            if (id && id.trim() !== "")
+            try
             {
-                this.get(id)
-                    .then((gist) =>
+                const gist = await this.get(id);
+                if (this.token)
+                {
+                    const user = await this.user();
+                    // Determines whether the owner of the gist is the currently authenticated user.
+                    if (user.id === gist.owner.id)
                     {
-                        if (this.token)
-                        {
-                            this.user().then((user) =>
-                            {
-                                // Determines whether the owner of the gist is the currently authenticated user.
-                                if (user && user.id === gist.owner.id)
-                                {
-                                    resolve(gist);
-                                }
-                                else
-                                {
-                                    resolve(false);
-                                }
-                            });
-                        }
-                        else
-                        {
-                            resolve(gist);
-                        }
-                    })
-                    .catch(() => resolve(false));
+                        return gist;
+                    }
+                    return false;
+                }
+                return gist;
             }
-            else
+            catch ({ code })
             {
-                resolve(false);
+                throw this._createError(code);
             }
-        });
+        }
+        return false;
     }
 
     /**
@@ -251,107 +240,97 @@ export class Gist
      * @param upsert Default is `true`, create new if gist not exists.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
-    public findAndUpdate(id: string, uploads: ISetting[], upsert = true, showIndicator = false): Promise<GitHubTypes.IGist>
+    public async findAndUpdate(
+        id: string,
+        uploads: ISetting[],
+        upsert = true,
+        showIndicator = false
+    ): Promise<GitHubTypes.IGist>
     {
-        return new Promise((resolve, reject) =>
+        if (showIndicator)
         {
-            function resolveWrap(value: GitHubTypes.IGist)
+            Toast.showSpinner(localize("toast.settings.uploading"));
+        }
+
+        try
+        {
+            let result: GitHubTypes.IGist;
+            const exists = await this.exists(id);
+
+            // Preparing local gist.
+            const localGist: { gist_id: string, files: any } = { gist_id: id, files: {} };
+            for (const item of uploads)
             {
-                if (showIndicator)
+                // Filter out `null` content.
+                if (item.content)
                 {
-                    Toast.clearSpinner("");
+                    localGist.files[item.remoteFilename] = { content: item.content };
                 }
-                resolve(value);
             }
 
-            function rejectWrap(error: Error)
+            if (exists)
             {
-                if (showIndicator)
+                // Upload if the local files are modified.
+                const remoteGist = exists as GitHubTypes.IGist;
+                localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
+                if (localGist.files)
                 {
-                    Toast.statusError(localize("toast.settings.uploading.failed", error.message));
+                    // poka-yoke - Determines whether there're too much changes since the last uploading.
+                    const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
+                    if (threshold > 0)
+                    {
+                        // Note that the local settings here have already been excluded.
+                        const localFiles = { ...localGist.files };
+                        const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
+
+                        // Diff settings.
+                        const changes = this._diffSettings(localFiles, remoteFiles);
+                        if (changes >= threshold)
+                        {
+                            const okButton = localize("pokaYoke.continue.upload");
+                            const message = localize("pokaYoke.continue.upload.message");
+                            const selection = await Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel"));
+                            if (selection !== okButton)
+                            {
+                                throw new Error(localize("error.abort.synchronization"));
+                            }
+                        }
+                    }
+                    result = await this.update(localGist);
                 }
-                reject(error);
+                else
+                {
+                    // Nothing changed.
+                    result = remoteGist;
+                }
+            }
+            else
+            {
+                if (upsert)
+                {
+                    // TODO: Pass gist public option.
+                    result = await this.createSettings(localGist.files);
+                }
+                else
+                {
+                    throw new Error(localize("error.gist.notfound", id));
+                }
             }
 
             if (showIndicator)
             {
-                Toast.showSpinner(localize("toast.settings.uploading"));
+                Toast.clearSpinner("");
             }
-
-            this.exists(id).then((exists) =>
+            return result;
+        }
+        catch (error)
+        {
+            if (showIndicator)
             {
-                const localGist: { gist_id: string, files: any } = { gist_id: id, files: {} };
-                for (const item of uploads)
-                {
-                    // `null` content will be filtered out, just in case.
-                    if (item.content)
-                    {
-                        localGist.files[item.remoteFilename] = { content: item.content };
-                    }
-                }
-
-                if (exists)
-                {
-                    // Upload if the files are modified.
-                    const remoteGist = exists as GitHubTypes.IGist;
-                    localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
-                    if (localGist.files)
-                    {
-                        // poka-yoke - Determines whether there're too much changes since the last uploading.
-                        const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
-                        if (threshold > 0)
-                        {
-                            // Note that the local settings here have already been excluded.
-                            const localFiles = { ...localGist.files };
-                            const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
-
-                            // Diff settings.
-                            const changes = this._diffSettings(localFiles, remoteFiles);
-                            if (changes >= threshold)
-                            {
-                                const okButton = localize("pokaYoke.continue.upload");
-                                const message = localize("pokaYoke.continue.upload.message");
-                                Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel")).then((selection) =>
-                                {
-                                    if (selection === okButton)
-                                    {
-                                        this.update(localGist).then(resolveWrap).catch(rejectWrap);
-                                    }
-                                    else
-                                    {
-                                        rejectWrap(new Error(localize("error.abort.synchronization")));
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                this.update(localGist).then(resolveWrap).catch(rejectWrap);
-                            }
-                        }
-                        else
-                        {
-                            this.update(localGist).then(resolveWrap).catch(rejectWrap);
-                        }
-                    }
-                    else
-                    {
-                        resolveWrap(remoteGist);
-                    }
-                }
-                else
-                {
-                    if (upsert)
-                    {
-                        // TODO: Pass gist public option.
-                        this.createSettings(localGist.files).then(resolveWrap).catch(rejectWrap);
-                    }
-                    else
-                    {
-                        rejectWrap(new Error(localize("error.gist.notfound", id)));
-                    }
-                }
-            });
-        });
+                Toast.statusError(localize("toast.settings.uploading.failed", error.message));
+            }
+            throw error;
+        }
     }
 
     /**
