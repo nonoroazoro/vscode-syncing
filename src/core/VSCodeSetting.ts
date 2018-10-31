@@ -82,15 +82,6 @@ export class VSCodeSetting
     {
         return new Promise((resolve) =>
         {
-            function resolveWrap(value: ISetting[])
-            {
-                if (showIndicator)
-                {
-                    Toast.clearSpinner("");
-                }
-                resolve(value);
-            }
-
             if (showIndicator)
             {
                 Toast.showSpinner(localize("toast.settings.gathering.local"));
@@ -140,13 +131,11 @@ export class VSCodeSetting
                             }
                         }
 
-                        tempSettings = [
-                            {
-                                filepath: path.join(this._env.codeUserDirectory, localFilename),
-                                remoteFilename,
-                                type
-                            }
-                        ];
+                        tempSettings = [{
+                            filepath: path.join(this._env.codeUserDirectory, localFilename),
+                            remoteFilename,
+                            type
+                        }];
                     }
 
                     if (loadFileContent)
@@ -180,7 +169,12 @@ export class VSCodeSetting
                     {
                         console.error(localize("error.invalid.settings", errorFiles.join(" ")));
                     }
-                    resolveWrap(results);
+
+                    if (showIndicator)
+                    {
+                        Toast.clearSpinner("");
+                    }
+                    resolve(results);
                 }
             );
         });
