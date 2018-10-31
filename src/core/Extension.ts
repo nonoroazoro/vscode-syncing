@@ -1,4 +1,3 @@
-import * as async from "async";
 import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
 import * as minimatch from "minimatch";
@@ -416,7 +415,6 @@ export class Extension
                 {
                     Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
                 }
-
                 const extension = await this.downloadExtension(item);
 
                 if (showIndicator)
@@ -454,7 +452,6 @@ export class Extension
                 {
                     Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
                 }
-
                 let extension = await this.downloadExtension(item);
 
                 if (showIndicator)
@@ -482,40 +479,31 @@ export class Extension
     /**
      * Removes extensions.
      */
-    private _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
+    private async _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
     {
-        return new Promise((resolve) =>
+        const { extensions, progress, showIndicator = false, total } = options;
+
+        let steps: number = progress;
+        const result = { removed: [] as IExtension[], removedErrors: [] as IExtension[] };
+        for (const item of extensions)
         {
-            const { extensions, progress, showIndicator = false, total } = options;
+            try
+            {
+                steps++;
 
-            let steps: number = progress;
-            const result = { removed: [] as IExtension[], removedErrors: [] as IExtension[] };
-            async.eachSeries(
-                extensions,
-                (item, done) =>
+                if (showIndicator)
                 {
-                    steps++;
-
-                    if (showIndicator)
-                    {
-                        Toast.showSpinner(localize("toast.settings.uninstalling.extension", item.id), steps, total);
-                    }
-
-                    this.uninstallExtension(item).then(() =>
-                    {
-                        result.removed.push(item);
-                        done();
-                    }).catch(() =>
-                    {
-                        result.removedErrors.push(item);
-                        done();
-                    });
-                },
-                () =>
-                {
-                    resolve(result);
+                    Toast.showSpinner(localize("toast.settings.uninstalling.extension", item.id), steps, total);
                 }
-            );
-        });
+                await this.uninstallExtension(item);
+
+                result.removed.push(item);
+            }
+            catch (error)
+            {
+                result.removedErrors.push(item);
+            }
+        }
+        return result;
     }
 }
