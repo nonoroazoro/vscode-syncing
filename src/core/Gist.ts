@@ -128,24 +128,21 @@ export class Gist
     /**
      * Gets all the gists of the currently authenticated user.
      */
-    public getAll(): Promise<GitHubTypes.IGist[]>
+    public async getAll(): Promise<GitHubTypes.IGist[]>
     {
-        return new Promise((resolve, reject) =>
+        try
         {
-            this._api.gists.getAll({}).then((res) =>
-            {
-                // Filter out VSCode settings.
-                const gists: GitHubTypes.IGist[] = res.data as any;
-                resolve(
-                    gists
-                        .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files["extensions.json"]))
-                        .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime())
-                );
-            }).catch(({ code }) =>
-            {
-                reject(this._createError(code));
-            });
-        });
+            const res = await this._api.gists.getAll({});
+            // Find and sort VSCode settings gists by time.
+            const gists: GitHubTypes.IGist[] = res.data as any;
+            return gists
+                .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files["extensions.json"]))
+                .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
+        }
+        catch ({ code })
+        {
+            throw this._createError(code);
+        }
     }
 
     /**
