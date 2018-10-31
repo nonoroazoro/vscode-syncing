@@ -496,54 +496,46 @@ export class VSCodeSetting
     /**
      * Determines whether the downloading should continue.
      */
-    private _shouldContinue(settings: ISetting[], settingsToSave: ISetting[], settingsToRemove: ISetting[])
+    private async _shouldContinue(
+        settings: ISetting[],
+        settingsToSave: ISetting[],
+        settingsToRemove: ISetting[]
+    ): Promise<boolean>
     {
-        return new Promise((resolve) =>
+        let result = true;
+        const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
+        if (threshold > 0)
         {
-            const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
-            if (threshold > 0)
-            {
-                this._loadContent(settings, false).then((localSettings) =>
-                {
-                    // poka-yoke - Determines whether there're too much changes since the last uploading.
-                    // 1. Excluded settings.
-                    // Here clone the settings to avoid manipulation.
-                    let excludedSettings = this._excludeSettings(
-                        localSettings,
-                        settingsToSave.map((setting) => ({ ...setting })),
-                        SettingTypes.Settings
-                    );
+            const localSettings = await this._loadContent(settings, false);
 
-                    // 2. Excluded extensions.
-                    excludedSettings = this._excludeSettings(
-                        excludedSettings.localSettings,
-                        excludedSettings.remoteSettings,
-                        SettingTypes.Extensions
-                    );
+            // poka-yoke - Determines whether there're too much changes since the last uploading.
+            // 1. Excluded settings.
+            // Here clone the settings to avoid manipulation.
+            let excludedSettings = this._excludeSettings(
+                localSettings,
+                settingsToSave.map((setting) => ({ ...setting })),
+                SettingTypes.Settings
+            );
 
-                    // 3. Diff settings.
-                    const changes = settingsToRemove.length
-                        + this._diffSettings(excludedSettings.localSettings, excludedSettings.remoteSettings);
-                    if (changes >= threshold)
-                    {
-                        const okButton = localize("pokaYoke.continue.download");
-                        const message = localize("pokaYoke.continue.download.message");
-                        Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel")).then((selection) =>
-                        {
-                            resolve(selection === okButton);
-                        });
-                    }
-                    else
-                    {
-                        resolve(true);
-                    }
-                });
-            }
-            else
+            // 2. Excluded extensions.
+            excludedSettings = this._excludeSettings(
+                excludedSettings.localSettings,
+                excludedSettings.remoteSettings,
+                SettingTypes.Extensions
+            );
+
+            // 3. Diff settings.
+            const changes = settingsToRemove.length
+                + this._diffSettings(excludedSettings.localSettings, excludedSettings.remoteSettings);
+            if (changes >= threshold)
             {
-                resolve(true);
+                const okButton = localize("pokaYoke.continue.download");
+                const message = localize("pokaYoke.continue.download.message");
+                const selection = await Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel"));
+                result = (selection === okButton);
             }
-        });
+        }
+        return result;
     }
 
     /**
