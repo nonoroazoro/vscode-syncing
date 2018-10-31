@@ -354,37 +354,22 @@ export class VSCodeSetting
      *
      * @param settings `VSCode Settings`.
      */
-    public removeSettings(settings: ISetting[]): Promise<ISyncedItem[]>
+    public async removeSettings(settings: ISetting[]): Promise<ISyncedItem[]>
     {
-        return new Promise((resolve, reject) =>
+        const removed: ISyncedItem[] = [];
+        for (const setting of settings)
         {
-            const removed: ISyncedItem[] = [];
-            async.eachSeries(
-                settings,
-                (item, done) =>
-                {
-                    fs.remove(item.filepath).then(() =>
-                    {
-                        removed.push({ setting: item });
-                        done();
-                    }).catch((err) =>
-                    {
-                        done(new Error(localize("error.remove.file", item.remoteFilename, err.message)));
-                    });
-                },
-                (err) =>
-                {
-                    if (err)
-                    {
-                        reject(err);
-                    }
-                    else
-                    {
-                        resolve(removed);
-                    }
-                }
-            );
-        });
+            try
+            {
+                await fs.remove(setting.filepath);
+                removed.push({ setting });
+            }
+            catch (error)
+            {
+                throw new Error(localize("error.remove.file", setting.remoteFilename, error.message));
+            }
+        }
+        return removed;
     }
 
     /**
