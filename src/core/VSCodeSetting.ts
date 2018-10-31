@@ -78,106 +78,95 @@ export class VSCodeSetting
      * @param {boolean} [loadFileContent=false] Whether to load the content of `VSCode Settings` files. Defaults to `false`.
      * @param {boolean} [showIndicator=false] Whether to show the progress indicator. Defaults to `false`.
      */
-    public getSettings(loadFileContent: boolean = false, showIndicator: boolean = false): Promise<ISetting[]>
+    public async getSettings(loadFileContent: boolean = false, showIndicator: boolean = false): Promise<ISetting[]>
     {
-        return new Promise((resolve) =>
+        if (showIndicator)
         {
-            if (showIndicator)
+            Toast.showSpinner(localize("toast.settings.gathering.local"));
+        }
+
+        // Note that this is an ordered list, to ensure that the smaller files (such as `settings.json`, `keybindings.json`) are synced first.
+        // Thus, the extensions will be the last one to sync.
+        const settingsList = [
+            SettingTypes.Settings,
+            SettingTypes.Keybindings,
+            SettingTypes.Locale,
+            SettingTypes.Snippets,
+            SettingTypes.Extensions
+        ];
+
+        const errorFiles: string[] = [];
+        const results: ISetting[] = [];
+        let localFilename: string;
+        let remoteFilename: string;
+        let tempSettings: ISetting[];
+
+        for (const type of settingsList)
+        {
+            if (type === SettingTypes.Snippets)
             {
-                Toast.showSpinner(localize("toast.settings.gathering.local"));
+                // Attention: Snippets may be empty.
+                tempSettings = await this._getSnippets(this._env.snippetsDirectory);
+            }
+            else
+            {
+                localFilename = `${type}.json`;
+                remoteFilename = localFilename;
+                if (type === SettingTypes.Keybindings)
+                {
+                    // Separate the keybindings.
+                    const separateKeybindings = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_SEPARATE_KEYBINDINGS);
+                    if (separateKeybindings)
+                    {
+                        remoteFilename = this._env.isMac
+                            ? `${type}${VSCodeSetting.MAC_SUFFIX}.json`
+                            : `${type}.json`;
+                    }
+                    else
+                    {
+                        remoteFilename = `${type}.json`;
+                    }
+                }
+
+                tempSettings = [{
+                    filepath: path.join(this._env.codeUserDirectory, localFilename),
+                    remoteFilename,
+                    type
+                }];
             }
 
-            // Note that this is an ordered list, to ensure that the smaller files (such as `settings.json`, `keybindings.json`) are synced first.
-            // Thus, the extensions will be the last one to sync.
-            const settingsList = [
-                SettingTypes.Settings,
-                SettingTypes.Keybindings,
-                SettingTypes.Locale,
-                SettingTypes.Snippets,
-                SettingTypes.Extensions
-            ];
-
-            let tempSettings: ISetting[];
-            let localFilename: string;
-            let remoteFilename: string;
-            const results: ISetting[] = [];
-            const errorFiles: string[] = [];
-            async.eachSeries(
-                settingsList,
-                async (type, done) =>
+            if (loadFileContent)
+            {
+                const values = await this._loadContent(tempSettings);
+                values.forEach((value: ISetting) =>
                 {
-                    if (type === SettingTypes.Snippets)
+                    // Success if the content is not `null`.
+                    if (value.content)
                     {
-                        // Attention: Snippets may be empty.
-                        tempSettings = await this._getSnippets(this._env.snippetsDirectory);
+                        results.push(value);
                     }
                     else
                     {
-                        localFilename = `${type}.json`;
-                        remoteFilename = localFilename;
-                        if (type === SettingTypes.Keybindings)
-                        {
-                            // Separate the keybindings.
-                            const separateKeybindings = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_SEPARATE_KEYBINDINGS);
-                            if (separateKeybindings)
-                            {
-                                remoteFilename = this._env.isMac
-                                    ? `${type}${VSCodeSetting.MAC_SUFFIX}.json`
-                                    : `${type}.json`;
-                            }
-                            else
-                            {
-                                remoteFilename = `${type}.json`;
-                            }
-                        }
+                        errorFiles.push(value.remoteFilename);
+                    }
+                });
+            }
+            else
+            {
+                results.push(...tempSettings);
+            }
+        }
 
-                        tempSettings = [{
-                            filepath: path.join(this._env.codeUserDirectory, localFilename),
-                            remoteFilename,
-                            type
-                        }];
-                    }
+        if (errorFiles.length > 0)
+        {
+            console.error(localize("error.invalid.settings", errorFiles.join(" ")));
+        }
 
-                    if (loadFileContent)
-                    {
-                        this._loadContent(tempSettings).then((values: ISetting[]) =>
-                        {
-                            values.forEach((value: ISetting) =>
-                            {
-                                // Success if the content is not null.
-                                if (value.content)
-                                {
-                                    results.push(value);
-                                }
-                                else
-                                {
-                                    errorFiles.push(value.remoteFilename);
-                                }
-                            });
-                            done();
-                        });
-                    }
-                    else
-                    {
-                        results.push(...tempSettings);
-                        done();
-                    }
-                },
-                () =>
-                {
-                    if (errorFiles.length > 0)
-                    {
-                        console.error(localize("error.invalid.settings", errorFiles.join(" ")));
-                    }
-
-                    if (showIndicator)
-                    {
-                        Toast.clearSpinner("");
-                    }
-                    resolve(results);
-                }
-            );
-        });
+        if (showIndicator)
+        {
+            Toast.clearSpinner("");
+        }
+        return results;
     }
 
     /**
