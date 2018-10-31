@@ -145,63 +145,54 @@ export async function showGistInputBox(forUpload: boolean = true): Promise<{ id:
  * @param api GitHub Gist utils.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ id: string }>
+export async function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ id: string }>
 {
-    return new Promise((resolve, reject) =>
+    showSpinner(localize("toast.settings.checking.remote.gists"));
+    const gists = await api.getAll();
+    clearSpinner("");
+
+    const manualItem: IGistListBoxItem = {
+        data: "@@manual",
+        description: "",
+        label: localize("toast.box.enter.gist.id.manually")
+    };
+
+    let item: IGistListBoxItem | undefined = manualItem;
+    // Show quick pick dialog only if the gists is not empty.
+    if (gists.length > 0)
     {
-        showSpinner(localize("toast.settings.checking.remote.gists"));
-        return api.getAll()
-            .then((gists: GitHubTypes.IGist[]) =>
-            {
-                clearSpinner("");
+        const items: IGistListBoxItem[] = gists.map((gist) => ({
+            data: gist.id,
+            description: localize("toast.box.gist.last.uploaded", moment.duration(new Date(gist.updated_at).getTime() - Date.now()).humanize(true)),
+            label: `Gist ID: ${gist.id}`
+        }));
+        items.unshift(manualItem);
+        item = await vscode.window.showQuickPick(items, {
+            ignoreFocusOut: true,
+            matchOnDescription: true,
+            placeHolder: forUpload
+                ? localize("toast.box.choose.gist.upload")
+                : localize("toast.box.choose.gist.download")
+        });
+    }
 
-                const manualItem: IGistListBoxItem = {
-                    data: "@@manual",
-                    description: "",
-                    label: localize("toast.box.enter.gist.id.manually")
-                };
-
-                // Show quick pick dialog only if the gists is not empty.
-                if (gists.length > 0)
-                {
-                    const items: IGistListBoxItem[] = gists.map((gist) => ({
-                        data: gist.id,
-                        description: localize("toast.box.gist.last.uploaded", moment.duration(new Date(gist.updated_at).getTime() - Date.now()).humanize(true)),
-                        label: `Gist ID: ${gist.id}`
-                    }));
-                    items.unshift(manualItem);
-                    return vscode.window.showQuickPick(items, {
-                        ignoreFocusOut: true,
-                        matchOnDescription: true,
-                        placeHolder: forUpload
-                            ? localize("toast.box.choose.gist.upload")
-                            : localize("toast.box.choose.gist.download")
-                    });
-                }
-                return manualItem;
-            })
-            .then((item) =>
-            {
-                if (item)
-                {
-                    const { data: id } = item;
-                    if (id === "@@manual")
-                    {
-                        resolve({ id: "" });
-                    }
-                    else
-                    {
-                        resolve({ id });
-                    }
-                }
-                else
-                {
-                    // Reject if cancelled.
-                    reject(new Error(localize("error.abort.synchronization")));
-                }
-            })
-            .catch(reject);
-    });
+    if (item === undefined)
+    {
+        // Cancelled.
+        throw new Error(localize("error.abort.synchronization"));
+    }
+    else
+    {
+        const { data: id } = item;
+        if (id === "@@manual")
+        {
+            return { id: "" };
+        }
+        else
+        {
+            return { id };
+        }
+    }
 }
 
 /**
