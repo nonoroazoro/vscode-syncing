@@ -111,40 +111,32 @@ export async function showGitHubTokenInputBox(forUpload: boolean = true): Promis
  *
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
+export async function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
 {
-    return new Promise((resolve, reject) =>
-    {
-        const placeHolder = forUpload
-            ? localize("toast.box.enter.gist.id.upload")
-            : localize("toast.box.enter.gist.id.download");
-        vscode.window.showInputBox({
-            ignoreFocusOut: true,
-            password: false,
-            placeHolder,
-            prompt: localize("toast.box.enter.gist.id.description")
-        }).then((value) =>
-        {
-            if (value === undefined)
-            {
-                // Reject if cancelled.
-                reject(new Error(localize("error.abort.synchronization")));
-            }
-            else
-            {
-                const id = value.trim();
-                if (!forUpload && !id)
-                {
-                    // Only reject when downloading.
-                    reject(new Error(localize("error.no.gist.id")));
-                }
-                else
-                {
-                    resolve({ id });
-                }
-            }
-        });
+    const placeHolder = forUpload
+        ? localize("toast.box.enter.gist.id.upload")
+        : localize("toast.box.enter.gist.id.download");
+    const value = await vscode.window.showInputBox({
+        ignoreFocusOut: true,
+        password: false,
+        placeHolder,
+        prompt: localize("toast.box.enter.gist.id.description")
     });
+    if (value === undefined)
+    {
+        // Cancelled.
+        throw new Error(localize("error.abort.synchronization"));
+    }
+    else
+    {
+        const id = value.trim();
+        if (!id && !forUpload)
+        {
+            // Only throw when it's downloading.
+            throw new Error(localize("error.no.gist.id"));
+        }
+        return { id };
+    }
 }
 
 /**
