@@ -275,20 +275,18 @@ export class Syncing
      * @param token GitHub Personal Access Token.
      * @param forUpload Whether to show messages for upload. Defaults to `true`.
      */
-    private _requestGistID(token: string, forUpload: boolean = true): Promise<{ id: string }>
+    private async _requestGistID(token: string, forUpload: boolean = true): Promise<{ id: string }>
     {
         if (token)
         {
             const api: Gist = Gist.create(token, this.proxy);
-            return Toast.showRemoteGistListBox(api, forUpload).then((value) =>
+            const result = await Toast.showRemoteGistListBox(api, forUpload);
+            if (result.id === "")
             {
-                if (value.id === "")
-                {
-                    // Show gist input box when id is still null.
-                    return Toast.showGistInputBox(forUpload);
-                }
-                return value;
-            });
+                // Show gist input box when id is still null.
+                return Toast.showGistInputBox(forUpload);
+            }
+            return result;
         }
         return Toast.showGistInputBox(forUpload);
     }
