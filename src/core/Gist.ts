@@ -30,14 +30,18 @@ export class Gist
     private constructor(token?: string, proxy?: string)
     {
         this._proxy = proxy;
-        this._api = new Github(Object.assign({ timeout: 8000 }, proxy ? { agent: new HttpsProxyAgent(proxy) } : {}));
+
+        const options: Record<string, any> = { timeout: 8000 };
+        if (proxy)
+        {
+            options["agent"] = new HttpsProxyAgent(proxy);
+        }
+        this._api = new Github(options);
+
         this._token = token;
         if (token)
         {
-            this._api.authenticate({
-                token,
-                type: "oauth"
-            });
+            this._api.authenticate({ token, type: "oauth" });
         }
     }
 
@@ -352,7 +356,7 @@ export class Gist
             remoteFile = remoteFiles[key];
             if (localFile)
             {
-                // Ignore null local file.
+                // Ignore the null local file.
                 if (localFile.content && localFile.content !== remoteFile.content)
                 {
                     result[key] = localFile;
@@ -360,7 +364,7 @@ export class Gist
             }
             else
             {
-                // Remove remote file except keybindings and settings.
+                // Remove the remote files except keybindings and settings.
                 if (!key.includes(SettingTypes.Keybindings) && !key.includes(SettingTypes.Settings))
                 {
                     result[key] = null;
@@ -369,7 +373,7 @@ export class Gist
             recordedKeys.push(key);
         }
 
-        // Add rest local files.
+        // Add the rest local files.
         for (const key of Object.keys(localFiles))
         {
             if (recordedKeys.indexOf(key) === -1)
@@ -401,7 +405,7 @@ export class Gist
             message = localize("error.check.gist.id");
         }
         const error = new Error(message);
-        Object.assign(error, { code });
+        error["code"] = code;
         return error;
     }
 
