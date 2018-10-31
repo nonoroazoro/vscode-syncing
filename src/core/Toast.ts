@@ -6,7 +6,6 @@ import * as moment from "moment";
 import * as vscode from "vscode";
 
 import { localize } from "../i18n";
-import * as GitHubTypes from "../types/GitHubTypes";
 import { reloadWindow } from "../utils/vscodeAPI";
 import { Gist } from "./Gist";
 
@@ -111,7 +110,7 @@ export async function showGitHubTokenInputBox(forUpload: boolean = true): Promis
  *
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export async function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
+export async function showGistInputBox(forUpload: boolean = true): Promise<string>
 {
     const placeHolder = forUpload
         ? localize("toast.box.enter.gist.id.upload")
@@ -135,7 +134,7 @@ export async function showGistInputBox(forUpload: boolean = true): Promise<{ id:
             // Only throw when it's downloading.
             throw new Error(localize("error.no.gist.id"));
         }
-        return { id };
+        return id;
     }
 }
 
@@ -145,7 +144,7 @@ export async function showGistInputBox(forUpload: boolean = true): Promise<{ id:
  * @param api GitHub Gist utils.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export async function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ id: string }>
+export async function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<string>
 {
     showSpinner(localize("toast.settings.checking.remote.gists"));
     const gists = await api.getAll();
@@ -186,11 +185,11 @@ export async function showRemoteGistListBox(api: Gist, forUpload: boolean = true
         const { data: id } = item;
         if (id === "@@manual")
         {
-            return { id: "" };
+            return "";
         }
         else
         {
-            return { id };
+            return id;
         }
     }
 }
