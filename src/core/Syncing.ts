@@ -140,78 +140,47 @@ export class Syncing
      * @param forUpload Whether to show messages for upload. Defaults to `true`.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public prepareSettings(forUpload: boolean = true, showIndicator: boolean = false): Promise<ISyncingSettings>
+    public async prepareSettings(forUpload: boolean = true, showIndicator: boolean = false): Promise<ISyncingSettings>
     {
-        return new Promise((resolve, reject) =>
+        if (showIndicator)
         {
-            function resolveWrap(value: ISyncingSettings)
+            Toast.showSpinner(localize("toast.syncing.checking.settings"));
+        }
+
+        try
+        {
+            const settings: ISyncingSettings = this.loadSettings();
+            if (!settings.token)
             {
-                if (showIndicator)
-                {
-                    Toast.clearSpinner("");
-                }
-                resolve(value);
+                const { token } = await Toast.showGitHubTokenInputBox(forUpload);
+                settings.token = token;
             }
 
-            function rejectWrap(error: Error)
+            if (!settings.id)
             {
-                if (showIndicator)
-                {
-                    Toast.statusError(forUpload
-                        ? localize("toast.settings.uploading.canceled", error.message)
-                        : localize("toast.settings.downloading.canceled", error.message)
-                    );
-                }
-                reject(error);
+                const { id } = await this._requestGistID(settings.token, forUpload);
+                settings.id = id;
             }
+
+            await this.saveSettings(settings, true);
 
             if (showIndicator)
             {
-                Toast.showSpinner(localize("toast.syncing.checking.settings"));
+                Toast.clearSpinner("");
             }
-
-            const settings: ISyncingSettings = this.loadSettings();
-            if (settings.token && settings.id)
+            return settings;
+        }
+        catch (error)
+        {
+            if (showIndicator)
             {
-                resolveWrap(settings);
+                Toast.statusError(forUpload
+                    ? localize("toast.settings.uploading.canceled", error.message)
+                    : localize("toast.settings.downloading.canceled", error.message)
+                );
             }
-            else
-            {
-                let gistIDTask: Promise<{ id: string }>;
-                if (settings.token)
-                {
-                    if (settings.id)
-                    {
-                        gistIDTask = Promise.resolve({ id: settings.id });
-                    }
-                    else
-                    {
-                        gistIDTask = this._requestGistID(settings.token, forUpload);
-                    }
-                }
-                else
-                {
-                    gistIDTask = Toast.showGitHubTokenInputBox(forUpload).then(({ token }) =>
-                    {
-                        settings.token = token;
-                        if (settings.id)
-                        {
-                            return settings;
-                        }
-                        else
-                        {
-                            return this._requestGistID(token, forUpload);
-                        }
-                    });
-                }
-
-                gistIDTask.then(({ id }) =>
-                {
-                    settings.id = id;
-                    this.saveSettings(settings, true).then(() => resolveWrap(settings));
-                }).catch(rejectWrap);
-            }
-        });
+            throw error;
+        }
     }
 
     /**
