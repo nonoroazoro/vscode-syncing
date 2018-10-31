@@ -400,51 +400,37 @@ export class Extension
     /**
      * Adds extensions.
      */
-    private _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
+    private async _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
     {
-        return new Promise((resolve) =>
+        const { extensions, progress, showIndicator = false, total } = options;
+
+        let steps: number = progress;
+        const result = { added: [] as IExtension[], addedErrors: [] as IExtension[] };
+        for (const item of extensions)
         {
-            const { extensions, progress, showIndicator = false, total } = options;
+            try
+            {
+                steps++;
 
-            let steps: number = progress;
-            const result = { added: [] as IExtension[], addedErrors: [] as IExtension[] };
-            async.eachSeries(
-                extensions,
-                (item, done) =>
+                if (showIndicator)
                 {
-                    steps++;
-
-                    if (showIndicator)
-                    {
-                        Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
-                    }
-
-                    this.downloadExtension(item)
-                        .then((extension) =>
-                        {
-                            if (showIndicator)
-                            {
-                                Toast.showSpinner(localize("toast.settings.installing.extension", item.id), steps, total);
-                            }
-                            return this.extractExtension(extension);
-                        })
-                        .then(() =>
-                        {
-                            result.added.push(item);
-                            done();
-                        })
-                        .catch(() =>
-                        {
-                            result.addedErrors.push(item);
-                            done();
-                        });
-                },
-                () =>
-                {
-                    resolve(result);
+                    Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
                 }
-            );
-        });
+
+                const extension = await this.downloadExtension(item);
+                if (showIndicator)
+                {
+                    Toast.showSpinner(localize("toast.settings.installing.extension", item.id), steps, total);
+                }
+                await this.extractExtension(extension);
+                result.added.push(item);
+            }
+            catch (error)
+            {
+                result.addedErrors.push(item);
+            }
+        }
+        return result;
     }
 
     /**
