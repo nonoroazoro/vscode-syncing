@@ -104,12 +104,12 @@ export class VSCodeSetting
             const errorFiles: string[] = [];
             async.eachSeries(
                 settingsList,
-                (type, done) =>
+                async (type, done) =>
                 {
                     if (type === SettingTypes.Snippets)
                     {
                         // Attention: Snippets may be empty.
-                        tempSettings = this._getSnippets(this._env.snippetsDirectory);
+                        tempSettings = await this._getSnippets(this._env.snippetsDirectory);
                     }
                     else
                     {
@@ -377,12 +377,12 @@ export class VSCodeSetting
      *
      * @param snippetsDir Snippets dir.
      */
-    private _getSnippets(snippetsDir: string): ISetting[]
+    private async _getSnippets(snippetsDir: string): Promise<ISetting[]>
     {
         const results: ISetting[] = [];
         try
         {
-            const filenames: string[] = fs.readdirSync(snippetsDir);
+            const filenames = await fs.readdir(snippetsDir);
             filenames.filter(junk.not).forEach((filename: string) =>
             {
                 // Add prefix to all snippets.
