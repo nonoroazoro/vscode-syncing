@@ -30,14 +30,18 @@ export class Gist
     private constructor(token?: string, proxy?: string)
     {
         this._proxy = proxy;
-        this._api = new Github(Object.assign({ timeout: 8000 }, proxy ? { agent: new HttpsProxyAgent(proxy) } : {}));
+
+        const options: Record<string, any> = { timeout: 8000 };
+        if (proxy)
+        {
+            options["agent"] = new HttpsProxyAgent(proxy);
+        }
+        this._api = new Github(options);
+
         this._token = token;
         if (token)
         {
-            this._api.authenticate({
-                token,
-                type: "oauth"
-            });
+            this._api.authenticate({ token, type: "oauth" });
         }
     }
 
@@ -75,24 +79,21 @@ export class Gist
     /**
      * Gets the currently authenticated GitHub user.
      */
-    public user(): Promise<{ id: number, name: string } | null>
+    public async user(): Promise<{ id: number, name: string }>
     {
-        return new Promise((resolve) =>
+        try
         {
-            this._api.users.get({})
-                .then((res) =>
-                {
-                    const data: GitHubTypes.IGistOwner = res.data;
-                    resolve({
-                        id: data.id,
-                        name: data.login
-                    });
-                })
-                .catch(() =>
-                {
-                    resolve();
-                });
-        });
+            const res = await this._api.users.get({});
+            const data = res.data as GitHubTypes.IGistOwner;
+            return {
+                id: data.id,
+                name: data.login
+            };
+        }
+        catch ({ code })
+        {
+            throw this._createError(code);
+        }
     }
 
     /**
@@ -101,61 +102,52 @@ export class Gist
      * @param id Gist id.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
-    public get(id: string, showIndicator: boolean = false): Promise<GitHubTypes.IGist>
+    public async get(id: string, showIndicator: boolean = false): Promise<GitHubTypes.IGist>
     {
-        return new Promise((resolve, reject) =>
+        if (showIndicator)
         {
-            function resolveWrap(value: Github.AnyResponse)
-            {
-                if (showIndicator)
-                {
-                    Toast.clearSpinner("");
-                }
-                resolve(value.data);
-            }
+            Toast.showSpinner(localize("toast.settings.checking.remote"));
+        }
 
-            function rejectWrap(error: Error)
-            {
-                if (showIndicator)
-                {
-                    Toast.statusError(localize("toast.settings.downloading.failed", error.message));
-                }
-                reject(error);
-            }
-
+        try
+        {
+            const result = await this._api.gists.get({ gist_id: id });
             if (showIndicator)
             {
-                Toast.showSpinner(localize("toast.settings.checking.remote"));
+                Toast.clearSpinner("");
             }
-
-            this._api.gists.get({ gist_id: id }).then(resolveWrap).catch(({ code }) =>
+            return result.data as any;
+        }
+        catch ({ code })
+        {
+            const error = this._createError(code);
+            if (showIndicator)
             {
-                rejectWrap(this._createError(code));
-            });
-        });
+                Toast.statusError(localize("toast.settings.downloading.failed", error.message));
+            }
+            throw error;
+        }
     }
 
     /**
      * Gets all the gists of the currently authenticated user.
      */
-    public getAll(): Promise<GitHubTypes.IGist[]>
+    public async getAll(): Promise<GitHubTypes.IGist[]>
     {
-        return new Promise((resolve, reject) =>
+        try
         {
-            this._api.gists.getAll({}).then((res) =>
-            {
-                // Filter out VSCode settings.
-                const gists: GitHubTypes.IGist[] = res.data as any;
-                resolve(
-                    gists
-                        .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files["extensions.json"]))
-                        .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime())
-                );
-            }).catch(({ code }) =>
-            {
-                reject(this._createError(code));
-            });
-        });
+            const res = await this._api.gists.getAll({});
+            // Find and sort VSCode settings gists by time.
+            const gists: GitHubTypes.IGist[] = res.data as any;
+            const extensionsRemoteFilename = `${SettingTypes.Extensions}.json`;
+            return gists
+                .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
+                .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
+        }
+        catch ({ code })
+        {
+            throw this._createError(code);
+        }
     }
 
     /**
@@ -173,9 +165,10 @@ export class Gist
      *
      * @param content Gist content.
      */
-    public update(content: Github.GistsEditParams): Promise<GitHubTypes.IGist>
+    public async update(content: Github.GistsEditParams): Promise<GitHubTypes.IGist>
     {
-        return this._api.gists.edit(content).then((res) => res.data as any as GitHubTypes.IGist);
+        const res = await this._api.gists.edit(content);
+        return res.data as any;
     }
 
     /**
@@ -183,42 +176,31 @@ export class Gist
      *
      * @param id Gist id.
      */
-    public exists(id: string): Promise<GitHubTypes.IGist | boolean>
+    public async exists(id: string): Promise<GitHubTypes.IGist | boolean>
     {
-        return new Promise((resolve) =>
+        if (id != null && id.trim() !== "")
         {
-            if (id && id.trim() !== "")
+            try
             {
-                this.get(id)
-                    .then((gist) =>
+                const gist = await this.get(id);
+                if (this.token)
+                {
+                    const user = await this.user();
+                    // Determines whether the owner of the gist is the currently authenticated user.
+                    if (user.id === gist.owner.id)
                     {
-                        if (this.token)
-                        {
-                            this.user().then((user) =>
-                            {
-                                // Determines whether the owner of the gist is the currently authenticated user.
-                                if (user && user.id === gist.owner.id)
-                                {
-                                    resolve(gist);
-                                }
-                                else
-                                {
-                                    resolve(false);
-                                }
-                            });
-                        }
-                        else
-                        {
-                            resolve(gist);
-                        }
-                    })
-                    .catch(() => resolve(false));
+                        return gist;
+                    }
+                    return false;
+                }
+                return gist;
             }
-            else
+            catch ({ code })
             {
-                resolve(false);
+                throw this._createError(code);
             }
-        });
+        }
+        return false;
     }
 
     /**
@@ -226,18 +208,17 @@ export class Gist
      *
      * @param content Gist content.
      */
-    public create(content: Github.GistsCreateParams): Promise<GitHubTypes.IGist>
+    public async create(content: Github.GistsCreateParams): Promise<GitHubTypes.IGist>
     {
-        return new Promise((resolve, reject) =>
+        try
         {
-            this._api.gists.create(content).then((res) =>
-            {
-                resolve(res.data as any as GitHubTypes.IGist);
-            }).catch(({ code }) =>
-            {
-                reject(this._createError(code));
-            });
-        });
+            const result = await this._api.gists.create(content);
+            return result.data as any;
+        }
+        catch ({ code })
+        {
+            throw this._createError(code);
+        }
     }
 
     /**
@@ -263,107 +244,97 @@ export class Gist
      * @param upsert Default is `true`, create new if gist not exists.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
      */
-    public findAndUpdate(id: string, uploads: ISetting[], upsert = true, showIndicator = false): Promise<GitHubTypes.IGist>
+    public async findAndUpdate(
+        id: string,
+        uploads: ISetting[],
+        upsert = true,
+        showIndicator = false
+    ): Promise<GitHubTypes.IGist>
     {
-        return new Promise((resolve, reject) =>
+        if (showIndicator)
         {
-            function resolveWrap(value: GitHubTypes.IGist)
+            Toast.showSpinner(localize("toast.settings.uploading"));
+        }
+
+        try
+        {
+            let result: GitHubTypes.IGist;
+            const exists = await this.exists(id);
+
+            // Preparing local gist.
+            const localGist: { gist_id: string, files: any } = { gist_id: id, files: {} };
+            for (const item of uploads)
             {
-                if (showIndicator)
+                // Filter out `null` content.
+                if (item.content)
                 {
-                    Toast.clearSpinner("");
+                    localGist.files[item.remoteFilename] = { content: item.content };
                 }
-                resolve(value);
             }
 
-            function rejectWrap(error: Error)
+            if (exists)
             {
-                if (showIndicator)
+                // Upload if the local files are modified.
+                const remoteGist = exists as GitHubTypes.IGist;
+                localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
+                if (localGist.files)
                 {
-                    Toast.statusError(localize("toast.settings.uploading.failed", error.message));
+                    // poka-yoke - Determines whether there're too much changes since the last uploading.
+                    const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
+                    if (threshold > 0)
+                    {
+                        // Note that the local settings here have already been excluded.
+                        const localFiles = { ...localGist.files };
+                        const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
+
+                        // Diff settings.
+                        const changes = this._diffSettings(localFiles, remoteFiles);
+                        if (changes >= threshold)
+                        {
+                            const okButton = localize("pokaYoke.continue.upload");
+                            const message = localize("pokaYoke.continue.upload.message");
+                            const selection = await Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel"));
+                            if (selection !== okButton)
+                            {
+                                throw new Error(localize("error.abort.synchronization"));
+                            }
+                        }
+                    }
+                    result = await this.update(localGist);
                 }
-                reject(error);
+                else
+                {
+                    // Nothing changed.
+                    result = remoteGist;
+                }
+            }
+            else
+            {
+                if (upsert)
+                {
+                    // TODO: Pass gist public option.
+                    result = await this.createSettings(localGist.files);
+                }
+                else
+                {
+                    throw new Error(localize("error.gist.notfound", id));
+                }
             }
 
             if (showIndicator)
             {
-                Toast.showSpinner(localize("toast.settings.uploading"));
+                Toast.clearSpinner("");
             }
-
-            this.exists(id).then((exists) =>
+            return result;
+        }
+        catch (error)
+        {
+            if (showIndicator)
             {
-                const localGist: { gist_id: string, files: any } = { gist_id: id, files: {} };
-                for (const item of uploads)
-                {
-                    // `null` content will be filtered out, just in case.
-                    if (item.content)
-                    {
-                        localGist.files[item.remoteFilename] = { content: item.content };
-                    }
-                }
-
-                if (exists)
-                {
-                    // Upload if the files are modified.
-                    const remoteGist = exists as GitHubTypes.IGist;
-                    localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
-                    if (localGist.files)
-                    {
-                        // poka-yoke - Determines whether there're too much changes since the last uploading.
-                        const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
-                        if (threshold > 0)
-                        {
-                            // Note that the local settings here have already been excluded.
-                            const localFiles = { ...localGist.files };
-                            const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
-
-                            // Diff settings.
-                            const changes = this._diffSettings(localFiles, remoteFiles);
-                            if (changes >= threshold)
-                            {
-                                const okButton = localize("pokaYoke.continue.upload");
-                                const message = localize("pokaYoke.continue.upload.message");
-                                Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel")).then((selection) =>
-                                {
-                                    if (selection === okButton)
-                                    {
-                                        this.update(localGist).then(resolveWrap).catch(rejectWrap);
-                                    }
-                                    else
-                                    {
-                                        rejectWrap(new Error(localize("error.abort.synchronization")));
-                                    }
-                                });
-                            }
-                            else
-                            {
-                                this.update(localGist).then(resolveWrap).catch(rejectWrap);
-                            }
-                        }
-                        else
-                        {
-                            this.update(localGist).then(resolveWrap).catch(rejectWrap);
-                        }
-                    }
-                    else
-                    {
-                        resolveWrap(remoteGist);
-                    }
-                }
-                else
-                {
-                    if (upsert)
-                    {
-                        // TODO: Pass gist public option.
-                        this.createSettings(localGist.files).then(resolveWrap).catch(rejectWrap);
-                    }
-                    else
-                    {
-                        rejectWrap(new Error(localize("error.gist.notfound", id)));
-                    }
-                }
-            });
-        });
+                Toast.statusError(localize("toast.settings.uploading.failed", error.message));
+            }
+            throw error;
+        }
     }
 
     /**
@@ -386,7 +357,7 @@ export class Gist
             remoteFile = remoteFiles[key];
             if (localFile)
             {
-                // Ignore null local file.
+                // Ignore the null local file.
                 if (localFile.content && localFile.content !== remoteFile.content)
                 {
                     result[key] = localFile;
@@ -394,7 +365,7 @@ export class Gist
             }
             else
             {
-                // Remove remote file except keybindings and settings.
+                // Remove the remote files except keybindings and settings.
                 if (!key.includes(SettingTypes.Keybindings) && !key.includes(SettingTypes.Settings))
                 {
                     result[key] = null;
@@ -403,7 +374,7 @@ export class Gist
             recordedKeys.push(key);
         }
 
-        // Add rest local files.
+        // Add the rest local files.
         for (const key of Object.keys(localFiles))
         {
             if (recordedKeys.indexOf(key) === -1)
@@ -435,7 +406,7 @@ export class Gist
             message = localize("error.check.gist.id");
         }
         const error = new Error(message);
-        Object.assign(error, { code });
+        error["code"] = code;
         return error;
     }
 
@@ -454,6 +425,7 @@ export class Gist
      */
     private _parseToJSON(files: GitHubTypes.IGistFiles): object
     {
+        const extensionsRemoteFilename = `${SettingTypes.Extensions}.json`;
         let file: GitHubTypes.IGistFile;
         let parsed: object;
         const result = {};
@@ -464,7 +436,7 @@ export class Gist
             {
                 parsed = parse(file.content || "");
 
-                if (key === "extensions.json" && Array.isArray(parsed))
+                if (key === extensionsRemoteFilename && Array.isArray(parsed))
                 {
                     for (const ext of parsed)
                     {

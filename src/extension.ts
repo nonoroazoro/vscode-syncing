@@ -55,80 +55,70 @@ function _registerCommand(context: vscode.ExtensionContext, command: string, cal
 /**
  * Uploads your settings.
  */
-function _uploadSettings()
+async function _uploadSettings()
 {
     if (!_isSynchronizing)
     {
         _isSynchronizing = true;
-        _syncing.prepareUploadSettings(true).then((syncingSettings) =>
+        try
         {
+            const syncingSettings = await _syncing.prepareUploadSettings(true);
             const api = Gist.create(syncingSettings.token, _syncing.proxy);
-            return _vscodeSetting.getSettings(true, true).then((settings) =>
+            const settings = await _vscodeSetting.getSettings(true, true);
+            const gist = await api.findAndUpdate(syncingSettings.id, settings, true, true);
+            if (gist.id !== syncingSettings.id)
             {
-                return api.findAndUpdate(syncingSettings.id, settings, true, true).then((gist) =>
-                {
-                    if (gist.id === syncingSettings.id)
-                    {
-                        Toast.statusInfo(localize("toast.settings.uploaded"));
-                    }
-                    else
-                    {
-                        _syncing.saveSettings({ ...syncingSettings, id: gist.id }).then(() =>
-                        {
-                            Toast.statusInfo(localize("toast.settings.uploaded"));
-                        });
-                    }
-
-                    _isSynchronizing = false;
-                });
-            });
-        }).catch(() =>
+                await _syncing.saveSettings({ ...syncingSettings, id: gist.id });
+            }
+            Toast.statusInfo(localize("toast.settings.uploaded"));
+        }
+        catch (error) { }
+        finally
         {
             _isSynchronizing = false;
-        });
+        }
     }
 }
 
 /**
  * Downloads your settings.
  */
-function _downloadSettings()
+async function _downloadSettings()
 {
     if (!_isSynchronizing)
     {
         _isSynchronizing = true;
-        _syncing.prepareDownloadSettings(true).then((syncingSettings) =>
+        try
         {
+            const syncingSettings = await _syncing.prepareDownloadSettings(true);
             const api = Gist.create(syncingSettings.token, _syncing.proxy);
-            return api.get(syncingSettings.id, true).then((gist) =>
+            try
             {
-                return _vscodeSetting.saveSettings(gist.files, true).then((syncedItems) =>
+                const gist = await api.get(syncingSettings.id, true);
+                const syncedItems = await _vscodeSetting.saveSettings(gist.files, true);
+                Toast.statusInfo(localize("toast.settings.downloaded"));
+                if (_isExtensionsSynced(syncedItems))
                 {
-                    Toast.statusInfo(localize("toast.settings.downloaded"));
-                    if (_isExtensionsSynced(syncedItems))
-                    {
-                        Toast.showReloadBox();
-                    }
-
-                    _isSynchronizing = false;
-                });
-            }).catch((err) =>
+                    Toast.showReloadBox();
+                }
+            }
+            catch ({ code })
             {
-                if (err.code === 401)
+                if (code === 401)
                 {
                     _syncing.clearGitHubToken();
                 }
-                else if (err.code === 404)
+                else if (code === 404)
                 {
                     _syncing.clearGistID();
                 }
-
-                _isSynchronizing = false;
-            });
-        }).catch(() =>
+            }
+        }
+        catch (error) { }
+        finally
         {
             _isSynchronizing = false;
-        });
+        }
     }
 }
 

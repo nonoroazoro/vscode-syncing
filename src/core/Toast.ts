@@ -6,7 +6,6 @@ import * as moment from "moment";
 import * as vscode from "vscode";
 
 import { localize } from "../i18n";
-import * as GitHubTypes from "../types/GitHubTypes";
 import { reloadWindow } from "../utils/vscodeAPI";
 import { Gist } from "./Gist";
 
@@ -77,41 +76,33 @@ export function statusFatal(message: string): void
  *
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ token: string }>
+export async function showGitHubTokenInputBox(forUpload: boolean = true): Promise<string>
 {
-    return new Promise((resolve, reject) =>
+    const placeHolder = forUpload
+        ? localize("toast.box.enter.github.token.upload")
+        : localize("toast.box.enter.github.token.download");
+    const options = {
+        ignoreFocusOut: true,
+        password: false,
+        placeHolder,
+        prompt: localize("toast.box.enter.github.token.description")
+    };
+    const value = await vscode.window.showInputBox(options);
+    if (value === undefined)
     {
-        const placeHolder = forUpload
-            ? localize("toast.box.enter.github.token.upload")
-            : localize("toast.box.enter.github.token.download");
-        const options = {
-            ignoreFocusOut: true,
-            password: false,
-            placeHolder,
-            prompt: localize("toast.box.enter.github.token.description")
-        };
-        vscode.window.showInputBox(options).then((value) =>
+        // Cancelled.
+        throw new Error(localize("error.abort.synchronization"));
+    }
+    else
+    {
+        const token = value.trim();
+        if (!token && forUpload)
         {
-            if (value === undefined)
-            {
-                // Reject if cancelled.
-                reject(new Error(localize("error.abort.synchronization")));
-            }
-            else
-            {
-                const token = value.trim();
-                if (forUpload && !token)
-                {
-                    // Only reject when uploading.
-                    reject(new Error(localize("error.no.github.token")));
-                }
-                else
-                {
-                    resolve({ token });
-                }
-            }
-        });
-    });
+            // Only throw when it's uploading.
+            throw new Error(localize("error.no.github.token"));
+        }
+        return token;
+    }
 }
 
 /**
@@ -119,40 +110,32 @@ export function showGitHubTokenInputBox(forUpload: boolean = true): Promise<{ to
  *
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export function showGistInputBox(forUpload: boolean = true): Promise<{ id: string }>
+export async function showGistInputBox(forUpload: boolean = true): Promise<string>
 {
-    return new Promise((resolve, reject) =>
-    {
-        const placeHolder = forUpload
-            ? localize("toast.box.enter.gist.id.upload")
-            : localize("toast.box.enter.gist.id.download");
-        vscode.window.showInputBox({
-            ignoreFocusOut: true,
-            password: false,
-            placeHolder,
-            prompt: localize("toast.box.enter.gist.id.description")
-        }).then((value) =>
-        {
-            if (value === undefined)
-            {
-                // Reject if cancelled.
-                reject(new Error(localize("error.abort.synchronization")));
-            }
-            else
-            {
-                const id = value.trim();
-                if (!forUpload && !id)
-                {
-                    // Only reject when downloading.
-                    reject(new Error(localize("error.no.gist.id")));
-                }
-                else
-                {
-                    resolve({ id });
-                }
-            }
-        });
+    const placeHolder = forUpload
+        ? localize("toast.box.enter.gist.id.upload")
+        : localize("toast.box.enter.gist.id.download");
+    const value = await vscode.window.showInputBox({
+        ignoreFocusOut: true,
+        password: false,
+        placeHolder,
+        prompt: localize("toast.box.enter.gist.id.description")
     });
+    if (value === undefined)
+    {
+        // Cancelled.
+        throw new Error(localize("error.abort.synchronization"));
+    }
+    else
+    {
+        const id = value.trim();
+        if (!id && !forUpload)
+        {
+            // Only throw when it's downloading.
+            throw new Error(localize("error.no.gist.id"));
+        }
+        return id;
+    }
 }
 
 /**
@@ -161,63 +144,54 @@ export function showGistInputBox(forUpload: boolean = true): Promise<{ id: strin
  * @param api GitHub Gist utils.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<{ id: string }>
+export async function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<string>
 {
-    return new Promise((resolve, reject) =>
+    showSpinner(localize("toast.settings.checking.remote.gists"));
+    const gists = await api.getAll();
+    clearSpinner("");
+
+    const manualItem: IGistListBoxItem = {
+        data: "@@manual",
+        description: "",
+        label: localize("toast.box.enter.gist.id.manually")
+    };
+
+    let item: IGistListBoxItem | undefined = manualItem;
+    // Show quick pick dialog only if the gists is not empty.
+    if (gists.length > 0)
     {
-        showSpinner(localize("toast.settings.checking.remote.gists"));
-        return api.getAll()
-            .then((gists: GitHubTypes.IGist[]) =>
-            {
-                clearSpinner("");
+        const items: IGistListBoxItem[] = gists.map((gist) => ({
+            data: gist.id,
+            description: localize("toast.box.gist.last.uploaded", moment.duration(new Date(gist.updated_at).getTime() - Date.now()).humanize(true)),
+            label: `Gist ID: ${gist.id}`
+        }));
+        items.unshift(manualItem);
+        item = await vscode.window.showQuickPick(items, {
+            ignoreFocusOut: true,
+            matchOnDescription: true,
+            placeHolder: forUpload
+                ? localize("toast.box.choose.gist.upload")
+                : localize("toast.box.choose.gist.download")
+        });
+    }
 
-                const manualItem: IGistListBoxItem = {
-                    data: "@@manual",
-                    description: "",
-                    label: localize("toast.box.enter.gist.id.manually")
-                };
-
-                // Show quick pick dialog only if the gists is not empty.
-                if (gists.length > 0)
-                {
-                    const items: IGistListBoxItem[] = gists.map((gist) => ({
-                        data: gist.id,
-                        description: localize("toast.box.gist.last.uploaded", moment.duration(new Date(gist.updated_at).getTime() - Date.now()).humanize(true)),
-                        label: `Gist ID: ${gist.id}`
-                    }));
-                    items.unshift(manualItem);
-                    return vscode.window.showQuickPick(items, {
-                        ignoreFocusOut: true,
-                        matchOnDescription: true,
-                        placeHolder: forUpload
-                            ? localize("toast.box.choose.gist.upload")
-                            : localize("toast.box.choose.gist.download")
-                    });
-                }
-                return manualItem;
-            })
-            .then((item) =>
-            {
-                if (item)
-                {
-                    const { data: id } = item;
-                    if (id === "@@manual")
-                    {
-                        resolve({ id: "" });
-                    }
-                    else
-                    {
-                        resolve({ id });
-                    }
-                }
-                else
-                {
-                    // Reject if cancelled.
-                    reject(new Error(localize("error.abort.synchronization")));
-                }
-            })
-            .catch(reject);
-    });
+    if (item === undefined)
+    {
+        // Cancelled.
+        throw new Error(localize("error.abort.synchronization"));
+    }
+    else
+    {
+        const { data: id } = item;
+        if (id === "@@manual")
+        {
+            return "";
+        }
+        else
+        {
+            return id;
+        }
+    }
 }
 
 /**

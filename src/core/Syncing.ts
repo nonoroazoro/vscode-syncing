@@ -140,78 +140,45 @@ export class Syncing
      * @param forUpload Whether to show messages for upload. Defaults to `true`.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public prepareSettings(forUpload: boolean = true, showIndicator: boolean = false): Promise<ISyncingSettings>
+    public async prepareSettings(forUpload: boolean = true, showIndicator: boolean = false): Promise<ISyncingSettings>
     {
-        return new Promise((resolve, reject) =>
+        if (showIndicator)
         {
-            function resolveWrap(value: ISyncingSettings)
+            Toast.showSpinner(localize("toast.syncing.checking.settings"));
+        }
+
+        try
+        {
+            const settings: ISyncingSettings = this.loadSettings();
+            if (!settings.token)
             {
-                if (showIndicator)
-                {
-                    Toast.clearSpinner("");
-                }
-                resolve(value);
+                settings.token = await Toast.showGitHubTokenInputBox(forUpload);
             }
 
-            function rejectWrap(error: Error)
+            if (!settings.id)
             {
-                if (showIndicator)
-                {
-                    Toast.statusError(forUpload
-                        ? localize("toast.settings.uploading.canceled", error.message)
-                        : localize("toast.settings.downloading.canceled", error.message)
-                    );
-                }
-                reject(error);
+                settings.id = await this._requestGistID(settings.token, forUpload);
             }
+
+            await this.saveSettings(settings, true);
 
             if (showIndicator)
             {
-                Toast.showSpinner(localize("toast.syncing.checking.settings"));
+                Toast.clearSpinner("");
             }
-
-            const settings: ISyncingSettings = this.loadSettings();
-            if (settings.token && settings.id)
+            return settings;
+        }
+        catch (error)
+        {
+            if (showIndicator)
             {
-                resolveWrap(settings);
+                Toast.statusError(forUpload
+                    ? localize("toast.settings.uploading.canceled", error.message)
+                    : localize("toast.settings.downloading.canceled", error.message)
+                );
             }
-            else
-            {
-                let gistIDTask: Promise<{ id: string }>;
-                if (settings.token)
-                {
-                    if (settings.id)
-                    {
-                        gistIDTask = Promise.resolve({ id: settings.id });
-                    }
-                    else
-                    {
-                        gistIDTask = this._requestGistID(settings.token, forUpload);
-                    }
-                }
-                else
-                {
-                    gistIDTask = Toast.showGitHubTokenInputBox(forUpload).then(({ token }) =>
-                    {
-                        settings.token = token;
-                        if (settings.id)
-                        {
-                            return settings;
-                        }
-                        else
-                        {
-                            return this._requestGistID(token, forUpload);
-                        }
-                    });
-                }
-
-                gistIDTask.then(({ id }) =>
-                {
-                    settings.id = id;
-                    this.saveSettings(settings, true).then(() => resolveWrap(settings));
-                }).catch(rejectWrap);
-            }
-        });
+            throw error;
+        }
     }
 
     /**
@@ -222,10 +189,10 @@ export class Syncing
         const settings: ISyncingSettings = { ...Syncing.DEFAULT_SETTINGS };
         try
         {
-            Object.assign(
-                settings,
-                fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
-            );
+            return {
+                ...settings,
+                ...fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
+            };
         }
         catch (err)
         {
@@ -253,20 +220,20 @@ export class Syncing
      * @param settings Syncing's Settings.
      * @param showToast Whether to show error toast. Defaults to `false`.
      */
-    public saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
+    public async saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
     {
-        return new Promise((resolve) =>
+        const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
+        try
         {
-            const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
-            fs.outputFile(this.settingsPath, content, (err) =>
+            await fs.outputFile(this.settingsPath, content);
+        }
+        catch (err)
+        {
+            if (showToast)
             {
-                if (err && showToast)
-                {
-                    Toast.statusError(localize("toast.syncing.save.settings", err));
-                }
-                resolve();
-            });
-        });
+                Toast.statusError(localize("toast.syncing.save.settings", err));
+            }
+        }
     }
 
     /**
@@ -275,20 +242,18 @@ export class Syncing
      * @param token GitHub Personal Access Token.
      * @param forUpload Whether to show messages for upload. Defaults to `true`.
      */
-    private _requestGistID(token: string, forUpload: boolean = true): Promise<{ id: string }>
+    private async _requestGistID(token: string, forUpload: boolean = true): Promise<string>
     {
         if (token)
         {
             const api: Gist = Gist.create(token, this.proxy);
-            return Toast.showRemoteGistListBox(api, forUpload).then((value) =>
+            const id = await Toast.showRemoteGistListBox(api, forUpload);
+            if (!id)
             {
-                if (value.id === "")
-                {
-                    // Show gist input box when id is still null.
-                    return Toast.showGistInputBox(forUpload);
-                }
-                return value;
-            });
+                // Show gist input box when id is still supplied.
+                return Toast.showGistInputBox(forUpload);
+            }
+            return id;
         }
         return Toast.showGistInputBox(forUpload);
     }

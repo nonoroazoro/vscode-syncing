@@ -1,4 +1,3 @@
-import * as async from "async";
 import * as fs from "fs-extra";
 import * as junk from "junk";
 import * as minimatch from "minimatch";
@@ -78,112 +77,95 @@ export class VSCodeSetting
      * @param {boolean} [loadFileContent=false] Whether to load the content of `VSCode Settings` files. Defaults to `false`.
      * @param {boolean} [showIndicator=false] Whether to show the progress indicator. Defaults to `false`.
      */
-    public getSettings(loadFileContent: boolean = false, showIndicator: boolean = false): Promise<ISetting[]>
+    public async getSettings(loadFileContent: boolean = false, showIndicator: boolean = false): Promise<ISetting[]>
     {
-        return new Promise((resolve) =>
+        if (showIndicator)
         {
-            function resolveWrap(value: ISetting[])
+            Toast.showSpinner(localize("toast.settings.gathering.local"));
+        }
+
+        // Note that this is an ordered list, to ensure that the smaller files (such as `settings.json`, `keybindings.json`) are synced first.
+        // Thus, the extensions will be the last one to sync.
+        const settingsList = [
+            SettingTypes.Settings,
+            SettingTypes.Keybindings,
+            SettingTypes.Locale,
+            SettingTypes.Snippets,
+            SettingTypes.Extensions
+        ];
+
+        const errorFiles: string[] = [];
+        const results: ISetting[] = [];
+        let localFilename: string;
+        let remoteFilename: string;
+        let tempSettings: ISetting[];
+
+        for (const type of settingsList)
+        {
+            if (type === SettingTypes.Snippets)
             {
-                if (showIndicator)
-                {
-                    Toast.clearSpinner("");
-                }
-                resolve(value);
+                // Attention: Snippets may be empty.
+                tempSettings = await this._getSnippets(this._env.snippetsDirectory);
             }
-
-            if (showIndicator)
+            else
             {
-                Toast.showSpinner(localize("toast.settings.gathering.local"));
-            }
-
-            // Note that this is an ordered list, to ensure that the smaller files (such as `settings.json`, `keybindings.json`) are synced first.
-            // Thus, the extensions will be the last one to sync.
-            const settingsList = [
-                SettingTypes.Settings,
-                SettingTypes.Keybindings,
-                SettingTypes.Locale,
-                SettingTypes.Snippets,
-                SettingTypes.Extensions
-            ];
-
-            let tempSettings: ISetting[];
-            let localFilename: string;
-            let remoteFilename: string;
-            const results: ISetting[] = [];
-            const errorFiles: string[] = [];
-            async.eachSeries(
-                settingsList,
-                (type, done) =>
+                localFilename = `${type}.json`;
+                remoteFilename = localFilename;
+                if (type === SettingTypes.Keybindings)
                 {
-                    if (type === SettingTypes.Snippets)
+                    // Separate the keybindings.
+                    const separateKeybindings = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_SEPARATE_KEYBINDINGS);
+                    if (separateKeybindings)
                     {
-                        // Attention: Snippets may be empty.
-                        tempSettings = this._getSnippets(this._env.snippetsDirectory);
+                        remoteFilename = this._env.isMac
+                            ? `${type}${VSCodeSetting.MAC_SUFFIX}.json`
+                            : `${type}.json`;
                     }
                     else
                     {
-                        localFilename = `${type}.json`;
-                        remoteFilename = localFilename;
-                        if (type === SettingTypes.Keybindings)
-                        {
-                            // Separate the keybindings.
-                            const separateKeybindings = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_SEPARATE_KEYBINDINGS);
-                            if (separateKeybindings)
-                            {
-                                remoteFilename = this._env.isMac
-                                    ? `${type}${VSCodeSetting.MAC_SUFFIX}.json`
-                                    : `${type}.json`;
-                            }
-                            else
-                            {
-                                remoteFilename = `${type}.json`;
-                            }
-                        }
-
-                        tempSettings = [
-                            {
-                                filepath: path.join(this._env.codeUserDirectory, localFilename),
-                                remoteFilename,
-                                type
-                            }
-                        ];
+                        remoteFilename = `${type}.json`;
                     }
+                }
 
-                    if (loadFileContent)
+                tempSettings = [{
+                    filepath: path.join(this._env.codeUserDirectory, localFilename),
+                    remoteFilename,
+                    type
+                }];
+            }
+
+            if (loadFileContent)
+            {
+                const values = await this._loadContent(tempSettings);
+                values.forEach((value: ISetting) =>
+                {
+                    // Success if the content is not `null`.
+                    if (value.content)
                     {
-                        this._loadContent(tempSettings).then((values: ISetting[]) =>
-                        {
-                            values.forEach((value: ISetting) =>
-                            {
-                                // Success if the content is not null.
-                                if (value.content)
-                                {
-                                    results.push(value);
-                                }
-                                else
-                                {
-                                    errorFiles.push(value.remoteFilename);
-                                }
-                            });
-                            done();
-                        });
+                        results.push(value);
                     }
                     else
                     {
-                        results.push(...tempSettings);
-                        done();
+                        errorFiles.push(value.remoteFilename);
                     }
-                },
-                () =>
-                {
-                    if (errorFiles.length > 0)
-                    {
-                        console.error(localize("error.invalid.settings", errorFiles.join(" ")));
-                    }
-                    resolveWrap(results);
-                }
-            );
-        });
+                });
+            }
+            else
+            {
+                results.push(...tempSettings);
+            }
+        }
+
+        if (errorFiles.length > 0)
+        {
+            console.error(localize("error.invalid.settings", errorFiles.join(" ")));
+        }
+
+        if (showIndicator)
+        {
+            Toast.clearSpinner("");
+        }
+        return results;
     }
 
     /**
@@ -192,167 +174,146 @@ export class VSCodeSetting
      * @param files `VSCode Settings` from GitHub Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public saveSettings(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
+    public async saveSettings(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
         updated: ISyncedItem[],
         removed: ISyncedItem[]
     }>
     {
-        return new Promise((resolve, reject) =>
+        if (showIndicator)
         {
-            function resolveWrap(value: {
-                updated: ISyncedItem[],
-                removed: ISyncedItem[]
-            })
-            {
-                if (showIndicator)
-                {
-                    Toast.clearSpinner("");
-                }
-                resolve(value);
-            }
+            Toast.showSpinner(localize("toast.settings.downloading"));
+        }
 
-            function rejectWrap(error: Error)
-            {
-                if (showIndicator)
-                {
-                    Toast.statusError(localize("toast.settings.downloading.failed", error.message));
-                }
-                reject(error);
-            }
-
-            if (showIndicator)
-            {
-                Toast.showSpinner(localize("toast.settings.downloading"));
-            }
-
+        try
+        {
             if (files)
             {
-                let extensionsSetting: ISetting;
-                const settingsToSave: ISetting[] = [];
-                const settingsToRemove: ISetting[] = [];
                 const existsFileKeys: string[] = [];
-                this.getSettings().then((settings: ISetting[]) =>
+                const settingsToRemove: ISetting[] = [];
+                const settingsToSave: ISetting[] = [];
+                let extensionsSetting: ISetting | undefined;
+                let gistFile: GitHubTypes.IGistFile;
+
+                const settings = await this.getSettings();
+                for (const setting of settings)
                 {
-                    let gistFile: GitHubTypes.IGistFile;
-                    for (const setting of settings)
+                    gistFile = files[setting.remoteFilename];
+                    if (gistFile)
                     {
-                        gistFile = files[setting.remoteFilename];
-                        if (gistFile)
+                        // If the file exists in both remote and local, it should be synchronized.
+                        if (setting.type === SettingTypes.Extensions)
                         {
-                            // If the file exists in both remote and local, it should be synchronized.
-                            if (setting.type === SettingTypes.Extensions)
+                            // Temp extensions file.
+                            extensionsSetting = {
+                                ...setting,
+                                content: gistFile.content
+                            };
+                        }
+                        else
+                        {
+                            // Temp other file.
+                            settingsToSave.push({
+                                ...setting,
+                                content: gistFile.content
+                            });
+                        }
+                        existsFileKeys.push(setting.remoteFilename);
+                    }
+                    else
+                    {
+                        // File exists in remote, but not exists in local.
+                        // Delete if it's a snippet file.
+                        if (setting.type === SettingTypes.Snippets)
+                        {
+                            settingsToRemove.push(setting);
+                        }
+                    }
+                }
+
+                let filename: string;
+                for (const key of Object.keys(files))
+                {
+                    if (existsFileKeys.indexOf(key) === -1)
+                    {
+                        gistFile = files[key];
+                        if (gistFile.filename.startsWith(VSCodeSetting.SNIPPET_PREFIX))
+                        {
+                            // Snippets.
+                            filename = gistFile.filename.slice(VSCodeSetting.SNIPPET_PREFIX.length);
+                            if (filename)
                             {
-                                // Temp extensions file.
-                                extensionsSetting = {
-                                    ...setting,
-                                    content: gistFile.content
-                                };
-                            }
-                            else
-                            {
-                                // Temp other file.
                                 settingsToSave.push({
-                                    ...setting,
-                                    content: gistFile.content
+                                    content: gistFile.content,
+                                    filepath: this._env.getSnippetFilePath(filename),
+                                    remoteFilename: gistFile.filename,
+                                    type: SettingTypes.Snippets
                                 });
                             }
-                            existsFileKeys.push(setting.remoteFilename);
                         }
                         else
                         {
-                            // File exists in remote, but not exists in local.
-                            // Delete if it's a snippet file.
-                            if (setting.type === SettingTypes.Snippets)
-                            {
-                                settingsToRemove.push(setting);
-                            }
+                            // Unknown files, don't care.
+                        }
+                    }
+                }
+
+                // Put extensions file to the last.
+                if (extensionsSetting)
+                {
+                    settingsToSave.push(extensionsSetting);
+                }
+
+                // poka-yoke - Determines whether there're too much changes since the last downloading.
+                const value = await this._shouldContinue(settings, settingsToSave, settingsToRemove);
+                if (value)
+                {
+                    const syncedItems: {
+                        updated: ISyncedItem[],
+                        removed: ISyncedItem[]
+                    } = { updated: [], removed: [] };
+
+                    // Save settings.
+                    for (const setting of settingsToSave)
+                    {
+                        try
+                        {
+                            const saved = await this._saveSetting(setting);
+                            syncedItems.updated.push(saved);
+                        }
+                        catch (error)
+                        {
+                            throw new Error(localize("error.save.file", setting.remoteFilename, error.message));
                         }
                     }
 
-                    let filename: string;
-                    for (const key of Object.keys(files))
-                    {
-                        if (existsFileKeys.indexOf(key) === -1)
-                        {
-                            gistFile = files[key];
-                            if (gistFile.filename.startsWith(VSCodeSetting.SNIPPET_PREFIX))
-                            {
-                                // Snippets.
-                                filename = gistFile.filename.slice(VSCodeSetting.SNIPPET_PREFIX.length);
-                                if (filename)
-                                {
-                                    settingsToSave.push({
-                                        content: gistFile.content,
-                                        filepath: this._env.getSnippetFilePath(filename),
-                                        remoteFilename: gistFile.filename,
-                                        type: SettingTypes.Snippets
-                                    });
-                                }
-                            }
-                            else
-                            {
-                                // Unknown files, don't care.
-                            }
-                        }
-                    }
+                    // Remove settings.
+                    const removed = await this.removeSettings(settingsToRemove);
+                    syncedItems.removed = removed;
 
-                    // Put extensions file to the last.
-                    if (extensionsSetting)
+                    if (showIndicator)
                     {
-                        settingsToSave.push(extensionsSetting);
+                        Toast.clearSpinner("");
                     }
-
-                    // poka-yoke - Determines whether there're too much changes since the last downloading.
-                    this._shouldContinue(settings, settingsToSave, settingsToRemove).then((value) =>
-                    {
-                        if (value)
-                        {
-                            const syncedItems: {
-                                updated: ISyncedItem[],
-                                removed: ISyncedItem[]
-                            } = { updated: [], removed: [] };
-                            async.eachSeries(
-                                settingsToSave,
-                                (setting: ISetting, done: async.ErrorCallback<Error>) =>
-                                {
-                                    this._saveSetting(setting).then((saved) =>
-                                    {
-                                        syncedItems.updated.push(saved);
-                                        done();
-                                    }).catch((err) =>
-                                    {
-                                        done(new Error(localize("error.save.file", setting.remoteFilename, err.message)));
-                                    });
-                                },
-                                (err) =>
-                                {
-                                    if (err)
-                                    {
-                                        rejectWrap(err);
-                                    }
-                                    else
-                                    {
-                                        this.removeSettings(settingsToRemove).then((removed) =>
-                                        {
-                                            syncedItems.removed = removed;
-                                            resolveWrap(syncedItems);
-                                        }).catch(rejectWrap);
-                                    }
-                                }
-                            );
-                        }
-                        else
-                        {
-                            rejectWrap(new Error(localize("error.abort.synchronization")));
-                        }
-                    });
-                });
+                    return syncedItems;
+                }
+                else
+                {
+                    throw new Error(localize("error.abort.synchronization"));
+                }
             }
             else
             {
-                rejectWrap(new Error(localize("error.gist.files.notfound")));
+                throw new Error(localize("error.gist.files.notfound"));
             }
-        });
+        }
+        catch (error)
+        {
+            if (showIndicator)
+            {
+                Toast.statusError(localize("toast.settings.downloading.failed", error.message));
+            }
+            throw error;
+        }
     }
 
     /**
@@ -360,37 +321,22 @@ export class VSCodeSetting
      *
      * @param settings `VSCode Settings`.
      */
-    public removeSettings(settings: ISetting[]): Promise<ISyncedItem[]>
+    public async removeSettings(settings: ISetting[]): Promise<ISyncedItem[]>
     {
-        return new Promise((resolve, reject) =>
+        const removed: ISyncedItem[] = [];
+        for (const setting of settings)
         {
-            const removed: ISyncedItem[] = [];
-            async.eachSeries(
-                settings,
-                (item, done) =>
-                {
-                    fs.remove(item.filepath).then(() =>
-                    {
-                        removed.push({ setting: item });
-                        done();
-                    }).catch((err) =>
-                    {
-                        done(new Error(localize("error.remove.file", item.remoteFilename, err.message)));
-                    });
-                },
-                (err) =>
-                {
-                    if (err)
-                    {
-                        reject(err);
-                    }
-                    else
-                    {
-                        resolve(removed);
-                    }
-                }
-            );
-        });
+            try
+            {
+                await fs.remove(setting.filepath);
+                removed.push({ setting });
+            }
+            catch (error)
+            {
+                throw new Error(localize("error.remove.file", setting.remoteFilename, error.message));
+            }
+        }
+        return removed;
     }
 
     /**
@@ -398,12 +344,12 @@ export class VSCodeSetting
      *
      * @param snippetsDir Snippets dir.
      */
-    private _getSnippets(snippetsDir: string): ISetting[]
+    private async _getSnippets(snippetsDir: string): Promise<ISetting[]>
     {
         const results: ISetting[] = [];
         try
         {
-            const filenames: string[] = fs.readdirSync(snippetsDir);
+            const filenames = await fs.readdir(snippetsDir);
             filenames.filter(junk.not).forEach((filename: string) =>
             {
                 // Add prefix to all snippets.
@@ -427,51 +373,47 @@ export class VSCodeSetting
      * @param settings `VSCode Settings`.
      * @param exclude Default is `true`, exclude some `VSCode Settings` base on the exclude list of `Syncing`.
      */
-    private _loadContent(settings: ISetting[], exclude: boolean = true): Promise<ISetting[]>
+    private async _loadContent(settings: ISetting[], exclude: boolean = true): Promise<ISetting[]>
     {
-        return new Promise((resolve) =>
+        return settings.map((setting: ISetting) =>
         {
             let content: string | undefined;
-            const results: ISetting[] = settings.map((setting: ISetting) =>
+            try
             {
-                try
+                if (setting.type === SettingTypes.Extensions)
                 {
-                    if (setting.type === SettingTypes.Extensions)
+                    // Exclude extensions.
+                    let extensions = this._ext.getAll();
+                    if (exclude && extensions.length > 0)
                     {
-                        // Exclude extensions.
-                        let extensions = this._ext.getAll();
-                        if (exclude && extensions.length > 0)
-                        {
-                            const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_EXTENSIONS);
-                            extensions = this._getExcludedExtensions(extensions, patterns);
-                        }
-                        content = JSON.stringify(extensions, null, 4);
+                        const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_EXTENSIONS);
+                        extensions = this._getExcludedExtensions(extensions, patterns);
                     }
-                    else
-                    {
-                        content = fs.readFileSync(setting.filepath, "utf8");
+                    content = JSON.stringify(extensions, null, 4);
+                }
+                else
+                {
+                    content = fs.readFileSync(setting.filepath, "utf8");
 
-                        // Exclude settings.
-                        if (exclude && content && setting.type === SettingTypes.Settings)
+                    // Exclude settings.
+                    if (exclude && content && setting.type === SettingTypes.Settings)
+                    {
+                        const settingsJSON = parse(content);
+                        if (settingsJSON)
                         {
-                            const settingsJSON = parse(content);
-                            if (settingsJSON)
-                            {
-                                const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_SETTINGS);
-                                content = excludeSettings(content, settingsJSON, patterns);
-                            }
+                            const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_SETTINGS);
+                            content = excludeSettings(content, settingsJSON, patterns);
                         }
                     }
                 }
-                catch (err)
-                {
-                    content = undefined;
-                    console.error(localize("error.loading.settings", setting.type, err));
-                }
+            }
+            catch (err)
+            {
+                content = undefined;
+                console.error(localize("error.loading.settings", setting.type, err));
+            }
 
-                return { ...setting, content };
-            });
-            resolve(results);
+            return { ...setting, content };
         });
     }
 
@@ -521,54 +463,46 @@ export class VSCodeSetting
     /**
      * Determines whether the downloading should continue.
      */
-    private _shouldContinue(settings: ISetting[], settingsToSave: ISetting[], settingsToRemove: ISetting[])
+    private async _shouldContinue(
+        settings: ISetting[],
+        settingsToSave: ISetting[],
+        settingsToRemove: ISetting[]
+    ): Promise<boolean>
     {
-        return new Promise((resolve) =>
+        let result = true;
+        const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
+        if (threshold > 0)
         {
-            const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
-            if (threshold > 0)
-            {
-                this._loadContent(settings, false).then((localSettings) =>
-                {
-                    // poka-yoke - Determines whether there're too much changes since the last uploading.
-                    // 1. Excluded settings.
-                    // Here clone the settings to avoid manipulation.
-                    let excludedSettings = this._excludeSettings(
-                        localSettings,
-                        settingsToSave.map((setting) => ({ ...setting })),
-                        SettingTypes.Settings
-                    );
+            const localSettings = await this._loadContent(settings, false);
 
-                    // 2. Excluded extensions.
-                    excludedSettings = this._excludeSettings(
-                        excludedSettings.localSettings,
-                        excludedSettings.remoteSettings,
-                        SettingTypes.Extensions
-                    );
+            // poka-yoke - Determines whether there're too much changes since the last uploading.
+            // 1. Excluded settings.
+            // Here clone the settings to avoid manipulation.
+            let excludedSettings = this._excludeSettings(
+                localSettings,
+                settingsToSave.map((setting) => ({ ...setting })),
+                SettingTypes.Settings
+            );
 
-                    // 3. Diff settings.
-                    const changes = settingsToRemove.length
-                        + this._diffSettings(excludedSettings.localSettings, excludedSettings.remoteSettings);
-                    if (changes >= threshold)
-                    {
-                        const okButton = localize("pokaYoke.continue.download");
-                        const message = localize("pokaYoke.continue.download.message");
-                        Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel")).then((selection) =>
-                        {
-                            resolve(selection === okButton);
-                        });
-                    }
-                    else
-                    {
-                        resolve(true);
-                    }
-                });
-            }
-            else
+            // 2. Excluded extensions.
+            excludedSettings = this._excludeSettings(
+                excludedSettings.localSettings,
+                excludedSettings.remoteSettings,
+                SettingTypes.Extensions
+            );
+
+            // 3. Diff settings.
+            const changes = settingsToRemove.length
+                + this._diffSettings(excludedSettings.localSettings, excludedSettings.remoteSettings);
+            if (changes >= threshold)
             {
-                resolve(true);
+                const okButton = localize("pokaYoke.continue.download");
+                const message = localize("pokaYoke.continue.download.message");
+                const selection = await Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel"));
+                result = (selection === okButton);
             }
-        });
+        }
+        return result;
     }
 
     /**
