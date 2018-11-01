@@ -1,5 +1,12 @@
 # Changelogs
 
+## 2.0.1 - November 01, 2018
+
+- Changed: Refactor and improve code readability (migrate from node async utilities to async functions).
+
+- Fixed: Trying to avoid the repeated creation of gists.
+
+
 ## 2.0.0 - October 30, 2018
 
 - Added: Support for `i18n (internationalization)`, and currently is shipped with `English` and `Simplified Chinese`.
