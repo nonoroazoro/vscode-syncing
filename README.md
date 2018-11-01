@@ -17,7 +17,7 @@
 
 * From ***version 2.0.0*** onwards:
 
-    1. Add support for `i18n (internationalization)`, and `Syncing` is currently shipped with `English` and `Simplified Chinese`.
+    1. Add support for `i18n (internationalization)`. `Syncing` is now shipped with `English` and `Simplified Chinese`.
 
         > Don't forget to install the [Chinese (Simplified) Language Pack](https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-zh-hans) if you changed the locale to `Simplified Chinese`.
 
