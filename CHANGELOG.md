@@ -2,7 +2,7 @@
 
 ## 2.0.2 - November 13, 2018
 
-- Fixed: Fixed a bug while parsing VSCode settings.
+- Fixed: Fixed an error while parsing VSCode settings.
 
 
 ## 2.0.1 - November 01, 2018
