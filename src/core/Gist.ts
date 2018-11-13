@@ -440,7 +440,10 @@ export class Gist
                 {
                     for (const ext of parsed)
                     {
-                        ext["id"] = ext["id"].toLocaleLowerCase();
+                        if (ext["id"] != null)
+                        {
+                            ext["id"] = ext["id"].toLocaleLowerCase();
+                        }
 
                         // Only compares id and version.
                         delete ext["name"];
