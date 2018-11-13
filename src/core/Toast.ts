@@ -2,10 +2,10 @@
  * VSCode message utils.
  */
 
-import * as moment from "moment";
 import * as vscode from "vscode";
 
-import { localize } from "../i18n";
+import { locale, localize } from "../i18n";
+import { formatDistance } from "../utils/date";
 import { reloadWindow } from "../utils/vscodeAPI";
 import { Gist } from "./Gist";
 
@@ -162,7 +162,10 @@ export async function showRemoteGistListBox(api: Gist, forUpload: boolean = true
     {
         const items: IGistListBoxItem[] = gists.map((gist) => ({
             data: gist.id,
-            description: localize("toast.box.gist.last.uploaded", moment.duration(new Date(gist.updated_at).getTime() - Date.now()).humanize(true)),
+            description: localize(
+                "toast.box.gist.last.uploaded",
+                formatDistance(new Date(gist.updated_at), new Date(), locale())
+            ),
             label: `Gist ID: ${gist.id}`
         }));
         items.unshift(manualItem);
