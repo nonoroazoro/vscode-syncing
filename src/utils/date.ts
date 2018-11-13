@@ -9,7 +9,7 @@ import * as zhCN from "date-fns/locale/zh-CN";
  * @param {Date} baseDate The date to compare with.
  * @param {string} locale The locale string, such as `"zh-CN"`, `"en-US"`...
  */
-export function formatDistance(date: Date, baseDate: Date, locale: string)
+export function formatDistance(date: Date, baseDate: Date, locale?: string)
 {
     return rawFormatDistance(date, baseDate, {
         addSuffix: true,
@@ -23,7 +23,7 @@ export function formatDistance(date: Date, baseDate: Date, locale: string)
  *
  * @param {string} locale The locale string, such as `"zh-CN"`, `"en-US"`...
  */
-function _getLocale(locale: string)
+function _getLocale(locale?: string)
 {
     switch (locale)
     {
