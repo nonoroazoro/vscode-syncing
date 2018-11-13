@@ -19,7 +19,7 @@
     "toast.box.enter.github.token.description": "Syncing 会用该 Token 来访问您的 Gist",
     "toast.box.enter.github.token.download": "请输入您的 GitHub Personal Access Token（如果您想从一个公开的 Gist 下载配置，请留空）",
     "toast.box.enter.github.token.upload": "请输入您的 GitHub Personal Access Token",
-    "toast.box.gist.last.uploaded": "最后上传时间 {0}",
+    "toast.box.gist.last.uploaded": "最后上传于 {0}",
     "toast.box.reload": "重新加载窗口",
     "toast.box.reload.message": "配置已成功同步，请重新加载 VSCode 以让配置生效。",
     "toast.settings.checking.remote": "Syncing: 正在检查云端配置",
