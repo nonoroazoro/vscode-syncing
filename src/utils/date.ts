@@ -1,4 +1,4 @@
-import * as rawFormatDistance from "date-fns/formatDistance";
+import rawFormatDistance from "date-fns/esm/formatDistance";
 import * as enUS from "date-fns/locale/en-US";
 import * as zhCN from "date-fns/locale/zh-CN";
 
