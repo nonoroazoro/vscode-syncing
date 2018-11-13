@@ -115,6 +115,7 @@
     },
     "dependencies": {
         "@octokit/rest": "^15.15.1",
+        "date-fns": "^2.0.0-alpha.25",
         "extract-zip": "^1.6.7",
         "fs-extra": "^7.0.0",
         "https-proxy-agent": "^2.2.1",
@@ -124,7 +125,6 @@
         "lodash.isstring": "^4.0.1",
         "lodash.pick": "^4.4.0",
         "minimatch": "^3.0.4",
-        "moment": "^2.22.2",
         "tmp": "0.0.33"
     },
     "devDependencies": {
