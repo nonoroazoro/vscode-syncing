@@ -98,7 +98,7 @@ export class Extension
                 result.push(item);
             }
         }
-        return result;
+        return result.sort((a, b) => (a.id || "").localeCompare(b.id || ""));
     }
 
     /**
