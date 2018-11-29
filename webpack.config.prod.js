@@ -18,7 +18,10 @@ module.exports = {
         libraryTarget: "commonjs",
     },
     resolve: {
-        extensions: [".ts", ".js"]
+        extensions: [".ts", ".js"],
+        alias: {
+            deepmerge$: 'deepmerge/dist/umd.js',
+        }
     },
     externals: {
         "vscode": "commonjs vscode"
@@ -33,11 +36,6 @@ module.exports = {
                     }
                 ],
                 exclude: /node_modules/
-            },
-            {
-                test: /\.mjs$/,
-                type: "javascript/auto",
-                use: []
             }
         ]
     },
