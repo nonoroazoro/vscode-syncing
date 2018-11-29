@@ -21,7 +21,7 @@
 
 - Changed: Refactor and improve code readability (migrate from node async utilities to async functions).
 
-- Fixed: Trying to avoid the repeated creation of gists.
+- Fixed: Try not to repeatedly create the gists while uploading the settings.
 
 
 ## 2.0.0 - October 30, 2018
