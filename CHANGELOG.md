@@ -1,5 +1,10 @@
 # Changelogs
 
+## 2.0.6 - November 29, 2018
+
+- Fixed: Fixed the [issue](https://github.com/octokit/rest.js/issues/1144) introduced by `deepmerge`.
+
+
 ## 2.0.5 - November 29, 2018
 
 - Changed: Replaced `moment` with `date-fns` which can significantly reduce the extension's size.
