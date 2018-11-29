@@ -1,6 +1,6 @@
 # Changelogs
 
-## 2.0.3 - November 29, 2018
+## 2.0.5 - November 29, 2018
 
 - Changed: Replaced `moment` with `date-fns` which can significantly reduce the extension's size.
 
