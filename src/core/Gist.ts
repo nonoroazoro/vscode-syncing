@@ -83,7 +83,7 @@ export class Gist
     {
         try
         {
-            const res = await this._api.users.get({});
+            const res = await this._api.users.getAuthenticated({});
             const data = res.data as GitHubTypes.IGistOwner;
             return {
                 id: data.id,
@@ -136,7 +136,7 @@ export class Gist
     {
         try
         {
-            const res = await this._api.gists.getAll({});
+            const res = await this._api.gists.list({});
             // Find and sort VSCode settings gists by time.
             const gists: GitHubTypes.IGist[] = res.data as any;
             const extensionsRemoteFilename = `${SettingTypes.Extensions}.json`;
@@ -165,9 +165,9 @@ export class Gist
      *
      * @param content Gist content.
      */
-    public async update(content: Github.GistsEditParams): Promise<GitHubTypes.IGist>
+    public async update(content: Github.GistsUpdateParams): Promise<GitHubTypes.IGist>
     {
-        const res = await this._api.gists.edit(content);
+        const res = await this._api.gists.update(content);
         return res.data as any;
     }
 
