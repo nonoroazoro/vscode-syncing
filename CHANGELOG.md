@@ -1,5 +1,12 @@
 # Changelogs
 
+## 2.0.7 - December 03, 2018
+
+- Changed: Syncing will remain deactivated until you execute any of its commands.
+
+- Fixed: Sort the extensions in alphabetical order to stabilize the settings.
+
+
 ## 2.0.6 - November 29, 2018
 
 - Fixed: Fixed the [issue](https://github.com/octokit/rest.js/issues/1144) introduced by `deepmerge`.
