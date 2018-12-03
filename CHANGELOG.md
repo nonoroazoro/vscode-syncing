@@ -1,5 +1,12 @@
 # Changelogs
 
+## 2.0.7 - December 03, 2018
+
+- Changed: Syncing will remain deactivated until you execute any of its commands.
+
+- Fixed: Sort the extensions in alphabetical order to stabilize the settings.
+
+
 ## 2.0.6 - November 29, 2018
 
 - Fixed: Fixed the [issue](https://github.com/octokit/rest.js/issues/1144) introduced by `deepmerge`.
@@ -21,7 +28,7 @@
 
 - Changed: Refactor and improve code readability (migrate from node async utilities to async functions).
 
-- Fixed: Trying to avoid the repeated creation of gists.
+- Fixed: Try not to repeatedly create the gists while uploading the settings.
 
 
 ## 2.0.0 - October 30, 2018

@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "%displayName%",
     "description": "%description%",
-    "version": "2.0.6",
+    "version": "2.0.7",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -35,7 +35,9 @@
         "vscode-syncing"
     ],
     "activationEvents": [
-        "*"
+        "onCommand:syncing.uploadSettings",
+        "onCommand:syncing.downloadSettings",
+        "onCommand:syncing.openSettings"
     ],
     "contributes": {
         "commands": [
