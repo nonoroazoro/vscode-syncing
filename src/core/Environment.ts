@@ -194,8 +194,8 @@ export class Environment
                 break;
 
             default:
-                // TODO: Unknown platform.
-                throw new Error(localize("error.not.supported"));
+                // Unknown platform.
+                throw new Error(localize("error.env.platform.not.supported"));
         }
         return path.join(baseDirectory, this._codeMap.dataDirectoryName);
     }
