@@ -45,6 +45,7 @@
     "error.check.internet": "Please check your Internet connection or proxy settings.",
     "error.no.gist.id": "The Gist ID is not set.",
     "error.no.github.token": "The GitHub Personal Access Token is not set.",
+    "error.env.unknown.vscode": "Cannot identify the VSCode version.",
     "error.extract.extension-1": "Cannot extract extension: {0}. {1}",
     "error.extract.extension-2": "Cannot extract extension: {0}. Access temporary directory denied.",
     "error.extract.extension-3": "Cannot extract extension: {0}. Extension zip file not found.",
