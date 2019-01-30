@@ -12,10 +12,34 @@ export class Environment
 {
     private static _instance: Environment;
 
+    /**
+     * The builtin-environments of different VSCode versions.
+     *
+     * Note: The key will be matched with the `vscode.env.appName`, contains the followings:
+     *
+     * 1. The VSCode Standard;
+     * 2. The VSCode Insiders;
+     * 3. The VSCode under FLOSS license, see [VSCodium](https://github.com/VSCodium/vscodium).
+     */
+    private static _codeEnvironments = {
+        "Visual Studio Code": {
+            extensionsDirectoryName: ".vscode",
+            dataDirectoryName: "Code"
+        },
+        "Visual Studio Code - Insiders": {
+            extensionsDirectoryName: ".vscode-insiders",
+            dataDirectoryName: "Code - Insiders"
+        },
+        "VSCodium": {
+            extensionsDirectoryName: ".vscode-oss",
+            dataDirectoryName: "VSCodium"
+        }
+    };
+
+    private _codeMap: { extensionsDirectoryName: string; dataDirectoryName: string; };
     private _codeDataDirectory: string;
     private _codeUserDirectory: string;
     private _extensionsDirectory: string;
-    private _isInsiders: boolean;
     private _isMac: boolean;
     private _isPortable: boolean;
     private _snippetsDirectory: string;
@@ -23,8 +47,13 @@ export class Environment
     private constructor()
     {
         // Note that the followings are order-sensitive.
+        this._codeMap = Environment._codeEnvironments[vscode.env.appName];
+        if (!this._codeMap)
+        {
+            // Unknown VSCode version.
+            throw new Error(localize("error.env.unknown.vscode"));
+        }
         this._isMac = process.platform === "darwin";
-        this._isInsiders = vscode.version.indexOf("insider") >= 0;
         this._isPortable = process.env.VSCODE_PORTABLE != null;
 
         this._extensionsDirectory = this._getCodeExtensionsDirectory();
@@ -51,14 +80,6 @@ export class Environment
     public get isMac(): boolean
     {
         return this._isMac;
-    }
-
-    /**
-     * Gets a value indicating whether the VSCode is an `Insiders` version.
-     */
-    public get isInsiders(): boolean
-    {
-        return this._isInsiders;
     }
 
     /**
@@ -144,7 +165,7 @@ export class Environment
         }
         return path.join(
             os.homedir(),
-            this.isInsiders ? ".vscode-insiders" : ".vscode",
+            this._codeMap.extensionsDirectoryName,
             "extensions"
         );
     }
@@ -173,9 +194,9 @@ export class Environment
                 break;
 
             default:
-                // Unknown platform.
+                // TODO: Unknown platform.
                 throw new Error(localize("error.not.supported"));
         }
-        return path.join(baseDirectory, this.isInsiders ? "Code - Insiders" : "Code");
+        return path.join(baseDirectory, this._codeMap.dataDirectoryName);
     }
 }
