@@ -1,5 +1,12 @@
 # Changelogs
 
+## 2.1.0 - January 30, 2019
+
+- Added: Add support for different editions of VSCode binaries.
+
+- Changed: Tweak the localizations.
+
+
 ## 2.0.7 - December 03, 2018
 
 - Changed: Syncing will remain deactivated until you execute any of its commands.
