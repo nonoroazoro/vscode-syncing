@@ -15,13 +15,17 @@
 
 ## Breaking Changes
 
-* From ***version 2.0.0*** onwards:
+* From ***version 2.1.0*** onwards:
 
-    1. Add support for `i18n (internationalization)`. `Syncing` is now shipped with `English` and `Simplified Chinese`.
+    1. Add support for different editions of VSCode binaries as the followings:
 
-        > Don't forget to install the [Chinese (Simplified) Language Pack](https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-zh-hans) if you changed the locale to `Simplified Chinese`.
+        1. [The VSCode Standard](https://code.visualstudio.com/).
 
-    1. Accelerate the startup speed of `Syncing`, nearly `3 times faster` than before (may vary depending on your hardware).
+        1. [The VSCode Insiders](https://code.visualstudio.com/insiders/).
+
+        1. The VSCode under FLOSS license, see [VSCodium](https://github.com/VSCodium/vscodium).
+
+        > Don't worry, Syncing will automatically identify the VSCode edition for you.
 
 
 ## Features

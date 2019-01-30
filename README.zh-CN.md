@@ -15,13 +15,17 @@
 
 ## 重要变更
 
-* 从 ***2.0.0*** 版本开始：
+* 从 ***2.1.0*** 版本开始：
 
-    1. 加入`国际化`，目前支持`英语`和`简体中文`。
+    1. 支持更多版本的 VSCode，包括：
 
-        > 注意：切换为`简体中文`时请务必安装微软官方提供的[简体中文语言包](https://marketplace.visualstudio.com/items?itemName=MS-CEINTL.vscode-language-pack-zh-hans)。
+        1. [VSCode 标准版本](https://code.visualstudio.com/)；
 
-    1. `Syncing` 的启动速度将会提高 `3 倍左右`（取决于您的硬件）。
+        1. [VSCode Insiders 版本](https://code.visualstudio.com/insiders/)；
+
+        1. [VSCodium](https://github.com/VSCodium/vscodium)，这是 [FLOSS License](https://www.gnu.org/philosophy/floss-and-foss.en.html) 下的一个 VSCode 版本。
+
+        > 无须担心，升级之后 Syncing 会自动帮您检测 VSCode 版本。
 
 
 ## 功能
