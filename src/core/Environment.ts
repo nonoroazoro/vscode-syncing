@@ -33,6 +33,10 @@ export class Environment
         "VSCodium": {
             extensionsDirectoryName: ".vscode-oss",
             dataDirectoryName: "VSCodium"
+        },
+        "Code - OSS": {
+            extensionsDirectoryName: ".vscode-oss",
+            dataDirectoryName: "Code - OSS"
         }
     };
 
