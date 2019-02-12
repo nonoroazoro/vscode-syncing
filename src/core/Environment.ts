@@ -30,6 +30,10 @@ export class Environment
             extensionsDirectoryName: ".vscode-insiders",
             dataDirectoryName: "Code - Insiders"
         },
+        "Visual Studio Code - Exploration": {
+            extensionsDirectoryName: ".vscode-exploration",
+            dataDirectoryName: "Code - Exploration"
+        },
         "VSCodium": {
             extensionsDirectoryName: ".vscode-oss",
             dataDirectoryName: "VSCodium"
