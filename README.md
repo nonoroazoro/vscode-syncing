@@ -15,15 +15,19 @@
 
 ## Breaking Changes
 
-* From ***version 2.1.0*** onwards:
+* From ***version 2.1.1*** onwards:
 
     1. Add support for different editions of VSCode binaries as the followings:
 
-        1. [The VSCode Standard](https://code.visualstudio.com/).
+        1. [VSCode Standard Builds](https://code.visualstudio.com/).
 
-        1. [The VSCode Insiders](https://code.visualstudio.com/insiders/).
+        1. [VSCode Insiders Builds](https://code.visualstudio.com/insiders/).
 
-        1. The VSCode under FLOSS license, see [VSCodium](https://github.com/VSCodium/vscodium).
+        1. [VSCode Exploration Builds](https://github.com/Microsoft/vscode/issues/61787).
+
+        1. VSCode builds under FLOSS license, see [VSCodium](https://github.com/VSCodium/vscodium).
+
+        1. Self-compiled VSCode under [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json) (Thank [@Backfighter](https://github.com/Backfighter) for the PR).
 
         > Don't worry, Syncing will automatically identify the VSCode edition for you.
 
