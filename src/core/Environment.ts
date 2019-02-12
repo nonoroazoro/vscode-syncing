@@ -13,7 +13,7 @@ export class Environment
     private static _instance: Environment;
 
     /**
-     * The builtin-environments of different VSCode versions.
+     * The builtin-environments of different VSCode editions.
      *
      * Note: The key will be matched with the `vscode.env.appName`, contains the followings:
      *
