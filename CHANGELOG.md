@@ -2,6 +2,7 @@
 
 ## 2.1.1 - February 12, 2019
 
+- Added: Add support for the VSCode exploration builds.
 - Added: Add support for the self-compiled version of VSCode under [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json) (Thank [@Backfighter](https://github.com/Backfighter) for the PR).
 
 
