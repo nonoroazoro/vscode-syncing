@@ -19,11 +19,11 @@
 
     1. 增加对各种 VSCode 版本的支持，包括：
 
-        1. [VSCode 标准版](https://code.visualstudio.com/)；
+        1. [VSCode 标准版本](https://code.visualstudio.com/)；
 
-        1. [VSCode Insiders 版](https://code.visualstudio.com/insiders/)；
+        1. [VSCode Insiders 版本](https://code.visualstudio.com/insiders/)；
 
-        1. [VSCode Exploration 版](https://github.com/Microsoft/vscode/issues/61787)；
+        1. [VSCode Exploration 版本](https://github.com/Microsoft/vscode/issues/61787)；
 
         1. [VSCodium](https://github.com/VSCodium/vscodium)，这是 [FLOSS License](https://www.gnu.org/philosophy/floss-and-foss.en.html) 下的一个 VSCode 版本；
 
