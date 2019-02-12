@@ -15,15 +15,19 @@
 
 ## 重要变更
 
-* 从 ***2.1.0*** 版本开始：
+* 从 ***2.1.1*** 版本开始：
 
-    1. 支持更多版本的 VSCode，包括：
+    1. 增加对各种 VSCode 版本的支持，包括：
 
-        1. [VSCode 标准版本](https://code.visualstudio.com/)；
+        1. [VSCode 标准版](https://code.visualstudio.com/)；
 
-        1. [VSCode Insiders 版本](https://code.visualstudio.com/insiders/)；
+        1. [VSCode Insiders 版](https://code.visualstudio.com/insiders/)；
 
-        1. [VSCodium](https://github.com/VSCodium/vscodium)，这是 [FLOSS License](https://www.gnu.org/philosophy/floss-and-foss.en.html) 下的一个 VSCode 版本。
+        1. [VSCode Exploration 版](https://github.com/Microsoft/vscode/issues/61787)；
+
+        1. [VSCodium](https://github.com/VSCodium/vscodium)，这是 [FLOSS License](https://www.gnu.org/philosophy/floss-and-foss.en.html) 下的一个 VSCode 版本；
+
+        1. 按照[默认配置](https://github.com/Microsoft/vscode/blob/master/product.json)自行编译的 VSCode 版本 (感谢 [@Backfighter](https://github.com/Backfighter) 的 PR)。
 
         > 无须担心，升级之后 Syncing 会自动帮您检测 VSCode 版本。
 
