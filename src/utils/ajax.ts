@@ -17,9 +17,9 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
     return new Promise((resolve, reject) =>
     {
         const body: string = JSON.stringify(data);
-        const { hostname, path, port } = url.parse(api);
+        const { host, path, port } = url.parse(api);
         const options: https.RequestOptions = {
-            host: hostname,
+            host,
             path,
             method: "POST",
             headers: {
@@ -79,11 +79,8 @@ export function downloadFile(uri: string, savepath: string, proxy?: string): Pro
 {
     return new Promise((resolve, reject) =>
     {
-        const { hostname, path, port } = url.parse(uri);
-        const options: https.RequestOptions = {
-            host: hostname,
-            path
-        };
+        const { host, path, port } = url.parse(uri);
+        const options: https.RequestOptions = { host, path };
 
         if (port)
         {
@@ -131,9 +128,9 @@ export function downloadFile(uri: string, savepath: string, proxy?: string): Pro
             }
         }).on("error", (err) =>
         {
-            fs.remove(savepath)
-                .then(() => reject(err))
-                .catch(() => reject(err));
+            // Close and remove the temp file.
+            file.close();
+            fs.remove(savepath).catch().then(() => reject(err));
         });
     });
 }
