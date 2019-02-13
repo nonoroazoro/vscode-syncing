@@ -1,5 +1,10 @@
 # Changelogs
 
+## 2.1.2 - February 13, 2019
+
+- Changed: Increase the download speed and accelerate the process of adding and installing VSCode extensions.
+
+
 ## 2.1.1 - February 12, 2019
 
 - Added: Add support for the VSCode exploration builds.

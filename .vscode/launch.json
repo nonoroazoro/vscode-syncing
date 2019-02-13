@@ -18,7 +18,7 @@
             "smartStep": true,
             "sourceMaps": true,
             "osx": {
-                "preLaunchTask": "tsc-watch"
+                // "preLaunchTask": "tsc-watch"
             },
         }
     ]
