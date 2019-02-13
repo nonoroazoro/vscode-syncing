@@ -45,11 +45,8 @@ export async function queryExtensions(ids: string[], proxy?: string): Promise<Ca
             {
                 (results[0].extensions || []).forEach((extension: IExtensionMeta) =>
                 {
-                    // Use extension's id as the key.
-                    result.set(
-                        `${extension.publisher.publisherName}.${extension.extensionName}`,
-                        extension
-                    );
+                    // Use extension's fullname as the key.
+                    result.set(`${extension.publisher.publisherName}.${extension.extensionName}`, extension);
                 });
             }
         }
@@ -61,7 +58,20 @@ export async function queryExtensions(ids: string[], proxy?: string): Promise<Ca
 }
 
 /**
+ * Gets the latest version of the VSIX file.
+ *
+ * @param {IExtensionMeta} extensionMeta The extension's meta object.
+ */
+export function getLatestVSIXVersion(extensionMeta: IExtensionMeta): string | undefined
+{
+    const versionMeta = extensionMeta.versions[0];
+    return versionMeta ? versionMeta.version : undefined;
+}
+
+/**
  * Gets the VSIX download URL.
+ *
+ * @deprecated The download speed of this URL is too slow.
  *
  * @param {IExtensionVersion} version The extension's version object.
  */
@@ -76,5 +86,5 @@ export function getVSIXDownloadURL(version: IExtensionVersion): string | undefin
             return file.source;
         }
     }
-    return undefined;
+    return;
 }
