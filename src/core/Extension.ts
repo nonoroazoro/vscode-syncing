@@ -12,7 +12,7 @@ import { IExtension, ISyncedItem } from "../types/SyncingTypes";
 import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
-import { getVSIXDownloadURL, queryExtensions } from "../utils/vscodeWebAPI";
+import { getLatestVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
 import { Environment } from "./Environment";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
@@ -168,14 +168,12 @@ export class Extension
                     return;
                 }
 
-                // Fallback to normal package in case the extension query service is down.
-                if (!extension.downloadURL)
-                {
-                    extension.downloadURL =
-                        `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
-                        + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
-                        + `assetbyname/Microsoft.VisualStudio.Services.VSIXPackage`;
-                }
+                // Calculates the VSIX download URL.
+                extension.downloadURL =
+                    `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
+                    + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
+                    + `assetbyname/Microsoft.VisualStudio.Services.VSIXPackage?install=true`;
+
                 downloadFile(extension.downloadURL, filepath, this._syncing.proxy).then(() =>
                 {
                     resolve({ ...extension, vsixFilepath: filepath });
@@ -341,19 +339,14 @@ export class Extension
                     const extensionMeta = queriedExtensions.get(ext.id);
                     if (extensionMeta)
                     {
-                        const versionMeta = extensionMeta.versions[0];
-                        if (versionMeta)
+                        const latestVersion = getLatestVSIXVersion(extensionMeta);
+                        if (latestVersion != null)
                         {
-                            const version = versionMeta.version;
-                            const downloadURL = getVSIXDownloadURL(versionMeta);
-                            if (version && downloadURL)
-                            {
-                                ext.version = version;
-                                ext.downloadURL = downloadURL;
-                            }
+                            ext.version = latestVersion;
                         }
                     }
                 }
+
                 const localExtension = getExtensionById(ext.id);
                 if (localExtension)
                 {
