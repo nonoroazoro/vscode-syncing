@@ -15,7 +15,9 @@
 
 ## Breaking Changes
 
-* From ***version 2.1.1*** onwards:
+* From ***version 2.1.2*** onwards:
+
+    1. Increase the download speed and accelerate the process of adding and installing VSCode extensions.
 
     1. Add support for different editions of VSCode binaries as the followings:
 
