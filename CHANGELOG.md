@@ -1,5 +1,12 @@
 # Changelogs
 
+## 2.1.3 - February 14, 2019
+
+- Changed: Synchronize with the latest `octokit` api.
+
+- Changed: Upgrade the VSCode web api to version `5.1-preview.1`.
+
+
 ## 2.1.2 - February 13, 2019
 
 - Changed: Increase the download speed and accelerate the process of adding and installing VSCode extensions.
