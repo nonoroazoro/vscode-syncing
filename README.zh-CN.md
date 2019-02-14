@@ -1,8 +1,9 @@
 # Syncing
 
-[![Version](https://vsmarketplacebadge.apphb.com/version/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
+[![Version](https://vsmarketplacebadge.apphb.com/version-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![Installs](https://vsmarketplacebadge.apphb.com/installs-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
-[![Ratings](https://vsmarketplacebadge.apphb.com/rating/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing#review-details)
+[![Downloads](https://vsmarketplacebadge.apphb.com/downloads-short/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
+[![Ratings](https://vsmarketplacebadge.apphb.com/rating-star/nonoroazoro.syncing.svg)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing#review-details)
 
 [English](README.md) | [中文](README.zh-CN.md)
 
@@ -17,7 +18,7 @@
 
 * 从 ***2.1.2*** 版本开始：
 
-    1. 显著加快 VSCode 插件的下载和安装速度；
+    1. 显著加快 VSCode 插件的下载和安装速度，尤其是中国用户在无代理情况下的下载和安装速度；
 
     1. 增加对各种 VSCode 版本的支持，包括：
 
