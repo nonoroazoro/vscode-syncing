@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "%displayName%",
     "description": "%description%",
-    "version": "2.1.2",
+    "version": "2.1.3",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -29,8 +29,9 @@
     ],
     "keywords": [
         "sync",
-        "sync-settings",
         "syncing",
+        "sync-settings",
+        "settings-sync",
         "vscode-sync",
         "vscode-syncing"
     ],
