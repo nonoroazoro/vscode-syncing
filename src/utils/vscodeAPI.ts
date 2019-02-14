@@ -21,7 +21,7 @@ export function getExtensionById(id: string, ignoreCase = true)
 }
 
 /**
- * Gets the `editor.formatOnSave` setting from `VSCode User Settings`.
+ * Gets the setting from `VSCode User Settings`.
  */
 export function getVSCodeSetting<T>(section: string, key: string, defaultValue?: T): T
 {

@@ -31,18 +31,19 @@ export class Gist
     {
         this._proxy = proxy;
 
-        const options: Record<string, any> = { timeout: 8000 };
+        const options: Record<string, any> = { request: { timeout: 8000 } };
         if (proxy)
         {
-            options["agent"] = new HttpsProxyAgent(proxy);
+            options.request["agent"] = new HttpsProxyAgent(proxy);
         }
-        this._api = new Github(options);
 
         this._token = token;
-        if (token)
+        if (token != null)
         {
-            this._api.authenticate({ token, type: "oauth" });
+            options["auth"] = `token ${token}`;
         }
+
+        this._api = new Github(options);
     }
 
     /**
