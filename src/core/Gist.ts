@@ -177,7 +177,7 @@ export class Gist
      *
      * @param id Gist id.
      */
-    public async exists(id: string): Promise<GitHubTypes.IGist | boolean>
+    public async exists(id: string): Promise<false | GitHubTypes.IGist>
     {
         if (id != null && id.trim() !== "")
         {
@@ -276,8 +276,7 @@ export class Gist
             if (exists)
             {
                 // Upload if the local files are modified.
-                const remoteGist = exists as GitHubTypes.IGist;
-                localGist.files = this._getModifiedFiles(localGist.files, remoteGist.files);
+                localGist.files = this._getModifiedFiles(localGist.files, exists.files);
                 if (localGist.files)
                 {
                     // poka-yoke - Determines whether there're too much changes since the last uploading.
@@ -286,7 +285,7 @@ export class Gist
                     {
                         // Note that the local settings here have already been excluded.
                         const localFiles = { ...localGist.files };
-                        const remoteFiles = pick(remoteGist.files, Object.keys(localFiles));
+                        const remoteFiles = pick(exists.files, Object.keys(localFiles));
 
                         // Diff settings.
                         const changes = this._diffSettings(localFiles, remoteFiles);
@@ -306,7 +305,7 @@ export class Gist
                 else
                 {
                     // Nothing changed.
-                    result = remoteGist;
+                    result = exists;
                 }
             }
             else
