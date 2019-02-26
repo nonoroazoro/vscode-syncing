@@ -52,7 +52,7 @@
     "error.extract.extension-3": "无法解压缩扩展: {0}。未找到安装扩展所需的压缩文件",
     "error.gist.notfound": "在 Gist 中未找到该 ID: {0}",
     "error.gist.files.notfound": "在您的 Gist 中未找到任何配置文件",
-    "error.invalid.settings": "部分 VSCode 配置已失效，将被忽略: {0}",
+    "error.invalid.settings": "以下 VSCode 配置已失效，将会被忽略: {0}",
     "error.loading.settings": "Syncing: 载入 VSCode 配置文件时发生错误: {0}。\n{1}",
     "error.loading.snippets": "Syncing: 载入代码片段文件时发生错误",
     "error.loading.syncing.settings": "Syncing: 无法载入 Syncing 的配置",
