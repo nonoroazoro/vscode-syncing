@@ -1,27 +1,25 @@
 import { readJsonSync } from "fs-extra";
 import * as path from "path";
 
+import { NormalizedLocale } from "../types/NormalizedLocale";
 import { format } from "../utils/template";
+import { getNormalizedVSCodeLocale } from "../utils/vscodeAPI";
 
 let instance: I18n;
 
-/**
- * I18n.
- */
 class I18n
 {
     private static _instance: I18n;
-    private static DEFAULT_LOCALE: string = "en-us";
     private static DEFAULT_LOCALE_FILENAME: string = "package.nls.json";
 
     private _bundle: Record<string, string>;
     private _extensionPath: string;
-    private _locale: string;
+    private _locale: NormalizedLocale;
 
-    private constructor(extensionPath: string, vscodeLocale: string)
+    private constructor(extensionPath: string)
     {
         this._extensionPath = extensionPath;
-        this._locale = vscodeLocale;
+        this._locale = getNormalizedVSCodeLocale();
         this._prepare();
     }
 
@@ -32,24 +30,15 @@ class I18n
     {
         if (!I18n._instance || I18n._instance._extensionPath !== extensionPath)
         {
-            let vscodeLocale: string | undefined;
-            try
-            {
-                vscodeLocale = JSON.parse(process.env.VSCODE_NLS_CONFIG || "{}").locale;
-            }
-            catch (err)
-            {
-            }
-            vscodeLocale = vscodeLocale || I18n.DEFAULT_LOCALE;
-            I18n._instance = new I18n(extensionPath, vscodeLocale);
+            I18n._instance = new I18n(extensionPath);
         }
         return I18n._instance;
     }
 
     /**
-     * Gets the locale of VSCode.
+     * Gets the VSCode locale.
      */
-    public get locale(): string
+    public get locale(): NormalizedLocale
     {
         return this._locale;
     }
@@ -72,10 +61,9 @@ class I18n
 
     private _prepare()
     {
-        const lowerCaseLocale = this.locale.toLowerCase();
-        const filename = (lowerCaseLocale === I18n.DEFAULT_LOCALE)
+        const filename = (this.locale === NormalizedLocale.EN_US)
             ? I18n.DEFAULT_LOCALE_FILENAME
-            : `package.nls.${lowerCaseLocale}.json`;
+            : `package.nls.${this.locale}.json`;
         try
         {
             this._bundle = readJsonSync(
@@ -102,9 +90,9 @@ export function setup(extensionPath: string): void
 }
 
 /**
- * Gets the locale of VSCode.
+ * Gets the VSCode locale.
  */
-export function locale(): string
+export function locale(): NormalizedLocale
 {
     return instance.locale;
 }
