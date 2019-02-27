@@ -52,6 +52,21 @@ export function getJSONFormatOnSaveSetting(settingsJSON: any): boolean | undefin
 }
 
 /**
+ * Gets the VSCode locale string.
+ */
+export function getVSCodeLocale(): string | undefined
+{
+    try
+    {
+        return JSON.parse(process.env.VSCODE_NLS_CONFIG || "{}").locale;
+    }
+    catch (err)
+    {
+        return;
+    }
+}
+
+/**
  * Opens the file in a VSCode editor.
  *
  * @param filepath The full path of the file.
