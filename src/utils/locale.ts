@@ -1,11 +1,11 @@
 import { NormalizedLocale } from "../types/NormalizedLocale";
 
 /**
- * Normalizes the locale.
+ * Normalizes the locale string.
  *
  * @param {string} locale The locale string, such as `"zh-CN"`, `"en-US"`...
  */
-export function normalize(locale: string): NormalizedLocale
+export function normalize(locale: string | undefined): NormalizedLocale
 {
     switch (locale)
     {
