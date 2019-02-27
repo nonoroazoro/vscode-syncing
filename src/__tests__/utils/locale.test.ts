@@ -5,7 +5,7 @@ describe("Syncing/utils/locale", () =>
 {
     it("normalize - undefined", () =>
     {
-        expect(normalize(undefined as any)).toEqual(NormalizedLocale.EN_US);
+        expect(normalize(undefined)).toEqual(NormalizedLocale.EN_US);
     });
 
     it("normalize - en", () =>
