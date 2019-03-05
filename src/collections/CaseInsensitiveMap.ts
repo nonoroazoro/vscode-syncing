@@ -1,4 +1,4 @@
-import isString = require("lodash.isstring");
+import { isString } from "../utils/lang";
 
 /**
  * A `case-insensitive` `Map`.
