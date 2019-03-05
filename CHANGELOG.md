@@ -1,5 +1,14 @@
 # Changelogs
 
+## 2.1.4 - March 05, 2019
+
+- Fixed: Cannot download settings from a public Gist.
+
+- Changed: Tweak download process, reduce interruptions.
+
+- Changed: Replace `lodash.isstring` with local util.
+
+
 ## 2.1.3 - February 14, 2019
 
 - Changed: Synchronize with the latest `octokit` api.
