@@ -151,12 +151,16 @@ export class Syncing
         try
         {
             const settings: ISyncingSettings = this.loadSettings();
-            if (!settings.token)
+            const isTokenEmpty = settings.token == null || isEmptyString(settings.token);
+            const isIDEmpty = settings.id == null || isEmptyString(settings.id);
+            // Ask for token when:
+            // 1. uploading with an empty token
+            // 2. downloading with an empty token and an empty Gist ID.
+            if (isTokenEmpty && (forUpload || isIDEmpty))
             {
                 settings.token = await Toast.showGitHubTokenInputBox(forUpload);
             }
-
-            if (!settings.id)
+            if (isIDEmpty)
             {
                 settings.id = await this._requestGistID(settings.token, forUpload);
             }
