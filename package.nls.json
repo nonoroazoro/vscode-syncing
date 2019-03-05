@@ -52,7 +52,7 @@
     "error.extract.extension-3": "Cannot extract extension: {0}. Extension zip file not found.",
     "error.gist.notfound": "No such ID in Gist: {0}",
     "error.gist.files.notfound": "Cannot find any files in your Gist.",
-    "error.invalid.settings": "Some of the VSCode settings are invalid, and will be ignored: {0}",
+    "error.invalid.settings": "The following VSCode settings are invalid and will be ignored: {0}",
     "error.loading.settings": "Syncing: Error loading VSCode settings file: {0}.\n{1}",
     "error.loading.snippets": "Syncing: Error loading snippets.",
     "error.loading.syncing.settings": "Syncing: Error loading Syncing's settings.",

@@ -2,38 +2,39 @@ import { formatDistance as rawFormatDistance } from "date-fns";
 import * as enUS from "date-fns/locale/en-US";
 import * as zhCN from "date-fns/locale/zh-CN";
 
+import { NormalizedLocale } from "../types/NormalizedLocale";
+
 /**
  * Return the distance between the given dates in words.
  *
  * @param {Date} date The date.
  * @param {Date} baseDate The date to compare with.
- * @param {string} locale The locale string, such as `"zh-CN"`, `"en-US"`...
+ * @param {NormalizedLocale} [locale] The normalized locale.
  */
-export function formatDistance(date: Date, baseDate: Date, locale?: string)
+export function formatDistance(date: Date, baseDate: Date, locale?: NormalizedLocale)
 {
-    return rawFormatDistance(date, baseDate, {
-        addSuffix: true,
-        includeSeconds: true,
-        locale: _getLocale(locale)
-    });
+    return rawFormatDistance(
+        date,
+        baseDate,
+        {
+            addSuffix: true,
+            includeSeconds: true,
+            locale: _getDateLocale(locale)
+        }
+    );
 }
 
 /**
- * Gets the corresponding `Locale` of `date-fns` from the locale string.
- *
- * @param {string} locale The locale string, such as `"zh-CN"`, `"en-US"`...
+ * Gets the `Locale` of `date-fns` corresponding to the normalied locale.
  */
-function _getLocale(locale?: string)
+function _getDateLocale(locale?: NormalizedLocale)
 {
     switch (locale)
     {
-        case "zh-cn":
-        case "zh-CN":
+        case NormalizedLocale.ZH_CN:
             return zhCN;
 
-        case "en":
-        case "en-us":
-        case "en-US":
+        case NormalizedLocale.EN_US:
         default:
             return enUS;
     }

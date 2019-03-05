@@ -410,7 +410,7 @@ export class VSCodeSetting
             catch (err)
             {
                 content = undefined;
-                console.error(localize("error.loading.settings", setting.type, err));
+                console.error(localize("error.loading.settings", setting.remoteFilename, err));
             }
 
             return { ...setting, content };

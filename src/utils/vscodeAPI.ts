@@ -1,5 +1,8 @@
 import * as vscode from "vscode";
 
+import { NormalizedLocale } from "../types/NormalizedLocale";
+import { normalize } from "./locale";
+
 /**
  * Gets the VSCode extension by id.
  *
@@ -49,6 +52,29 @@ export function getJSONFormatOnSaveSetting(settingsJSON: any): boolean | undefin
         }
     }
     return result;
+}
+
+/**
+ * Gets the normalized VSCode locale.
+ */
+export function getNormalizedVSCodeLocale(): NormalizedLocale
+{
+    return normalize(getVSCodeLocale());
+}
+
+/**
+ * Gets the VSCode locale string.
+ */
+export function getVSCodeLocale(): string | undefined
+{
+    try
+    {
+        return JSON.parse(process.env.VSCODE_NLS_CONFIG || "{}").locale;
+    }
+    catch (err)
+    {
+        return;
+    }
 }
 
 /**

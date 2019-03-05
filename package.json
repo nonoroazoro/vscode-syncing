@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "%displayName%",
     "description": "%description%",
-    "version": "2.1.3",
+    "version": "2.1.4",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -124,7 +124,6 @@
         "jsonc-parser": "^2.0.3",
         "jsondiffpatch": "^0.3.11",
         "junk": "^2.1.0",
-        "lodash.isstring": "^4.0.1",
         "lodash.pick": "^4.4.0",
         "minimatch": "^3.0.4",
         "tmp": "0.0.33"
@@ -133,7 +132,6 @@
         "@types/extract-zip": "^1.6.2",
         "@types/fs-extra": "^5.0.5",
         "@types/jest": "^24.0.3",
-        "@types/lodash.isstring": "^4.0.4",
         "@types/lodash.pick": "^4.4.4",
         "@types/minimatch": "^3.0.3",
         "@types/node": "^11.9.3",

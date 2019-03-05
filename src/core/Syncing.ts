@@ -2,6 +2,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 
 import { localize } from "../i18n";
+import { isEmptyString } from "../utils/lang";
 import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
@@ -77,7 +78,7 @@ export class Syncing
     public get proxy(): string | undefined
     {
         let proxy = this.loadSettings().http_proxy;
-        if (!proxy)
+        if (proxy == null || isEmptyString(proxy))
         {
             proxy = process.env["http_proxy"] || process.env["https_proxy"];
         }
@@ -150,12 +151,16 @@ export class Syncing
         try
         {
             const settings: ISyncingSettings = this.loadSettings();
-            if (!settings.token)
+            const isTokenEmpty = settings.token == null || isEmptyString(settings.token);
+            const isIDEmpty = settings.id == null || isEmptyString(settings.id);
+            // Ask for token when:
+            // 1. uploading with an empty token
+            // 2. downloading with an empty token and an empty Gist ID.
+            if (isTokenEmpty && (forUpload || isIDEmpty))
             {
                 settings.token = await Toast.showGitHubTokenInputBox(forUpload);
             }
-
-            if (!settings.id)
+            if (isIDEmpty)
             {
                 settings.id = await this._requestGistID(settings.token, forUpload);
             }
@@ -244,13 +249,13 @@ export class Syncing
      */
     private async _requestGistID(token: string, forUpload: boolean = true): Promise<string>
     {
-        if (token)
+        if (token != null && !isEmptyString(token))
         {
             const api: Gist = Gist.create(token, this.proxy);
             const id = await Toast.showRemoteGistListBox(api, forUpload);
-            if (!id)
+            if (isEmptyString(id))
             {
-                // Show gist input box when id is still supplied.
+                // Show gist input box when id is still not supplied.
                 return Toast.showGistInputBox(forUpload);
             }
             return id;

@@ -4,6 +4,8 @@ import * as HttpsProxyAgent from "https-proxy-agent";
 import * as url from "url";
 import * as zlib from "zlib";
 
+import { isEmptyString } from "./lang";
+
 /**
  * Posts a request.
  *
@@ -34,7 +36,7 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
             options.port = +port;
         }
 
-        if (proxy)
+        if (proxy != null && !isEmptyString(proxy))
         {
             options.agent = new HttpsProxyAgent(proxy);
         }
@@ -87,7 +89,7 @@ export function downloadFile(uri: string, savepath: string, proxy?: string): Pro
             options.port = +port;
         }
 
-        if (proxy)
+        if (proxy != null && !isEmptyString(proxy))
         {
             options.agent = new HttpsProxyAgent(proxy);
         }
