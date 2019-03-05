@@ -2,6 +2,7 @@ import * as fs from "fs-extra";
 import * as path from "path";
 
 import { localize } from "../i18n";
+import { isEmptyString } from "../utils/lang";
 import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
@@ -77,7 +78,7 @@ export class Syncing
     public get proxy(): string | undefined
     {
         let proxy = this.loadSettings().http_proxy;
-        if (!proxy)
+        if (proxy == null || isEmptyString(proxy))
         {
             proxy = process.env["http_proxy"] || process.env["https_proxy"];
         }
@@ -244,13 +245,13 @@ export class Syncing
      */
     private async _requestGistID(token: string, forUpload: boolean = true): Promise<string>
     {
-        if (token)
+        if (token != null && !isEmptyString(token))
         {
             const api: Gist = Gist.create(token, this.proxy);
             const id = await Toast.showRemoteGistListBox(api, forUpload);
-            if (!id)
+            if (isEmptyString(id))
             {
-                // Show gist input box when id is still supplied.
+                // Show gist input box when id is still not supplied.
                 return Toast.showGistInputBox(forUpload);
             }
             return id;

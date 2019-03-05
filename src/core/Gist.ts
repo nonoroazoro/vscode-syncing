@@ -8,6 +8,7 @@ import * as GitHubTypes from "../types/GitHubTypes";
 import { ISetting, SettingTypes } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
 import { parse } from "../utils/jsonc";
+import { isEmptyString } from "../utils/lang";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
 import * as Toast from "./Toast";
 
@@ -32,13 +33,13 @@ export class Gist
         this._proxy = proxy;
 
         const options: Record<string, any> = { request: { timeout: 8000 } };
-        if (proxy)
+        if (proxy != null && !isEmptyString(proxy))
         {
             options.request["agent"] = new HttpsProxyAgent(proxy);
         }
 
         this._token = token;
-        if (token != null)
+        if (token != null && !isEmptyString(token))
         {
             options["auth"] = `token ${token}`;
         }
@@ -179,7 +180,7 @@ export class Gist
      */
     public async exists(id: string): Promise<false | GitHubTypes.IGist>
     {
-        if (id != null && id.trim() !== "")
+        if (id != null && !isEmptyString(id))
         {
             try
             {
