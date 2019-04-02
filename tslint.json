@@ -10,10 +10,17 @@
             "spaces",
             4
         ],
+        "interface-name": [
+            true,
+            "never-prefix"
+        ],
         "max-classes-per-file": true,
         "max-line-length": [
             true,
-            200
+            {
+                "limit": 120,
+                "ignore-pattern": "<path .*"
+            }
         ],
         "member-access": false,
         "member-ordering": [
@@ -45,9 +52,11 @@
         "no-console": {
             "severity": "warn"
         },
+        "no-empty-interface": false,
         "no-empty": false,
         "no-string-literal": false,
         "no-var-keyword": true,
+        "no-var-requires": false,
         "object-literal-sort-keys": false,
         "one-line": false,
         "only-arrow-functions": false,
@@ -62,7 +71,9 @@
         ],
         "variable-name": [
             true,
-            "allow-leading-underscore"
+            "allow-pascal-case",
+            "ban-keywords",
+            "check-format"
         ]
     }
 }
