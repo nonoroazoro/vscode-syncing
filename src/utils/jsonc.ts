@@ -56,7 +56,8 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: object
 }
 
 /**
- * Merges the source VSCode settings with the destination settings, based on the exclude list (glob patterns) of source settings.
+ * Merges the source VSCode settings with the destination settings,
+ * based on the exclude list (glob patterns) of source settings.
  *
  * Creates and returns the new source settings JSON string.
  *
@@ -130,7 +131,7 @@ export function getExcludedKeys(settingsJSON: object, patterns: string[]): strin
 /**
  * Formats the given JSON string.
  */
-export function format(jsonString: string, formattingOptions: jsonc.FormattingOptions = JSONC_MODIFICATION_OPTIONS.formattingOptions): string
+export function format(jsonString: string, formattingOptions = JSONC_MODIFICATION_OPTIONS.formattingOptions): string
 {
     const edits = jsonc.format(jsonString, undefined, formattingOptions);
     return jsonc.applyEdits(jsonString, edits);

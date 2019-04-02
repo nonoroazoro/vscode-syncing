@@ -294,7 +294,11 @@ export class Gist
                         {
                             const okButton = localize("pokaYoke.continue.upload");
                             const message = localize("pokaYoke.continue.upload.message");
-                            const selection = await Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel"));
+                            const selection = await Toast.showConfirmBox(
+                                message,
+                                okButton,
+                                localize("pokaYoke.cancel")
+                            );
                             if (selection !== okButton)
                             {
                                 throw new Error(localize("error.abort.synchronization"));

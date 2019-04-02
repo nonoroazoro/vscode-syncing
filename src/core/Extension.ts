@@ -6,7 +6,12 @@ import * as tmp from "tmp";
 import * as vscode from "vscode";
 
 import { CaseInsensitiveMap, CaseInsensitiveSet } from "../collections";
-import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_EXTENSIONS_AUTOUPDATE, CONFIGURATION_KEY } from "../common/constants";
+import
+{
+    CONFIGURATION_EXCLUDED_EXTENSIONS,
+    CONFIGURATION_EXTENSIONS_AUTOUPDATE,
+    CONFIGURATION_KEY
+} from "../common/constants";
 import { localize } from "../i18n";
 import { IExtension, ISyncedItem } from "../types/SyncingTypes";
 import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
@@ -240,7 +245,9 @@ export class Extension
     public async uninstallExtension(extension: IExtension): Promise<IExtension>
     {
         const localExtension = getExtensionById(extension.id);
-        const extensionPath = localExtension ? localExtension.extensionPath : this._env.getExtensionDirectory(extension);
+        const extensionPath = localExtension
+            ? localExtension.extensionPath
+            : this._env.getExtensionDirectory(extension);
         try
         {
             await fs.remove(extensionPath);
@@ -323,7 +330,10 @@ export class Extension
         {
             // 1. Auto update extensions: Query the latest extensions.
             let queriedExtensions: CaseInsensitiveMap<string, IExtensionMeta> = new CaseInsensitiveMap();
-            const autoUpdateExtensions = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_EXTENSIONS_AUTOUPDATE);
+            const autoUpdateExtensions = getVSCodeSetting<boolean>(
+                CONFIGURATION_KEY,
+                CONFIGURATION_EXTENSIONS_AUTOUPDATE
+            );
             if (autoUpdateExtensions)
             {
                 queriedExtensions = await queryExtensions(extensions.map((ext) => ext.id), this._syncing.proxy);
@@ -429,7 +439,8 @@ export class Extension
     /**
      * Updates extensions.
      */
-    private async _updateExtensions(options: ISyncOptions): Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
+    private async _updateExtensions(options: ISyncOptions)
+        : Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
     {
         const { extensions, progress, showIndicator = false, total } = options;
 
@@ -472,7 +483,8 @@ export class Extension
     /**
      * Removes extensions.
      */
-    private async _removeExtensions(options: ISyncOptions): Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
+    private async _removeExtensions(options: ISyncOptions)
+        : Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
     {
         const { extensions, progress, showIndicator = false, total } = options;
 

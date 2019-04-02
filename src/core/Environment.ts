@@ -21,7 +21,8 @@ export class Environment
      * 2. The VSCode Insiders;
      * 3. The VSCode Exploration Builds;
      * 4. The VSCode under FLOSS license, see [VSCodium](https://github.com/VSCodium/vscodium).
-     * 5. The self-compiled version of VSCode under [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json).
+     * 5. The self-compiled version of VSCode under
+     * [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json).
      */
     private static _codeEnvironments = {
         "Visual Studio Code": {

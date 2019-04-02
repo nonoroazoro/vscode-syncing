@@ -1,7 +1,7 @@
 /**
  * Represents an enhanced `Error`.
  */
-export interface EnhancedError extends Error
+export interface IEnhancedError extends Error
 {
     /**
      * The error code, if available.
@@ -25,7 +25,7 @@ export interface EnhancedError extends Error
 }
 
 /**
- * Creates an `EnhancedError` object with the specified
+ * Creates an `Enhanced Error` object with the specified
  * message, error code, request, response and meta data.
  *
  * @param {string} message The error message.
@@ -41,30 +41,30 @@ export function createError(
     request?: any,
     response?: any,
     meta?: any
-): EnhancedError
+): IEnhancedError
 {
     return enhanceError(new Error(message), code, request, response, meta);
 }
 
 /**
- * Enhances an existing `Error` or `EnhancedError` object with the specified
+ * Enhances an existing `Error` or `Enhanced Error` object with the specified
  * error code, request, response and meta data.
  *
- * @param {(Error | EnhancedError)} error The error to enhance.
+ * @param {(Error | IEnhancedError)} error The error to enhance.
  * @param {(number | string)} [code] The error code.
  * @param {any} [request] The request.
  * @param {any} [response] The response.
  * @param {any} [meta] The meta data.
  */
 export function enhanceError(
-    error: Error | EnhancedError,
+    error: Error | IEnhancedError,
     code?: number | string,
     request?: any,
     response?: any,
     meta?: any
-): EnhancedError
+): IEnhancedError
 {
-    const e: EnhancedError = error;
+    const e: IEnhancedError = error;
     if (code !== undefined)
     {
         e.code = code;

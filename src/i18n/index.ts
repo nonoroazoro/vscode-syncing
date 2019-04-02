@@ -47,7 +47,8 @@ class I18n
      * Gets the localized message.
      *
      * @param {string} key The key of the message.
-     * @param {...any[]} templateValues If the message is a template string, these args will be used to replace the templates.
+     * @param {...any[]} templateValues If the message is a template string,
+     * these args will be used to replace the templates.
      */
     public localize(key: string, ...templateValues: any[]): string
     {
@@ -101,7 +102,8 @@ export function locale(): NormalizedLocale
  * Gets the localized message.
  *
  * @param {string} key The key of the message.
- * @param {...any[]} templateValues If the message is a template string, these args will be used to replace the templates.
+ * @param {...any[]} templateValues If the message is a template string,
+ * these args will be used to replace the templates.
  */
 export function localize(key: string, ...templateValues: any[]): string
 {

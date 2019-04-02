@@ -74,7 +74,8 @@ export class VSCodeSetting
      *        ...
      *    ]
      *
-     * @param {boolean} [loadFileContent=false] Whether to load the content of `VSCode Settings` files. Defaults to `false`.
+     * @param {boolean} [loadFileContent=false] Whether to load the content of `VSCode Settings` files.
+     * Defaults to `false`.
      * @param {boolean} [showIndicator=false] Whether to show the progress indicator. Defaults to `false`.
      */
     public async getSettings(loadFileContent: boolean = false, showIndicator: boolean = false): Promise<ISetting[]>
@@ -84,7 +85,8 @@ export class VSCodeSetting
             Toast.showSpinner(localize("toast.settings.gathering.local"));
         }
 
-        // Note that this is an ordered list, to ensure that the smaller files (such as `settings.json`, `keybindings.json`) are synced first.
+        // Note that this is an ordered list, to ensure that the smaller files
+        // (such as `settings.json`, `keybindings.json`) are synced first.
         // Thus, the extensions will be the last one to sync.
         const settingsList = [
             SettingTypes.Settings,
@@ -114,7 +116,10 @@ export class VSCodeSetting
                 if (type === SettingTypes.Keybindings)
                 {
                     // Separate the keybindings.
-                    const separateKeybindings = getVSCodeSetting<boolean>(CONFIGURATION_KEY, CONFIGURATION_SEPARATE_KEYBINDINGS);
+                    const separateKeybindings = getVSCodeSetting<boolean>(
+                        CONFIGURATION_KEY,
+                        CONFIGURATION_SEPARATE_KEYBINDINGS
+                    );
                     if (separateKeybindings)
                     {
                         remoteFilename = this._env.isMac
@@ -386,7 +391,10 @@ export class VSCodeSetting
                     let extensions = this._ext.getAll();
                     if (exclude && extensions.length > 0)
                     {
-                        const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_EXTENSIONS);
+                        const patterns = getVSCodeSetting<string[]>(
+                            CONFIGURATION_KEY,
+                            CONFIGURATION_EXCLUDED_EXTENSIONS
+                        );
                         extensions = this._getExcludedExtensions(extensions, patterns);
                     }
                     content = JSON.stringify(extensions, null, 4);
@@ -401,7 +409,10 @@ export class VSCodeSetting
                         const settingsJSON = parse(content);
                         if (settingsJSON)
                         {
-                            const patterns = getVSCodeSetting<string[]>(CONFIGURATION_KEY, CONFIGURATION_EXCLUDED_SETTINGS);
+                            const patterns = getVSCodeSetting<string[]>(
+                                CONFIGURATION_KEY,
+                                CONFIGURATION_EXCLUDED_SETTINGS
+                            );
                             content = excludeSettings(content, settingsJSON, patterns);
                         }
                     }
