@@ -10,7 +10,7 @@
         "url": "http://www.alibabagroup.com/"
     },
     "homepage": "https://github.com/nonoroazoro/vscode-syncing",
-    "license": "MIT",
+    "license": "(MIT AND 996ICU)",
     "main": "dist/extension",
     "icon": "resources/logo.png",
     "repository": {
