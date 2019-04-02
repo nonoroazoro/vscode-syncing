@@ -92,9 +92,9 @@ export class Gist
                 name: data.login
             };
         }
-        catch ({ code })
+        catch ({ status })
         {
-            throw this._createError(code);
+            throw this._createError(status);
         }
     }
 
@@ -120,9 +120,9 @@ export class Gist
             }
             return result.data as any;
         }
-        catch ({ code })
+        catch ({ status })
         {
-            const error = this._createError(code);
+            const error = this._createError(status);
             if (showIndicator)
             {
                 Toast.statusError(localize("toast.settings.downloading.failed", error.message));
@@ -146,9 +146,9 @@ export class Gist
                 .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
                 .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
         }
-        catch ({ code })
+        catch ({ status })
         {
-            throw this._createError(code);
+            throw this._createError(status);
         }
     }
 
@@ -197,9 +197,9 @@ export class Gist
                 }
                 return gist;
             }
-            catch ({ code })
+            catch ({ status })
             {
-                throw this._createError(code);
+                throw this._createError(status);
             }
         }
         return false;
@@ -217,9 +217,9 @@ export class Gist
             const result = await this._api.gists.create(content);
             return result.data as any;
         }
-        catch ({ code })
+        catch ({ status })
         {
-            throw this._createError(code);
+            throw this._createError(status);
         }
     }
 
