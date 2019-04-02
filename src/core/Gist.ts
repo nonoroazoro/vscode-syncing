@@ -7,6 +7,7 @@ import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
 import { ISetting, SettingTypes } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
+import { createError } from "../utils/errors";
 import { parse } from "../utils/jsonc";
 import { isEmptyString } from "../utils/lang";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
@@ -80,6 +81,8 @@ export class Gist
 
     /**
      * Gets the currently authenticated GitHub user.
+     *
+     * @throws {IEnhancedError}
      */
     public async user(): Promise<{ id: number, name: string }>
     {
@@ -103,6 +106,7 @@ export class Gist
      *
      * @param id Gist id.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
+     * @throws {IEnhancedError}
      */
     public async get(id: string, showIndicator: boolean = false): Promise<GitHubTypes.IGist>
     {
@@ -133,6 +137,8 @@ export class Gist
 
     /**
      * Gets all the gists of the currently authenticated user.
+     *
+     * @throws {IEnhancedError}
      */
     public async getAll(): Promise<GitHubTypes.IGist[]>
     {
@@ -177,6 +183,7 @@ export class Gist
      * Determines whether the specified gist exists.
      *
      * @param id Gist id.
+     * @throws {IEnhancedError}
      */
     public async exists(id: string): Promise<false | GitHubTypes.IGist>
     {
@@ -209,6 +216,7 @@ export class Gist
      * Creates a new gist.
      *
      * @param content Gist content.
+     * @throws {IEnhancedError}
      */
     public async create(content: Github.GistsCreateParams): Promise<GitHubTypes.IGist>
     {
@@ -410,9 +418,7 @@ export class Gist
         {
             message = localize("error.check.gist.id");
         }
-        const error = new Error(message);
-        error["code"] = code;
-        return error;
+        return createError(message, code);
     }
 
     /**
