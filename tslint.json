@@ -10,10 +10,6 @@
             "spaces",
             4
         ],
-        "interface-name": [
-            true,
-            "never-prefix"
-        ],
         "max-classes-per-file": true,
         "max-line-length": [
             true,
