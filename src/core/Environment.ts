@@ -4,6 +4,7 @@ import * as path from "path";
 import { VSCODE_BUILTIN_ENVIRONMENTS } from "../common/constants";
 import { localize } from "../i18n";
 import { IExtension } from "../types/SyncingTypes";
+import { VSCodeEdition } from "../types/VSCodeEdition";
 import { getVSCodeEdition } from "../utils/vscodeAPI";
 
 /**
@@ -13,7 +14,8 @@ export class Environment
 {
     private static _instance: Environment;
 
-    private _codeMap: { extensionsDirectoryName: string; dataDirectoryName: string; };
+    private _edition: VSCodeEdition;
+    private _codeEnvironment: { extensionsDirectoryName: string; dataDirectoryName: string; };
     private _codeDataDirectory: string;
     private _codeUserDirectory: string;
     private _extensionsDirectory: string;
@@ -24,12 +26,8 @@ export class Environment
     private constructor()
     {
         // Note that the followings are order-sensitive.
-        this._codeMap = VSCODE_BUILTIN_ENVIRONMENTS[getVSCodeEdition()];
-        if (!this._codeMap)
-        {
-            // Unknown VSCode version.
-            throw new Error(localize("error.env.unknown.vscode"));
-        }
+        this._edition = getVSCodeEdition();
+        this._codeEnvironment = VSCODE_BUILTIN_ENVIRONMENTS[this._edition];
         this._isMac = process.platform === "darwin";
         this._isPortable = process.env.VSCODE_PORTABLE != null;
 
@@ -142,7 +140,7 @@ export class Environment
         }
         return path.join(
             os.homedir(),
-            this._codeMap.extensionsDirectoryName,
+            this._codeEnvironment.extensionsDirectoryName,
             "extensions"
         );
     }
@@ -174,6 +172,6 @@ export class Environment
                 // Unknown platform.
                 throw new Error(localize("error.env.platform.not.supported"));
         }
-        return path.join(baseDirectory, this._codeMap.dataDirectoryName);
+        return path.join(baseDirectory, this._codeEnvironment.dataDirectoryName);
     }
 }
