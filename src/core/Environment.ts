@@ -1,9 +1,11 @@
 import * as os from "os";
 import * as path from "path";
-import * as vscode from "vscode";
 
+import { VSCODE_BUILTIN_ENVIRONMENTS } from "../common/constants";
 import { localize } from "../i18n";
 import { IExtension } from "../types/SyncingTypes";
+import { VSCodeEdition } from "../types/VSCodeEdition";
+import { getVSCodeEdition } from "../utils/vscodeAPI";
 
 /**
  * VSCode environment wrapper.
@@ -12,41 +14,8 @@ export class Environment
 {
     private static _instance: Environment;
 
-    /**
-     * The builtin-environments of different VSCode editions.
-     *
-     * Note: The key will be matched with the `vscode.env.appName`, contains the followings:
-     *
-     * 1. The VSCode Standard Builds;
-     * 2. The VSCode Insiders;
-     * 3. The VSCode Exploration Builds;
-     * 4. The VSCode under FLOSS license, see [VSCodium](https://github.com/VSCodium/vscodium).
-     * 5. The self-compiled version of VSCode under [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json).
-     */
-    private static _codeEnvironments = {
-        "Visual Studio Code": {
-            extensionsDirectoryName: ".vscode",
-            dataDirectoryName: "Code"
-        },
-        "Visual Studio Code - Insiders": {
-            extensionsDirectoryName: ".vscode-insiders",
-            dataDirectoryName: "Code - Insiders"
-        },
-        "Visual Studio Code - Exploration": {
-            extensionsDirectoryName: ".vscode-exploration",
-            dataDirectoryName: "Code - Exploration"
-        },
-        "VSCodium": {
-            extensionsDirectoryName: ".vscode-oss",
-            dataDirectoryName: "VSCodium"
-        },
-        "Code - OSS": {
-            extensionsDirectoryName: ".vscode-oss",
-            dataDirectoryName: "Code - OSS"
-        }
-    };
-
-    private _codeMap: { extensionsDirectoryName: string; dataDirectoryName: string; };
+    private _edition: VSCodeEdition;
+    private _codeEnvironment: { extensionsDirectoryName: string; dataDirectoryName: string; };
     private _codeDataDirectory: string;
     private _codeUserDirectory: string;
     private _extensionsDirectory: string;
@@ -57,12 +26,8 @@ export class Environment
     private constructor()
     {
         // Note that the followings are order-sensitive.
-        this._codeMap = Environment._codeEnvironments[vscode.env.appName];
-        if (!this._codeMap)
-        {
-            // Unknown VSCode version.
-            throw new Error(localize("error.env.unknown.vscode"));
-        }
+        this._edition = getVSCodeEdition();
+        this._codeEnvironment = VSCODE_BUILTIN_ENVIRONMENTS[this._edition];
         this._isMac = process.platform === "darwin";
         this._isPortable = process.env.VSCODE_PORTABLE != null;
 
@@ -175,7 +140,7 @@ export class Environment
         }
         return path.join(
             os.homedir(),
-            this._codeMap.extensionsDirectoryName,
+            this._codeEnvironment.extensionsDirectoryName,
             "extensions"
         );
     }
@@ -207,6 +172,6 @@ export class Environment
                 // Unknown platform.
                 throw new Error(localize("error.env.platform.not.supported"));
         }
-        return path.join(baseDirectory, this._codeMap.dataDirectoryName);
+        return path.join(baseDirectory, this._codeEnvironment.dataDirectoryName);
     }
 }

@@ -7,6 +7,7 @@ import { ISyncedItem } from "./types/SyncingTypes";
 
 let _syncing: Syncing;
 let _vscodeSetting: VSCodeSetting;
+let _isReady: boolean;
 let _isSynchronizing: boolean;
 
 export function activate(context: vscode.ExtensionContext)
@@ -22,11 +23,20 @@ function _init(context: vscode.ExtensionContext)
     // Config i18n.
     setup(context.extensionPath);
 
-    _isSynchronizing = false;
-    _syncing = Syncing.create();
-    _vscodeSetting = VSCodeSetting.create();
-
     _initCommands(context);
+
+    _isSynchronizing = false;
+    try
+    {
+        _syncing = Syncing.create();
+        _vscodeSetting = VSCodeSetting.create();
+        _isReady = true;
+    }
+    catch (err)
+    {
+        _isReady = false;
+        Toast.statusFatal(localize("error.initialization", err.message));
+    }
 }
 
 /**
@@ -53,7 +63,7 @@ function _registerCommand(context: vscode.ExtensionContext, command: string, cal
  */
 async function _uploadSettings()
 {
-    if (!_isSynchronizing)
+    if (_isReady && !_isSynchronizing)
     {
         _isSynchronizing = true;
         try
@@ -68,7 +78,7 @@ async function _uploadSettings()
             }
             Toast.statusInfo(localize("toast.settings.uploaded"));
         }
-        catch (error) { }
+        catch { }
         finally
         {
             _isSynchronizing = false;
@@ -81,7 +91,7 @@ async function _uploadSettings()
  */
 async function _downloadSettings()
 {
-    if (!_isSynchronizing)
+    if (_isReady && !_isSynchronizing)
     {
         _isSynchronizing = true;
         try
@@ -98,19 +108,19 @@ async function _downloadSettings()
                     Toast.showReloadBox();
                 }
             }
-            catch ({ code })
+            catch (err)
             {
-                if (code === 401)
+                if (err.code === 401)
                 {
                     _syncing.clearGitHubToken();
                 }
-                else if (code === 404)
+                else if (err.code === 404)
                 {
                     _syncing.clearGistID();
                 }
             }
         }
-        catch (error) { }
+        catch { }
         finally
         {
             _isSynchronizing = false;
@@ -123,7 +133,10 @@ async function _downloadSettings()
  */
 function _openSettings()
 {
-    _syncing.openSettings();
+    if (_isReady)
+    {
+        _syncing.openSettings();
+    }
 }
 
 /**

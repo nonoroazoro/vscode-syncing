@@ -1,6 +1,8 @@
 import * as vscode from "vscode";
 
+import { localize } from "../i18n";
 import { NormalizedLocale } from "../types/NormalizedLocale";
+import { VSCodeEdition } from "../types/VSCodeEdition";
 import { normalize } from "./locale";
 
 /**
@@ -75,6 +77,38 @@ export function getVSCodeLocale(): string | undefined
     {
         return;
     }
+}
+
+/**
+ * Gets the edition of the current running VSCode.
+ *
+ * @throws {Error} Throws an error when the edition is unknown.
+ */
+export function getVSCodeEdition()
+{
+    switch (vscode.env.appName)
+    {
+        case "Visual Studio Code":
+            return VSCodeEdition.STANDARD;
+
+        case "Visual Studio Code - Insiders":
+            return VSCodeEdition.INSIDERS;
+
+        case "Visual Studio Code - Exploration":
+            return VSCodeEdition.EXPLORATION;
+
+        case "VSCodium":
+            return VSCodeEdition.VSCODIUM;
+
+        case "Code - OSS":
+            return VSCodeEdition.OSS;
+    }
+
+    // if (vscode.extensions.getExtension("coder.coder"))
+    // {
+    //     return VSCodeEdition.CODER;
+    // }
+    throw new Error(localize("error.env.unknown.vscode"));
 }
 
 /**

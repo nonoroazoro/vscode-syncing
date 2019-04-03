@@ -15,7 +15,8 @@ import { post } from "./ajax";
  * @param {string[]} ids The id list of extensions. The id is in the form of: `publisher.name`.
  * @param {string} [proxy] The proxy settings.
  */
-export async function queryExtensions(ids: string[], proxy?: string): Promise<CaseInsensitiveMap<string, IExtensionMeta>>
+export async function queryExtensions(ids: string[], proxy?: string)
+    : Promise<CaseInsensitiveMap<string, IExtensionMeta>>
 {
     const result = new CaseInsensitiveMap<string, IExtensionMeta>();
     if (ids.length > 0)
