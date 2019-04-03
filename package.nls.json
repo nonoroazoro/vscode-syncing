@@ -39,7 +39,7 @@
     "toast.settings.removing.outdated.extension": "Syncing: Removing outdated extension: {0}",
     "toast.syncing.checking.settings": "Syncing: Checking Syncing's settings.",
     "toast.syncing.save.settings": "Syncing: Cannot save Syncing's settings: {0}",
-    "error.initialization": "Syncing: Failed to initialize the extension: {0}",
+    "error.initialization": "Syncing: Failed to initialize: {0}",
     "error.abort.synchronization": "You abort the synchronization.",
     "error.check.gist.id": "Please check your Gist ID.",
     "error.check.github.token": "Please check your GitHub Personal Access Token.",
