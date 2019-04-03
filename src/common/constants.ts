@@ -39,5 +39,9 @@ export const VSCODE_BUILTIN_ENVIRONMENTS = {
     [VSCodeEdition.OSS]: {
         extensionsDirectoryName: ".vscode-oss",
         dataDirectoryName: "Code - OSS"
+    },
+    [VSCodeEdition.CODER]: {
+        extensionsDirectoryName: "vscode",
+        dataDirectoryName: "Code"
     }
 };
