@@ -78,7 +78,7 @@ async function _uploadSettings()
             }
             Toast.statusInfo(localize("toast.settings.uploaded"));
         }
-        catch (error) { }
+        catch { }
         finally
         {
             _isSynchronizing = false;
@@ -108,19 +108,19 @@ async function _downloadSettings()
                     Toast.showReloadBox();
                 }
             }
-            catch ({ code })
+            catch (err)
             {
-                if (code === 401)
+                if (err.code === 401)
                 {
                     _syncing.clearGitHubToken();
                 }
-                else if (code === 404)
+                else if (err.code === 404)
                 {
                     _syncing.clearGistID();
                 }
             }
         }
-        catch (error) { }
+        catch { }
         finally
         {
             _isSynchronizing = false;
