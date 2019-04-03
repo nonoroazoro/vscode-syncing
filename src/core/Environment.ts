@@ -1,9 +1,10 @@
 import * as os from "os";
 import * as path from "path";
-import * as vscode from "vscode";
 
+import { VSCODE_BUILTIN_ENVIRONMENTS } from "../common/constants";
 import { localize } from "../i18n";
 import { IExtension } from "../types/SyncingTypes";
+import { getVSCodeEdition } from "../utils/vscodeAPI";
 
 /**
  * VSCode environment wrapper.
@@ -11,41 +12,6 @@ import { IExtension } from "../types/SyncingTypes";
 export class Environment
 {
     private static _instance: Environment;
-
-    /**
-     * The builtin-environments of different VSCode editions.
-     *
-     * Note: The key will be matched with the `vscode.env.appName`, contains the followings:
-     *
-     * 1. The VSCode Standard Builds;
-     * 2. The VSCode Insiders;
-     * 3. The VSCode Exploration Builds;
-     * 4. The VSCode under FLOSS license, see [VSCodium](https://github.com/VSCodium/vscodium).
-     * 5. The self-compiled version of VSCode under
-     * [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json).
-     */
-    private static _codeEnvironments = {
-        "Visual Studio Code": {
-            extensionsDirectoryName: ".vscode",
-            dataDirectoryName: "Code"
-        },
-        "Visual Studio Code - Insiders": {
-            extensionsDirectoryName: ".vscode-insiders",
-            dataDirectoryName: "Code - Insiders"
-        },
-        "Visual Studio Code - Exploration": {
-            extensionsDirectoryName: ".vscode-exploration",
-            dataDirectoryName: "Code - Exploration"
-        },
-        "VSCodium": {
-            extensionsDirectoryName: ".vscode-oss",
-            dataDirectoryName: "VSCodium"
-        },
-        "Code - OSS": {
-            extensionsDirectoryName: ".vscode-oss",
-            dataDirectoryName: "Code - OSS"
-        }
-    };
 
     private _codeMap: { extensionsDirectoryName: string; dataDirectoryName: string; };
     private _codeDataDirectory: string;
@@ -58,7 +24,7 @@ export class Environment
     private constructor()
     {
         // Note that the followings are order-sensitive.
-        this._codeMap = Environment._codeEnvironments[vscode.env.appName];
+        this._codeMap = VSCODE_BUILTIN_ENVIRONMENTS[getVSCodeEdition()];
         if (!this._codeMap)
         {
             // Unknown VSCode version.
