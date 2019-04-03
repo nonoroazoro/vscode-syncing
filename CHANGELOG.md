@@ -1,5 +1,14 @@
 # Changelogs
 
+## 2.1.5 - April 03, 2019
+
+- Added: Handle error during initialization.
+
+- Added: Added Anti 996 license.
+
+- Changed: Tweak localizations.
+
+
 ## 2.1.4 - March 05, 2019
 
 - Fixed: Cannot download settings from a public Gist.
