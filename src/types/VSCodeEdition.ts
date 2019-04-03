@@ -4,11 +4,6 @@
 export enum VSCodeEdition
 {
     /**
-     * Unknown VSCode edition.
-     */
-    UNKNOWN,
-
-    /**
      * The VSCode Standard Builds.
      */
     STANDARD,
