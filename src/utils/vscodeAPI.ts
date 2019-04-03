@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 
+import { localize } from "../i18n";
 import { NormalizedLocale } from "../types/NormalizedLocale";
 import { VSCodeEdition } from "../types/VSCodeEdition";
 import { normalize } from "./locale";
@@ -80,6 +81,8 @@ export function getVSCodeLocale(): string | undefined
 
 /**
  * Gets the edition of the current running VSCode.
+ *
+ * @throws {Error} Throws an error when the edition is unknown.
  */
 export function getVSCodeEdition()
 {
@@ -99,10 +102,13 @@ export function getVSCodeEdition()
 
         case "Code - OSS":
             return VSCodeEdition.OSS;
-
-        default:
-            return VSCodeEdition.STANDARD;
     }
+
+    // if (vscode.extensions.getExtension("coder.coder"))
+    // {
+    //     return VSCodeEdition.CODER;
+    // }
+    throw new Error(localize("error.env.unknown.vscode"));
 }
 
 /**
