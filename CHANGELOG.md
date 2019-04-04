@@ -1,5 +1,10 @@
 # Changelogs
 
+## 2.1.6 - April 04, 2019
+
+- Changed: Remove unused files to reduce the extension size and improve the performance.
+
+
 ## 2.1.5 - April 03, 2019
 
 - Added: Handle error during initialization.
