@@ -1,9 +1,14 @@
+# Node files
+node_modules
+package-lock.json
+
 # Editor files
 .vscode/**
 
 # Configuration files
 .editorconfig
 .gitignore
+.huskyrc
 jest.config.js
 tsconfig.json
 tslint.json
