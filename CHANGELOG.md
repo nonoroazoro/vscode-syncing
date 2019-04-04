@@ -9,7 +9,7 @@
 
 - Added: Handle error during initialization.
 
-- Added: Added Anti 996 license.
+- Added: Add Anti 996 license.
 
 - Changed: Tweak localizations.
 
@@ -58,19 +58,19 @@
 
 ## 2.0.6 - November 29, 2018
 
-- Fixed: Fixed the [issue](https://github.com/octokit/rest.js/issues/1144) introduced by `deepmerge`.
+- Fixed: Fix the [issue](https://github.com/octokit/rest.js/issues/1144) introduced by `deepmerge`.
 
 
 ## 2.0.5 - November 29, 2018
 
-- Changed: Replaced `moment` with `date-fns` which can significantly reduce the extension's size.
+- Changed: Replace `moment` with `date-fns` which can significantly reduce the extension's size.
 
-- Fixed: Fixed the [event-stream security issue](https://code.visualstudio.com/blogs/2018/11/26/event-stream).
+- Fixed: Fix the [event-stream security issue](https://code.visualstudio.com/blogs/2018/11/26/event-stream).
 
 
 ## 2.0.2 - November 13, 2018
 
-- Fixed: Fixed an error while parsing VSCode settings.
+- Fixed: Fix an error while parsing VSCode settings.
 
 
 ## 2.0.1 - November 01, 2018
