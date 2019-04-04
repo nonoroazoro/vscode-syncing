@@ -15,6 +15,7 @@
         "rootDir": "src",
         "skipLibCheck": true,
         "sourceMap": true,
+        "strictBindCallApply": true,
         "strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": true,
         "target": "es2017"
