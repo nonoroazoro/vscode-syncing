@@ -21,27 +21,27 @@ export const SETTING_EXCLUDED_SETTINGS = `${CONFIGURATION_KEY}.${CONFIGURATION_E
  */
 export const VSCODE_BUILTIN_ENVIRONMENTS = {
     [VSCodeEdition.STANDARD]: {
-        extensionsDirectoryName: ".vscode",
-        dataDirectoryName: "Code"
+        dataDirectoryName: "Code",
+        extensionsDirectoryName: ".vscode"
     },
     [VSCodeEdition.INSIDERS]: {
-        extensionsDirectoryName: ".vscode-insiders",
-        dataDirectoryName: "Code - Insiders"
+        dataDirectoryName: "Code - Insiders",
+        extensionsDirectoryName: ".vscode-insiders"
     },
     [VSCodeEdition.EXPLORATION]: {
-        extensionsDirectoryName: ".vscode-exploration",
-        dataDirectoryName: "Code - Exploration"
+        dataDirectoryName: "Code - Exploration",
+        extensionsDirectoryName: ".vscode-exploration"
     },
     [VSCodeEdition.VSCODIUM]: {
-        extensionsDirectoryName: ".vscode-oss",
-        dataDirectoryName: "VSCodium"
+        dataDirectoryName: "VSCodium",
+        extensionsDirectoryName: ".vscode-oss"
     },
     [VSCodeEdition.OSS]: {
-        extensionsDirectoryName: ".vscode-oss",
-        dataDirectoryName: "Code - OSS"
+        dataDirectoryName: "Code - OSS",
+        extensionsDirectoryName: ".vscode-oss"
     },
     [VSCodeEdition.CODER]: {
-        extensionsDirectoryName: "vscode",
-        dataDirectoryName: "Code"
+        dataDirectoryName: "Code",
+        extensionsDirectoryName: "vscode"
     }
 };
