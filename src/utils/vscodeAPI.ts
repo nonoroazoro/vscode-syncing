@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { VSCODE_BUILTIN_ENVIRONMENTS } from "../common/constants";
+import { VSCODE_BUILTIN_ENVIRONMENTS } from "../constants";
 import { localize } from "../i18n";
 import { NormalizedLocale } from "../types/NormalizedLocale";
 import { VSCodeEdition } from "../types/VSCodeEdition";

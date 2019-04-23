@@ -11,7 +11,7 @@ import
     CONFIGURATION_EXCLUDED_EXTENSIONS,
     CONFIGURATION_EXTENSIONS_AUTOUPDATE,
     CONFIGURATION_KEY
-} from "../common/constants";
+} from "../constants";
 import { localize } from "../i18n";
 import { IExtension, ISyncedItem } from "../types/SyncingTypes";
 import { IExtensionMeta } from "../types/VSCodeWebAPITypes";

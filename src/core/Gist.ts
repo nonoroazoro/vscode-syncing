@@ -2,7 +2,7 @@ import * as Github from "@octokit/rest";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
 
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../common/constants";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
 import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
 import { ISetting, SettingTypes } from "../types/SyncingTypes";

@@ -12,7 +12,7 @@ import
     CONFIGURATION_SEPARATE_KEYBINDINGS,
     SETTING_EXCLUDED_EXTENSIONS,
     SETTING_EXCLUDED_SETTINGS
-} from "../common/constants";
+} from "../constants";
 import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
 import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../types/SyncingTypes";
