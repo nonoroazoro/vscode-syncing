@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 
+import { VSCODE_BUILTIN_ENVIRONMENTS } from "../common/constants";
 import { localize } from "../i18n";
 import { NormalizedLocale } from "../types/NormalizedLocale";
 import { VSCodeEdition } from "../types/VSCodeEdition";
@@ -109,6 +110,14 @@ export function getVSCodeEdition()
     //     return VSCodeEdition.CODER;
     // }
     throw new Error(localize("error.env.unknown.vscode"));
+}
+
+/**
+ * Gets the builtin-environment of the current running VSCode.
+ */
+export function getVSCodeBuiltinEnvironment()
+{
+    return VSCODE_BUILTIN_ENVIRONMENTS[getVSCodeEdition()];
 }
 
 /**
