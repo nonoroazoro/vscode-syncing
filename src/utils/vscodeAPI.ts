@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import { VSCODE_BUILTIN_ENVIRONMENTS } from "../common/constants";
 import { localize } from "../i18n";
 import { NormalizedLocale } from "../types/NormalizedLocale";
+import { Platform } from "../types/Platform";
 import { VSCodeEdition } from "../types/VSCodeEdition";
 import { normalize } from "./locale";
 
@@ -78,6 +79,28 @@ export function getVSCodeLocale(): string | undefined
     {
         return;
     }
+}
+
+/**
+ * Gets the current running platform.
+ *
+ * @throws {Error} Throws an error when the platform is unknown.
+ */
+export function getPlatform()
+{
+    if (process.platform === "linux")
+    {
+        return Platform.LINUX;
+    }
+    if (process.platform === "darwin")
+    {
+        return Platform.MACINTOSH;
+    }
+    if (process.platform === "win32")
+    {
+        return Platform.WINDOWS;
+    }
+    throw new Error(localize("error.env.platform.not.supported"));
 }
 
 /**
