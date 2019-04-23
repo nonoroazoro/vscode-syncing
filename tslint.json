@@ -5,7 +5,6 @@
     ],
     "rules": {
         "import-spacing": false,
-        "interface-name": false,
         "indent": [
             true,
             "spaces",
