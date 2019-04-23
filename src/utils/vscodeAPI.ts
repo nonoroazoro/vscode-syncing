@@ -114,6 +114,8 @@ export function getVSCodeEdition()
 
 /**
  * Gets the builtin-environment of the current running VSCode.
+ *
+ * @throws {Error} Throws an error when the environment is not found.
  */
 export function getVSCodeBuiltinEnvironment()
 {
