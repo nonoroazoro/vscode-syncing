@@ -47,7 +47,7 @@ export class Syncing
     private constructor()
     {
         this._env = Environment.create();
-        this._settingsPath = path.join(this._env.codeUserDirectory, "syncing.json");
+        this._settingsPath = path.join(this._env.userDirectory, "syncing.json");
     }
 
     /**

@@ -133,7 +133,7 @@ export class VSCodeSetting
                 }
 
                 tempSettings = [{
-                    filepath: path.join(this._env.codeUserDirectory, localFilename),
+                    filepath: path.join(this._env.userDirectory, localFilename),
                     remoteFilename,
                     type
                 }];
