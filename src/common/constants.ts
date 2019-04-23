@@ -1,3 +1,4 @@
+import { VSCodeBuiltinEnvironment } from "../types/VSCodeBuiltinEnvironment";
 import { VSCodeEdition } from "../types/VSCodeEdition";
 
 /**
@@ -19,7 +20,7 @@ export const SETTING_EXCLUDED_SETTINGS = `${CONFIGURATION_KEY}.${CONFIGURATION_E
 /**
  * The builtin-environments of different VSCode editions.
  */
-export const VSCODE_BUILTIN_ENVIRONMENTS = {
+export const VSCODE_BUILTIN_ENVIRONMENTS: Record<VSCodeEdition, VSCodeBuiltinEnvironment> = {
     [VSCodeEdition.STANDARD]: {
         dataDirectoryName: "Code",
         extensionsDirectoryName: ".vscode"
