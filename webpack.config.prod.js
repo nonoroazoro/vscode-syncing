@@ -20,7 +20,7 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".js"],
         alias: {
-            deepmerge$: 'deepmerge/dist/umd.js',
+            deepmerge$: "deepmerge/dist/umd.js"
         }
     },
     externals: {
