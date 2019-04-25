@@ -15,6 +15,7 @@ tslint.json
 webpack.config.prod.js
 
 # Project specific stuff
+__tests__/**
 .github/**
 docs/**
 src/**
