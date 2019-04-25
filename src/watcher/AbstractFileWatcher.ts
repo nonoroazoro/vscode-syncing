@@ -1,0 +1,33 @@
+import { EventEmitter } from "events";
+
+export enum FileWatcherEvent
+{
+    ADDED = "added",
+    CHANGED = "changed",
+    DELETED = "deleted"
+}
+
+export abstract class AbstractFileWatcher
+{
+    protected _emitter = new EventEmitter();
+
+    abstract start(): Promise<void>;
+    abstract stop(): Promise<void>;
+
+    on(event: FileWatcherEvent, fn: (...args: any[]) => void): this
+    {
+        this._emitter.on(event, fn);
+        return this;
+    }
+
+    off(event: FileWatcherEvent, fn: (...args: any[]) => void): this
+    {
+        this._emitter.off(event, fn);
+        return this;
+    }
+
+    emit(event: FileWatcherEvent, ...args: any[]): boolean
+    {
+        return this._emitter.emit(event, ...args);
+    }
+}
