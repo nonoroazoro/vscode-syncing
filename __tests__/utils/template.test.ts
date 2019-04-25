@@ -1,4 +1,4 @@
-import { format } from "../../utils/template";
+import { format } from "../../src/utils/template";
 
 describe("Syncing/utils/template", () =>
 {

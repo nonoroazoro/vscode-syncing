@@ -1,4 +1,4 @@
-import { isEmptyString, isString } from "../../utils/lang";
+import { isEmptyString, isString } from "../../src/utils/lang";
 
 describe("Syncing/utils/lang", () =>
 {

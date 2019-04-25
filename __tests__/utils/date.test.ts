@@ -1,5 +1,5 @@
-import { NormalizedLocale } from "../../types/NormalizedLocale";
-import { formatDistance } from "../../utils/date";
+import { NormalizedLocale } from "../../src/types/NormalizedLocale";
+import { formatDistance } from "../../src/utils/date";
 
 describe("Syncing/utils/date", () =>
 {
