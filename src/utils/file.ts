@@ -1,7 +1,7 @@
 import * as fs from "fs-extra";
 
 /**
- * Reads the last modified time of the file.
+ * Reads the last modified time (in milliseconds) of the file.
  *
  * `Note:` Returns `undefined` if the file is not exists or error occurs.
  *
