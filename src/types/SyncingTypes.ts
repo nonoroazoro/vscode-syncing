@@ -34,6 +34,11 @@ export interface ISetting
      * Settings type.
      */
     type: SettingTypes;
+
+    /**
+     * The last modified time of the setting.
+     */
+    lastModified?: number;
 }
 
 /**
