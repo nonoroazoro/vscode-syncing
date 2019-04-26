@@ -3,21 +3,17 @@
  */
 export interface IGist
 {
-    created_at: string;
     description: string;
     files: IGistFiles;
     history: IGistHistory[];
     id: string;
-    owner: IGistOwner;
+    owner: IGistUser;
     public: boolean;
-    truncated: boolean;
 
     /**
      * The last update time, such as "2019-04-26T01:43:01Z".
      */
     updated_at: string;
-
-    url: string;
 }
 
 /**
@@ -35,20 +31,15 @@ export interface IGistFile
 {
     content: string;
     filename: string;
-    language: string;
-    size: number;
-    truncated: boolean;
-    type: string;
 }
 
 /**
- * Represents the `owner` of the GitHub Gist.
+ * Represents the `user` of the GitHub Gist.
  */
-export interface IGistOwner
+export interface IGistUser
 {
     id: number;
     login: string;
-    type: string;
 }
 
 /**
@@ -56,7 +47,6 @@ export interface IGistOwner
  */
 export interface IGistHistory
 {
-    committed_at: string;
-    user: IGistOwner;
+    user: IGistUser;
     version: string;
 }

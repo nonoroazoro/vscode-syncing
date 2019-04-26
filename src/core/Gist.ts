@@ -5,7 +5,7 @@ import pick = require("lodash.pick");
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
 import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
-import { ISetting, SettingTypes } from "../types/SyncingTypes";
+import { ISetting, SettingType } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
 import { createError } from "../utils/errors";
 import { parse } from "../utils/jsonc";
@@ -89,7 +89,7 @@ export class Gist
         try
         {
             const res = await this._api.users.getAuthenticated({});
-            const data = res.data as GitHubTypes.IGistOwner;
+            const data = res.data as GitHubTypes.IGistUser;
             return {
                 id: data.id,
                 name: data.login
@@ -147,7 +147,7 @@ export class Gist
             const res = await this._api.gists.list({});
             // Find and sort VSCode settings gists by time.
             const gists: GitHubTypes.IGist[] = res.data as any;
-            const extensionsRemoteFilename = `${SettingTypes.Extensions}.json`;
+            const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
             return gists
                 .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
                 .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
@@ -379,7 +379,7 @@ export class Gist
             else
             {
                 // Remove the remote files except keybindings and settings.
-                if (!key.includes(SettingTypes.Keybindings) && !key.includes(SettingTypes.Settings))
+                if (!key.includes(SettingType.Keybindings) && !key.includes(SettingType.Settings))
                 {
                     result[key] = null;
                 }
@@ -436,7 +436,7 @@ export class Gist
      */
     private _parseToJSON(files: GitHubTypes.IGistFiles): object
     {
-        const extensionsRemoteFilename = `${SettingTypes.Extensions}.json`;
+        const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
         let file: GitHubTypes.IGistFile;
         let parsed: object;
         const result = {};

@@ -1,7 +1,7 @@
 /**
- * Represents the types of the various `VSCode Settings`, such as `Extensions`, `Keybindings`...
+ * Represents various kinds of `VSCode Settings`, such as `Extensions`, `Keybindings`...
  */
-export enum SettingTypes
+export enum SettingType
 {
     Extensions = "extensions",
     Keybindings = "keybindings",
@@ -16,24 +16,21 @@ export enum SettingTypes
 export interface ISetting
 {
     /**
-     * Settings content.
+     * The corresponding local filepath.
      */
-    content?: string;
+    localFilepath: string;
 
     /**
-     * Settings local filepath.
-     */
-    filepath: string;
-
-    /**
-     * Settings filename in GitHub Gist.
+     * The corresponding remote filename.
      */
     remoteFilename: string;
 
+    type: SettingType;
+
     /**
-     * Settings type.
+     * The content of the setting.
      */
-    type: SettingTypes;
+    content?: string;
 
     /**
      * The last modified time of the setting.
