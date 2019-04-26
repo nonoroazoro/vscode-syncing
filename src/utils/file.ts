@@ -1,13 +1,13 @@
 import * as fs from "fs-extra";
 
 /**
- * Reads the file and returns its last modified time.
+ * Reads the last modified time of the file.
  *
  * `Note:` Returns `undefined` if the file is not exists or error occurs.
  *
  * @param {string} path The path of the file.
  */
-export function lastModified(path: string): Promise<number | undefined>
+export function readLastModified(path: string): Promise<number | undefined>
 {
     return new Promise((resolve) =>
     {
