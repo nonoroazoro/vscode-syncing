@@ -17,6 +17,7 @@ import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
 import { IExtension, ISetting, ISyncedItem, SettingTypes } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
+import { readLastModified } from "../utils/file";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
@@ -380,9 +381,11 @@ export class VSCodeSetting
      */
     private async _loadContent(settings: ISetting[], exclude: boolean = true): Promise<ISetting[]>
     {
-        return settings.map((setting: ISetting) =>
+        const result: ISetting[] = [];
+        for (const setting of settings)
         {
             let content: string | undefined;
+            let lastModified: number | undefined;
             try
             {
                 if (setting.type === SettingTypes.Extensions)
@@ -416,6 +419,8 @@ export class VSCodeSetting
                             content = excludeSettings(content, settingsJSON, patterns);
                         }
                     }
+
+                    lastModified = await readLastModified(setting.filepath);
                 }
             }
             catch (err)
@@ -423,9 +428,9 @@ export class VSCodeSetting
                 content = undefined;
                 console.error(localize("error.loading.settings", setting.remoteFilename, err));
             }
-
-            return { ...setting, content };
-        });
+            result.push({ ...setting, content, lastModified });
+        }
+        return result;
     }
 
     /**
