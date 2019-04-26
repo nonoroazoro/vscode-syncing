@@ -9,7 +9,7 @@ export enum FileWatcherEvent
 
 export abstract class AbstractFileWatcher
 {
-    protected _emitter = new EventEmitter();
+    private _emitter = new EventEmitter();
 
     abstract start(): Promise<void>;
     abstract stop(): Promise<void>;
@@ -26,7 +26,7 @@ export abstract class AbstractFileWatcher
         return this;
     }
 
-    emit(event: FileWatcherEvent, ...args: any[]): boolean
+    protected emit(event: FileWatcherEvent, ...args: any[]): boolean
     {
         return this._emitter.emit(event, ...args);
     }

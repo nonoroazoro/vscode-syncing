@@ -63,6 +63,6 @@ export class ChokidarFileWatcher extends AbstractFileWatcher
                 return;
         }
         console.info(eventType, path);
-        this._emitter.emit(eventType, path);
+        this.emit(eventType, path);
     }
 }
