@@ -149,11 +149,5 @@
         "vscode": "^1.1.33",
         "webpack": "^4.30.0",
         "webpack-cli": "^3.3.1"
-    },
-    "lint-staged": {
-        "./src/**/*.ts": [
-            "tslint",
-            "git add"
-        ]
     }
 }
