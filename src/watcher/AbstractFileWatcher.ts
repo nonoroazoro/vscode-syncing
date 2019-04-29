@@ -11,16 +11,13 @@ export abstract class AbstractFileWatcher
 {
     private _emitter = new EventEmitter();
 
-    abstract start(): Promise<void>;
-    abstract stop(): Promise<void>;
-
-    on(event: FileWatcherEvent, fn: (...args: any[]) => void): this
+    public on(event: FileWatcherEvent, fn: (...args: any[]) => void): this
     {
         this._emitter.on(event, fn);
         return this;
     }
 
-    off(event: FileWatcherEvent, fn: (...args: any[]) => void): this
+    public off(event: FileWatcherEvent, fn: (...args: any[]) => void): this
     {
         this._emitter.off(event, fn);
         return this;
@@ -30,4 +27,7 @@ export abstract class AbstractFileWatcher
     {
         return this._emitter.emit(event, ...args);
     }
+
+    abstract start(): Promise<void>;
+    abstract stop(): Promise<void>;
 }

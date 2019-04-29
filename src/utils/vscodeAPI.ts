@@ -103,13 +103,15 @@ export function getVSCodeEdition()
 
         case "Code - OSS":
             return VSCodeEdition.OSS;
+
+        default:
+            throw new Error(localize("error.env.unknown.vscode"));
     }
 
     // if (vscode.extensions.getExtension("coder.coder"))
     // {
     //     return VSCodeEdition.CODER;
     // }
-    throw new Error(localize("error.env.unknown.vscode"));
 }
 
 /**

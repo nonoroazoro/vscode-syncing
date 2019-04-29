@@ -16,7 +16,7 @@ export class ChokidarFileWatcher extends AbstractFileWatcher
         this._paths = paths;
     }
 
-    async start()
+    public async start()
     {
         if (!this._watcher && this._paths)
         {
@@ -31,7 +31,7 @@ export class ChokidarFileWatcher extends AbstractFileWatcher
         }
     }
 
-    async stop()
+    public async stop()
     {
         if (this._watcher)
         {

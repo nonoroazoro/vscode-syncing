@@ -142,7 +142,7 @@ function _openSettings()
 /**
  * Determines whether the extensions are actually synchronized.
  */
-function _isExtensionsSynced(syncedItems: { updated: ISyncedItem[], removed: ISyncedItem[] }): boolean
+function _isExtensionsSynced(syncedItems: { updated: ISyncedItem[]; removed: ISyncedItem[] }): boolean
 {
     for (const item of syncedItems.updated)
     {

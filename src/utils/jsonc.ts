@@ -34,7 +34,7 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: object
         for (const key of excludedKeys)
         {
             // Remove the listed properties.
-            edits = jsonc.modify(result, [key], void 0, JSONC_MODIFICATION_OPTIONS);
+            edits = jsonc.modify(result, [key], undefined, JSONC_MODIFICATION_OPTIONS);
             if (edits.length > 0)
             {
                 modified = true;

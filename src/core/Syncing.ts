@@ -177,9 +177,10 @@ export class Syncing
         {
             if (showIndicator)
             {
-                Toast.statusError(forUpload
-                    ? localize("toast.settings.uploading.canceled", error.message)
-                    : localize("toast.settings.downloading.canceled", error.message)
+                Toast.statusError(
+                    forUpload
+                        ? localize("toast.settings.uploading.canceled", error.message)
+                        : localize("toast.settings.downloading.canceled", error.message)
                 );
             }
             throw error;

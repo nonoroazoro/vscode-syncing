@@ -197,6 +197,7 @@ export class Environment
                     dataDirectoryName
                 );
 
+            default:
             case Platform.LINUX:
                 return path.join(
                     os.homedir(),

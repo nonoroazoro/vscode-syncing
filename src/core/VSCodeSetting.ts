@@ -181,8 +181,8 @@ export class VSCodeSetting
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
     public async saveSettings(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
-        updated: ISyncedItem[],
-        removed: ISyncedItem[]
+        updated: ISyncedItem[];
+        removed: ISyncedItem[];
     }>
     {
         if (showIndicator)
@@ -274,8 +274,8 @@ export class VSCodeSetting
                 if (value)
                 {
                     const syncedItems: {
-                        updated: ISyncedItem[],
-                        removed: ISyncedItem[]
+                        updated: ISyncedItem[];
+                        removed: ISyncedItem[];
                     } = { updated: [], removed: [] };
 
                     // Save settings.

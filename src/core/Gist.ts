@@ -84,7 +84,7 @@ export class Gist
      *
      * @throws {IEnhancedError}
      */
-    public async user(): Promise<{ id: number, name: string }>
+    public async user(): Promise<{ id: number; name: string }>
     {
         try
         {
@@ -272,7 +272,7 @@ export class Gist
             const exists = await this.exists(id);
 
             // Preparing local gist.
-            const localGist: { gist_id: string, files: any } = { gist_id: id, files: {} };
+            const localGist: { gist_id: string; files: any } = { gist_id: id, files: {} };
             for (const item of uploads)
             {
                 // Filter out `null` content.

@@ -83,12 +83,12 @@ export interface ISyncedItem
      * Extensions that have been added, updated or removed.
      */
     extension?: {
-        added: IExtension[],
-        addedErrors: IExtension[],
-        updated: IExtension[],
-        updatedErrors: IExtension[],
-        removed: IExtension[],
-        removedErrors: IExtension[]
+        added: IExtension[];
+        addedErrors: IExtension[];
+        updated: IExtension[];
+        updatedErrors: IExtension[];
+        removed: IExtension[];
+        removedErrors: IExtension[];
     };
 
     /**
