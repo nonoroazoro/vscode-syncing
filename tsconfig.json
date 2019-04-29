@@ -8,8 +8,6 @@
         "allowUnusedLabels": false,
         "declaration": false,
         "experimentalDecorators": true,
-        "incremental": true,
-        "tsBuildInfoFile": "dist/ts.buildcache",
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
