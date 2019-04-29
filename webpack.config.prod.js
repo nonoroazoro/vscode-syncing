@@ -15,7 +15,7 @@ module.exports = {
     output: {
         path: BUILD_PATH,
         filename: "[name].js",
-        libraryTarget: "commonjs",
+        libraryTarget: "commonjs"
     },
     resolve: {
         extensions: [".ts", ".js"],
@@ -29,10 +29,19 @@ module.exports = {
     module: {
         rules: [
             {
+                enforce: "pre",
+                test: /\.ts$/,
+                loader: "eslint-loader",
+                options: { cache: true },
+                exclude: /node_modules/
+            },
+            {
                 test: /\.ts$/,
                 use: [
+                    "cache-loader",
                     {
-                        loader: "ts-loader"
+                        loader: "ts-loader",
+                        options: { transpileOnly: true }
                     }
                 ],
                 exclude: /node_modules/
