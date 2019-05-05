@@ -11,31 +11,96 @@ import { getVSCodeBuiltinEnvironment } from "../utils/vscodeAPI";
  */
 export class Environment
 {
+    /**
+     * Gets a value indicating whether the current operating system is `Linux`.
+     */
+    public readonly isLinux: boolean;
+
+    /**
+     * Gets a value indicating whether the current operating system is `Macintosh`.
+     */
+    public readonly isMac: boolean;
+
+    /**
+     * Gets a value indicating whether the current operating system is `Windows`.
+     */
+    public readonly isWindows: boolean;
+
+    /**
+     * Gets a value indicating whether the VSCode is running in `Portable Mode`.
+     */
+    public readonly isPortable: boolean;
+
+    /**
+     * Gets a value indicating the type of the current operating system.
+     */
+    public readonly platform: Platform;
+
+    /**
+     * Gets the full path of VSCode's `extensions directory`.
+     */
+    public readonly extensionsDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's `data directory`.
+     */
+    public readonly dataDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's `user directory`.
+     */
+    public readonly userDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's `keybindings file`.
+     */
+    public readonly keybindingsFilePath: string;
+
+    /**
+     * Gets the full path of VSCode's `locale file`.
+     */
+    public readonly localeFilePath: string;
+
+    /**
+     * Gets the full path of VSCode's `settings file`.
+     */
+    public readonly settingsFilePath: string;
+
+    /**
+     * Gets the full path of VSCode's `snippets directory`.
+     */
+    public readonly snippetsDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's `.obsolete file`.
+     */
+    public readonly obsoleteFilePath: string;
+
+    /**
+     * Gets the full path of Syncing's `settings file`.
+     */
+    public readonly syncingFilePath: string;
+
     private static _instance: Environment;
-
-    private _isLinux: boolean;
-    private _isMac: boolean;
-    private _isWindows: boolean;
-    private _isPortable: boolean;
-    private _platform: Platform;
-
-    private _extensionsDirectory: string;
-    private _dataDirectory: string;
-    private _userDirectory: string;
-    private _snippetsDirectory: string;
 
     private constructor()
     {
-        this._platform = this._getPlatform();
-        this._isLinux = (this._platform === Platform.LINUX);
-        this._isMac = (this._platform === Platform.MACINTOSH);
-        this._isWindows = (this._platform === Platform.WINDOWS);
-        this._isPortable = (process.env.VSCODE_PORTABLE != null);
+        this.platform = this._getPlatform();
+        this.isLinux = (this.platform === Platform.LINUX);
+        this.isMac = (this.platform === Platform.MACINTOSH);
+        this.isWindows = (this.platform === Platform.WINDOWS);
+        this.isPortable = (process.env.VSCODE_PORTABLE != null);
 
-        this._extensionsDirectory = this._getExtensionsDirectory(this._isPortable);
-        this._dataDirectory = this._getDataDirectory(this._isPortable, this._platform);
-        this._userDirectory = path.join(this._dataDirectory, "User");
-        this._snippetsDirectory = this.getSettingsFilePath("snippets");
+        this.extensionsDirectory = this._getExtensionsDirectory(this.isPortable);
+        this.dataDirectory = this._getDataDirectory(this.isPortable, this.platform);
+        this.userDirectory = path.join(this.dataDirectory, "User");
+
+        this.keybindingsFilePath = this.getSettingsFilePath("keybindings.json");
+        this.localeFilePath = this.getSettingsFilePath("locale.json");
+        this.settingsFilePath = this.getSettingsFilePath("settings.json");
+        this.snippetsDirectory = this.getSettingsFilePath("snippets");
+        this.obsoleteFilePath = path.join(this.extensionsDirectory, ".obsolete");
+        this.syncingFilePath = this.getSettingsFilePath("syncing.json");
     }
 
     /**
@@ -48,78 +113,6 @@ export class Environment
             Environment._instance = new Environment();
         }
         return Environment._instance;
-    }
-
-    /**
-     * Gets a value indicating whether the current operating system is `Linux`.
-     */
-    public get isLinux(): boolean
-    {
-        return this._isLinux;
-    }
-
-    /**
-     * Gets a value indicating whether the current operating system is `Macintosh`.
-     */
-    public get isMac(): boolean
-    {
-        return this._isMac;
-    }
-
-    /**
-     * Gets a value indicating whether the current operating system is `Windows`.
-     */
-    public get isWindows(): boolean
-    {
-        return this._isWindows;
-    }
-
-    /**
-     * Gets a value indicating the type of the current operating system.
-     */
-    public get platform(): Platform
-    {
-        return this._platform;
-    }
-
-    /**
-     * Gets a value indicating whether the VSCode is running in `Portable Mode`.
-     */
-    public get isPortable(): boolean
-    {
-        return this._isPortable;
-    }
-
-    /**
-     * Gets the full path of VSCode `extensions directory`.
-     */
-    public get extensionsDirectory(): string
-    {
-        return this._extensionsDirectory;
-    }
-
-    /**
-     * Gets the full path of VSCode `data directory`.
-     */
-    public get dataDirectory(): string
-    {
-        return this._dataDirectory;
-    }
-
-    /**
-     * Gets the full path of VSCode `user directory`.
-     */
-    public get userDirectory(): string
-    {
-        return this._userDirectory;
-    }
-
-    /**
-     * Gets the full path of VSCode `snippets directory`.
-     */
-    public get snippetsDirectory(): string
-    {
-        return this._snippetsDirectory;
     }
 
     /**
@@ -140,14 +133,6 @@ export class Environment
     public getSettingsFilePath(filename: string): string
     {
         return path.join(this.userDirectory, filename);
-    }
-
-    /**
-     * Gets the full path of the `.obsolete` file.
-     */
-    public getObsoleteFilePath(): string
-    {
-        return path.join(this.extensionsDirectory, ".obsolete");
     }
 
     /**

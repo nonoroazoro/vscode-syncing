@@ -268,7 +268,7 @@ export class Extension
         updated: IExtension[] = []
     ): Promise<void>
     {
-        const filepath = this._env.getObsoleteFilePath();
+        const filepath = this._env.obsoleteFilePath;
         let obsolete: { [extensionFolderName: string]: boolean } | undefined;
         try
         {
