@@ -4,13 +4,13 @@ import { VSCodeExtensionWatcher } from "./VSCodeExtensionWatcher";
 
 export class SettingsWatcher extends AbstractWatcher<WatcherEvent.ALL>
 {
-    private _paths: string[];
+    private _paths: string | string[];
     private _excludes: string[] | undefined;
 
     private _fileWatcher: ChokidarFileWatcher | undefined;
     private _extensionWatcher: VSCodeExtensionWatcher | undefined;
 
-    constructor(paths: string[], excludes?: string[])
+    constructor(paths: string | string[], excludes?: string[])
     {
         super();
         this._paths = paths;
