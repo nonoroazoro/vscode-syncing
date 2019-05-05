@@ -133,6 +133,16 @@ export class Environment
     }
 
     /**
+     * Gets the full path of the settings from a filename.
+     *
+     * @param filename The settings filename.
+     */
+    public getSettingsFilePath(filename: string): string
+    {
+        return path.join(this.userDirectory, filename);
+    }
+
+    /**
      * Gets the full path of the `.obsolete` file.
      */
     public getObsoleteFilePath(): string
