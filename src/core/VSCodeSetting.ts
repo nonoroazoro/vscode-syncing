@@ -141,8 +141,8 @@ export class VSCodeSetting
 
             if (loadFileContent)
             {
-                const values = await this._loadContent(tempSettings);
-                values.forEach((value: ISetting) =>
+                const contents = await this._loadContent(tempSettings);
+                contents.forEach((value: ISetting) =>
                 {
                     // Success if the content is not `null`.
                     if (value.content)
