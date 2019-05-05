@@ -52,21 +52,6 @@ export class Environment
     public readonly userDirectory: string;
 
     /**
-     * Gets the full path of VSCode's `keybindings file`.
-     */
-    public readonly keybindingsFilePath: string;
-
-    /**
-     * Gets the full path of VSCode's `locale file`.
-     */
-    public readonly localeFilePath: string;
-
-    /**
-     * Gets the full path of VSCode's `settings file`.
-     */
-    public readonly settingsFilePath: string;
-
-    /**
      * Gets the full path of VSCode's `snippets directory`.
      */
     public readonly snippetsDirectory: string;
@@ -75,11 +60,6 @@ export class Environment
      * Gets the full path of VSCode's `.obsolete file`.
      */
     public readonly obsoleteFilePath: string;
-
-    /**
-     * Gets the full path of Syncing's `settings file`.
-     */
-    public readonly syncingFilePath: string;
 
     private static _instance: Environment;
 
@@ -94,13 +74,8 @@ export class Environment
         this.extensionsDirectory = this._getExtensionsDirectory(this.isPortable);
         this.dataDirectory = this._getDataDirectory(this.isPortable, this.platform);
         this.userDirectory = path.join(this.dataDirectory, "User");
-
-        this.keybindingsFilePath = this.getSettingsFilePath("keybindings.json");
-        this.localeFilePath = this.getSettingsFilePath("locale.json");
-        this.settingsFilePath = this.getSettingsFilePath("settings.json");
         this.snippetsDirectory = this.getSettingsFilePath("snippets");
         this.obsoleteFilePath = path.join(this.extensionsDirectory, ".obsolete");
-        this.syncingFilePath = this.getSettingsFilePath("syncing.json");
     }
 
     /**
