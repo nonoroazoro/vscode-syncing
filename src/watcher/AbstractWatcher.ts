@@ -2,6 +2,8 @@ import { EventEmitter } from "events";
 
 export enum WatcherEvent
 {
+    ALL = "all",
+
     ADDED = "added",
     UPDATED = "updated",
     DELETED = "deleted"
