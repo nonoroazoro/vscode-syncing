@@ -1,9 +1,8 @@
 import * as chokidar from "chokidar";
 
-import { AbstractFileWatcher } from "./AbstractFileWatcher";
-import { WatcherEvent } from "./AbstractWatcher";
+import { WatcherEvent, AbstractWatcher } from "./AbstractWatcher";
 
-export class ChokidarFileWatcher extends AbstractFileWatcher
+export class ChokidarFileWatcher extends AbstractWatcher
 {
     private static readonly DEFAULT_OPTIONS = {
         depth: 2,
@@ -25,7 +24,7 @@ export class ChokidarFileWatcher extends AbstractFileWatcher
         this._options = { ...ChokidarFileWatcher.DEFAULT_OPTIONS, ...options };
     }
 
-    public async start()
+    public start()
     {
         if (!this._watcher && this._paths)
         {
@@ -34,11 +33,11 @@ export class ChokidarFileWatcher extends AbstractFileWatcher
         }
     }
 
-    public async stop()
+    public stop()
     {
         if (this._watcher)
         {
-            this.removeAllListeners();
+            super.stop();
             this._watcher.close();
             this._watcher = undefined;
         }

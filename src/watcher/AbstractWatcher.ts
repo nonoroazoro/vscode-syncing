@@ -13,6 +13,11 @@ export abstract class AbstractWatcher<EventType extends string | symbol = Watche
 {
     private _emitter = new EventEmitter();
 
+    public stop(): void
+    {
+        this.removeAllListeners();
+    }
+
     public on(event: EventType, fn: (...args: any[]) => void): this
     {
         this._emitter.on(event, fn);
@@ -29,4 +34,6 @@ export abstract class AbstractWatcher<EventType extends string | symbol = Watche
         this._emitter.removeAllListeners();
         return this;
     }
+
+    public abstract start(): void;
 }

@@ -6,7 +6,7 @@ export class VSCodeExtensionWatcher extends AbstractWatcher<WatcherEvent.ALL>
 {
     private _watcher: vscode.Disposable | undefined;
 
-    public async start()
+    public start()
     {
         if (!this._watcher)
         {
@@ -14,11 +14,11 @@ export class VSCodeExtensionWatcher extends AbstractWatcher<WatcherEvent.ALL>
         }
     }
 
-    public async stop()
+    public stop()
     {
         if (this._watcher)
         {
-            this.removeAllListeners();
+            super.stop();
             this._watcher.dispose();
             this._watcher = undefined;
         }
