@@ -1,13 +1,8 @@
 import * as vscode from "vscode";
 
-import { AbstractWatcher } from "./AbstractWatcher";
+import { AbstractWatcher, WatcherEvent } from "./AbstractWatcher";
 
-export enum ExtensionWatcherEvent
-{
-    ALL = "all"
-}
-
-export class VSCodeExtensionWatcher extends AbstractWatcher<ExtensionWatcherEvent>
+export class VSCodeExtensionWatcher extends AbstractWatcher<WatcherEvent.ALL>
 {
     private _watcher: vscode.Disposable | undefined;
 
@@ -30,6 +25,6 @@ export class VSCodeExtensionWatcher extends AbstractWatcher<ExtensionWatcherEven
 
     private _handleWatcherEvent = () =>
     {
-        this.emit(ExtensionWatcherEvent.ALL);
+        this.emit(WatcherEvent.ALL);
     };
 }
