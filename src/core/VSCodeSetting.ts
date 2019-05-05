@@ -124,23 +124,19 @@ export class VSCodeSetting
                         CONFIGURATION_KEY,
                         CONFIGURATION_SEPARATE_KEYBINDINGS
                     );
-                    if (separateKeybindings)
+                    if (separateKeybindings && this._env.isMac)
                     {
-                        remoteFilename = this._env.isMac
-                            ? `${type}${VSCodeSetting.MAC_SUFFIX}.json`
-                            : `${type}.json`;
-                    }
-                    else
-                    {
-                        remoteFilename = `${type}.json`;
+                        remoteFilename = `${type}${VSCodeSetting.MAC_SUFFIX}.json`;
                     }
                 }
 
-                tempSettings = [{
-                    localFilepath: path.join(this._env.userDirectory, localFilename),
-                    remoteFilename,
-                    type
-                }];
+                tempSettings = [
+                    {
+                        localFilepath: path.join(this._env.userDirectory, localFilename),
+                        remoteFilename,
+                        type
+                    }
+                ];
             }
 
             if (loadFileContent)
@@ -155,7 +151,7 @@ export class VSCodeSetting
                     }
                     else
                     {
-                        errorFiles.push(value.remoteFilename);
+                        errorFiles.push(value.localFilepath);
                     }
                 });
             }
@@ -167,7 +163,7 @@ export class VSCodeSetting
 
         if (errorFiles.length > 0)
         {
-            console.error(localize("error.invalid.settings", errorFiles.join(" ")));
+            console.error(localize("error.invalid.settings", errorFiles.join("\r\n")));
         }
 
         if (showIndicator)
