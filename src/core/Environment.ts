@@ -35,7 +35,7 @@ export class Environment
         this._extensionsDirectory = this._getExtensionsDirectory(this._isPortable);
         this._dataDirectory = this._getDataDirectory(this._isPortable, this._platform);
         this._userDirectory = path.join(this._dataDirectory, "User");
-        this._snippetsDirectory = path.join(this._userDirectory, "snippets");
+        this._snippetsDirectory = this.getSettingsFilePath("snippets");
     }
 
     /**
