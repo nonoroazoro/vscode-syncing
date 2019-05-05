@@ -1,4 +1,18 @@
 import { VSCodeEdition } from "../types/VSCodeEdition";
+import { SettingType } from "../types/SyncingTypes";
+
+/**
+ * Note that this is an ordered list, to ensure that the smaller files
+ * (such as `settings.json`, `keybindings.json`) are synced first.
+ * Thus, the `extensions` will be the last one to sync.
+ */
+export const VSCODE_SETTINGS_LIST = [
+    SettingType.Settings,
+    SettingType.Keybindings,
+    SettingType.Locale,
+    SettingType.Snippets,
+    SettingType.Extensions
+];
 
 /**
  * Dot-separated identifiers, same as the sections of VSCode, see `vscode.workspace.getConfiguration`.

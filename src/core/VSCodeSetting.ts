@@ -11,7 +11,8 @@ import
     CONFIGURATION_POKA_YOKE_THRESHOLD,
     CONFIGURATION_SEPARATE_KEYBINDINGS,
     SETTING_EXCLUDED_EXTENSIONS,
-    SETTING_EXCLUDED_SETTINGS
+    SETTING_EXCLUDED_SETTINGS,
+    VSCODE_SETTINGS_LIST
 } from "../constants";
 import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
@@ -81,42 +82,36 @@ export class VSCodeSetting
      * @param {boolean} [loadFileContent=false] Whether to load the content of `VSCode Settings` files.
      * Defaults to `false`.
      * @param {boolean} [showIndicator=false] Whether to show the progress indicator. Defaults to `false`.
+     * @param {SettingType[]} [settingsList=VSCODE_SETTINGS_LIST] Specifies the settings to get.
      */
-    public async getSettings(loadFileContent: boolean = false, showIndicator: boolean = false): Promise<ISetting[]>
+    public async getSettings(
+        loadFileContent: boolean = false,
+        showIndicator: boolean = false,
+        settingsList: SettingType[] = VSCODE_SETTINGS_LIST
+    ): Promise<ISetting[]>
     {
         if (showIndicator)
         {
             Toast.showSpinner(localize("toast.settings.gathering.local"));
         }
 
-        // Note that this is an ordered list, to ensure that the smaller files
-        // (such as `settings.json`, `keybindings.json`) are synced first.
-        // Thus, the extensions will be the last one to sync.
-        const settingsList = [
-            SettingType.Settings,
-            SettingType.Keybindings,
-            SettingType.Locale,
-            SettingType.Snippets,
-            SettingType.Extensions
-        ];
-
         let results: ISetting[] = [];
         let localFilename: string;
         let remoteFilename: string;
         let tempSettings: ISetting[];
 
-        for (const type of settingsList)
+        for (const settingType of settingsList)
         {
-            if (type === SettingType.Snippets)
+            if (settingType === SettingType.Snippets)
             {
                 // Attention: Snippets may be empty.
                 tempSettings = await this._getSnippets(this._env.snippetsDirectory);
             }
             else
             {
-                localFilename = `${type}.json`;
+                localFilename = `${settingType}.json`;
                 remoteFilename = localFilename;
-                if (type === SettingType.Keybindings)
+                if (settingType === SettingType.Keybindings)
                 {
                     // Separate the keybindings.
                     const separateKeybindings = getVSCodeSetting<boolean>(
@@ -125,7 +120,7 @@ export class VSCodeSetting
                     );
                     if (separateKeybindings && this._env.isMac)
                     {
-                        remoteFilename = `${type}${VSCodeSetting.MAC_SUFFIX}.json`;
+                        remoteFilename = `${settingType}${VSCodeSetting.MAC_SUFFIX}.json`;
                     }
                 }
 
@@ -133,7 +128,7 @@ export class VSCodeSetting
                     {
                         localFilePath: this._env.getSettingsFilePath(localFilename),
                         remoteFilename,
-                        type
+                        type: settingType
                     }
                 ];
             }
