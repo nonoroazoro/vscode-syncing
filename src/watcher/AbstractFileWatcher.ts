@@ -1,13 +1,6 @@
 import { AbstractWatcher } from "./AbstractWatcher";
 
-export enum FileWatcherEvent
-{
-    ADDED = "added",
-    CHANGED = "changed",
-    DELETED = "deleted"
-}
-
-export abstract class AbstractFileWatcher extends AbstractWatcher<FileWatcherEvent>
+export abstract class AbstractFileWatcher extends AbstractWatcher
 {
     abstract start(): Promise<void>;
     abstract stop(): Promise<void>;

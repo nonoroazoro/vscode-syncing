@@ -1,6 +1,13 @@
 import { EventEmitter } from "events";
 
-export abstract class AbstractWatcher<EventType extends string | symbol>
+export enum WatcherEvent
+{
+    ADDED = "added",
+    UPDATED = "updated",
+    DELETED = "deleted"
+}
+
+export abstract class AbstractWatcher<EventType extends string | symbol = WatcherEvent>
 {
     private _emitter = new EventEmitter();
 

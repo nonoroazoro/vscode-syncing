@@ -1,6 +1,7 @@
 import * as chokidar from "chokidar";
 
-import { AbstractFileWatcher, FileWatcherEvent } from "./AbstractFileWatcher";
+import { AbstractFileWatcher } from "./AbstractFileWatcher";
+import { WatcherEvent } from "./AbstractWatcher";
 
 export class ChokidarFileWatcher extends AbstractFileWatcher
 {
@@ -44,21 +45,21 @@ export class ChokidarFileWatcher extends AbstractFileWatcher
 
     private _handleWatcherEvent = (type: string, path: string) =>
     {
-        let eventType: FileWatcherEvent;
+        let eventType: WatcherEvent;
         switch (type)
         {
             case "add":
             case "addDir":
-                eventType = FileWatcherEvent.ADDED;
+                eventType = WatcherEvent.ADDED;
                 break;
 
             case "change":
-                eventType = FileWatcherEvent.CHANGED;
+                eventType = WatcherEvent.UPDATED;
                 break;
 
             case "unlink":
             case "unlinkDir":
-                eventType = FileWatcherEvent.DELETED;
+                eventType = WatcherEvent.DELETED;
                 break;
 
             default:
