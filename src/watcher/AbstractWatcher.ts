@@ -19,14 +19,14 @@ export abstract class AbstractWatcher<EventType extends string | symbol = Watche
         return this;
     }
 
-    public off(event: EventType, fn: (...args: any[]) => void): this
-    {
-        this._emitter.off(event, fn);
-        return this;
-    }
-
     protected emit(event: EventType, ...args: any[]): boolean
     {
         return this._emitter.emit(event, ...args);
+    }
+
+    protected removeAllListeners(): this
+    {
+        this._emitter.removeAllListeners();
+        return this;
     }
 }

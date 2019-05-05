@@ -38,6 +38,7 @@ export class ChokidarFileWatcher extends AbstractFileWatcher
     {
         if (this._watcher)
         {
+            this.removeAllListeners();
             this._watcher.close();
             this._watcher = undefined;
         }

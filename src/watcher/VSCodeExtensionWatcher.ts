@@ -18,6 +18,7 @@ export class VSCodeExtensionWatcher extends AbstractWatcher<WatcherEvent.ALL>
     {
         if (this._watcher)
         {
+            this.removeAllListeners();
             this._watcher.dispose();
             this._watcher = undefined;
         }
