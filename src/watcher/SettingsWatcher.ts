@@ -21,12 +21,14 @@ export class SettingsWatcher extends AbstractWatcher<WatcherEvent.ALL>
         {
             this._fileWatcher = new ChokidarFileWatcher(this._paths);
             this._fileWatcher.on(WatcherEvent.ALL, this._handleWatcherEvent);
+            this._fileWatcher.start();
         }
 
         if (!this._extensionWatcher)
         {
             this._extensionWatcher = new VSCodeExtensionWatcher();
             this._extensionWatcher.on(WatcherEvent.ALL, this._handleWatcherEvent);
+            this._extensionWatcher.start();
         }
     }
 
