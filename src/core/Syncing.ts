@@ -1,5 +1,4 @@
 import * as fs from "fs-extra";
-import * as path from "path";
 
 import { localize } from "../i18n";
 import { isEmptyString } from "../utils/lang";
@@ -47,7 +46,7 @@ export class Syncing
     private constructor()
     {
         this._env = Environment.create();
-        this._settingsPath = path.join(this._env.userDirectory, "syncing.json");
+        this._settingsPath = this._env.getSettingsFilePath("syncing.json");
     }
 
     /**
