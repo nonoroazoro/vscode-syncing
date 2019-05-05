@@ -64,16 +64,19 @@ export class VSCodeSetting
 
     /**
      * Gets `VSCode Settings` (which will be uploaded or downloaded, anyway).
+     *
      * For example:
-     *    [
-     *        {
-     *            name: "extensions",
-     *            path: "C:\\Users\\AppData\\Roaming\\Code\\User\\extensions.json",
-     *            remote: "extensions.json",
-     *            content: "// init"
-     *        },
-     *        ...
-     *    ]
+     ```
+     [
+         {
+             name: "settings",
+             path: "/Users/Library/Application Support/Code/User/settings.json",
+             remote: "settings.json",
+             ...
+         },
+         ...
+     ]
+     ```
      *
      * @param {boolean} [loadFileContent=false] Whether to load the content of `VSCode Settings` files.
      * Defaults to `false`.
