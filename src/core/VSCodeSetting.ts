@@ -100,8 +100,7 @@ export class VSCodeSetting
             SettingType.Extensions
         ];
 
-        const errorFiles: string[] = [];
-        const results: ISetting[] = [];
+        let results: ISetting[] = [];
         let localFilename: string;
         let remoteFilename: string;
         let tempSettings: ISetting[];
@@ -138,32 +137,32 @@ export class VSCodeSetting
                     }
                 ];
             }
-
-            if (loadFileContent)
-            {
-                const contents = await this._loadContent(tempSettings);
-                contents.forEach((value: ISetting) =>
-                {
-                    // Success if the content is not `null`.
-                    if (value.content)
-                    {
-                        results.push(value);
-                    }
-                    else
-                    {
-                        errorFiles.push(value.localFilePath);
-                    }
-                });
-            }
-            else
-            {
-                results.push(...tempSettings);
-            }
+            results.push(...tempSettings);
         }
 
-        if (errorFiles.length > 0)
+        if (loadFileContent)
         {
-            console.error(localize("error.invalid.settings", errorFiles.join("\r\n")));
+            const contents = await this._loadContent(results);
+
+            const errorFiles: string[] = [];
+            results = [];
+            contents.forEach((value: ISetting) =>
+            {
+                // Success if the content is not `null`.
+                if (value.content != null)
+                {
+                    results.push(value);
+                }
+                else
+                {
+                    errorFiles.push(value.localFilePath);
+                }
+            });
+
+            if (errorFiles.length > 0)
+            {
+                console.error(localize("error.invalid.settings", errorFiles.join("\r\n")));
+            }
         }
 
         if (showIndicator)
