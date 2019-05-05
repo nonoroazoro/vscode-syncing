@@ -5,21 +5,23 @@ import { VSCodeExtensionWatcher } from "./VSCodeExtensionWatcher";
 export class SettingsWatcher extends AbstractWatcher<WatcherEvent.ALL>
 {
     private _paths: string[];
+    private _excludes: string[] | undefined;
 
     private _fileWatcher: ChokidarFileWatcher | undefined;
     private _extensionWatcher: VSCodeExtensionWatcher | undefined;
 
-    constructor(paths: string[])
+    constructor(paths: string[], excludes?: string[])
     {
         super();
         this._paths = paths;
+        this._excludes = excludes;
     }
 
     public async start()
     {
         if (!this._fileWatcher)
         {
-            this._fileWatcher = new ChokidarFileWatcher(this._paths);
+            this._fileWatcher = new ChokidarFileWatcher(this._paths, { ignored: this._excludes });
             this._fileWatcher.on(WatcherEvent.ALL, this._handleWatcherEvent);
             this._fileWatcher.start();
         }
