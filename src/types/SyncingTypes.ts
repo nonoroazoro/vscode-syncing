@@ -16,9 +16,9 @@ export enum SettingType
 export interface ISetting
 {
     /**
-     * The corresponding local filepath.
+     * The corresponding local file path.
      */
-    localFilepath: string;
+    localFilePath: string;
 
     /**
      * The corresponding remote filename.

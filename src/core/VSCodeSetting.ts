@@ -132,7 +132,7 @@ export class VSCodeSetting
 
                 tempSettings = [
                     {
-                        localFilepath: path.join(this._env.userDirectory, localFilename),
+                        localFilePath: this._env.getSettingsFilePath(localFilename),
                         remoteFilename,
                         type
                     }
@@ -151,7 +151,7 @@ export class VSCodeSetting
                     }
                     else
                     {
-                        errorFiles.push(value.localFilepath);
+                        errorFiles.push(value.localFilePath);
                     }
                 });
             }
@@ -249,7 +249,7 @@ export class VSCodeSetting
                             {
                                 settingsToSave.push({
                                     content: gistFile.content,
-                                    localFilepath: this._env.getSnippetFilePath(filename),
+                                    localFilePath: this._env.getSnippetFilePath(filename),
                                     remoteFilename: gistFile.filename,
                                     type: SettingType.Snippets
                                 });
@@ -333,7 +333,7 @@ export class VSCodeSetting
         {
             try
             {
-                await fs.remove(setting.localFilepath);
+                await fs.remove(setting.localFilePath);
                 removed.push({ setting });
             }
             catch (error)
@@ -359,7 +359,7 @@ export class VSCodeSetting
             {
                 // Add prefix to all snippets.
                 results.push({
-                    localFilepath: path.join(snippetsDir, filename),
+                    localFilePath: path.join(snippetsDir, filename),
                     remoteFilename: `${VSCodeSetting.SNIPPET_PREFIX}${filename}`,
                     type: SettingType.Snippets
                 });
@@ -403,7 +403,7 @@ export class VSCodeSetting
                 }
                 else
                 {
-                    content = await fs.readFile(setting.localFilepath, "utf8");
+                    content = await fs.readFile(setting.localFilePath, "utf8");
 
                     // Exclude settings.
                     if (exclude && content && setting.type === SettingType.Settings)
@@ -419,7 +419,7 @@ export class VSCodeSetting
                         }
                     }
 
-                    lastModified = await readLastModified(setting.localFilepath);
+                    lastModified = await readLastModified(setting.localFilePath);
                 }
             }
             catch (err)
@@ -472,7 +472,7 @@ export class VSCodeSetting
      */
     private _saveToFile(setting: ISetting)
     {
-        return fs.outputFile(setting.localFilepath, setting.content || "{}").then(() => ({ setting } as ISyncedItem));
+        return fs.outputFile(setting.localFilePath, setting.content || "{}").then(() => ({ setting } as ISyncedItem));
     }
 
     /**
