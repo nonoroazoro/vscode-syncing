@@ -1,6 +1,6 @@
 import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
-import * as minimatch from "minimatch";
+import * as micromatch from "micromatch";
 import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
@@ -91,7 +91,7 @@ export class Extension
         {
             if (
                 !ext.packageJSON.isBuiltin
-                && !excludedPatterns.some((pattern) => minimatch(ext.id, pattern, { nocase: true }))
+                && !excludedPatterns.some((pattern) => micromatch.isMatch(ext.id, pattern, { nocase: true }))
             )
             {
                 item = {

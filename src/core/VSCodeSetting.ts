@@ -1,6 +1,6 @@
 import * as fs from "fs-extra";
 import * as junk from "junk";
-import * as minimatch from "minimatch";
+import * as micromatch from "micromatch";
 import * as path from "path";
 
 import
@@ -561,7 +561,7 @@ export class VSCodeSetting
     {
         return extensions.filter((ext) =>
         {
-            return !patterns.some((pattern) => minimatch(ext.id, pattern));
+            return !patterns.some((pattern) => micromatch.isMatch(ext.id, pattern));
         });
     }
 
