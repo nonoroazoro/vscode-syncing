@@ -5,6 +5,8 @@ import { WatcherEvent, AbstractWatcher } from "./AbstractWatcher";
 
 export type ChokidarPaths = string | string[];
 
+export type ChokidarOptions = chokidar.WatchOptions | { ignored?: ChokidarIgnored };
+
 export type ChokidarIgnored = string | ChokidarIgnoredFunction | Array<string | ChokidarIgnoredFunction>;
 
 /**
@@ -24,10 +26,10 @@ export class ChokidarFileWatcher extends AbstractWatcher
     };
 
     private _paths: ChokidarPaths;
-    private _options: chokidar.WatchOptions;
+    private _options: ChokidarOptions;
     private _watcher: chokidar.FSWatcher | undefined;
 
-    constructor(paths: ChokidarPaths, options?: chokidar.WatchOptions)
+    constructor(paths: ChokidarPaths, options?: ChokidarOptions)
     {
         super();
         this._paths = paths;
