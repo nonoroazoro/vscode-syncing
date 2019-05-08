@@ -1,4 +1,4 @@
 export * from "./AbstractWatcher";
 export * from "./ChokidarFileWatcher";
-export * from "./SettingsWatcher";
+export * from "./SettingsWatcherService";
 export * from "./VSCodeExtensionWatcher";
