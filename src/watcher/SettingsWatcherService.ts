@@ -91,6 +91,16 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
         }
     }
 
+    public pause()
+    {
+        super.pause();
+        if (this._options.debounce)
+        {
+            // Clear debounce queue.
+            (this._handleWatcherEvent as any).cancel();
+        }
+    }
+
     public stop()
     {
         super.stop();
