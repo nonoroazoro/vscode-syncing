@@ -23,7 +23,7 @@ interface ISyncingSettings
     token: string;
 
     /**
-     * Store the auto sync setting.
+     * Store the auto-sync setting.
      */
     auto_sync?: boolean;
 
@@ -80,7 +80,7 @@ export class Syncing
     }
 
     /**
-     * Gets the proxy setting from `Syncing`'s `http_proxy` setting.
+     * Gets the proxy setting of `Syncing`.
      *
      * If the proxy setting is not set, it will read from the `http_proxy` and `https_proxy` environment variables.
      */
@@ -92,6 +92,18 @@ export class Syncing
             proxy = process.env["http_proxy"] || process.env["https_proxy"];
         }
         return proxy;
+    }
+
+    /**
+     * Gets the auto-sync setting of `Syncing`.
+     *
+     * If the proxy setting is not set, it will read from the `http_proxy` and `https_proxy` environment variables.
+     *
+     * @default false
+     */
+    public get autoSync(): boolean
+    {
+        return this.loadSettings().auto_sync || false;
     }
 
     /**
