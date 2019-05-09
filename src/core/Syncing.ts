@@ -23,6 +23,11 @@ interface ISyncingSettings
     token: string;
 
     /**
+     * Store the auto sync setting.
+     */
+    auto_sync?: boolean;
+
+    /**
      * Store the http proxy setting.
      */
     http_proxy?: string;
@@ -38,7 +43,12 @@ export class Syncing
     /**
      * The default settings of `Syncing`.
      */
-    private static readonly DEFAULT_SETTINGS: ISyncingSettings = { id: "", token: "", http_proxy: "" };
+    private static readonly DEFAULT_SETTINGS: ISyncingSettings = {
+        id: "",
+        token: "",
+        auto_sync: false,
+        http_proxy: ""
+    };
 
     private _env: Environment;
     private _settingsPath: string;
