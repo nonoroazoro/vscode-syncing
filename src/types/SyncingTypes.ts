@@ -33,7 +33,7 @@ export interface ISetting
     content?: string;
 
     /**
-     * The last modified time of the setting.
+     * The last modified time (in milliseconds) of the setting.
      */
     lastModified?: number;
 }
