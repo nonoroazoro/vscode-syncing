@@ -220,7 +220,7 @@ export class VSCodeSetting
                     }
                     else
                     {
-                        // File exists in remote, but not exists in local.
+                        // File exists in local but not remote.
                         // Delete if it's a snippet file.
                         if (setting.type === SettingType.Snippets)
                         {
