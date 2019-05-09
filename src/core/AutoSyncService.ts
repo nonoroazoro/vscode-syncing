@@ -3,9 +3,10 @@ import * as vscode from "vscode";
 import * as Toast from "./Toast";
 import { VSCodeSetting } from "./VSCodeSetting";
 import { Gist } from "./Gist";
-import { ISyncingSettings } from "../types/SyncingTypes";
+import { ISyncingSettings, ISetting } from "../types/SyncingTypes";
 import { isAfter } from "../utils/date";
 import { SettingsWatcherService, WatcherEvent } from "../watcher";
+import { IGist } from "../types/GitHubTypes";
 
 export class AutoSyncService
 {
@@ -74,24 +75,37 @@ export class AutoSyncService
         try
         {
             const { token, id, http_proxy } = syncingSettings;
-            const lastModifiedLocal = await this._vscodeSetting.getSettingsLastModified();
-            const lastModifiedRemote = await Gist.create(token, http_proxy).getLastModified(id);
-            if (isAfter(lastModifiedLocal, lastModifiedRemote))
+            const localSettings = await this._vscodeSetting.getSettings(true);
+            const localLastModified = await this._vscodeSetting.getLastModified(localSettings);
+
+            const api = Gist.create(token, http_proxy);
+            const remoteSettings = await api.get(id);
+            const remoteLastModified = api.getLastModified(remoteSettings);
+            if (this._isModified(localSettings, remoteSettings, api))
             {
-                // Upload settings.
-                console.info("first uploading");
-                await vscode.commands.executeCommand("syncing.uploadSettings");
+                if (isAfter(localLastModified, remoteLastModified))
+                {
+                    // Upload settings.
+                    console.info("first uploading");
+                    await vscode.commands.executeCommand("syncing.uploadSettings");
+                }
+                else
+                {
+                    // Download settings.
+                    console.info("first downloading");
+                    await vscode.commands.executeCommand("syncing.downloadSettings");
+                }
             }
             else
             {
-                // Download settings.
-                console.info("first downloading");
-                await vscode.commands.executeCommand("syncing.downloadSettings");
+                // Do nothing if not modified.
+                Toast.clearSpinner("");
+                Toast.statusInfo("Syncing: Nothing changed since last synchronization.");
             }
         }
         catch (err)
         {
-            // Toast.statusError(`toast.settings.autoSync.failed ${err.message}`);
+            Toast.statusError(`toast.settings.autoSync.failed ${err.message}`);
         }
     }
 
@@ -100,5 +114,19 @@ export class AutoSyncService
         // Upload settings whenever the user changed the local settings.
         console.info("auto uploading");
         vscode.commands.executeCommand("syncing.uploadSettings");
+    }
+
+    private _isModified(localSettings: ISetting[], remoteSettings: IGist, api: Gist): boolean
+    {
+        const localFiles = {} as any;
+        for (const item of localSettings)
+        {
+            // Filter out `null` content.
+            if (item.content)
+            {
+                localFiles[item.remoteFilename] = { content: item.content };
+            }
+        }
+        return api.getModifiedFiles(localFiles, remoteSettings.files) != null;
     }
 }
