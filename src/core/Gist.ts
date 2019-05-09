@@ -162,14 +162,10 @@ export class Gist
     /**
      * Gets the last modified time (date string) of the gist.
      *
-     * @param id Gist id.
-     * @param showIndicator Defaults to `false`, don't show progress indicator.
-     *
-     * @throws {IEnhancedError}
+     * @param {GitHubTypes.IGist} gist Gist.
      */
-    public async getLastModified(id: string, showIndicator: boolean = false): Promise<string>
+    public getLastModified(gist: GitHubTypes.IGist): string
     {
-        const gist = await this.get(id, showIndicator);
         return gist.updated_at;
     }
 
@@ -300,7 +296,7 @@ export class Gist
             if (exists)
             {
                 // Upload if the local files are modified.
-                localGist.files = this._getModifiedFiles(localGist.files, exists.files);
+                localGist.files = this.getModifiedFiles(localGist.files, exists.files);
                 if (localGist.files)
                 {
                     // poka-yoke - Determines whether there're too much changes since the last uploading.
@@ -366,9 +362,15 @@ export class Gist
     }
 
     /**
-     * Gets the modified files list.
+     * Compares the local and remote files, returns the modified files or `undefined`.
+     *
+     * @param {GitHubTypes.IGistFiles} localFiles Local files.
+     * @param {GitHubTypes.IGistFiles} [remoteFiles] Remote files.
      */
-    private _getModifiedFiles(localFiles: any, remoteFiles?: GitHubTypes.IGistFiles): object | null
+    public getModifiedFiles(
+        localFiles: GitHubTypes.IGistFiles,
+        remoteFiles?: GitHubTypes.IGistFiles
+    ): GitHubTypes.IGistFiles | undefined
     {
         if (!remoteFiles)
         {
@@ -377,7 +379,7 @@ export class Gist
 
         let localFile;
         let remoteFile;
-        const result = {};
+        const result = {} as GitHubTypes.IGistFiles;
         const recordedKeys = [];
         for (const key of Object.keys(remoteFiles))
         {
@@ -396,7 +398,7 @@ export class Gist
                 // Remove the remote files except keybindings and settings.
                 if (!key.includes(SettingType.Keybindings) && !key.includes(SettingType.Settings))
                 {
-                    result[key] = null;
+                    result[key] = null as any;
                 }
             }
             recordedKeys.push(key);
@@ -416,7 +418,7 @@ export class Gist
             }
         }
 
-        return (Object.keys(result).length === 0) ? null : result;
+        return (Object.keys(result).length === 0) ? undefined : result;
     }
 
     /**
