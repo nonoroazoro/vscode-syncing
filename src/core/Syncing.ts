@@ -6,32 +6,7 @@ import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
 import * as Toast from "./Toast";
-
-/**
- * Represents the `Syncing Settings`.
- */
-interface ISyncingSettings
-{
-    /**
-     * Store the GitHub Gist ID.
-     */
-    id: string;
-
-    /**
-     * Store the GitHub Personal Access Token.
-     */
-    token: string;
-
-    /**
-     * Store the http proxy setting.
-     */
-    http_proxy: string | undefined;
-
-    /**
-     * Store the auto-sync setting.
-     */
-    auto_sync: boolean;
-}
+import { ISyncingSettings } from "../types/SyncingTypes";
 
 /**
  * `Syncing` wrapper.

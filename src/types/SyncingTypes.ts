@@ -1,4 +1,30 @@
 /**
+ * Represents the `Syncing Settings`.
+ */
+export interface ISyncingSettings
+{
+    /**
+     * Store the GitHub Gist ID.
+     */
+    id: string;
+
+    /**
+     * Store the GitHub Personal Access Token.
+     */
+    token: string;
+
+    /**
+     * Store the http proxy setting.
+     */
+    http_proxy: string | undefined;
+
+    /**
+     * Store the auto-sync setting.
+     */
+    auto_sync: boolean;
+}
+
+/**
  * Represents various kinds of `VSCode Settings`, such as `Extensions`, `Keybindings`...
  */
 export enum SettingType
