@@ -1,5 +1,5 @@
 import { NormalizedLocale } from "../../src/types/NormalizedLocale";
-import { formatDistance } from "../../src/utils/date";
+import { formatDistance, isAfter } from "../../src/utils/date";
 
 describe("Syncing/utils/date", () =>
 {
@@ -25,5 +25,19 @@ describe("Syncing/utils/date", () =>
         const date = new Date("2018-01-18");
         const baseDate = new Date("2018-01-20");
         expect(formatDistance(date, baseDate, NormalizedLocale.ZH_CN)).toEqual(target);
+    });
+
+    it("isAfter: false", () =>
+    {
+        const date = new Date("2018-01-18");
+        const baseDate = "2018-12-20";
+        expect(isAfter(date, baseDate)).toEqual(false);
+    });
+
+    it("isAfter: true", () =>
+    {
+        const date = "2018-12-20";
+        const baseDate = new Date("2018-01-18");
+        expect(isAfter(date, baseDate)).toEqual(true);
     });
 });
