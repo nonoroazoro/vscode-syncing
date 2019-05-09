@@ -141,3 +141,12 @@ export function reloadWindow()
 {
     vscode.commands.executeCommand("workbench.action.reloadWindow");
 }
+
+/**
+ * Register extension command on VSCode.
+ */
+export function registerCommand(context: vscode.ExtensionContext, command: string, callback: () => void)
+{
+    // Add to a list of disposables which are disposed when this extension is deactivated.
+    context.subscriptions.push(vscode.commands.registerCommand(command, callback));
+}
