@@ -106,6 +106,7 @@ export class Gist
      *
      * @param id Gist id.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
+     *
      * @throws {IEnhancedError}
      */
     public async get(id: string, showIndicator: boolean = false): Promise<GitHubTypes.IGist>
@@ -156,6 +157,20 @@ export class Gist
         {
             throw this._createError(status);
         }
+    }
+
+    /**
+     * Gets the last modified time (date string) of the gist.
+     *
+     * @param id Gist id.
+     * @param showIndicator Defaults to `false`, don't show progress indicator.
+     *
+     * @throws {IEnhancedError}
+     */
+    public async getLastModified(id: string, showIndicator: boolean = false): Promise<string>
+    {
+        const gist = await this.get(id, showIndicator);
+        return gist.updated_at;
     }
 
     /**
