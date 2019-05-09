@@ -7,6 +7,7 @@ import { ISyncingSettings, ISetting } from "../types/SyncingTypes";
 import { isAfter } from "../utils/date";
 import { SettingsWatcherService, WatcherEvent } from "../watcher";
 import { IGist } from "../types/GitHubTypes";
+import { localize } from "../i18n";
 
 export class AutoSyncService
 {
@@ -71,7 +72,7 @@ export class AutoSyncService
      */
     public async synchronize(syncingSettings: ISyncingSettings)
     {
-        Toast.showSpinner("Syncing: auto-sync service is checking your settings...");
+        Toast.showSpinner(localize("toast.settings.autoSync.checkingSettings"));
         try
         {
             const { token, id, http_proxy } = syncingSettings;
@@ -100,12 +101,12 @@ export class AutoSyncService
             {
                 // Do nothing if not modified.
                 Toast.clearSpinner("");
-                Toast.statusInfo("Syncing: Nothing changed since last synchronization.");
+                Toast.statusInfo(localize("toast.settings.autoSync.nothingChanged"));
             }
         }
         catch (err)
         {
-            Toast.statusError(`toast.settings.autoSync.failed ${err.message}`);
+            Toast.statusError(localize("toast.settings.autoSync.failed", err.message));
         }
     }
 
