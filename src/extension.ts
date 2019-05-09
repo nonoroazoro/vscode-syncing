@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 
-import { Gist, Syncing, VSCodeSetting } from "./core";
+import { Gist, Syncing, VSCodeSetting, AutoSyncService } from "./core";
 import * as Toast from "./core/Toast";
 import { localize, setup } from "./i18n";
 import { ISyncedItem } from "./types/SyncingTypes";
@@ -8,6 +8,7 @@ import { registerCommand } from "./utils/vscodeAPI";
 
 let _syncing: Syncing;
 let _vscodeSetting: VSCodeSetting;
+let _autoSyncService: AutoSyncService;
 let _isReady: boolean;
 let _isSynchronizing: boolean;
 
@@ -15,6 +16,12 @@ export function activate(context: vscode.ExtensionContext)
 {
     _initCommands(context);
     _initSyncing(context);
+    _initAutoSync();
+}
+
+export function deactivate()
+{
+    _stopAutoSyncService();
 }
 
 /**
@@ -51,6 +58,29 @@ function _initSyncing(context: vscode.ExtensionContext)
 }
 
 /**
+ * Init auto-sync.
+ */
+function _initAutoSync()
+{
+    if (_isReady)
+    {
+        setTimeout(async () =>
+        {
+            const syncingSettings = await _syncing.loadSettings();
+            if (syncingSettings.auto_sync && syncingSettings.token != null && syncingSettings.id != null)
+            {
+                _autoSyncService = AutoSyncService.create();
+                // 1. Synchronization on activation.
+                _autoSyncService.synchronize(syncingSettings);
+
+                // 2. Start watching.
+                _autoSyncService.start();
+            }
+        }, 5000);
+    }
+}
+
+/**
  * Uploads your settings.
  */
 async function _uploadVSCodeSettings()
@@ -58,6 +88,7 @@ async function _uploadVSCodeSettings()
     if (_isReady && !_isSynchronizing)
     {
         _isSynchronizing = true;
+        _pauseAutoSyncService();
         try
         {
             const syncingSettings = await _syncing.prepareUploadSettings(true);
@@ -74,6 +105,7 @@ async function _uploadVSCodeSettings()
         finally
         {
             _isSynchronizing = false;
+            _resumeAutoSyncService();
         }
     }
 }
@@ -86,6 +118,7 @@ async function _downloadVSCodeSettings()
     if (_isReady && !_isSynchronizing)
     {
         _isSynchronizing = true;
+        _pauseAutoSyncService();
         try
         {
             const syncingSettings = await _syncing.prepareDownloadSettings(true);
@@ -116,6 +149,7 @@ async function _downloadVSCodeSettings()
         finally
         {
             _isSynchronizing = false;
+            _resumeAutoSyncService();
         }
     }
 }
@@ -148,4 +182,28 @@ function _isExtensionsSynced(syncedItems: { updated: ISyncedItem[]; removed: ISy
         }
     }
     return false;
+}
+
+function _pauseAutoSyncService()
+{
+    if (_autoSyncService)
+    {
+        _autoSyncService.pause();
+    }
+}
+
+function _resumeAutoSyncService()
+{
+    if (_autoSyncService)
+    {
+        _autoSyncService.resume();
+    }
+}
+
+function _stopAutoSyncService()
+{
+    if (_autoSyncService)
+    {
+        _autoSyncService.stop();
+    }
 }
