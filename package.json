@@ -126,6 +126,7 @@
         "jsonc-parser": "^2.1.0",
         "jsondiffpatch": "^0.3.11",
         "junk": "^3.1.0",
+        "lodash.debounce": "^4.0.8",
         "lodash.pick": "^4.4.0",
         "micromatch": "^4.0.2",
         "tmp": "0.1.0"
@@ -134,6 +135,7 @@
         "@types/extract-zip": "^1.6.2",
         "@types/fs-extra": "^5.1.0",
         "@types/jest": "^24.0.12",
+        "@types/lodash.debounce": "^4.0.6",
         "@types/lodash.pick": "^4.4.6",
         "@types/node": "^12.0.0",
         "@types/tmp": "0.1.0",

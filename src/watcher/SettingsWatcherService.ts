@@ -1,18 +1,59 @@
 import { Stats } from "fs-extra";
 import { basename } from "path";
 import * as junk from "junk";
+import debounce = require("lodash.debounce");
 
 import { AbstractWatcher, WatcherEvent } from "./AbstractWatcher";
 import { ChokidarFileWatcher } from "./ChokidarFileWatcher";
 import { VSCodeExtensionWatcher } from "./VSCodeExtensionWatcher";
 import { Environment, Syncing } from "../core";
 
+export interface SettingsWatcherServiceOptions
+{
+    /**
+     * Sets a value indicating whether to use debounce event.
+     *
+     * Defaults to `true`.
+     *
+     * @default true
+     */
+    debounce: true;
+
+    /**
+     * Sets the debounce delay `in milliseconds`.
+     *
+     * Defaults to `1 minute`.
+     *
+     * @default 60000
+     */
+    debounceDelay: number;
+}
+
 export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
 {
+    private static readonly DEFAULT_OPTIONS: SettingsWatcherServiceOptions = {
+        debounce: true,
+        debounceDelay: 60000
+    };
+
+    private _options: SettingsWatcherServiceOptions;
     private _fileWatcher: ChokidarFileWatcher | undefined;
     private _extensionWatcher: VSCodeExtensionWatcher | undefined;
 
-    public async start()
+    constructor(options?: SettingsWatcherServiceOptions)
+    {
+        super();
+        this._options = { ...SettingsWatcherService.DEFAULT_OPTIONS, ...options };
+        if (this._options.debounce)
+        {
+            this._handleWatcherEvent = debounce(
+                this._handleWatcherEvent,
+                this._options.debounceDelay
+            );
+        }
+    }
+
+    public start()
     {
         if (!this._fileWatcher)
         {
@@ -50,7 +91,7 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
         }
     }
 
-    public async stop()
+    public stop()
     {
         super.stop();
         if (this._fileWatcher)
