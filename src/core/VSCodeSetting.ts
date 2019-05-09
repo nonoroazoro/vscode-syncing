@@ -168,6 +168,22 @@ export class VSCodeSetting
     }
 
     /**
+     * Gets the last modified time (in milliseconds) of VSCode settings.
+     *
+     * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
+     */
+    public async getSettingsLastModified(showIndicator: boolean = false): Promise<number>
+    {
+        const settings = await this.getSettings(true, showIndicator);
+        return Math.max.apply(
+            null,
+            settings
+                .filter((s) => s.lastModified != null)
+                .map((s) => s.lastModified)
+        );
+    }
+
+    /**
      * Save `VSCode Settings` to files.
      *
      * @param files `VSCode Settings` from GitHub Gist.
