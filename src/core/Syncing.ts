@@ -23,14 +23,14 @@ interface ISyncingSettings
     token: string;
 
     /**
-     * Store the auto-sync setting.
-     */
-    auto_sync?: boolean;
-
-    /**
      * Store the http proxy setting.
      */
-    http_proxy?: string;
+    http_proxy: string | undefined;
+
+    /**
+     * Store the auto-sync setting.
+     */
+    auto_sync: boolean;
 }
 
 /**
@@ -46,8 +46,8 @@ export class Syncing
     private static readonly DEFAULT_SETTINGS: ISyncingSettings = {
         id: "",
         token: "",
-        auto_sync: false,
-        http_proxy: ""
+        http_proxy: "",
+        auto_sync: false
     };
 
     private _env: Environment;
@@ -86,24 +86,17 @@ export class Syncing
      */
     public get proxy(): string | undefined
     {
-        let proxy = this.loadSettings().http_proxy;
-        if (proxy == null || isEmptyString(proxy))
-        {
-            proxy = process.env["http_proxy"] || process.env["https_proxy"];
-        }
-        return proxy;
+        return this.loadSettings().http_proxy;
     }
 
     /**
      * Gets the auto-sync setting of `Syncing`.
      *
-     * If the proxy setting is not set, it will read from the `http_proxy` and `https_proxy` environment variables.
-     *
      * @default false
      */
     public get autoSync(): boolean
     {
-        return this.loadSettings().auto_sync || false;
+        return this.loadSettings().auto_sync;
     }
 
     /**
@@ -209,14 +202,14 @@ export class Syncing
     }
 
     /**
-     * Loads the `Syncing`'s settings from the settings file (`syncing.json`).
+     * Loads the `Syncing`'s settings from the settings file (`syncing.json`) and environment variables.
      */
     public loadSettings(): ISyncingSettings
     {
-        const settings: ISyncingSettings = { ...Syncing.DEFAULT_SETTINGS };
+        let settings: ISyncingSettings = { ...Syncing.DEFAULT_SETTINGS };
         try
         {
-            return {
+            settings = {
                 ...settings,
                 ...fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
             };
@@ -225,7 +218,16 @@ export class Syncing
         {
             console.error(localize("error.loading.syncing.settings"), err);
         }
-        return settings;
+
+        // Read proxy setting from environment variables.
+        // Note that the proxy will eventually be normalized to either `undefined` or a correct string value.
+        let proxy = settings.http_proxy;
+        if (proxy == null || isEmptyString(proxy))
+        {
+            proxy = process.env["http_proxy"] || process.env["https_proxy"];
+        }
+
+        return { ...settings, http_proxy: proxy };
     }
 
     /**
@@ -249,7 +251,15 @@ export class Syncing
      */
     public async saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
     {
-        const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
+        const target = { ...settings };
+
+        // Normalize null proxy to an empty string.
+        if (target.http_proxy == null)
+        {
+            target.http_proxy = "";
+        }
+
+        const content = JSON.stringify(target, null, 4);
         try
         {
             await fs.outputFile(this.settingsPath, content);
