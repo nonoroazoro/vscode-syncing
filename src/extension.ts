@@ -4,6 +4,7 @@ import { Gist, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
 import { localize, setup } from "./i18n";
 import { ISyncedItem } from "./types/SyncingTypes";
+import { registerCommand } from "./utils/vscodeAPI";
 
 let _syncing: Syncing;
 let _vscodeSetting: VSCodeSetting;
@@ -12,24 +13,34 @@ let _isSynchronizing: boolean;
 
 export function activate(context: vscode.ExtensionContext)
 {
-    _init(context);
+    _initCommands(context);
+    _initSyncing(context);
 }
 
 /**
- * Init.
+ * Init the commands.
  */
-function _init(context: vscode.ExtensionContext)
+function _initCommands(context: vscode.ExtensionContext)
 {
-    // Config i18n.
-    setup(context.extensionPath);
+    registerCommand(context, "syncing.uploadSettings", _uploadVSCodeSettings);
+    registerCommand(context, "syncing.downloadSettings", _downloadVSCodeSettings);
+    registerCommand(context, "syncing.openSettings", _openSyncingSettings);
+}
 
-    _initCommands(context);
-
-    _isSynchronizing = false;
+/**
+ * Init the extension.
+ */
+function _initSyncing(context: vscode.ExtensionContext)
+{
     try
     {
+        // 1. Setup i18n.
+        setup(context.extensionPath);
+
+        // 2. Init Syncing.
         _syncing = Syncing.create();
         _vscodeSetting = VSCodeSetting.create();
+
         _isReady = true;
     }
     catch (err)
@@ -40,28 +51,9 @@ function _init(context: vscode.ExtensionContext)
 }
 
 /**
- * Init the extension's commands.
- */
-function _initCommands(context: vscode.ExtensionContext)
-{
-    _registerCommand(context, "syncing.uploadSettings", _uploadSettings);
-    _registerCommand(context, "syncing.downloadSettings", _downloadSettings);
-    _registerCommand(context, "syncing.openSettings", _openSettings);
-}
-
-/**
- * VSCode's registerCommand wrapper.
- */
-function _registerCommand(context: vscode.ExtensionContext, command: string, callback: () => void)
-{
-    // Add to a list of disposables which are disposed when this extension is deactivated.
-    context.subscriptions.push(vscode.commands.registerCommand(command, callback));
-}
-
-/**
  * Uploads your settings.
  */
-async function _uploadSettings()
+async function _uploadVSCodeSettings()
 {
     if (_isReady && !_isSynchronizing)
     {
@@ -89,7 +81,7 @@ async function _uploadSettings()
 /**
  * Downloads your settings.
  */
-async function _downloadSettings()
+async function _downloadVSCodeSettings()
 {
     if (_isReady && !_isSynchronizing)
     {
@@ -131,7 +123,7 @@ async function _downloadSettings()
 /**
  * Opens the Syncing's settings file in a VSCode editor.
  */
-function _openSettings()
+function _openSyncingSettings()
 {
     if (_isReady)
     {
