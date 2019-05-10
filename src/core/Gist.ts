@@ -95,9 +95,9 @@ export class Gist
                 name: data.login
             };
         }
-        catch ({ status })
+        catch (err)
         {
-            throw this._createError(status);
+            throw this._createError(err);
         }
     }
 
@@ -125,9 +125,9 @@ export class Gist
             }
             return result.data as any;
         }
-        catch ({ status })
+        catch (err)
         {
-            const error = this._createError(status);
+            const error = this._createError(err);
             if (showIndicator)
             {
                 Toast.statusError(localize("toast.settings.downloading.failed", error.message));
@@ -153,9 +153,9 @@ export class Gist
                 .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
                 .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
         }
-        catch ({ status })
+        catch (err)
         {
-            throw this._createError(status);
+            throw this._createError(err);
         }
     }
 
@@ -205,9 +205,9 @@ export class Gist
                 }
                 return gist;
             }
-            catch ({ status })
+            catch (err)
             {
-                throw this._createError(status);
+                throw this._createError(err);
             }
         }
         return false;
@@ -226,9 +226,9 @@ export class Gist
             const result = await this._api.gists.create(content);
             return result.data as any;
         }
-        catch ({ status })
+        catch (err)
         {
-            throw this._createError(status);
+            throw this._createError(err);
         }
     }
 
@@ -414,18 +414,20 @@ export class Gist
     /**
      * Creates the error from an error code.
      */
-    private _createError(code: number)
+    private _createError(error: Error & { status: number })
     {
+        const { status } = error;
         let message = localize("error.check.internet");
-        if (code === 401)
+        if (status === 401)
         {
             message = localize("error.check.github.token");
         }
-        else if (code === 404)
+        else if (status === 404)
         {
             message = localize("error.check.gist.id");
         }
-        return createError(message, code);
+        console.error(error);
+        return createError(message, status);
     }
 
     /**
