@@ -18,23 +18,23 @@
 
 ## 重要变更
 
-* 从 ***2.1.2*** 版本开始：
+* 从 ***3.0.0*** 版本开始：
 
-    1. 显著加快 VSCode 插件的下载和安装速度，尤其是中国用户在无代理情况下的下载和安装速度；
+    1. 支持**配置自动同步**（终于...），以下是简单步骤：
 
-    1. 增加对各种 VSCode 版本的支持，包括：
+        1. 更新 `Syncing` 到 `3.0.0`；
 
-        1. [VSCode 标准版本](https://code.visualstudio.com/)；
+        1. 在后续操作之前，**强烈推荐**您执行一次`下载配置`以便让自动同步功能更好地工作；
 
-        1. [VSCode Insiders 版本](https://code.visualstudio.com/insiders/)；
+        1. 打开 `Syncing` 的配置文件（[不知道如何打开？](#配置自动同步)）并启用 **auto-sync**，例如：
 
-        1. [VSCode Exploration 版本](https://github.com/Microsoft/vscode/issues/61787)；
+            ```json
+            "auto_sync": true
+            ```
 
-        1. [VSCodium](https://github.com/VSCodium/vscodium)，这是 [FLOSS License](https://www.gnu.org/philosophy/floss-and-foss.en.html) 下的一个 VSCode 版本；
+        1. 重新加载或重启 VSCode，大功告成！
 
-        1. 按照[默认配置](https://github.com/Microsoft/vscode/blob/master/product.json)自行编译的 VSCode 版本 (感谢 [@Backfighter](https://github.com/Backfighter) 的 PR)。
-
-        > 无须担心，升级之后 Syncing 会自动帮您检测 VSCode 版本。
+        > 最后，别忘了设置您的 `Github Personal Access Token` 和 `Gist ID`，否则自动同步功能将不会工作。
 
 
 ## 功能
@@ -186,6 +186,21 @@
 大功告成！另外，如果您不想在这里配置代理，那么 `Syncing` 也会尝试从系统环境中读取 `http_proxy` 和 `https_proxy` 作为代理设置。
 
 > 注意：不同于那些保存在 [VSCode 用户设置](#vscode-配置项)中的 `Syncing` 配置项，这个独立的配置文件并**不会被同步**，因为里面保存了您的私人信息。
+
+
+## 配置自动同步
+
+Syncing 现在支持配置自动同步了，具体步骤如下：
+
+1. 在 `VSCode 的命令面板`中输入 `Syncing: Open Syncing Settings`（或者 `opensync`）来打开 `Syncing` 自己的配置文件（即 `syncing.json` 文件）；
+
+1. 启用 `"auto_sync"` 配置，例如：
+
+    ```json
+    "auto_sync": "auto"
+    ```
+
+1. 重新加载或重启 VSCode。
 
 
 ## 快速开始
