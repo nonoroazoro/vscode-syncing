@@ -22,7 +22,7 @@
 
     1. Supports **auto-sync** (finally...), here's a brief guide:
 
-        1. Update Syncing to `3.0.0`.
+        1. ***Disclaimer***, by enabling auto-sync, you may **unintentionally overwrite** your settings ([see the discussion here](https://github.com/nonoroazoro/vscode-syncing/issues/6)), make sure you know what you're doing before you continue!
 
         1. It's **highly recommended** that you perform a `Download Settings` (which will set a baseline) before the following steps.
 
