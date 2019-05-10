@@ -1,8 +1,17 @@
 import { NormalizedLocale } from "../../src/types/NormalizedLocale";
-import { formatDistance, isAfter } from "../../src/utils/date";
+import { formatDistance, isAfter, parse } from "../../src/utils/date";
 
 describe("Syncing/utils/date", () =>
 {
+    it("parse date", () =>
+    {
+        const target = new Date();
+        const str = target.toISOString();
+        const time = target.getTime();
+        expect(parse(str)).toEqual(target);
+        expect(parse(time)).toEqual(target);
+    });
+
     it("format distance of dates in Default Locale", () =>
     {
         const target = "2 days ago";
