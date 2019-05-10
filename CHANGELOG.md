@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.1 - May 10, 2019
+
+- Changed: No longer pause auto-sync during uploading.
+
+
 ## 3.0.0 - May 10, 2019
 
 - Added: Add support for settings **auto-sync**.
