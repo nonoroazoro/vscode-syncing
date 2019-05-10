@@ -126,7 +126,7 @@ async function _downloadVSCodeSettings()
             try
             {
                 const gist = await api.get(syncingSettings.id, true);
-                const syncedItems = await _vscodeSetting.saveSettings(gist.files, true);
+                const syncedItems = await _vscodeSetting.saveSettings(gist, true);
                 Toast.statusInfo(localize("toast.settings.downloaded"));
                 if (_isExtensionsSynced(syncedItems))
                 {
