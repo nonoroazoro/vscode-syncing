@@ -11,20 +11,20 @@ import { Environment, Syncing } from "../core";
 export interface SettingsWatcherServiceOptions
 {
     /**
-     * Sets a value indicating whether to use debounce event.
+     * Sets a value indicating whether to enable event debounce.
      *
      * Defaults to `true`.
      *
      * @default true
      */
-    debounce: true;
+    debounce: boolean;
 
     /**
      * Sets the debounce delay `in milliseconds`.
      *
-     * Defaults to `1 minute`.
+     * Defaults to `10 seconds`.
      *
-     * @default 60000
+     * @default 10000
      */
     debounceDelay: number;
 }
@@ -33,7 +33,7 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
 {
     private static readonly DEFAULT_OPTIONS: SettingsWatcherServiceOptions = {
         debounce: true,
-        debounceDelay: 60000
+        debounceDelay: 10000
     };
 
     private _options: SettingsWatcherServiceOptions;
@@ -91,12 +91,15 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
         }
     }
 
-    public pause()
+    public resume()
     {
-        super.pause();
+        super.resume();
+
+        // Clear the debounce queue to prevent firing the events collected
+        // during the suspension.
+        // Note: The debounce queue must be cleared here instead of in `pause`.
         if (this._options.debounce)
         {
-            // Clear debounce queue.
             (this._handleWatcherEvent as any).cancel();
         }
     }
