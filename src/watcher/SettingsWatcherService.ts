@@ -22,9 +22,9 @@ export interface SettingsWatcherServiceOptions
     /**
      * Sets the debounce delay `in milliseconds`.
      *
-     * Defaults to `10 seconds`.
+     * Defaults to `8 seconds`.
      *
-     * @default 10000
+     * @default 8000
      */
     debounceDelay: number;
 }
@@ -33,7 +33,7 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
 {
     private static readonly DEFAULT_OPTIONS: SettingsWatcherServiceOptions = {
         debounce: true,
-        debounceDelay: 10000
+        debounceDelay: 8000
     };
 
     private _options: SettingsWatcherServiceOptions;
