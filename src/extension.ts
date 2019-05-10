@@ -88,7 +88,6 @@ async function _uploadVSCodeSettings()
     if (_isReady && !_isSynchronizing)
     {
         _isSynchronizing = true;
-        _pauseAutoSyncService();
         try
         {
             const syncingSettings = await _syncing.prepareUploadSettings(true);
@@ -105,7 +104,6 @@ async function _uploadVSCodeSettings()
         finally
         {
             _isSynchronizing = false;
-            _resumeAutoSyncService();
         }
     }
 }
