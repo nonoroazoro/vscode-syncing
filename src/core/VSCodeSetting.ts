@@ -411,7 +411,7 @@ export class VSCodeSetting
                     }
                     content = JSON.stringify(extensions, null, 4);
 
-                    lastModified = await readLastModified(this._env.obsoleteFilePath);
+                    lastModified = await readLastModified(this._env.extensionsDirectory);
                 }
                 else
                 {
@@ -459,7 +459,7 @@ export class VSCodeSetting
             result = await this._ext.sync(extensions, true);
 
             // Synchronize last modified time.
-            await writeLastModified(this._env.obsoleteFilePath, lastModified);
+            await writeLastModified(this._env.extensionsDirectory, lastModified);
         }
         else
         {
