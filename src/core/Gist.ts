@@ -9,7 +9,6 @@ import { ISetting, SettingType } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
 import { createError } from "../utils/errors";
 import { parse } from "../utils/jsonc";
-import { parse as parseDate } from "../utils/date";
 import { isEmptyString } from "../utils/lang";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
 import * as Toast from "./Toast";
@@ -158,16 +157,6 @@ export class Gist
         {
             throw this._createError(status);
         }
-    }
-
-    /**
-     * Gets the last modified time (in milliseconds) of the gist.
-     *
-     * @param {GitHubTypes.IGist} gist Gist.
-     */
-    public getLastModified(gist: GitHubTypes.IGist): number
-    {
-        return parseDate(gist.updated_at).getTime();
     }
 
     /**
