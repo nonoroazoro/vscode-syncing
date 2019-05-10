@@ -8,7 +8,25 @@ import * as enUS from "date-fns/locale/en-US";
 import * as zhCN from "date-fns/locale/zh-CN";
 
 import { NormalizedLocale } from "../types/NormalizedLocale";
-import { isString } from "./lang";
+import { isDate, isString } from "./lang";
+
+/**
+ * Parses the given value and returns the `Date` the input value represents.
+ *
+ * @param {(Date | number | string)} input The input value.
+ */
+export function parse(input: Date | number | string): Date
+{
+    if (isDate(input))
+    {
+        return input;
+    }
+    if (isString(input))
+    {
+        return parseISO(input);
+    }
+    return new Date(input);
+}
 
 /**
  * Checks if the first date is after the base date.
@@ -18,9 +36,7 @@ import { isString } from "./lang";
  */
 export function isAfter(date: Date | number | string, baseDate: Date | number | string)
 {
-    const parsedDate = isString(date) ? parseISO(date) : date;
-    const parsedBaseDate = isString(baseDate) ? parseISO(baseDate) : baseDate;
-    return rawIsAfter(parsedDate, parsedBaseDate);
+    return rawIsAfter(parse(date), parse(baseDate));
 }
 
 /**
