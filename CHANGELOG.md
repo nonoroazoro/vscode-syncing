@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.0 - May 10, 2019
+
+- Added: Add support for settings **auto-sync**.
+
+
 ## 2.1.6 - April 04, 2019
 
 - Changed: Remove unused files to reduce the extension size and improve the performance.
