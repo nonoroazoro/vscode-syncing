@@ -1,0 +1,12 @@
+{
+    "extends": [
+        "eslint-config-zoro/eslint",
+        "eslint-config-zoro/typescript"
+    ],
+    "env": {
+        "jest": true
+    },
+    "parserOptions": {
+        "project": "./tsconfig.json"
+    }
+}

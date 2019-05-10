@@ -18,23 +18,23 @@
 
 ## Breaking Changes
 
-* From ***version 2.1.2*** onwards:
+* From ***version 3.0.0*** onwards:
 
-    1. Increase the download speed and accelerate the process of adding and installing VSCode extensions.
+    1. Supports **auto-sync** (finally...), here's a brief guide:
 
-    1. Add support for different editions of VSCode binaries as the followings:
+        1. ***Disclaimer***, by enabling auto-sync, you may **unintentionally overwrite** your settings ([see the discussion here](https://github.com/nonoroazoro/vscode-syncing/issues/6)), make sure you know what you're doing before you continue!
 
-        1. [VSCode Standard Builds](https://code.visualstudio.com/).
+        1. It's **highly recommended** that you perform a `Download Settings` (which will set a baseline) before the following steps.
 
-        1. [VSCode Insiders Builds](https://code.visualstudio.com/insiders/).
+        1. `Open Syncing Settings` ([Don't known how to open?](#auto-sync-settings)) and enable the **auto-sync** like the followings:
 
-        1. [VSCode Exploration Builds](https://github.com/Microsoft/vscode/issues/61787).
+            ```json
+            "auto_sync": true
+            ```
 
-        1. VSCode builds under FLOSS license, see [VSCodium](https://github.com/VSCodium/vscodium).
+        1. Reload or reopen your VSCode and enjoy!
 
-        1. Self-compiled VSCode under [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json) (Thank [@Backfighter](https://github.com/Backfighter) for the PR).
-
-        > Don't worry, Syncing will automatically identify the VSCode edition for you.
+        > BTW, don't forget to fill in the correct `Github Personal Access Token` and `Gist ID`, otherwise auto-sync will not work.
 
 
 ## Features
@@ -186,6 +186,21 @@ You can set up a proxy to accelerate the synchronization. Here are the steps:
 Moreover, if the `"http_proxy"` is unset, `Syncing` will try to read the `http_proxy` and `https_proxy` environment variables as a fallback.
 
 > Please note that unlike the settings in [VSCode User Settings](#vscode-user-settings), `Syncing` **will not upload** its own settings file because it contains your personal information.
+
+
+## Auto-sync Settings
+
+You can now let Syncing auto-sync your settings. Here are the steps:
+
+1. Type `"Syncing: Open Syncing Settings"` (or just `"opensync"`) in `VSCode Command Palette` to open `Syncing`'s own settings file (i.e. `syncing.json`).
+
+1. Enable the `"auto_sync"` setting, for example:
+
+    ```json
+    "auto_sync": "auto"
+    ```
+
+1. Reload or reopen VSCode to take effect.
 
 
 ## Getting Started

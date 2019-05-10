@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 
+import { VSCODE_BUILTIN_ENVIRONMENTS } from "../constants";
 import { localize } from "../i18n";
 import { NormalizedLocale } from "../types/NormalizedLocale";
 import { VSCodeEdition } from "../types/VSCodeEdition";
@@ -102,13 +103,25 @@ export function getVSCodeEdition()
 
         case "Code - OSS":
             return VSCodeEdition.OSS;
+
+        default:
+            throw new Error(localize("error.env.unknown.vscode"));
     }
 
     // if (vscode.extensions.getExtension("coder.coder"))
     // {
     //     return VSCodeEdition.CODER;
     // }
-    throw new Error(localize("error.env.unknown.vscode"));
+}
+
+/**
+ * Gets the builtin-environment of the current running VSCode.
+ *
+ * @throws {Error} Throws an error when the environment is not found.
+ */
+export function getVSCodeBuiltinEnvironment()
+{
+    return VSCODE_BUILTIN_ENVIRONMENTS[getVSCodeEdition()];
 }
 
 /**
@@ -127,4 +140,13 @@ export function openFile(filepath: string)
 export function reloadWindow()
 {
     vscode.commands.executeCommand("workbench.action.reloadWindow");
+}
+
+/**
+ * Register extension command on VSCode.
+ */
+export function registerCommand(context: vscode.ExtensionContext, command: string, callback: () => void)
+{
+    // Add to a list of disposables which are disposed when this extension is deactivated.
+    context.subscriptions.push(vscode.commands.registerCommand(command, callback));
 }

@@ -2,10 +2,10 @@ import * as Github from "@octokit/rest";
 import * as HttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
 
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../common/constants";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
 import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
-import { ISetting, SettingTypes } from "../types/SyncingTypes";
+import { ISetting, SettingType } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
 import { createError } from "../utils/errors";
 import { parse } from "../utils/jsonc";
@@ -84,20 +84,20 @@ export class Gist
      *
      * @throws {IEnhancedError}
      */
-    public async user(): Promise<{ id: number, name: string }>
+    public async user(): Promise<{ id: number; name: string }>
     {
         try
         {
             const res = await this._api.users.getAuthenticated({});
-            const data = res.data as GitHubTypes.IGistOwner;
+            const data = res.data as GitHubTypes.IGistUser;
             return {
                 id: data.id,
                 name: data.login
             };
         }
-        catch ({ status })
+        catch (err)
         {
-            throw this._createError(status);
+            throw this._createError(err);
         }
     }
 
@@ -106,6 +106,7 @@ export class Gist
      *
      * @param id Gist id.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
+     *
      * @throws {IEnhancedError}
      */
     public async get(id: string, showIndicator: boolean = false): Promise<GitHubTypes.IGist>
@@ -124,9 +125,9 @@ export class Gist
             }
             return result.data as any;
         }
-        catch ({ status })
+        catch (err)
         {
-            const error = this._createError(status);
+            const error = this._createError(err);
             if (showIndicator)
             {
                 Toast.statusError(localize("toast.settings.downloading.failed", error.message));
@@ -147,14 +148,14 @@ export class Gist
             const res = await this._api.gists.list({});
             // Find and sort VSCode settings gists by time.
             const gists: GitHubTypes.IGist[] = res.data as any;
-            const extensionsRemoteFilename = `${SettingTypes.Extensions}.json`;
+            const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
             return gists
                 .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
                 .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
         }
-        catch ({ status })
+        catch (err)
         {
-            throw this._createError(status);
+            throw this._createError(err);
         }
     }
 
@@ -204,9 +205,9 @@ export class Gist
                 }
                 return gist;
             }
-            catch ({ status })
+            catch (err)
             {
-                throw this._createError(status);
+                throw this._createError(err);
             }
         }
         return false;
@@ -225,9 +226,9 @@ export class Gist
             const result = await this._api.gists.create(content);
             return result.data as any;
         }
-        catch ({ status })
+        catch (err)
         {
-            throw this._createError(status);
+            throw this._createError(err);
         }
     }
 
@@ -272,7 +273,7 @@ export class Gist
             const exists = await this.exists(id);
 
             // Preparing local gist.
-            const localGist: { gist_id: string, files: any } = { gist_id: id, files: {} };
+            const localGist: { gist_id: string; files: any } = { gist_id: id, files: {} };
             for (const item of uploads)
             {
                 // Filter out `null` content.
@@ -285,7 +286,7 @@ export class Gist
             if (exists)
             {
                 // Upload if the local files are modified.
-                localGist.files = this._getModifiedFiles(localGist.files, exists.files);
+                localGist.files = this.getModifiedFiles(localGist.files, exists.files);
                 if (localGist.files)
                 {
                     // poka-yoke - Determines whether there're too much changes since the last uploading.
@@ -351,9 +352,15 @@ export class Gist
     }
 
     /**
-     * Gets the modified files list.
+     * Compares the local and remote files, returns the modified files or `undefined`.
+     *
+     * @param {GitHubTypes.IGistFiles} localFiles Local files.
+     * @param {GitHubTypes.IGistFiles} [remoteFiles] Remote files.
      */
-    private _getModifiedFiles(localFiles: any, remoteFiles?: GitHubTypes.IGistFiles): object | null
+    public getModifiedFiles(
+        localFiles: GitHubTypes.IGistFiles,
+        remoteFiles?: GitHubTypes.IGistFiles
+    ): GitHubTypes.IGistFiles | undefined
     {
         if (!remoteFiles)
         {
@@ -362,7 +369,7 @@ export class Gist
 
         let localFile;
         let remoteFile;
-        const result = {};
+        const result = {} as GitHubTypes.IGistFiles;
         const recordedKeys = [];
         for (const key of Object.keys(remoteFiles))
         {
@@ -379,9 +386,9 @@ export class Gist
             else
             {
                 // Remove the remote files except keybindings and settings.
-                if (!key.includes(SettingTypes.Keybindings) && !key.includes(SettingTypes.Settings))
+                if (!key.includes(SettingType.Keybindings) && !key.includes(SettingType.Settings))
                 {
-                    result[key] = null;
+                    result[key] = null as any;
                 }
             }
             recordedKeys.push(key);
@@ -401,24 +408,26 @@ export class Gist
             }
         }
 
-        return (Object.keys(result).length === 0) ? null : result;
+        return (Object.keys(result).length === 0) ? undefined : result;
     }
 
     /**
      * Creates the error from an error code.
      */
-    private _createError(code: number)
+    private _createError(error: Error & { status: number })
     {
+        const { status } = error;
         let message = localize("error.check.internet");
-        if (code === 401)
+        if (status === 401)
         {
             message = localize("error.check.github.token");
         }
-        else if (code === 404)
+        else if (status === 404)
         {
             message = localize("error.check.gist.id");
         }
-        return createError(message, code);
+        console.error(error);
+        return createError(message, status);
     }
 
     /**
@@ -436,7 +445,7 @@ export class Gist
      */
     private _parseToJSON(files: GitHubTypes.IGistFiles): object
     {
-        const extensionsRemoteFilename = `${SettingTypes.Extensions}.json`;
+        const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
         let file: GitHubTypes.IGistFile;
         let parsed: object;
         const result = {};

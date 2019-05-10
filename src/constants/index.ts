@@ -1,4 +1,18 @@
 import { VSCodeEdition } from "../types/VSCodeEdition";
+import { SettingType } from "../types/SyncingTypes";
+
+/**
+ * Note that this is an ordered list, to ensure that the smaller files
+ * (such as `settings.json`, `keybindings.json`) are synced first.
+ * Thus, the `extensions` will be the last one to sync.
+ */
+export const VSCODE_SETTINGS_LIST = [
+    SettingType.Settings,
+    SettingType.Keybindings,
+    SettingType.Locale,
+    SettingType.Snippets,
+    SettingType.Extensions
+];
 
 /**
  * Dot-separated identifiers, same as the sections of VSCode, see `vscode.workspace.getConfiguration`.
@@ -19,29 +33,32 @@ export const SETTING_EXCLUDED_SETTINGS = `${CONFIGURATION_KEY}.${CONFIGURATION_E
 /**
  * The builtin-environments of different VSCode editions.
  */
-export const VSCODE_BUILTIN_ENVIRONMENTS = {
+export const VSCODE_BUILTIN_ENVIRONMENTS: Record<VSCodeEdition, {
+    dataDirectoryName: string;
+    extensionsDirectoryName: string;
+}> = {
     [VSCodeEdition.STANDARD]: {
-        extensionsDirectoryName: ".vscode",
-        dataDirectoryName: "Code"
+        dataDirectoryName: "Code",
+        extensionsDirectoryName: ".vscode"
     },
     [VSCodeEdition.INSIDERS]: {
-        extensionsDirectoryName: ".vscode-insiders",
-        dataDirectoryName: "Code - Insiders"
+        dataDirectoryName: "Code - Insiders",
+        extensionsDirectoryName: ".vscode-insiders"
     },
     [VSCodeEdition.EXPLORATION]: {
-        extensionsDirectoryName: ".vscode-exploration",
-        dataDirectoryName: "Code - Exploration"
+        dataDirectoryName: "Code - Exploration",
+        extensionsDirectoryName: ".vscode-exploration"
     },
     [VSCodeEdition.VSCODIUM]: {
-        extensionsDirectoryName: ".vscode-oss",
-        dataDirectoryName: "VSCodium"
+        dataDirectoryName: "VSCodium",
+        extensionsDirectoryName: ".vscode-oss"
     },
     [VSCodeEdition.OSS]: {
-        extensionsDirectoryName: ".vscode-oss",
-        dataDirectoryName: "Code - OSS"
+        dataDirectoryName: "Code - OSS",
+        extensionsDirectoryName: ".vscode-oss"
     },
     [VSCodeEdition.CODER]: {
-        extensionsDirectoryName: "vscode",
-        dataDirectoryName: "Code"
+        dataDirectoryName: "Code",
+        extensionsDirectoryName: "vscode"
     }
 };

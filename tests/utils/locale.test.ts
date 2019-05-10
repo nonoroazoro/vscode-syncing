@@ -1,5 +1,5 @@
-import { NormalizedLocale } from "../../types/NormalizedLocale";
-import { normalize } from "../../utils/locale";
+import { NormalizedLocale } from "../../src/types/NormalizedLocale";
+import { normalize } from "../../src/utils/locale";
 
 describe("Syncing/utils/locale", () =>
 {
@@ -32,5 +32,4 @@ describe("Syncing/utils/locale", () =>
     {
         expect(normalize("zh-CN")).toEqual(NormalizedLocale.ZH_CN);
     });
-
 });

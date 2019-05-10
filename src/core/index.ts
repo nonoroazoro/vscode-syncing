@@ -1,3 +1,4 @@
+export * from "./AutoSyncService";
 export * from "./Environment";
 export * from "./Extension";
 export * from "./Gist";

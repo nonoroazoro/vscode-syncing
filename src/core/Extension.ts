@@ -1,6 +1,6 @@
 import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
-import * as minimatch from "minimatch";
+import * as micromatch from "micromatch";
 import * as path from "path";
 import * as tmp from "tmp";
 import * as vscode from "vscode";
@@ -11,7 +11,7 @@ import
     CONFIGURATION_EXCLUDED_EXTENSIONS,
     CONFIGURATION_EXTENSIONS_AUTOUPDATE,
     CONFIGURATION_KEY
-} from "../common/constants";
+} from "../constants";
 import { localize } from "../i18n";
 import { IExtension, ISyncedItem } from "../types/SyncingTypes";
 import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
@@ -91,7 +91,7 @@ export class Extension
         {
             if (
                 !ext.packageJSON.isBuiltin
-                && !excludedPatterns.some((pattern) => minimatch(ext.id, pattern, { nocase: true }))
+                && !excludedPatterns.some((pattern) => micromatch.isMatch(ext.id, pattern, { nocase: true }))
             )
             {
                 item = {
@@ -177,7 +177,7 @@ export class Extension
                 extension.downloadURL =
                     `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
                     + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
-                    + `assetbyname/Microsoft.VisualStudio.Services.VSIXPackage?install=true`;
+                    + "assetbyname/Microsoft.VisualStudio.Services.VSIXPackage?install=true";
 
                 downloadFile(extension.downloadURL, filepath, this._syncing.proxy).then(() =>
                 {
@@ -268,8 +268,8 @@ export class Extension
         updated: IExtension[] = []
     ): Promise<void>
     {
-        const filepath = this._env.getObsoleteFilePath();
-        let obsolete: { [extensionFolderName: string]: boolean; } | undefined;
+        const filepath = this._env.obsoleteFilePath;
+        let obsolete: { [extensionFolderName: string]: boolean } | undefined;
         try
         {
             obsolete = await fs.readJson(filepath);
@@ -311,10 +311,10 @@ export class Extension
      * Gets the extensions that will be added, updated or removed.
      */
     private async _getDifferentExtensions(extensions: IExtension[]): Promise<{
-        added: IExtension[],
-        removed: IExtension[],
-        updated: IExtension[],
-        total: number
+        added: IExtension[];
+        removed: IExtension[];
+        updated: IExtension[];
+        total: number;
     }>
     {
         const result = {
@@ -402,7 +402,10 @@ export class Extension
     /**
      * Adds extensions.
      */
-    private async _addExtensions(options: ISyncOptions): Promise<{ added: IExtension[], addedErrors: IExtension[] }>
+    private async _addExtensions(options: ISyncOptions): Promise<{
+        added: IExtension[];
+        addedErrors: IExtension[];
+    }>
     {
         const { extensions, progress, showIndicator = false, total } = options;
 
@@ -439,8 +442,10 @@ export class Extension
     /**
      * Updates extensions.
      */
-    private async _updateExtensions(options: ISyncOptions)
-        : Promise<{ updated: IExtension[], updatedErrors: IExtension[] }>
+    private async _updateExtensions(options: ISyncOptions): Promise<{
+        updated: IExtension[];
+        updatedErrors: IExtension[];
+    }>
     {
         const { extensions, progress, showIndicator = false, total } = options;
 
@@ -483,8 +488,10 @@ export class Extension
     /**
      * Removes extensions.
      */
-    private async _removeExtensions(options: ISyncOptions)
-        : Promise<{ removed: IExtension[], removedErrors: IExtension[] }>
+    private async _removeExtensions(options: ISyncOptions): Promise<{
+        removed: IExtension[];
+        removedErrors: IExtension[];
+    }>
     {
         const { extensions, progress, showIndicator = false, total } = options;
 

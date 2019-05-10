@@ -1,4 +1,4 @@
-import { diff } from "../../utils/diffPatch";
+import { diff } from "../../src/utils/diffPatch";
 
 describe("Syncing/utils/diffPatch", () =>
 {

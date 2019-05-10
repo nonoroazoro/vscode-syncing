@@ -10,7 +10,7 @@ import { isString } from "../utils/lang";
  */
 export class CaseInsensitiveMap<K, V> extends Map<K, V>
 {
-    delete(key: K): boolean
+    public delete(key: K): boolean
     {
         if (isString(key))
         {
@@ -19,7 +19,7 @@ export class CaseInsensitiveMap<K, V> extends Map<K, V>
         return super.delete(key);
     }
 
-    get(key: K)
+    public get(key: K)
     {
         if (isString(key))
         {
@@ -28,7 +28,7 @@ export class CaseInsensitiveMap<K, V> extends Map<K, V>
         return super.get(key);
     }
 
-    has(key: K)
+    public has(key: K)
     {
         if (isString(key))
         {
@@ -37,7 +37,7 @@ export class CaseInsensitiveMap<K, V> extends Map<K, V>
         return super.has(key);
     }
 
-    set(key: K, value: V)
+    public set(key: K, value: V)
     {
         if (isString(key))
         {
