@@ -81,7 +81,7 @@ export class AutoSyncService
 
             const api = Gist.create(token, http_proxy);
             const remoteSettings = await api.get(id);
-            const remoteLastModified = api.getLastModified(remoteSettings);
+            const remoteLastModified = remoteSettings.updated_at;
             if (this._isModified(localSettings, remoteSettings, api))
             {
                 if (isAfter(localLastModified, remoteLastModified))
