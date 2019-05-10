@@ -1,40 +1,81 @@
 import * as os from "os";
 import * as path from "path";
 
-import { VSCODE_BUILTIN_ENVIRONMENTS } from "../common/constants";
 import { localize } from "../i18n";
+import { Platform } from "../types/Platform";
 import { IExtension } from "../types/SyncingTypes";
-import { VSCodeEdition } from "../types/VSCodeEdition";
-import { getVSCodeEdition } from "../utils/vscodeAPI";
+import { getVSCodeBuiltinEnvironment } from "../utils/vscodeAPI";
 
 /**
  * VSCode environment wrapper.
  */
 export class Environment
 {
-    private static _instance: Environment;
+    /**
+     * Gets a value indicating whether the current operating system is `Linux`.
+     */
+    public readonly isLinux: boolean;
 
-    private _edition: VSCodeEdition;
-    private _codeEnvironment: { extensionsDirectoryName: string; dataDirectoryName: string; };
-    private _codeDataDirectory: string;
-    private _codeUserDirectory: string;
-    private _extensionsDirectory: string;
-    private _isMac: boolean;
-    private _isPortable: boolean;
-    private _snippetsDirectory: string;
+    /**
+     * Gets a value indicating whether the current operating system is `Macintosh`.
+     */
+    public readonly isMac: boolean;
+
+    /**
+     * Gets a value indicating whether the current operating system is `Windows`.
+     */
+    public readonly isWindows: boolean;
+
+    /**
+     * Gets a value indicating whether the VSCode is running in `Portable Mode`.
+     */
+    public readonly isPortable: boolean;
+
+    /**
+     * Gets a value indicating the type of the current operating system.
+     */
+    public readonly platform: Platform;
+
+    /**
+     * Gets the full path of VSCode's `extensions directory`.
+     */
+    public readonly extensionsDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's `data directory`.
+     */
+    public readonly dataDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's `user directory`.
+     */
+    public readonly userDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's `snippets directory`.
+     */
+    public readonly snippetsDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's `.obsolete file`.
+     */
+    public readonly obsoleteFilePath: string;
+
+    private static _instance: Environment;
 
     private constructor()
     {
-        // Note that the followings are order-sensitive.
-        this._edition = getVSCodeEdition();
-        this._codeEnvironment = VSCODE_BUILTIN_ENVIRONMENTS[this._edition];
-        this._isMac = process.platform === "darwin";
-        this._isPortable = process.env.VSCODE_PORTABLE != null;
+        this.platform = this._getPlatform();
+        this.isLinux = (this.platform === Platform.LINUX);
+        this.isMac = (this.platform === Platform.MACINTOSH);
+        this.isWindows = (this.platform === Platform.WINDOWS);
+        this.isPortable = (process.env.VSCODE_PORTABLE != null);
 
-        this._extensionsDirectory = this._getCodeExtensionsDirectory();
-        this._codeDataDirectory = this._getCodeDataDirectory();
-        this._codeUserDirectory = path.join(this._codeDataDirectory, "User");
-        this._snippetsDirectory = path.join(this._codeUserDirectory, "snippets");
+        this.extensionsDirectory = this._getExtensionsDirectory(this.isPortable);
+        this.dataDirectory = this._getDataDirectory(this.isPortable, this.platform);
+        this.userDirectory = path.join(this.dataDirectory, "User");
+        this.snippetsDirectory = this.getSettingsFilePath("snippets");
+        this.obsoleteFilePath = path.join(this.extensionsDirectory, ".obsolete");
     }
 
     /**
@@ -50,54 +91,6 @@ export class Environment
     }
 
     /**
-     * Gets a value indicating whether the current operating system is `MacOS`.
-     */
-    public get isMac(): boolean
-    {
-        return this._isMac;
-    }
-
-    /**
-     * Gets a value indicating whether the VSCode is running in `Portable Mode`.
-     */
-    public get isPortable(): boolean
-    {
-        return this._isPortable;
-    }
-
-    /**
-     * Gets the full path of VSCode `extensions directory`.
-     */
-    public get extensionsDirectory(): string
-    {
-        return this._extensionsDirectory;
-    }
-
-    /**
-     * Gets the full path of VSCode `data directory`.
-     */
-    public get codeDataDirectory(): string
-    {
-        return this._codeDataDirectory;
-    }
-
-    /**
-     * Gets the full path of VSCode settings `user directory`.
-     */
-    public get codeUserDirectory(): string
-    {
-        return this._codeUserDirectory;
-    }
-
-    /**
-     * Gets the full path of VSCode settings `snippets directory`.
-     */
-    public get snippetsDirectory(): string
-    {
-        return this._snippetsDirectory;
-    }
-
-    /**
      * Gets the full path of the snippet from a filename.
      *
      * @param filename The snippet's filename.
@@ -108,7 +101,17 @@ export class Environment
     }
 
     /**
-     * Gets the full path of the extension.
+     * Gets the full path of the settings from a filename.
+     *
+     * @param filename The settings filename.
+     */
+    public getSettingsFilePath(filename: string): string
+    {
+        return path.join(this.userDirectory, filename);
+    }
+
+    /**
+     * Gets the directory of the extension.
      */
     public getExtensionDirectory(extension: IExtension): string
     {
@@ -124,54 +127,75 @@ export class Environment
     }
 
     /**
-     * Gets the full path of the `.obsolete` file.
+     * Gets the extensions directory of VSCode.
      */
-    public getObsoleteFilePath(): string
+    private _getExtensionsDirectory(isPortable: boolean)
     {
-        return path.join(this.extensionsDirectory, ".obsolete");
-    }
-
-    private _getCodeExtensionsDirectory()
-    {
-        if (this.isPortable)
+        if (isPortable)
         {
             // Such as the "/Applications/code-portable-data/extensions" directory in MacOS.
             return path.join(process.env.VSCODE_PORTABLE!, "extensions");
         }
         return path.join(
             os.homedir(),
-            this._codeEnvironment.extensionsDirectoryName,
+            getVSCodeBuiltinEnvironment().extensionsDirectoryName,
             "extensions"
         );
     }
 
-    private _getCodeDataDirectory(): string
+    /**
+     * Gets the data directory of VSCode.
+     */
+    private _getDataDirectory(isPortable: boolean, platform: Platform): string
     {
-        if (this.isPortable)
+        if (isPortable)
         {
             // Such as the "/Applications/code-portable-data/user-data" directory in MacOS.
             return path.join(process.env.VSCODE_PORTABLE!, "user-data");
         }
-
-        let baseDirectory: string;
-        switch (process.platform)
+        const { dataDirectoryName } = getVSCodeBuiltinEnvironment();
+        switch (platform)
         {
-            case "win32":
-                baseDirectory = process.env.APPDATA!;
-                break;
+            case Platform.WINDOWS:
+                return path.join(process.env.APPDATA!, dataDirectoryName);
 
-            case "darwin":
-                baseDirectory = path.join(os.homedir(), "Library", "Application Support");
-                break;
-
-            case "linux":
-                baseDirectory = path.join(os.homedir(), ".config");
-                break;
+            case Platform.MACINTOSH:
+                return path.join(
+                    os.homedir(),
+                    "Library",
+                    "Application Support",
+                    dataDirectoryName
+                );
 
             default:
-                // Unknown platform.
-                throw new Error(localize("error.env.platform.not.supported"));
+            case Platform.LINUX:
+                return path.join(
+                    os.homedir(),
+                    ".config",
+                    dataDirectoryName
+                );
         }
-        return path.join(baseDirectory, this._codeEnvironment.dataDirectoryName);
+    }
+
+    /**
+     * Gets the current running platform.
+     *
+     * @throws {Error} Throws an error when the platform is unknown.
+     */
+    private _getPlatform()
+    {
+        if (process.platform === "linux")
+        {
+            return Platform.LINUX;
+        }
+        if (process.platform === "darwin")
+        {
+            return Platform.MACINTOSH;
+        }
+        if (process.platform === "win32")
+        {
+            return Platform.WINDOWS;
+        }
+        throw new Error(localize("error.env.platform.not.supported"));
     }
 }

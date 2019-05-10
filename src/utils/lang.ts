@@ -1,4 +1,12 @@
 /**
+ * Checks if the input value is a `Date` object.
+ */
+export function isDate(input: any): input is Date
+{
+    return (input instanceof Date);
+}
+
+/**
  * Checks if the input value is an `empty` string.
  */
 export function isEmptyString(input: any): boolean

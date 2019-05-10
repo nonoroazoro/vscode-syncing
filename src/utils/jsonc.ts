@@ -1,7 +1,7 @@
 import * as jsonc from "jsonc-parser";
-import * as minimatch from "minimatch";
+import * as micromatch from "micromatch";
 
-import { SETTING_EXCLUDED_SETTINGS } from "../common/constants";
+import { SETTING_EXCLUDED_SETTINGS } from "../constants";
 import { getJSONFormatOnSaveSetting } from "./vscodeAPI";
 
 /**
@@ -34,7 +34,7 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: object
         for (const key of excludedKeys)
         {
             // Remove the listed properties.
-            edits = jsonc.modify(result, [key], void 0, JSONC_MODIFICATION_OPTIONS);
+            edits = jsonc.modify(result, [key], undefined, JSONC_MODIFICATION_OPTIONS);
             if (edits.length > 0)
             {
                 modified = true;
@@ -120,7 +120,7 @@ export function getExcludedKeys(settingsJSON: object, patterns: string[]): strin
     for (const key of keys)
     {
         // Get JSON path that matches with the exclude list.
-        if (patterns.some((pattern) => minimatch(key, pattern)))
+        if (patterns.some((pattern) => micromatch.isMatch(key, pattern)))
         {
             excludeKeys.push(key);
         }

@@ -1,5 +1,4 @@
 import * as fs from "fs-extra";
-import * as path from "path";
 
 import { localize } from "../i18n";
 import { isEmptyString } from "../utils/lang";
@@ -7,27 +6,7 @@ import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
 import * as Toast from "./Toast";
-
-/**
- * Represents the `Syncing Settings`.
- */
-interface ISyncingSettings
-{
-    /**
-     * Store the GitHub Gist ID.
-     */
-    id: string;
-
-    /**
-     * Store the GitHub Personal Access Token.
-     */
-    token: string;
-
-    /**
-     * Store the http proxy setting.
-     */
-    http_proxy?: string;
-}
+import { ISyncingSettings } from "../types/SyncingTypes";
 
 /**
  * `Syncing` wrapper.
@@ -39,7 +18,12 @@ export class Syncing
     /**
      * The default settings of `Syncing`.
      */
-    private static readonly DEFAULT_SETTINGS: ISyncingSettings = { id: "", token: "", http_proxy: "" };
+    private static readonly DEFAULT_SETTINGS: ISyncingSettings = {
+        id: "",
+        token: "",
+        http_proxy: "",
+        auto_sync: false
+    };
 
     private _env: Environment;
     private _settingsPath: string;
@@ -47,7 +31,7 @@ export class Syncing
     private constructor()
     {
         this._env = Environment.create();
-        this._settingsPath = path.join(this._env.codeUserDirectory, "syncing.json");
+        this._settingsPath = this._env.getSettingsFilePath("syncing.json");
     }
 
     /**
@@ -71,18 +55,23 @@ export class Syncing
     }
 
     /**
-     * Gets the proxy setting from `Syncing`'s `http_proxy` setting.
+     * Gets the proxy setting of `Syncing`.
      *
      * If the proxy setting is not set, it will read from the `http_proxy` and `https_proxy` environment variables.
      */
     public get proxy(): string | undefined
     {
-        let proxy = this.loadSettings().http_proxy;
-        if (proxy == null || isEmptyString(proxy))
-        {
-            proxy = process.env["http_proxy"] || process.env["https_proxy"];
-        }
-        return proxy;
+        return this.loadSettings().http_proxy;
+    }
+
+    /**
+     * Gets the auto-sync setting of `Syncing`.
+     *
+     * @default false
+     */
+    public get autoSync(): boolean
+    {
+        return this.loadSettings().auto_sync;
     }
 
     /**
@@ -177,9 +166,10 @@ export class Syncing
         {
             if (showIndicator)
             {
-                Toast.statusError(forUpload
-                    ? localize("toast.settings.uploading.canceled", error.message)
-                    : localize("toast.settings.downloading.canceled", error.message)
+                Toast.statusError(
+                    forUpload
+                        ? localize("toast.settings.uploading.canceled", error.message)
+                        : localize("toast.settings.downloading.canceled", error.message)
                 );
             }
             throw error;
@@ -187,14 +177,14 @@ export class Syncing
     }
 
     /**
-     * Loads the `Syncing`'s settings from the settings file (`syncing.json`).
+     * Loads the `Syncing`'s settings from the settings file (`syncing.json`) and environment variables.
      */
     public loadSettings(): ISyncingSettings
     {
-        const settings: ISyncingSettings = { ...Syncing.DEFAULT_SETTINGS };
+        let settings: ISyncingSettings = { ...Syncing.DEFAULT_SETTINGS };
         try
         {
-            return {
+            settings = {
                 ...settings,
                 ...fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
             };
@@ -203,7 +193,16 @@ export class Syncing
         {
             console.error(localize("error.loading.syncing.settings"), err);
         }
-        return settings;
+
+        // Read proxy setting from environment variables.
+        // Note that the proxy will eventually be normalized to either `undefined` or a correct string value.
+        let proxy = settings.http_proxy;
+        if (proxy == null || isEmptyString(proxy))
+        {
+            proxy = process.env["http_proxy"] || process.env["https_proxy"];
+        }
+
+        return { ...settings, http_proxy: proxy };
     }
 
     /**
@@ -227,7 +226,15 @@ export class Syncing
      */
     public async saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
     {
-        const content = JSON.stringify(settings, null, 4) || Syncing.DEFAULT_SETTINGS;
+        const target = { ...settings };
+
+        // Normalize null proxy to an empty string.
+        if (target.http_proxy == null)
+        {
+            target.http_proxy = "";
+        }
+
+        const content = JSON.stringify(target, null, 4);
         try
         {
             await fs.outputFile(this.settingsPath, content);

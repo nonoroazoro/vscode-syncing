@@ -9,7 +9,7 @@ import { isString } from "../utils/lang";
  */
 export class CaseInsensitiveSet<T> extends Set<T>
 {
-    add(value: T)
+    public add(value: T)
     {
         if (isString(value))
         {
@@ -18,7 +18,7 @@ export class CaseInsensitiveSet<T> extends Set<T>
         return super.add(value);
     }
 
-    delete(value: T): boolean
+    public delete(value: T): boolean
     {
         if (isString(value))
         {
@@ -27,7 +27,7 @@ export class CaseInsensitiveSet<T> extends Set<T>
         return super.delete(value);
     }
 
-    has(value: T): boolean
+    public has(value: T): boolean
     {
         if (isString(value))
         {

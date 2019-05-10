@@ -46,12 +46,12 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
             if (res.statusCode === 200)
             {
                 let result = "";
-                res.on("data", function (chunk)
+                res.on("data", (chunk) =>
                 {
                     result += chunk;
                 });
 
-                res.on("end", function ()
+                res.on("end", () =>
                 {
                     resolve(result);
                 });

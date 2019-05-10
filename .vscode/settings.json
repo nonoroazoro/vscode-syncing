@@ -1,4 +1,19 @@
 {
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        {
+            "language": "typescript",
+            "autoFix": true
+        },
+        {
+            "language": "typescriptreact",
+            "autoFix": true
+        }
+    ],
+    "files.exclude": {
+        "**/.cache-loader": true
+    },
     "search.exclude": {
         "**/dist": true,
         "**/yarn.lock": true

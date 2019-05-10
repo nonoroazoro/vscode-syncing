@@ -1,22 +1,26 @@
 {
     "compilerOptions": {
+        "rootDir": "src",
+        "outDir": "dist",
+        "module": "commonjs",
+        "target": "es2017",
         "allowUnreachableCode": true,
         "allowUnusedLabels": false,
         "declaration": false,
         "experimentalDecorators": true,
-        "module": "commonjs",
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
-        "outDir": "dist",
         "pretty": true,
-        "rootDir": "src",
         "skipLibCheck": true,
         "sourceMap": true,
+        "strictBindCallApply": true,
         "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "target": "es2017"
-    }
+        "suppressImplicitAnyIndexErrors": true
+    },
+    "include": [
+        "src"
+    ]
 }

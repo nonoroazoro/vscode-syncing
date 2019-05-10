@@ -1,7 +1,33 @@
 /**
- * Represents the types of the various `VSCode Settings`, such as `Extensions`, `Keybindings`...
+ * Represents the `Syncing Settings`.
  */
-export enum SettingTypes
+export interface ISyncingSettings
+{
+    /**
+     * Store the GitHub Gist ID.
+     */
+    id: string;
+
+    /**
+     * Store the GitHub Personal Access Token.
+     */
+    token: string;
+
+    /**
+     * Store the http proxy setting.
+     */
+    http_proxy: string | undefined;
+
+    /**
+     * Store the auto-sync setting.
+     */
+    auto_sync: boolean;
+}
+
+/**
+ * Represents various kinds of `VSCode Settings`, such as `Extensions`, `Keybindings`...
+ */
+export enum SettingType
 {
     Extensions = "extensions",
     Keybindings = "keybindings",
@@ -16,24 +42,26 @@ export enum SettingTypes
 export interface ISetting
 {
     /**
-     * Settings content.
+     * The corresponding local file path.
+     */
+    localFilePath: string;
+
+    /**
+     * The corresponding remote filename.
+     */
+    remoteFilename: string;
+
+    type: SettingType;
+
+    /**
+     * The content of the setting.
      */
     content?: string;
 
     /**
-     * Settings local filepath.
+     * The last modified time (in milliseconds) of the setting.
      */
-    filepath: string;
-
-    /**
-     * Settings filename in GitHub Gist.
-     */
-    remoteFilename: string;
-
-    /**
-     * Settings type.
-     */
-    type: SettingTypes;
+    lastModified?: number;
 }
 
 /**
@@ -81,12 +109,12 @@ export interface ISyncedItem
      * Extensions that have been added, updated or removed.
      */
     extension?: {
-        added: IExtension[],
-        addedErrors: IExtension[],
-        updated: IExtension[],
-        updatedErrors: IExtension[],
-        removed: IExtension[],
-        removedErrors: IExtension[]
+        added: IExtension[];
+        addedErrors: IExtension[];
+        updated: IExtension[];
+        updatedErrors: IExtension[];
+        removed: IExtension[];
+        removedErrors: IExtension[];
     };
 
     /**
