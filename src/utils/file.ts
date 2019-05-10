@@ -1,5 +1,7 @@
 import * as fs from "fs-extra";
 
+import { parse } from "./date";
+
 /**
  * Reads the last modified time (in milliseconds) of the file.
  *
@@ -19,13 +21,14 @@ export function readLastModified(path: string): Promise<number | undefined>
  * Sets the last modified time (in milliseconds) of the file.
  *
  * @param {string} path The path of the file.
- * @param {number} mtime The new last modified time.
+ * @param {(Date | number | string)} mtime The new last modified time.
  */
-export async function writeLastModified(path: string, mtime: number)
+export async function writeLastModified(path: string, mtime: Date | number | string)
 {
     try
     {
-        await fs.utimes(path, mtime, mtime);
+        const newMTime = parse(mtime);
+        await fs.utimes(path, newMTime, newMTime);
     }
     catch
     { }
