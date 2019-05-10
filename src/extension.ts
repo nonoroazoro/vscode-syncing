@@ -76,7 +76,7 @@ function _initAutoSync()
                 // 2. Start watching.
                 _autoSyncService.start();
             }
-        }, 5000);
+        }, 3000);
     }
 }
 
