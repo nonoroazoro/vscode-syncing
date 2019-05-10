@@ -36,9 +36,7 @@
         "vscode-syncing"
     ],
     "activationEvents": [
-        "onCommand:syncing.uploadSettings",
-        "onCommand:syncing.downloadSettings",
-        "onCommand:syncing.openSettings"
+        "*"
     ],
     "contributes": {
         "commands": [
