@@ -18,7 +18,7 @@ import { localize } from "../i18n";
 import * as GitHubTypes from "../types/GitHubTypes";
 import { IExtension, ISetting, ISyncedItem, SettingType } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
-import { readLastModified } from "../utils/file";
+import { readLastModified, writeLastModified } from "../utils/file";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
@@ -185,10 +185,10 @@ export class VSCodeSetting
     /**
      * Save `VSCode Settings` to files.
      *
-     * @param files `VSCode Settings` from GitHub Gist.
+     * @param gist `VSCode Settings` from GitHub Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public async saveSettings(files: GitHubTypes.IGistFiles, showIndicator: boolean = false): Promise<{
+    public async saveSettings(gist: GitHubTypes.IGist, showIndicator: boolean = false): Promise<{
         updated: ISyncedItem[];
         removed: ISyncedItem[];
     }>
@@ -200,6 +200,7 @@ export class VSCodeSetting
 
         try
         {
+            const { files, updated_at: lastModified } = gist;
             if (files)
             {
                 const existsFileKeys: string[] = [];
@@ -291,7 +292,7 @@ export class VSCodeSetting
                     {
                         try
                         {
-                            const saved = await this._saveSetting(setting);
+                            const saved = await this._saveSetting(setting, lastModified);
                             syncedItems.updated.push(saved);
                         }
                         catch (error)
@@ -409,6 +410,8 @@ export class VSCodeSetting
                         extensions = this._getExcludedExtensions(extensions, patterns);
                     }
                     content = JSON.stringify(extensions, null, 4);
+
+                    lastModified = await readLastModified(this._env.obsoleteFilePath);
                 }
                 else
                 {
@@ -446,7 +449,7 @@ export class VSCodeSetting
      *
      * @param setting `VSCode Setting`.
      */
-    private async _saveSetting(setting: ISetting): Promise<ISyncedItem>
+    private async _saveSetting(setting: ISetting, lastModified: string): Promise<ISyncedItem>
     {
         let result: ISyncedItem;
         if (setting.type === SettingType.Extensions)
@@ -454,6 +457,9 @@ export class VSCodeSetting
             // Sync extensions.
             const extensions: IExtension[] = parse(setting.content || "[]");
             result = await this._ext.sync(extensions, true);
+
+            // Synchronize last modified time.
+            await writeLastModified(this._env.obsoleteFilePath, lastModified);
         }
         else
         {
@@ -472,6 +478,9 @@ export class VSCodeSetting
 
             // Save to disk.
             result = await this._saveToFile({ ...setting, content: settingsToSave });
+
+            // Synchronize last modified time.
+            await writeLastModified(setting.localFilePath, lastModified);
         }
         return result;
     }
