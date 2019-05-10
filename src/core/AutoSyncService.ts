@@ -87,13 +87,11 @@ export class AutoSyncService
                 if (isAfter(localLastModified, remoteLastModified))
                 {
                     // Upload settings.
-                    console.info("first uploading");
                     await vscode.commands.executeCommand("syncing.uploadSettings");
                 }
                 else
                 {
                     // Download settings.
-                    console.info("first downloading");
                     await vscode.commands.executeCommand("syncing.downloadSettings");
                 }
             }
@@ -113,7 +111,6 @@ export class AutoSyncService
     private _handleWatcherEvent()
     {
         // Upload settings whenever the user changed the local settings.
-        console.info("auto uploading");
         vscode.commands.executeCommand("syncing.uploadSettings");
     }
 
