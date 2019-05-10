@@ -20,7 +20,7 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".js"],
         alias: {
-            deepmerge$: "deepmerge/dist/umd.js"
+            "is-plain-object$": "is-plain-object/index.cjs.js"
         }
     },
     externals: {
@@ -45,6 +45,10 @@ module.exports = {
                     }
                 ],
                 exclude: /node_modules/
+            },
+            {
+                test: /\.node$/,
+                use: "native-ext-loader"
             }
         ]
     },
