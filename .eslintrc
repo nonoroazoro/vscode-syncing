@@ -8,5 +8,9 @@
     },
     "parserOptions": {
         "project": "./tsconfig.json"
+    },
+    "rules": {
+        "no-extra-parens": "off",
+        "@typescript-eslint/no-extra-parens": "off"
     }
 }
