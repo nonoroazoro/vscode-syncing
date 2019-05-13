@@ -18,10 +18,7 @@ module.exports = {
         libraryTarget: "commonjs"
     },
     resolve: {
-        extensions: [".ts", ".js"],
-        alias: {
-            "is-plain-object$": "is-plain-object/index.cjs.js"
-        }
+        extensions: [".ts", ".js"]
     },
     externals: {
         "vscode": "commonjs vscode"
