@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.2 - May 20, 2019
+
+- Fixed: Minor fixes.
+
+
 ## 3.0.1 - May 10, 2019
 
 - Changed: No longer pause auto-sync during uploading.
