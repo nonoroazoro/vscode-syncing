@@ -197,7 +197,7 @@ Syncing 现在支持配置自动同步了，具体步骤如下：
 1. 启用 `"auto_sync"` 配置，例如：
 
     ```json
-    "auto_sync": "auto"
+    "auto_sync": true
     ```
 
 1. 重新加载或重启 VSCode。
