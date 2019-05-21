@@ -197,7 +197,7 @@ You can now let Syncing auto-sync your settings. Here are the steps:
 1. Enable the `"auto_sync"` setting, for example:
 
     ```json
-    "auto_sync": "auto"
+    "auto_sync": true
     ```
 
 1. Reload or reopen VSCode to take effect.

@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.3 - May 21, 2019
+
+- Fixed: Fix an error in the guide.
+
+
 ## 3.0.2 - May 20, 2019
 
 - Fixed: Minor fixes.
