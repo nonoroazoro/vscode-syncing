@@ -32,7 +32,6 @@
         "syncing",
         "sync-settings",
         "settings-sync",
-        "vscode-sync",
         "vscode-syncing"
     ],
     "activationEvents": [
@@ -101,7 +100,6 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "npm run build",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "prebuild": "npm run clean && npm run cleanCov",
         "build": "cross-env NODE_ENV=production webpack --config ./webpack.config.prod.js --progress",
