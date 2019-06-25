@@ -18,7 +18,7 @@ export class Syncing
     /**
      * The default settings of `Syncing`.
      */
-    private static readonly DEFAULT_SETTINGS: ISyncingSettings = {
+    private static readonly _DEFAULT_SETTINGS: ISyncingSettings = {
         id: "",
         token: "",
         http_proxy: "",
@@ -79,7 +79,7 @@ export class Syncing
      */
     public initSettings(): Promise<void>
     {
-        return this.saveSettings(Syncing.DEFAULT_SETTINGS);
+        return this.saveSettings(Syncing._DEFAULT_SETTINGS);
     }
 
     /**
@@ -181,7 +181,7 @@ export class Syncing
      */
     public loadSettings(): ISyncingSettings
     {
-        let settings: ISyncingSettings = { ...Syncing.DEFAULT_SETTINGS };
+        let settings: ISyncingSettings = { ...Syncing._DEFAULT_SETTINGS };
         try
         {
             settings = {

@@ -66,7 +66,7 @@ function _initAutoSync()
     {
         setTimeout(async () =>
         {
-            const syncingSettings = await _syncing.loadSettings();
+            const syncingSettings = _syncing.loadSettings();
             if (syncingSettings.auto_sync && syncingSettings.token != null && syncingSettings.id != null)
             {
                 _autoSyncService = AutoSyncService.create();

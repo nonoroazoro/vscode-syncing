@@ -31,7 +31,7 @@ export interface SettingsWatcherServiceOptions
 
 export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
 {
-    private static readonly DEFAULT_OPTIONS: SettingsWatcherServiceOptions = {
+    private static readonly _DEFAULT_OPTIONS: SettingsWatcherServiceOptions = {
         debounce: true,
         debounceDelay: 8000
     };
@@ -43,7 +43,7 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
     constructor(options?: SettingsWatcherServiceOptions)
     {
         super();
-        this._options = { ...SettingsWatcherService.DEFAULT_OPTIONS, ...options };
+        this._options = { ...SettingsWatcherService._DEFAULT_OPTIONS, ...options };
         if (this._options.debounce)
         {
             this._handleWatcherEvent = debounce(

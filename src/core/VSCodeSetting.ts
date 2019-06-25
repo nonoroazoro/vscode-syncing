@@ -35,12 +35,12 @@ export class VSCodeSetting
     /**
      * Suffix of remote mac files.
      */
-    private static readonly MAC_SUFFIX: string = "-mac";
+    private static readonly _MAC_SUFFIX: string = "-mac";
 
     /**
      * Prefix of remote snippet files.
      */
-    private static readonly SNIPPET_PREFIX: string = "snippet-";
+    private static readonly _SNIPPET_PREFIX: string = "snippet-";
 
     private _env: Environment;
     private _ext: Extension;
@@ -120,7 +120,7 @@ export class VSCodeSetting
                     );
                     if (separateKeybindings && this._env.isMac)
                     {
-                        remoteFilename = `${settingType}${VSCodeSetting.MAC_SUFFIX}.json`;
+                        remoteFilename = `${settingType}${VSCodeSetting._MAC_SUFFIX}.json`;
                     }
                 }
 
@@ -248,13 +248,13 @@ export class VSCodeSetting
                 let filename: string;
                 for (const key of Object.keys(files))
                 {
-                    if (existsFileKeys.indexOf(key) === -1)
+                    if (!existsFileKeys.includes(key))
                     {
                         gistFile = files[key];
-                        if (gistFile.filename.startsWith(VSCodeSetting.SNIPPET_PREFIX))
+                        if (gistFile.filename.startsWith(VSCodeSetting._SNIPPET_PREFIX))
                         {
                             // Snippets.
-                            filename = gistFile.filename.slice(VSCodeSetting.SNIPPET_PREFIX.length);
+                            filename = gistFile.filename.slice(VSCodeSetting._SNIPPET_PREFIX.length);
                             if (filename)
                             {
                                 settingsToSave.push({
@@ -370,7 +370,7 @@ export class VSCodeSetting
                 // Add prefix to all snippets.
                 results.push({
                     localFilePath: path.join(snippetsDir, filename),
-                    remoteFilename: `${VSCodeSetting.SNIPPET_PREFIX}${filename}`,
+                    remoteFilename: `${VSCodeSetting._SNIPPET_PREFIX}${filename}`,
                     type: SettingType.Snippets
                 });
             });

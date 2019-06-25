@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.4 - June 25, 2019
+
+- Fixed: Upgrade dependencies to avoid security vulnerability.
+
+
 ## 3.0.3 - May 21, 2019
 
 - Fixed: Fix an error in the guide.
