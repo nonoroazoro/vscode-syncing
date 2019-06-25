@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "%displayName%",
     "description": "%description%",
-    "version": "3.0.4",
+    "version": "3.0.3",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -142,7 +142,7 @@
         "cache-loader": "^4.0.0",
         "cross-env": "^5.2.0",
         "eslint": "^5.0.0",
-        "eslint-config-zoro": "^2.3.1",
+        "eslint-config-zoro": "^2.3.5",
         "eslint-loader": "^2.1.2",
         "eslint-plugin-react": "^7.14.2",
         "eslint-plugin-react-hooks": "^1.6.1",
