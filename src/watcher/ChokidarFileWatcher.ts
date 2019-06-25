@@ -16,7 +16,7 @@ export type ChokidarIgnoredFunction = (path: string, stats: Stats) => boolean;
 
 export class ChokidarFileWatcher extends AbstractWatcher
 {
-    private static readonly DEFAULT_OPTIONS = {
+    private static readonly _DEFAULT_OPTIONS = {
         depth: 2,
         interval: 1000, // Increase the intervals when the chokidar fallbacks to polling,
         binaryInterval: 1000,
@@ -33,7 +33,7 @@ export class ChokidarFileWatcher extends AbstractWatcher
     {
         super();
         this._paths = paths;
-        this._options = { ...ChokidarFileWatcher.DEFAULT_OPTIONS, ...options };
+        this._options = { ...ChokidarFileWatcher._DEFAULT_OPTIONS, ...options };
     }
 
     public start()

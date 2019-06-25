@@ -23,7 +23,7 @@ export class Gist
     /**
      * The description of Syncing's gists.
      */
-    private static readonly GIST_DESCRIPTION: string = "VSCode's Settings - Syncing";
+    private static readonly _GIST_DESCRIPTION: string = "VSCode's Settings - Syncing";
 
     private _api: Github;
     private _proxy?: string;
@@ -150,7 +150,7 @@ export class Gist
             const gists: GitHubTypes.IGist[] = res.data as any;
             const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
             return gists
-                .filter((gist) => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
+                .filter((gist) => (gist.description === Gist._GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
                 .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
         }
         catch (err)
@@ -241,7 +241,7 @@ export class Gist
     public createSettings(files = {}, isPublic = false): Promise<GitHubTypes.IGist>
     {
         return this.create({
-            description: Gist.GIST_DESCRIPTION,
+            description: Gist._GIST_DESCRIPTION,
             files,
             public: isPublic
         });
@@ -397,7 +397,7 @@ export class Gist
         // Add the rest local files.
         for (const key of Object.keys(localFiles))
         {
-            if (recordedKeys.indexOf(key) === -1)
+            if (!recordedKeys.includes(key))
             {
                 // Ignore null local file.
                 localFile = localFiles[key];

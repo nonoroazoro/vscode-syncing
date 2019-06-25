@@ -77,7 +77,7 @@ export class AutoSyncService
         {
             const { token, id, http_proxy } = syncingSettings;
             const localSettings = await this._vscodeSetting.getSettings(true);
-            const localLastModified = await this._vscodeSetting.getLastModified(localSettings);
+            const localLastModified = this._vscodeSetting.getLastModified(localSettings);
 
             const api = Gist.create(token, http_proxy);
             const remoteSettings = await api.get(id);

@@ -10,7 +10,7 @@ let instance: I18n;
 class I18n
 {
     private static _instance: I18n;
-    private static DEFAULT_LOCALE_FILENAME: string = "package.nls.json";
+    private static _DEFAULT_LOCALE_FILENAME: string = "package.nls.json";
 
     private _bundle: Record<string, string>;
     private _extensionPath: string;
@@ -63,7 +63,7 @@ class I18n
     private _prepare()
     {
         const filename = (this.locale === NormalizedLocale.EN_US)
-            ? I18n.DEFAULT_LOCALE_FILENAME
+            ? I18n._DEFAULT_LOCALE_FILENAME
             : `package.nls.${this.locale}.json`;
         try
         {
@@ -75,7 +75,7 @@ class I18n
         catch (err)
         {
             this._bundle = readJsonSync(
-                path.resolve(this._extensionPath, I18n.DEFAULT_LOCALE_FILENAME),
+                path.resolve(this._extensionPath, I18n._DEFAULT_LOCALE_FILENAME),
                 { encoding: "utf8" }
             );
         }
