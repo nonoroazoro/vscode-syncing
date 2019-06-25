@@ -75,7 +75,7 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
         const sPatterns = sSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
         const sExcludedKeys = getExcludedKeys(sSettingsJSON, sPatterns);
         const dExcludedKeys = getExcludedKeys(dSettingsJSON, sPatterns);
-        const excludedKeys = Array.from<string>(new Set([...sExcludedKeys, ...dExcludedKeys])).sort();
+        const excludedKeys = Array.from<string>(new Set([...sExcludedKeys, ...dExcludedKeys])).sort((a, b) => a.localeCompare(b));
 
         // Replace the source properties with the corresponding destination properties values.
         let dValue: any;
@@ -125,7 +125,7 @@ export function getExcludedKeys(settingsJSON: object, patterns: string[]): strin
             excludeKeys.push(key);
         }
     }
-    return excludeKeys.sort();
+    return excludeKeys.sort((a, b) => a.localeCompare(b));
 }
 
 /**
