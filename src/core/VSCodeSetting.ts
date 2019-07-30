@@ -332,7 +332,25 @@ export class VSCodeSetting
     }
 
     /**
-     * Delete the physical files corresponding to the `VSCode Settings`.
+     * Synchronizes the last modified time of the `VSCodeSetting`.
+     *
+     * @param {ISetting} setting The `VSCodeSetting`.
+     * @param {(Date | number | string)} lastModified The last modified time.
+     */
+    public async saveLastModifiedTime(setting: ISetting, lastModified: Date | number | string)
+    {
+        if (setting.type === SettingType.Extensions)
+        {
+            await writeLastModified(this._env.extensionsDirectory, lastModified);
+        }
+        else
+        {
+            await writeLastModified(setting.localFilePath, lastModified);
+        }
+    }
+
+    /**
+     * Deletes the physical files corresponding to the `VSCode Settings`.
      *
      * @param settings `VSCode Settings`.
      */
@@ -457,9 +475,6 @@ export class VSCodeSetting
             // Sync extensions.
             const extensions: IExtension[] = parse(setting.content || "[]");
             result = await this._ext.sync(extensions, true);
-
-            // Synchronize last modified time.
-            await writeLastModified(this._env.extensionsDirectory, lastModified);
         }
         else
         {
@@ -478,10 +493,11 @@ export class VSCodeSetting
 
             // Save to disk.
             result = await this._saveToFile({ ...setting, content: settingsToSave });
-
-            // Synchronize last modified time.
-            await writeLastModified(setting.localFilePath, lastModified);
         }
+
+        // Synchronize last modified time.
+        await this.saveLastModifiedTime(setting, lastModified);
+
         return result;
     }
 
