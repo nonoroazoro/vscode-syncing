@@ -98,6 +98,13 @@ async function _uploadVSCodeSettings()
             {
                 await _syncing.saveSettings({ ...syncingSettings, id: gist.id });
             }
+
+            // Synchronizes the last modified time.
+            for (const setting of settings)
+            {
+                await _vscodeSetting.saveLastModifiedTime(setting, gist.updated_at);
+            }
+
             Toast.statusInfo(localize("toast.settings.uploaded"));
         }
         catch { }
