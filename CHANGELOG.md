@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.6 - July 30, 2019
+
+- Fixed: Synchronize the last modified time of the settings.
+
+
 ## 3.0.5 - July 22, 2019
 
 - Fixed: Upgrade dependencies to avoid security vulnerability.
