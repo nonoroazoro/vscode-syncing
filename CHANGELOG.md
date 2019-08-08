@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.7 - August 08, 2019
+
+- Fixed: Fix the messages of GitHub permission errors.
+
+
 ## 3.0.6 - July 30, 2019
 
 - Fixed: Synchronize the last modified time of the settings.
