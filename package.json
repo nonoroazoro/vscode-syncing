@@ -100,6 +100,7 @@
         ]
     },
     "scripts": {
+        "vscode:prepublish": "npm run build",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "prebuild": "npm run clean && npm run cleanCov",
         "build": "cross-env NODE_ENV=production webpack --config ./webpack.config.prod.js --progress",
@@ -130,10 +131,10 @@
     "devDependencies": {
         "@types/extract-zip": "^1.6.2",
         "@types/fs-extra": "^8.0.0",
-        "@types/jest": "^24.0.15",
+        "@types/jest": "^24.0.17",
         "@types/lodash.debounce": "^4.0.6",
         "@types/lodash.pick": "^4.4.6",
-        "@types/node": "^12.6.8",
+        "@types/node": "^12.7.1",
         "@types/tmp": "0.1.0",
         "@typescript-eslint/eslint-plugin": "^1.13.0",
         "@typescript-eslint/parser": "^1.13.0",
@@ -144,7 +145,7 @@
         "eslint-loader": "^2.2.1",
         "eslint-plugin-react": "^7.14.3",
         "eslint-plugin-react-hooks": "^1.6.1",
-        "husky": "^3.0.1",
+        "husky": "^3.0.2",
         "jest": "^24.8.0",
         "lint-staged": "^9.2.1",
         "native-ext-loader": "^2.3.0",
@@ -152,8 +153,8 @@
         "ts-jest": "^24.0.2",
         "ts-loader": "^6.0.4",
         "typescript": "^3.5.3",
-        "vscode": "^1.1.35",
-        "webpack": "^4.38.0",
+        "vscode": "^1.1.36",
+        "webpack": "^4.39.1",
         "webpack-cli": "^3.3.6"
     }
 }
