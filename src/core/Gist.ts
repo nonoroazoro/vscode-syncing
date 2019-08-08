@@ -88,7 +88,7 @@ export class Gist
     {
         try
         {
-            const res = await this._api.users.getAuthenticated({});
+            const res = await this._api.users.getAuthenticated();
             const data = res.data as GitHubTypes.IGistUser;
             return {
                 id: data.id,
@@ -145,7 +145,7 @@ export class Gist
     {
         try
         {
-            const res = await this._api.gists.list({});
+            const res = await this._api.gists.list();
             // Find and sort VSCode settings gists by time.
             const gists: GitHubTypes.IGist[] = res.data as any;
             const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
@@ -163,28 +163,45 @@ export class Gist
      * Delete gist.
      *
      * @param id Gist id.
+     *
+     * @throws {IEnhancedError}
      */
     public async delete(id: string): Promise<void>
     {
-        await this._api.gists.delete({ gist_id: id });
+        try
+        {
+            await this._api.gists.delete({ gist_id: id });
+        }
+        catch (err)
+        {
+            throw this._createError(err);
+        }
     }
 
     /**
      * Update gist.
      *
      * @param content Gist content.
+     *
+     * @throws {IEnhancedError}
      */
     public async update(content: Github.GistsUpdateParams): Promise<GitHubTypes.IGist>
     {
-        const res = await this._api.gists.update(content);
-        return res.data as any;
+        try
+        {
+            const res = await this._api.gists.update(content);
+            return res.data as any;
+        }
+        catch (err)
+        {
+            throw this._createError(err);
+        }
     }
 
     /**
      * Determines whether the specified gist exists.
      *
      * @param id Gist id.
-     * @throws {IEnhancedError}
      */
     public async exists(id: string): Promise<false | GitHubTypes.IGist>
     {
@@ -207,7 +224,6 @@ export class Gist
             }
             catch (err)
             {
-                throw this._createError(err);
             }
         }
         return false;
@@ -217,6 +233,7 @@ export class Gist
      * Creates a new gist.
      *
      * @param content Gist content.
+     *
      * @throws {IEnhancedError}
      */
     public async create(content: Github.GistsCreateParams): Promise<GitHubTypes.IGist>
@@ -237,6 +254,8 @@ export class Gist
      *
      * @param files Settings files.
      * @param isPublic Defaults to `false`, the gist is set to private.
+     *
+     * @throws {IEnhancedError}
      */
     public createSettings(files = {}, isPublic = false): Promise<GitHubTypes.IGist>
     {
@@ -254,6 +273,8 @@ export class Gist
      * @param uploads Settings that will be uploaded.
      * @param upsert Default is `true`, create new if gist not exists.
      * @param showIndicator Defaults to `false`, don't show progress indicator.
+     *
+     * @throws {IEnhancedError}
      */
     public async findAndUpdate(
         id: string,
@@ -310,7 +331,7 @@ export class Gist
                             );
                             if (selection !== okButton)
                             {
-                                throw new Error(localize("error.abort.synchronization"));
+                                throw createError(localize("error.abort.synchronization"));
                             }
                         }
                     }
@@ -331,7 +352,7 @@ export class Gist
                 }
                 else
                 {
-                    throw new Error(localize("error.gist.notfound", id));
+                    throw createError(localize("error.gist.notfound", id));
                 }
             }
 
@@ -426,7 +447,7 @@ export class Gist
         {
             message = localize("error.check.gist.id");
         }
-        console.error(error);
+        console.error("Syncing:", error);
         return createError(message, status);
     }
 
