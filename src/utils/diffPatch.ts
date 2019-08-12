@@ -1,6 +1,15 @@
 import { DiffPatcher } from "jsondiffpatch";
 
-const diffPatcher = new DiffPatcher({ objectHash(obj: any) { return obj.id || obj.key; } });
+import { isFunction } from "./lang";
+
+const diffPatcher = new DiffPatcher({
+    objectHash(obj: any) { return obj.id || obj.key; },
+    propertyFilter(name: string, context: any)
+    {
+        // Ignore function properties.
+        return !isFunction(context.left[name]) && !isFunction(context.right[name]);
+    }
+});
 
 /**
  * Calculates the number of differences between the two objects.
