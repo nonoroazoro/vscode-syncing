@@ -19,6 +19,14 @@ export function isEmptyString(input: any): boolean
 }
 
 /**
+ * Checks if the input value is a `Function`.
+ */
+export function isFunction(input: any): input is Function
+{
+    return typeof input === "function";
+}
+
+/**
  * Checks if the input value is a `String` primitive or object.
  */
 export function isString(input: any): input is string

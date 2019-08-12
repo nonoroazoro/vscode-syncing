@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.8 - August 12, 2019
+
+- Fixed: Ignore the diff of function properties.
+
+
 ## 3.0.7 - August 08, 2019
 
 - Fixed: Fix the messages of GitHub permission errors.
