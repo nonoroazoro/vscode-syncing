@@ -618,11 +618,11 @@ export class VSCodeSetting
     /**
      * Converts the `content` of `ISetting[]` into a `JSON object`.
      */
-    private _parseToJSON(settings: ISetting[]): object
+    private _parseToJSON(settings: ISetting[]): Record<string, any>
     {
-        let parsed: object;
+        let parsed: any;
         let content: string;
-        const result = {};
+        const result: Record<string, any> = {};
         for (const setting of settings)
         {
             content = setting.content || "";

@@ -464,12 +464,12 @@ export class Gist
     /**
      * Converts the `content` of `GitHubTypes.IGistFiles` into a `JSON object`.
      */
-    private _parseToJSON(files: GitHubTypes.IGistFiles): object
+    private _parseToJSON(files: GitHubTypes.IGistFiles): Record<string, any>
     {
         const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
+        let parsed: any;
         let file: GitHubTypes.IGistFile;
-        let parsed: object;
-        const result = {};
+        const result: Record<string, any> = {};
         for (const key of Object.keys(files))
         {
             file = files[key];

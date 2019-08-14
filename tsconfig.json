@@ -5,6 +5,7 @@
         "module": "commonjs",
         "target": "es2017",
         "declaration": false,
+        "sourceMap": true,
         "allowUnreachableCode": true,
         "experimentalDecorators": true,
         "noImplicitAny": true,
@@ -13,10 +14,8 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "pretty": true,
-        "sourceMap": true,
         "strictBindCallApply": true,
-        "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true
+        "strictNullChecks": true
     },
     "include": [
         "src"
