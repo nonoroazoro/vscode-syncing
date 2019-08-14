@@ -6,6 +6,7 @@
         "target": "es2017",
         "declaration": false,
         "sourceMap": true,
+        "moduleResolution": "node",
         "allowUnreachableCode": true,
         "experimentalDecorators": true,
         "importHelpers": true,
