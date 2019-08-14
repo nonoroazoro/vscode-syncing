@@ -16,6 +16,7 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "pretty": true,
+        "skipLibCheck": true,
         "strictBindCallApply": true,
         "strictNullChecks": true
     },
