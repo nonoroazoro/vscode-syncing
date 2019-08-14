@@ -8,6 +8,7 @@
         "sourceMap": true,
         "allowUnreachableCode": true,
         "experimentalDecorators": true,
+        "importHelpers": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
