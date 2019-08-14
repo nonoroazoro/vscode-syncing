@@ -22,7 +22,7 @@
         "email": "xiaochao.k@gmail.com"
     },
     "engines": {
-        "vscode": "^1.32.3"
+        "vscode": "^1.37.0"
     },
     "categories": [
         "Other"
@@ -58,11 +58,17 @@
                 "properties": {
                     "syncing.excludedExtensions": {
                         "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
                         "default": [],
                         "description": "%configuration.syncing.excludedExtensions%"
                     },
                     "syncing.excludedSettings": {
                         "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
                         "default": [],
                         "description": "%configuration.syncing.excludedSettings%"
                     },
