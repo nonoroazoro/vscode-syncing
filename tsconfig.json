@@ -1,11 +1,10 @@
 {
     "compilerOptions": {
-        "rootDir": "src",
         "outDir": "dist",
         "module": "commonjs",
         "target": "es2017",
         "declaration": false,
-        "sourceMap": true,
+        "sourceMap": false,
         "moduleResolution": "node",
         "allowUnreachableCode": true,
         "experimentalDecorators": true,
