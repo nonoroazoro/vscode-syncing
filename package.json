@@ -109,7 +109,7 @@
         "vscode:prepublish": "npm run build",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "prebuild": "npm run clean && npm run cleanCov",
-        "build": "cross-env NODE_ENV=production webpack --config ./scripts/webpack.config.prod.js --progress",
+        "build": "cross-env NODE_ENV=production webpack --config ./scripts/webpack.config.prod.js",
         "build:ts": "tsc -p ./tsconfig.json",
         "watch": "tsc -p ./tsconfig.json -w",
         "clean": "rimraf dist/*",
@@ -162,6 +162,7 @@
         "typescript": "^3.5.3",
         "vscode": "^1.1.36",
         "webpack": "^4.39.2",
-        "webpack-cli": "^3.3.6"
+        "webpack-cli": "^3.3.6",
+        "webpackbar": "^4.0.0"
     }
 }
