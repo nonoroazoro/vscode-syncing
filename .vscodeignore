@@ -1,22 +1,22 @@
 # Node files
-node_modules
-package-lock.json
+node_modules/**
+yarn.lock
 
 # Editor files
 .vscode/**
 
 # Configuration files
-.editorconfig
+.eslintignore
+.eslintrc
 .gitignore
 .huskyrc
-jest.config.js
+.lintstagedrc
+tsconfig.eslint.json
 tsconfig.json
-tslint.json
-webpack.config.prod.js
 
 # Project specific stuff
-__tests__/**
 .github/**
 docs/**
+scripts/**
 src/**
-yarn.lock
+tests/**
