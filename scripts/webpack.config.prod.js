@@ -1,9 +1,12 @@
+const fs = require("fs");
 const path = require("path");
 
-const BUILD_PATH = path.join(__dirname, "./dist");
+const ROOT_PATH = fs.realpathSync(process.cwd());
+const BUILD_PATH = path.join(ROOT_PATH, "dist");
 
 // See https://github.com/Microsoft/vscode/blob/master/extensions/shared.webpack.config.js
 module.exports = {
+    context: ROOT_PATH,
     mode: "production",
     target: "node",
     node: {

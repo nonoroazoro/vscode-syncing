@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "%displayName%",
     "description": "%description%",
-    "version": "3.0.8",
+    "version": "3.0.9",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -22,7 +22,7 @@
         "email": "xiaochao.k@gmail.com"
     },
     "engines": {
-        "vscode": "^1.32.3"
+        "vscode": "^1.37.0"
     },
     "categories": [
         "Other"
@@ -58,11 +58,17 @@
                 "properties": {
                     "syncing.excludedExtensions": {
                         "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
                         "default": [],
                         "description": "%configuration.syncing.excludedExtensions%"
                     },
                     "syncing.excludedSettings": {
                         "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
                         "default": [],
                         "description": "%configuration.syncing.excludedSettings%"
                     },
@@ -103,12 +109,12 @@
         "vscode:prepublish": "npm run build",
         "postinstall": "node ./node_modules/vscode/bin/install",
         "prebuild": "npm run clean && npm run cleanCov",
-        "build": "cross-env NODE_ENV=production webpack --config ./webpack.config.prod.js --progress",
-        "build:ts": "tsc -p ./tsconfig.json --sourceMap false",
+        "build": "cross-env NODE_ENV=production webpack --config ./scripts/webpack.config.prod.js --progress",
+        "build:ts": "tsc -p ./tsconfig.json",
         "watch": "tsc -p ./tsconfig.json -w",
         "clean": "rimraf dist/*",
         "cleanCov": "rimraf @coverage",
-        "test": "jest --config ./jest.config.js",
+        "test": "jest --config ./scripts/jest.config.js",
         "test:watch": "npm test -- --watch",
         "test:cov": "npm run cleanCov && npm test -- --coverage"
     },
@@ -126,7 +132,8 @@
         "lodash.debounce": "^4.0.8",
         "lodash.pick": "^4.4.0",
         "micromatch": "^4.0.2",
-        "tmp": "0.1.0"
+        "tmp": "0.1.0",
+        "tslib": "^1.10.0"
     },
     "devDependencies": {
         "@types/extract-zip": "^1.6.2",
@@ -134,27 +141,27 @@
         "@types/jest": "^24.0.17",
         "@types/lodash.debounce": "^4.0.6",
         "@types/lodash.pick": "^4.4.6",
-        "@types/node": "^12.7.1",
+        "@types/node": "^12.7.2",
         "@types/tmp": "0.1.0",
-        "@typescript-eslint/eslint-plugin": "^1.13.0",
-        "@typescript-eslint/parser": "^1.13.0",
+        "@typescript-eslint/eslint-plugin": "^2.0.0",
+        "@typescript-eslint/parser": "^2.0.0",
         "cache-loader": "^4.1.0",
         "cross-env": "^5.2.0",
         "eslint": "^6.1.0",
-        "eslint-config-zoro": "^2.4.2",
+        "eslint-config-zoro": "^2.5.1",
         "eslint-loader": "^2.2.1",
         "eslint-plugin-react": "^7.14.3",
-        "eslint-plugin-react-hooks": "^1.6.1",
-        "husky": "^3.0.2",
+        "eslint-plugin-react-hooks": "^1.7.0",
+        "husky": "^3.0.3",
         "jest": "^24.8.0",
         "lint-staged": "^9.2.1",
         "native-ext-loader": "^2.3.0",
-        "rimraf": "^2.6.3",
+        "rimraf": "^3.0.0",
         "ts-jest": "^24.0.2",
         "ts-loader": "^6.0.4",
         "typescript": "^3.5.3",
         "vscode": "^1.1.36",
-        "webpack": "^4.39.1",
+        "webpack": "^4.39.2",
         "webpack-cli": "^3.3.6"
     }
 }
