@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.9 - August 16, 2019
+
+- Changed: Reduce the size of the extension to make it faster.
+
+
 ## 3.0.8 - August 12, 2019
 
 - Fixed: Ignore the diff of function properties.
