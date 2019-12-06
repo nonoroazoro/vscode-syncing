@@ -4,8 +4,7 @@ import
     isAfter as rawIsAfter,
     parseISO
 } from "date-fns";
-import * as enUS from "date-fns/locale/en-US";
-import * as zhCN from "date-fns/locale/zh-CN";
+import { enUS, zhCN } from "date-fns/locale";
 
 import { NormalizedLocale } from "../types/NormalizedLocale";
 import { isDate, isString } from "./lang";
