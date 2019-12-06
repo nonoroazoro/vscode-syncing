@@ -1,13 +1,8 @@
 # Changelogs
 
-## 3.0.11 - December 06, 2019
+## 3.0.12 - December 06, 2019
 
-- Fixed: Update packages.
-
-
-## 3.0.10 - December 06, 2019
-
-- Fixed: Update packages.
+- Fixed: Upgrade dependencies to avoid security vulnerability.
 
 
 ## 3.0.9 - August 16, 2019
