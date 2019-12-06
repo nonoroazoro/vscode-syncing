@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const Webpackbar = require("webpackbar");
 
 const ROOT_PATH = fs.realpathSync(process.cwd());
 const BUILD_PATH = path.join(ROOT_PATH, "dist");
@@ -52,6 +53,7 @@ module.exports = {
             }
         ]
     },
+    plugins: [new Webpackbar()],
     stats: {
         children: false,
         modules: false

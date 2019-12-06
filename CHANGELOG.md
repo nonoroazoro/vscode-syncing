@@ -1,5 +1,15 @@
 # Changelogs
 
+## 3.0.11 - December 06, 2019
+
+- Fixed: Update packages.
+
+
+## 3.0.10 - December 06, 2019
+
+- Fixed: Update packages.
+
+
 ## 3.0.9 - August 16, 2019
 
 - Changed: Reduce the size of the extension to make it faster.
