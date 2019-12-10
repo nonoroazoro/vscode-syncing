@@ -473,7 +473,7 @@ export class VSCodeSetting
         if (setting.type === SettingType.Extensions)
         {
             // Sync extensions.
-            const extensions: IExtension[] = parse(setting.content || "[]");
+            const extensions: IExtension[] = parse(setting.content ?? "[]");
             result = await this._ext.sync(extensions, true);
         }
         else
@@ -506,7 +506,7 @@ export class VSCodeSetting
      */
     private _saveToFile(setting: ISetting)
     {
-        return fs.outputFile(setting.localFilePath, setting.content || "{}").then(() => ({ setting } as ISyncedItem));
+        return fs.outputFile(setting.localFilePath, setting.content ?? "{}").then(() => ({ setting } as ISyncedItem));
     }
 
     /**
@@ -625,7 +625,7 @@ export class VSCodeSetting
         const result: Record<string, any> = {};
         for (const setting of settings)
         {
-            content = setting.content || "";
+            content = setting.content ?? "";
             parsed = parse(content);
 
             if (setting.type === SettingType.Extensions && Array.isArray(parsed))

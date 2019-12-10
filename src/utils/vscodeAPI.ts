@@ -72,7 +72,7 @@ export function getVSCodeLocale(): string | undefined
 {
     try
     {
-        return JSON.parse(process.env.VSCODE_NLS_CONFIG || "{}").locale;
+        return JSON.parse(process.env.VSCODE_NLS_CONFIG ?? "{}").locale;
     }
     catch (err)
     {

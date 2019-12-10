@@ -199,7 +199,7 @@ export class Syncing
         let proxy = settings.http_proxy;
         if (proxy == null || isEmptyString(proxy))
         {
-            proxy = process.env["http_proxy"] || process.env["https_proxy"];
+            proxy = process.env["http_proxy"] ?? process.env["https_proxy"];
         }
 
         return { ...settings, http_proxy: proxy };
