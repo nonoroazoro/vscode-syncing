@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.0.13 - December 10, 2019
+
+- Fixed: Rollback fs-extra to try to fix the issue in dock container.
+
+
 ## 3.0.12 - December 06, 2019
 
 - Fixed: Upgrade dependencies to avoid security vulnerability.
