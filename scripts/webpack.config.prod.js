@@ -22,7 +22,10 @@ module.exports = {
         libraryTarget: "commonjs"
     },
     resolve: {
-        extensions: [".ts", ".js"]
+        extensions: [".ts", ".js"],
+        alias: {
+            "universal-user-agent$": "universal-user-agent/dist-node/index.js"
+        }
     },
     externals: {
         "vscode": "commonjs vscode"
