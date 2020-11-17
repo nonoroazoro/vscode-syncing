@@ -1,15 +1,17 @@
 import * as jsonc from "jsonc-parser";
 import * as micromatch from "micromatch";
 
-import { SETTING_EXCLUDED_SETTINGS } from "../constants";
 import { getJSONFormatOnSaveSetting } from "./vscodeAPI";
+import { JSONObject } from "../typings/json";
+import { SETTING_EXCLUDED_SETTINGS } from "../constants";
 
 /**
  * The default `ModificationOptions` of `jsonc-parser`.
  */
-const JSONC_MODIFICATION_OPTIONS: jsonc.ModificationOptions = {
+const JSONC_MODIFICATION_OPTIONS = {
     formattingOptions: {
         tabSize: 4,
+        insertFinalNewline: true,
         insertSpaces: true
     }
 };
@@ -20,10 +22,10 @@ const JSONC_MODIFICATION_OPTIONS: jsonc.ModificationOptions = {
  * Creates and returns the new settings JSON string.
  *
  * @param {string} settingsJSONString VSCode settings in `JSON string` format.
- * @param {object} settingsJSON VSCode settings in `JSON object` format.
+ * @param {JSONObject} settingsJSON VSCode settings in `JSON object` format.
  * @param {string[]} patterns The exclude list (glob patterns).
  */
-export function excludeSettings(settingsJSONString: string, settingsJSON: object, patterns: string[]): string
+export function excludeSettings(settingsJSONString: string, settingsJSON: JSONObject, patterns: string[]): string
 {
     let result = settingsJSONString;
     if (settingsJSON && settingsJSONString)
@@ -113,7 +115,7 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
 /**
  * Gets the JSON property keys based on the exclude list (`glob patterns`) of Syncing.
  */
-export function getExcludedKeys(settingsJSON: object, patterns: string[]): string[]
+export function getExcludedKeys(settingsJSON: JSONObject, patterns: string[]): string[]
 {
     const excludeKeys: string[] = [];
     const keys = Object.keys(settingsJSON);
