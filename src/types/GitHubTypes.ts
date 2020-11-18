@@ -19,10 +19,7 @@ export interface IGist
 /**
  * Represents the `files` of the GitHub Gist.
  */
-export interface IGistFiles
-{
-    [key: string]: IGistFile;
-}
+export type IGistFiles = Record<string, IGistFile>;
 
 /**
  * Represents the `file` of GitHub Gist.
@@ -47,6 +44,12 @@ export interface IGistUser
  */
 export interface IGistHistory
 {
+    /**
+     * Date string.
+     */
+    committed_at: string;
+
+    url: string;
     user: IGistUser;
     version: string;
 }
