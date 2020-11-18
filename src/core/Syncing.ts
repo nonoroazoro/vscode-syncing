@@ -1,12 +1,12 @@
 import * as fs from "fs-extra";
 
-import { localize } from "../i18n";
-import { isEmptyString } from "../utils/lang";
-import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
-import * as Toast from "./Toast";
+import { isEmptyString } from "../utils/lang";
 import { ISyncingSettings } from "../types/SyncingTypes";
+import { localize } from "../i18n";
+import { openFile } from "../utils/vscodeAPI";
+import * as Toast from "./Toast";
 
 /**
  * `Syncing` wrapper.
@@ -162,7 +162,7 @@ export class Syncing
             }
             return settings;
         }
-        catch (error)
+        catch (error: any)
         {
             if (showIndicator)
             {
@@ -189,7 +189,7 @@ export class Syncing
                 ...fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
             };
         }
-        catch (err)
+        catch (err: any)
         {
             console.error(localize("error.loading.syncing.settings"), err);
         }
@@ -239,7 +239,7 @@ export class Syncing
         {
             await fs.outputFile(this.settingsPath, content);
         }
-        catch (err)
+        catch (err: any)
         {
             if (showToast)
             {

@@ -5,8 +5,8 @@ import debounce = require("lodash.debounce");
 
 import { AbstractWatcher, WatcherEvent } from "./AbstractWatcher";
 import { ChokidarFileWatcher } from "./ChokidarFileWatcher";
-import { VSCodeExtensionWatcher } from "./VSCodeExtensionWatcher";
 import { Environment, Syncing } from "../core";
+import { VSCodeExtensionWatcher } from "./VSCodeExtensionWatcher";
 
 export interface SettingsWatcherServiceOptions
 {

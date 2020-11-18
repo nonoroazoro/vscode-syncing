@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
 
-import * as Toast from "./Toast";
-import { VSCodeSetting } from "./VSCodeSetting";
 import { Gist } from "./Gist";
-import { ISyncingSettings, ISetting } from "../types/SyncingTypes";
-import { isAfter } from "../utils/date";
-import { SettingsWatcherService, WatcherEvent } from "../watcher";
 import { IGist } from "../types/GitHubTypes";
+import { isAfter } from "../utils/date";
+import { ISyncingSettings, ISetting } from "../types/SyncingTypes";
 import { localize } from "../i18n";
+import { SettingsWatcherService, WatcherEvent } from "../watcher";
+import { VSCodeSetting } from "./VSCodeSetting";
+import * as Toast from "./Toast";
 
 export class AutoSyncService
 {
@@ -102,7 +102,7 @@ export class AutoSyncService
                 Toast.statusInfo(localize("toast.settings.autoSync.nothingChanged"));
             }
         }
-        catch (err)
+        catch (err: any)
         {
             Toast.statusError(localize("toast.settings.autoSync.failed", err.message));
         }

@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 
-import { VSCODE_BUILTIN_ENVIRONMENTS } from "../constants";
 import { localize } from "../i18n";
-import { NormalizedLocale } from "../types/NormalizedLocale";
-import { VSCodeEdition } from "../types/VSCodeEdition";
 import { normalize } from "./locale";
+import { NormalizedLocale } from "../types/NormalizedLocale";
+import { VSCODE_BUILTIN_ENVIRONMENTS } from "../constants";
+import { VSCodeEdition } from "../types/VSCodeEdition";
 
 /**
  * Gets the VSCode extension by id.
@@ -74,7 +74,7 @@ export function getVSCodeLocale(): string | undefined
     {
         return JSON.parse(process.env.VSCODE_NLS_CONFIG ?? "{}").locale;
     }
-    catch (err)
+    catch
     {
         return;
     }

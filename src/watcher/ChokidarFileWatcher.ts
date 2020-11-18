@@ -1,5 +1,5 @@
-import * as chokidar from "chokidar";
 import { Stats } from "fs-extra";
+import * as chokidar from "chokidar";
 
 import { WatcherEvent, AbstractWatcher } from "./AbstractWatcher";
 

@@ -4,10 +4,10 @@
 
 import * as vscode from "vscode";
 
-import { locale, localize } from "../i18n";
 import { formatDistance } from "../utils/date";
-import { reloadWindow } from "../utils/vscodeAPI";
 import { Gist } from "./Gist";
+import { locale, localize } from "../i18n";
+import { reloadWindow } from "../utils/vscodeAPI";
 
 /**
  * Represents the item of GistListBox.

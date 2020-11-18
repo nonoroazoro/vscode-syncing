@@ -6,8 +6,8 @@ import
 } from "date-fns";
 import { enUS, zhCN } from "date-fns/locale";
 
-import { NormalizedLocale } from "../types/NormalizedLocale";
 import { isDate, isString } from "./lang";
+import { NormalizedLocale } from "../types/NormalizedLocale";
 
 /**
  * Parses the given value and returns the `Date` the input value represents.

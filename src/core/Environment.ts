@@ -1,10 +1,10 @@
 import * as os from "os";
 import * as path from "path";
 
+import { getVSCodeBuiltinEnvironment } from "../utils/vscodeAPI";
+import { IExtension } from "../types/SyncingTypes";
 import { localize } from "../i18n";
 import { Platform } from "../types/Platform";
-import { IExtension } from "../types/SyncingTypes";
-import { getVSCodeBuiltinEnvironment } from "../utils/vscodeAPI";
 
 /**
  * VSCode environment wrapper.

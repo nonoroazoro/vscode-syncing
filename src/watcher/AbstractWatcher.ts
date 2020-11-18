@@ -14,6 +14,15 @@ export abstract class AbstractWatcher<EventType extends string | symbol = Watche
     private _isPaused = false;
     private _emitter = new EventEmitter();
 
+    protected emit(event: EventType, ...args: any[]): boolean
+    {
+        if (this._isPaused)
+        {
+            return false;
+        }
+        return this._emitter.emit(event, ...args);
+    }
+
     public stop(): void
     {
         this._emitter.removeAllListeners();
@@ -33,15 +42,6 @@ export abstract class AbstractWatcher<EventType extends string | symbol = Watche
     {
         this._emitter.on(event, fn);
         return this;
-    }
-
-    protected emit(event: EventType, ...args: any[]): boolean
-    {
-        if (this._isPaused)
-        {
-            return false;
-        }
-        return this._emitter.emit(event, ...args);
     }
 
     public abstract start(): void;

@@ -1,9 +1,9 @@
 import { readJsonSync } from "fs-extra";
 import * as path from "path";
 
-import { NormalizedLocale } from "../types/NormalizedLocale";
 import { format } from "../utils/template";
 import { getNormalizedVSCodeLocale } from "../utils/vscodeAPI";
+import { NormalizedLocale } from "../types/NormalizedLocale";
 
 let instance: I18n;
 
@@ -72,7 +72,7 @@ class I18n
                 { encoding: "utf8" }
             );
         }
-        catch (err)
+        catch
         {
             this._bundle = readJsonSync(
                 path.resolve(this._extensionPath, I18n._DEFAULT_LOCALE_FILENAME),
