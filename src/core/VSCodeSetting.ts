@@ -14,15 +14,15 @@ import
     SETTING_EXCLUDED_SETTINGS,
     VSCODE_SETTINGS_LIST
 } from "../constants";
-import { localize } from "../i18n";
-import * as GitHubTypes from "../types/GitHubTypes";
-import { IExtension, ISetting, ISyncedItem, SettingType } from "../types/SyncingTypes";
 import { diff } from "../utils/diffPatch";
-import { readLastModified, writeLastModified } from "../utils/file";
-import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
-import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
+import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
 import { Extension } from "./Extension";
+import { getVSCodeSetting } from "../utils/vscodeAPI";
+import { IExtension, ISetting, ISyncedItem, SettingType } from "../types/SyncingTypes";
+import { localize } from "../i18n";
+import { readLastModified, writeLastModified } from "../utils/file";
+import * as GitHubTypes from "../types/GitHubTypes";
 import * as Toast from "./Toast";
 
 /**
@@ -295,7 +295,7 @@ export class VSCodeSetting
                             const saved = await this._saveSetting(setting, lastModified);
                             syncedItems.updated.push(saved);
                         }
-                        catch (error)
+                        catch (error: any)
                         {
                             throw new Error(localize("error.save.file", setting.remoteFilename, error.message));
                         }
@@ -321,7 +321,7 @@ export class VSCodeSetting
                 throw new Error(localize("error.gist.files.notfound"));
             }
         }
-        catch (error)
+        catch (error: any)
         {
             if (showIndicator)
             {
@@ -364,7 +364,7 @@ export class VSCodeSetting
                 await fs.remove(setting.localFilePath);
                 removed.push({ setting });
             }
-            catch (error)
+            catch (error: any)
             {
                 throw new Error(localize("error.remove.file", setting.remoteFilename, error.message));
             }
@@ -393,7 +393,7 @@ export class VSCodeSetting
                 });
             });
         }
-        catch (err)
+        catch
         {
             console.error(localize("error.loading.snippets"));
         }
@@ -452,7 +452,7 @@ export class VSCodeSetting
                     lastModified = await readLastModified(setting.localFilePath);
                 }
             }
-            catch (err)
+            catch (err: any)
             {
                 content = undefined;
                 console.error(localize("error.loading.settings", setting.remoteFilename, err));
@@ -473,7 +473,7 @@ export class VSCodeSetting
         if (setting.type === SettingType.Extensions)
         {
             // Sync extensions.
-            const extensions: IExtension[] = parse(setting.content || "[]");
+            const extensions: IExtension[] = parse(setting.content ?? "[]");
             result = await this._ext.sync(extensions, true);
         }
         else
@@ -506,7 +506,7 @@ export class VSCodeSetting
      */
     private _saveToFile(setting: ISetting)
     {
-        return fs.outputFile(setting.localFilePath, setting.content || "{}").then(() => ({ setting } as ISyncedItem));
+        return fs.outputFile(setting.localFilePath, setting.content ?? "{}").then(() => ({ setting } as ISyncedItem));
     }
 
     /**
@@ -625,7 +625,7 @@ export class VSCodeSetting
         const result: Record<string, any> = {};
         for (const setting of settings)
         {
-            content = setting.content || "";
+            content = setting.content ?? "";
             parsed = parse(content);
 
             if (setting.type === SettingType.Extensions && Array.isArray(parsed))

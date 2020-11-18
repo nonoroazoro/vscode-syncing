@@ -1,5 +1,11 @@
 # Changelogs
 
+## 3.1.0 - November 18, 2020
+
+- Note: Since the official `Settings Sync` doesn't meet my requirement, I decided to resume the updates.
+- Changed: Upgrade dependencies and some minor fix.
+
+
 ## 3.0.13 - December 10, 2019
 
 - Fixed: Rollback fs-extra to try to fix the issue in dock container.

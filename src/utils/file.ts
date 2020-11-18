@@ -9,12 +9,18 @@ import { parse } from "./date";
  *
  * @param {string} path The path of the file.
  */
-export function readLastModified(path: string): Promise<number | undefined>
+export async function readLastModified(path: string): Promise<number | undefined>
 {
-    return new Promise((resolve) =>
+    let result: number | undefined;
+    try
     {
-        fs.stat(path, (err, stats) => resolve(err ? undefined : stats.mtimeMs));
-    });
+        result = (await fs.stat(path)).mtimeMs;
+    }
+    catch
+    {
+        // Ignore error.
+    }
+    return result;
 }
 
 /**
@@ -31,5 +37,7 @@ export async function writeLastModified(path: string, mtime: Date | number | str
         await fs.utimes(path, newMTime, newMTime);
     }
     catch
-    { }
+    {
+        // Ignore error.
+    }
 }

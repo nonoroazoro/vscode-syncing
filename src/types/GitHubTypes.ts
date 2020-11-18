@@ -19,13 +19,10 @@ export interface IGist
 /**
  * Represents the `files` of the GitHub Gist.
  */
-export interface IGistFiles
-{
-    [key: string]: IGistFile;
-}
+export type IGistFiles = Record<string, IGistFile>;
 
 /**
- * Represents the `file` of GitHub Gist.
+ * Represents the `file` of the GitHub Gist.
  */
 export interface IGistFile
 {
@@ -47,6 +44,38 @@ export interface IGistUser
  */
 export interface IGistHistory
 {
+    /**
+     * Date string.
+     */
+    committed_at: string;
+
+    url: string;
     user: IGistUser;
     version: string;
+}
+
+/**
+ * Represents the param used to create a new GitHub Gist.
+ */
+export interface GistCreateParam
+{
+    files: IGistFiles;
+
+    description?: string;
+    public?: boolean;
+}
+
+/**
+ * Represents the param used to update the GitHub Gist.
+ */
+export interface GistUpdateParam
+{
+    gist_id: string;
+
+    /**
+     * Set file to `null` to delete the Gist file.
+     */
+    files?: IGistFiles;
+
+    description?: string;
 }

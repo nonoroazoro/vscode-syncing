@@ -53,8 +53,9 @@ export async function queryExtensions(
                 });
             }
         }
-        catch (err)
+        catch
         {
+            // Ignore error.
         }
     }
     return result;
@@ -81,10 +82,10 @@ export function getLatestVSIXVersion(extensionMeta: IExtensionMeta): string | un
 export function getVSIXDownloadURL(version: IExtensionVersion): string | undefined
 {
     const files = version.files;
-    if (files)
+    if (files != null)
     {
-        const file = files.find((f) => (f.assetType === ExtensionAssetType.SERVICES_VSIXPACKAGE));
-        if (file)
+        const file = files.find(f => (f.assetType === ExtensionAssetType.SERVICES_VSIXPACKAGE));
+        if (file != null)
         {
             return file.source;
         }

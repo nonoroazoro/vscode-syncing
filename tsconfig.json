@@ -4,7 +4,7 @@
         "module": "commonjs",
         "target": "es2017",
         "declaration": false,
-        "sourceMap": false,
+        "sourceMap": true,
         "moduleResolution": "node",
         "allowUnreachableCode": true,
         "experimentalDecorators": true,

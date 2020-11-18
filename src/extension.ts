@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 
 import { Gist, Syncing, VSCodeSetting, AutoSyncService } from "./core";
-import * as Toast from "./core/Toast";
-import { localize, setup } from "./i18n";
 import { ISyncedItem } from "./types/SyncingTypes";
+import { localize, setup } from "./i18n";
 import { registerCommand } from "./utils/vscodeAPI";
+import * as Toast from "./core/Toast";
 
 let _syncing: Syncing;
 let _vscodeSetting: VSCodeSetting;
@@ -50,7 +50,7 @@ function _initSyncing(context: vscode.ExtensionContext)
 
         _isReady = true;
     }
-    catch (err)
+    catch (err: any)
     {
         _isReady = false;
         Toast.statusFatal(localize("error.initialization", err.message));
@@ -107,11 +107,10 @@ async function _uploadVSCodeSettings()
 
             Toast.statusInfo(localize("toast.settings.uploaded"));
         }
-        catch { }
-        finally
+        catch
         {
-            _isSynchronizing = false;
         }
+        _isSynchronizing = false;
     }
 }
 
@@ -138,7 +137,7 @@ async function _downloadVSCodeSettings()
                     Toast.showReloadBox();
                 }
             }
-            catch (err)
+            catch (err: any)
             {
                 if (err.code === 401)
                 {
@@ -150,12 +149,11 @@ async function _downloadVSCodeSettings()
                 }
             }
         }
-        catch { }
-        finally
+        catch
         {
-            _isSynchronizing = false;
-            _resumeAutoSyncService();
         }
+        _isSynchronizing = false;
+        _resumeAutoSyncService();
     }
 }
 

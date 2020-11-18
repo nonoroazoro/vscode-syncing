@@ -19,7 +19,7 @@
             "sourceMaps": true,
             "osx": {
                 "preLaunchTask": "tsc-watch"
-            },
+            }
         }
     ]
 }
