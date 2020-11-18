@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+const TerserPlugin = require("terser-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const Webpackbar = require("webpackbar");
 
 const ROOT_PATH = fs.realpathSync(process.cwd());
@@ -15,6 +17,16 @@ module.exports = {
     },
     entry: {
         extension: ["./src/extension"]
+    },
+    optimization: {
+        minimizer: [
+            new TerserPlugin({
+                extractComments: false,
+                terserOptions: {
+                    format: { comments: false }
+                }
+            })
+        ]
     },
     output: {
         path: BUILD_PATH,
@@ -56,7 +68,14 @@ module.exports = {
             }
         ]
     },
-    plugins: [new Webpackbar()],
+    plugins: [
+        new ForkTsCheckerWebpackPlugin({
+            eslint: {
+                files: "{scripts,src,tests}/**/*.{js,jsx,ts,tsx}"
+            }
+        }),
+        new Webpackbar()
+    ],
     stats: {
         children: false,
         modules: false
