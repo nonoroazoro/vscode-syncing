@@ -2,7 +2,7 @@ import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
 import * as micromatch from "micromatch";
 import * as path from "path";
-import * as tmp from "tmp";
+import * as tmp from "tmp-promise";
 import * as vscode from "vscode";
 
 import { CaseInsensitiveMap, CaseInsensitiveSet } from "../collections";
@@ -12,13 +12,13 @@ import
     CONFIGURATION_EXTENSIONS_AUTOUPDATE,
     CONFIGURATION_KEY
 } from "../constants";
-import { localize } from "../i18n";
-import { IExtension, ISyncedItem } from "../types/SyncingTypes";
-import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
 import { downloadFile } from "../utils/ajax";
+import { Environment } from "./Environment";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
 import { getLatestVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
-import { Environment } from "./Environment";
+import { IExtension, ISyncedItem } from "../types/SyncingTypes";
+import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
+import { localize } from "../i18n";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
 
@@ -160,83 +160,57 @@ export class Extension
     /**
      * Downloads extension from VSCode marketplace.
      */
-    public downloadExtension(extension: IExtension): Promise<IExtension>
+    public async downloadExtension(extension: IExtension): Promise<IExtension>
     {
-        return new Promise((resolve, reject) =>
-        {
-            // Create a temporary file, the file will be automatically closed and unlinked on process exit.
-            tmp.file({ postfix: `.${extension.id}.zip` }, (err, filepath: string) =>
-            {
-                if (err)
-                {
-                    reject(err);
-                    return;
-                }
+        const filepath = (await tmp.file({ postfix: `.${extension.id}.zip` })).path;
 
-                // Calculates the VSIX download URL.
-                extension.downloadURL =
-                    `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
-                    + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
-                    + "assetbyname/Microsoft.VisualStudio.Services.VSIXPackage?install=true";
+        // Calculates the VSIX download URL.
+        extension.downloadURL =
+            `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
+            + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
+            + "assetbyname/Microsoft.VisualStudio.Services.VSIXPackage?install=true";
 
-                downloadFile(extension.downloadURL, filepath, this._syncing.proxy).then(() =>
-                {
-                    resolve({ ...extension, vsixFilepath: filepath });
-                }).catch(reject);
-            });
-        });
+        await downloadFile(extension.downloadURL, filepath, this._syncing.proxy);
+        return { ...extension, vsixFilepath: filepath };
     }
 
     /**
      * Extracts (install) extension vsix package.
      */
-    public extractExtension(extension: IExtension): Promise<IExtension>
+    public async extractExtension(extension: IExtension): Promise<IExtension>
     {
-        return new Promise((resolve, reject) =>
+        const { vsixFilepath } = extension;
+        if (vsixFilepath != null)
         {
-            const { vsixFilepath } = extension;
-            if (vsixFilepath)
+            let dirPath: string;
+            try
             {
-                tmp.dir({ postfix: `.${extension.id}`, unsafeCleanup: true }, (err1, dirPath: string) =>
-                {
-                    if (err1)
-                    {
-                        reject(localize("error.extract.extension-2", extension.id));
-                    }
-                    else
-                    {
-                        extractZip(vsixFilepath, { dir: dirPath }, (err2) =>
-                        {
-                            if (err2)
-                            {
-                                reject(localize("error.extract.extension-1", extension.id, err2.message));
-                            }
-                            else
-                            {
-                                const extPath = this._env.getExtensionDirectory(extension);
-                                fs.emptyDir(extPath)
-                                    .then(() =>
-                                    {
-                                        return fs.copy(path.join(dirPath, "extension"), extPath);
-                                    })
-                                    .then(() =>
-                                    {
-                                        resolve(extension);
-                                    })
-                                    .catch((err3) =>
-                                    {
-                                        reject(localize("error.extract.extension-1", extension.id, err3.message));
-                                    });
-                            }
-                        });
-                    }
-                });
+                // Create temp dir.
+                dirPath = (await tmp.dir({ postfix: `.${extension.id}`, unsafeCleanup: true })).path;
             }
-            else
+            catch
             {
-                reject(localize("error.extract.extension-3", extension.id));
+                throw new Error(localize("error.extract.extension-2", extension.id));
             }
-        });
+
+            try
+            {
+                // Extract extension to temp dir.
+                await extractZip(vsixFilepath, { dir: dirPath });
+
+                // Copy to vscode extension dir.
+                const extPath = this._env.getExtensionDirectory(extension);
+                await fs.emptyDir(extPath);
+                await fs.copy(path.join(dirPath, "extension"), extPath);
+                return extension;
+            }
+            catch (err: any)
+            {
+                throw new Error(localize("error.extract.extension-1", extension.id, err.message));
+            }
+        }
+
+        throw new Error(localize("error.extract.extension-3", extension.id));
     }
 
     /**
@@ -251,12 +225,12 @@ export class Extension
         try
         {
             await fs.remove(extensionPath);
+            return extension;
         }
-        catch (err)
+        catch
         {
             throw new Error(localize("error.uninstall.extension", extension.id));
         }
-        return extension;
     }
 
     /**
@@ -269,16 +243,17 @@ export class Extension
     ): Promise<void>
     {
         const filepath = this._env.obsoleteFilePath;
-        let obsolete: { [extensionFolderName: string]: boolean } | undefined;
+        // Record<extensionFolderName, boolean>
+        let obsolete: Record<string, boolean> | undefined;
         try
         {
             obsolete = await fs.readJson(filepath);
         }
-        catch (err)
+        catch
         {
         }
 
-        if (obsolete)
+        if (obsolete != null)
         {
             for (const ext of [...added, ...updated])
             {
@@ -301,7 +276,7 @@ export class Extension
                     await fs.remove(filepath);
                 }
             }
-            catch (err)
+            catch
             {
             }
         }
@@ -431,7 +406,7 @@ export class Extension
 
                 result.added.push(item);
             }
-            catch (error)
+            catch
             {
                 result.addedErrors.push(item);
             }
@@ -477,7 +452,7 @@ export class Extension
 
                 result.updated.push(item);
             }
-            catch (error)
+            catch
             {
                 result.updatedErrors.push(item);
             }
@@ -511,7 +486,7 @@ export class Extension
 
                 result.removed.push(item);
             }
-            catch (error)
+            catch
             {
                 result.removedErrors.push(item);
             }
