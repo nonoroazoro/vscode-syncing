@@ -1,16 +1,17 @@
-import * as Github from "@octokit/rest";
-import * as HttpsProxyAgent from "https-proxy-agent";
+import { Octokit } from "@octokit/rest";
+import { RequestRequestOptions } from "@octokit/types";
+import * as createHttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
 
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
-import { localize } from "../i18n";
-import * as GitHubTypes from "../types/GitHubTypes";
-import { ISetting, SettingType } from "../types/SyncingTypes";
-import { diff } from "../utils/diffPatch";
 import { createError } from "../utils/errors";
-import { parse } from "../utils/jsonc";
-import { isEmptyString } from "../utils/lang";
+import { diff } from "../utils/diffPatch";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
+import { isEmptyString } from "../utils/lang";
+import { ISetting, SettingType } from "../types/SyncingTypes";
+import { localize } from "../i18n";
+import { parse } from "../utils/jsonc";
+import * as GitHubTypes from "../types/GitHubTypes";
 import * as Toast from "./Toast";
 
 /**
@@ -23,9 +24,9 @@ export class Gist
     /**
      * The description of Syncing's gists.
      */
-    private static readonly _GIST_DESCRIPTION: string = "VSCode's Settings - Syncing";
+    private static readonly GIST_DESCRIPTION: string = "VSCode's Settings - Syncing";
 
-    private _api: Github;
+    private _api: Octokit;
     private _proxy?: string;
     private _token?: string;
 
@@ -33,19 +34,19 @@ export class Gist
     {
         this._proxy = proxy;
 
-        const options: Record<string, any> = { request: { timeout: 8000 } };
+        const options: { auth?: any; request: RequestRequestOptions } = { request: { timeout: 8000 } };
         if (proxy != null && !isEmptyString(proxy))
         {
-            options.request["agent"] = new HttpsProxyAgent(proxy);
+            options.request.agent = createHttpsProxyAgent(proxy);
         }
 
         this._token = token;
         if (token != null && !isEmptyString(token))
         {
-            options["auth"] = `token ${token}`;
+            options.auth = `token ${token}`;
         }
 
-        this._api = new Github(options);
+        this._api = new Octokit(options);
     }
 
     /**
@@ -84,18 +85,13 @@ export class Gist
      *
      * @throws {IEnhancedError}
      */
-    public async user(): Promise<{ id: number; name: string }>
+    public async user(): Promise<GitHubTypes.IGistUser>
     {
         try
         {
-            const res = await this._api.users.getAuthenticated();
-            const data = res.data as GitHubTypes.IGistUser;
-            return {
-                id: data.id,
-                name: data.login
-            };
+            return (await this._api.users.getAuthenticated()).data;
         }
-        catch (err)
+        catch (err: any)
         {
             throw this._createError(err);
         }
@@ -118,14 +114,14 @@ export class Gist
 
         try
         {
-            const result = await this._api.gists.get({ gist_id: id });
+            const result = (await this._api.gists.get({ gist_id: id })).data as GitHubTypes.IGist;
             if (showIndicator)
             {
                 Toast.clearSpinner("");
             }
-            return result.data as any;
+            return result;
         }
-        catch (err)
+        catch (err: any)
         {
             const error = this._createError(err);
             if (showIndicator)
@@ -145,15 +141,14 @@ export class Gist
     {
         try
         {
-            const res = await this._api.gists.list();
-            // Find and sort VSCode settings gists by time.
-            const gists: GitHubTypes.IGist[] = res.data as any;
+            // Find and sort VSCode settings gists by time in ascending order.
+            const gists = (await this._api.gists.list()).data as unknown as GitHubTypes.IGist[];
             const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
             return gists
-                .filter((gist) => (gist.description === Gist._GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
+                .filter(gist => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
                 .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
         }
-        catch (err)
+        catch (err: any)
         {
             throw this._createError(err);
         }
@@ -172,7 +167,7 @@ export class Gist
         {
             await this._api.gists.delete({ gist_id: id });
         }
-        catch (err)
+        catch (err: any)
         {
             throw this._createError(err);
         }
@@ -181,18 +176,17 @@ export class Gist
     /**
      * Update gist.
      *
-     * @param content Gist content.
+     * @param {GitHubTypes.GistUpdateParam} content Gist content.
      *
      * @throws {IEnhancedError}
      */
-    public async update(content: Github.GistsUpdateParams): Promise<GitHubTypes.IGist>
+    public async update(content: GitHubTypes.GistUpdateParam): Promise<GitHubTypes.IGist>
     {
         try
         {
-            const res = await this._api.gists.update(content);
-            return res.data as any;
+            return (await this._api.gists.update(content as any)).data as GitHubTypes.IGist;
         }
-        catch (err)
+        catch (err: any)
         {
             throw this._createError(err);
         }
@@ -210,20 +204,20 @@ export class Gist
             try
             {
                 const gist = await this.get(id);
-                if (this.token)
+                if (this.token != null)
                 {
                     const user = await this.user();
                     // Determines whether the owner of the gist is the currently authenticated user.
-                    if (user.id === gist.owner.id)
+                    if (user.id !== gist.owner.id)
                     {
-                        return gist;
+                        return false;
                     }
-                    return false;
                 }
                 return gist;
             }
-            catch (err)
+            catch
             {
+                // Ignore error.
             }
         }
         return false;
@@ -232,18 +226,17 @@ export class Gist
     /**
      * Creates a new gist.
      *
-     * @param content Gist content.
+     * @param {GitHubTypes.GistCreateParam} content Gist content.
      *
      * @throws {IEnhancedError}
      */
-    public async create(content: Github.GistsCreateParams): Promise<GitHubTypes.IGist>
+    public async create(content: GitHubTypes.GistCreateParam): Promise<GitHubTypes.IGist>
     {
         try
         {
-            const result = await this._api.gists.create(content);
-            return result.data as any;
+            return (await this._api.gists.create(content as any)).data as GitHubTypes.IGist;
         }
-        catch (err)
+        catch (err: any)
         {
             throw this._createError(err);
         }
@@ -260,8 +253,8 @@ export class Gist
     public createSettings(files = {}, isPublic = false): Promise<GitHubTypes.IGist>
     {
         return this.create({
-            description: Gist._GIST_DESCRIPTION,
             files,
+            description: Gist.GIST_DESCRIPTION,
             public: isPublic
         });
     }
@@ -298,7 +291,7 @@ export class Gist
             for (const item of uploads)
             {
                 // Filter out `null` content.
-                if (item.content)
+                if (item.content != null)
                 {
                     localGist.files[item.remoteFilename] = { content: item.content };
                 }
@@ -362,7 +355,7 @@ export class Gist
             }
             return result;
         }
-        catch (error)
+        catch (error: any)
         {
             if (showIndicator)
             {
@@ -388,8 +381,8 @@ export class Gist
             return localFiles;
         }
 
-        let localFile;
-        let remoteFile;
+        let localFile: GitHubTypes.IGistFile;
+        let remoteFile: GitHubTypes.IGistFile;
         const result = {} as GitHubTypes.IGistFiles;
         const recordedKeys = [];
         for (const key of Object.keys(remoteFiles))
@@ -398,8 +391,8 @@ export class Gist
             remoteFile = remoteFiles[key];
             if (localFile)
             {
-                // Ignore the null local file.
-                if (localFile.content && localFile.content !== remoteFile.content)
+                // Ignore null local file.
+                if (localFile.content != null && localFile.content !== remoteFile.content)
                 {
                     result[key] = localFile;
                 }
