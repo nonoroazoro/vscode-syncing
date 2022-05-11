@@ -1,7 +1,6 @@
 import * as createHttpsProxyAgent from "https-proxy-agent";
 import * as fs from "fs-extra";
 import * as https from "https";
-import * as url from "url";
 import * as zlib from "zlib";
 
 import { isEmptyString } from "./lang";
@@ -18,11 +17,8 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
 {
     return new Promise((resolve, reject) =>
     {
-        const body: string = JSON.stringify(data);
-        const { host, path, port } = url.parse(api);
+        const body = JSON.stringify(data);
         const options: https.RequestOptions = {
-            host,
-            path,
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -30,23 +26,17 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
                 ...headers
             }
         };
-
-        if (port)
-        {
-            options.port = +port;
-        }
-
         if (proxy != null && !isEmptyString(proxy))
         {
             options.agent = createHttpsProxyAgent(proxy);
         }
 
-        const req = https.request(options, (res) =>
+        const req = https.request(api, options, res =>
         {
             if (res.statusCode === 200)
             {
                 let result = "";
-                res.on("data", (chunk) =>
+                res.on("data", chunk =>
                 {
                     result += chunk;
                 });
@@ -60,7 +50,7 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
             {
                 reject();
             }
-        }).on("error", (err) =>
+        }).on("error", err =>
         {
             reject(err);
         });
@@ -81,14 +71,7 @@ export function downloadFile(uri: string, savepath: string, proxy?: string): Pro
 {
     return new Promise((resolve, reject) =>
     {
-        const { host, path, port } = url.parse(uri);
-        const options: https.RequestOptions = { host, path };
-
-        if (port)
-        {
-            options.port = +port;
-        }
-
+        const options: https.RequestOptions = {};
         if (proxy != null && !isEmptyString(proxy))
         {
             options.agent = createHttpsProxyAgent(proxy);
@@ -100,7 +83,7 @@ export function downloadFile(uri: string, savepath: string, proxy?: string): Pro
             file.close();
             resolve();
         });
-        https.get(options, (res) =>
+        https.get(uri, options, res =>
         {
             if (res.statusCode === 200)
             {
@@ -128,7 +111,7 @@ export function downloadFile(uri: string, savepath: string, proxy?: string): Pro
             {
                 reject();
             }
-        }).on("error", (err) =>
+        }).on("error", err =>
         {
             // Close and remove the temp file.
             file.close();
