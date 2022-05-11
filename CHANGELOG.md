@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.2.0 - May 11, 2022
+
+- Changed: Upgrade dependencies and some minor fix.
+
+
 ## 3.1.0 - November 18, 2020
 
 - Note: Since the official `Settings Sync` doesn't meet my requirement, I decided to resume the updates.
