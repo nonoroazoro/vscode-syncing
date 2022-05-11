@@ -5,9 +5,9 @@
 import * as vscode from "vscode";
 
 import { formatDistance } from "../utils/date";
-import { Gist } from "./Gist";
 import { locale, localize } from "../i18n";
 import { reloadWindow } from "../utils/vscodeAPI";
+import type { Gist } from "./Gist";
 
 /**
  * Represents the item of GistListBox.

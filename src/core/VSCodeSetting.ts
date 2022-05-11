@@ -19,11 +19,11 @@ import { Environment } from "./Environment";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
 import { Extension } from "./Extension";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
-import { IExtension, ISetting, ISyncedItem, SettingType } from "../types/SyncingTypes";
 import { localize } from "../i18n";
 import { readLastModified, writeLastModified } from "../utils/file";
-import * as GitHubTypes from "../types/GitHubTypes";
+import { SettingType } from "../types";
 import * as Toast from "./Toast";
+import type { IExtension, ISetting, ISyncedItem, IGist, IGistFile } from "../types";
 
 /**
  * `VSCode Settings` wrapper.
@@ -188,7 +188,7 @@ export class VSCodeSetting
      * @param gist `VSCode Settings` from GitHub Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public async saveSettings(gist: GitHubTypes.IGist, showIndicator: boolean = false): Promise<{
+    public async saveSettings(gist: IGist, showIndicator: boolean = false): Promise<{
         updated: ISyncedItem[];
         removed: ISyncedItem[];
     }>
@@ -207,7 +207,7 @@ export class VSCodeSetting
                 const settingsToRemove: ISetting[] = [];
                 const settingsToSave: ISetting[] = [];
                 let extensionsSetting: ISetting | undefined;
-                let gistFile: GitHubTypes.IGistFile;
+                let gistFile: IGistFile;
 
                 const settings = await this.getSettings();
                 for (const setting of settings)
@@ -570,7 +570,7 @@ export class VSCodeSetting
                 if (type === SettingType.Settings)
                 {
                     // Exclude settings.
-                    const patterns = rSettingJSON[SETTING_EXCLUDED_SETTINGS] || [];
+                    const patterns = rSettingJSON[SETTING_EXCLUDED_SETTINGS] ?? [];
                     lSetting.content = excludeSettings(lSetting.content, lSettingJSON, patterns);
                     rSetting.content = excludeSettings(rSetting.content, rSettingJSON, patterns);
                 }
@@ -583,7 +583,7 @@ export class VSCodeSetting
                         const rVSCodeSettingsJSON = parse(rVSCodeSettings.content);
                         if (rVSCodeSettingsJSON)
                         {
-                            const patterns: string[] = rVSCodeSettingsJSON[SETTING_EXCLUDED_EXTENSIONS] || [];
+                            const patterns: string[] = rVSCodeSettingsJSON[SETTING_EXCLUDED_EXTENSIONS] ?? [];
                             lSetting.content = JSON.stringify(this._getExcludedExtensions(lSettingJSON, patterns));
                             rSetting.content = JSON.stringify(this._getExcludedExtensions(rSettingJSON, patterns));
                         }
@@ -644,7 +644,7 @@ export class VSCodeSetting
                 }
             }
 
-            result[setting.remoteFilename] = parsed || content;
+            result[setting.remoteFilename] = parsed ?? content;
         }
         return result;
     }

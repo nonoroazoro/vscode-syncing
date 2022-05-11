@@ -2,9 +2,9 @@ import * as os from "os";
 import * as path from "path";
 
 import { getVSCodeBuiltinEnvironment } from "../utils/vscodeAPI";
-import { IExtension } from "../types/SyncingTypes";
 import { localize } from "../i18n";
-import { Platform } from "../types/Platform";
+import { Platform } from "../types";
+import type { IExtension } from "../types";
 
 /**
  * VSCode environment wrapper.
@@ -134,7 +134,7 @@ export class Environment
         if (isPortable)
         {
             // Such as the "/Applications/code-portable-data/extensions" directory in MacOS.
-            return path.join(process.env.VSCODE_PORTABLE!, "extensions");
+            return path.join(process.env.VSCODE_PORTABLE ?? "", "extensions");
         }
         return path.join(
             os.homedir(),
@@ -151,13 +151,13 @@ export class Environment
         if (isPortable)
         {
             // Such as the "/Applications/code-portable-data/user-data" directory in MacOS.
-            return path.join(process.env.VSCODE_PORTABLE!, "user-data");
+            return path.join(process.env.VSCODE_PORTABLE ?? "", "user-data");
         }
         const { dataDirectoryName } = getVSCodeBuiltinEnvironment();
         switch (platform)
         {
             case Platform.WINDOWS:
-                return path.join(process.env.APPDATA!, dataDirectoryName);
+                return path.join(process.env.APPDATA ?? "", dataDirectoryName);
 
             case Platform.MACINTOSH:
                 return path.join(
@@ -167,8 +167,8 @@ export class Environment
                     dataDirectoryName
                 );
 
-            default:
             case Platform.LINUX:
+            default:
                 return path.join(
                     os.homedir(),
                     ".config",

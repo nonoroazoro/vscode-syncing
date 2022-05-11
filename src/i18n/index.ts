@@ -3,7 +3,7 @@ import * as path from "path";
 
 import { format } from "../utils/template";
 import { getNormalizedVSCodeLocale } from "../utils/vscodeAPI";
-import { NormalizedLocale } from "../types/NormalizedLocale";
+import { NormalizedLocale } from "../types";
 
 let instance: I18n;
 

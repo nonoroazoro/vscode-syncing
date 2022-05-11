@@ -1,5 +1,4 @@
-import { VSCodeEdition } from "../types/VSCodeEdition";
-import { SettingType } from "../types/SyncingTypes";
+import { SettingType, VSCodeEdition } from "../types";
 
 /**
  * Note that this is an ordered list, to ensure that the smaller files

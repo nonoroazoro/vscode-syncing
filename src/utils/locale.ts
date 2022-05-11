@@ -1,4 +1,4 @@
-import { NormalizedLocale } from "../types/NormalizedLocale";
+import { NormalizedLocale } from "../types";
 
 /**
  * Normalizes the locale string.

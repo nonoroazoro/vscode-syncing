@@ -1,18 +1,25 @@
 import { Octokit } from "@octokit/rest";
-import { RequestRequestOptions } from "@octokit/types";
 import * as createHttpsProxyAgent from "https-proxy-agent";
 import pick = require("lodash.pick");
 
+import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast";
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
 import { createError } from "../utils/errors";
 import { diff } from "../utils/diffPatch";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { isEmptyString } from "../utils/lang";
-import { ISetting, SettingType } from "../types/SyncingTypes";
 import { localize } from "../i18n";
 import { parse } from "../utils/jsonc";
-import * as GitHubTypes from "../types/GitHubTypes";
-import * as Toast from "./Toast";
+import { SettingType } from "../types";
+import type {
+    GistCreateParam,
+    GistUpdateParam,
+    IGist,
+    IGistFile,
+    IGistFiles,
+    IGistUser,
+    ISetting
+} from "../types";
 
 /**
  * GitHub Gist utils.
@@ -34,7 +41,7 @@ export class Gist
     {
         this._proxy = proxy;
 
-        const options: { auth?: any; request: RequestRequestOptions } = { request: { timeout: 8000 } };
+        const options: { auth?: any; request: { agent?: any; timeout?: number } } = { request: { timeout: 8000 } };
         if (proxy != null && !isEmptyString(proxy))
         {
             options.request.agent = createHttpsProxyAgent(proxy);
@@ -85,7 +92,7 @@ export class Gist
      *
      * @throws {IEnhancedError}
      */
-    public async user(): Promise<GitHubTypes.IGistUser>
+    public async user(): Promise<IGistUser>
     {
         try
         {
@@ -105,19 +112,19 @@ export class Gist
      *
      * @throws {IEnhancedError}
      */
-    public async get(id: string, showIndicator: boolean = false): Promise<GitHubTypes.IGist>
+    public async get(id: string, showIndicator: boolean = false): Promise<IGist>
     {
         if (showIndicator)
         {
-            Toast.showSpinner(localize("toast.settings.checking.remote"));
+            showSpinner(localize("toast.settings.checking.remote"));
         }
 
         try
         {
-            const result = (await this._api.gists.get({ gist_id: id })).data as GitHubTypes.IGist;
+            const result = (await this._api.gists.get({ gist_id: id })).data as IGist;
             if (showIndicator)
             {
-                Toast.clearSpinner("");
+                clearSpinner("");
             }
             return result;
         }
@@ -126,7 +133,7 @@ export class Gist
             const error = this._createError(err);
             if (showIndicator)
             {
-                Toast.statusError(localize("toast.settings.downloading.failed", error.message));
+                statusError(localize("toast.settings.downloading.failed", error.message));
             }
             throw error;
         }
@@ -137,12 +144,12 @@ export class Gist
      *
      * @throws {IEnhancedError}
      */
-    public async getAll(): Promise<GitHubTypes.IGist[]>
+    public async getAll(): Promise<IGist[]>
     {
         try
         {
             // Find and sort VSCode settings gists by time in ascending order.
-            const gists = (await this._api.gists.list()).data as unknown as GitHubTypes.IGist[];
+            const gists = (await this._api.gists.list()).data as unknown as IGist[];
             const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
             return gists
                 .filter(gist => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
@@ -176,15 +183,15 @@ export class Gist
     /**
      * Update gist.
      *
-     * @param {GitHubTypes.GistUpdateParam} content Gist content.
+     * @param {GistUpdateParam} content Gist content.
      *
      * @throws {IEnhancedError}
      */
-    public async update(content: GitHubTypes.GistUpdateParam): Promise<GitHubTypes.IGist>
+    public async update(content: GistUpdateParam): Promise<IGist>
     {
         try
         {
-            return (await this._api.gists.update(content as any)).data as GitHubTypes.IGist;
+            return (await this._api.gists.update(content as any)).data as IGist;
         }
         catch (err: any)
         {
@@ -197,7 +204,7 @@ export class Gist
      *
      * @param id Gist id.
      */
-    public async exists(id: string): Promise<false | GitHubTypes.IGist>
+    public async exists(id: string): Promise<IGist | false>
     {
         if (id != null && !isEmptyString(id))
         {
@@ -226,15 +233,15 @@ export class Gist
     /**
      * Creates a new gist.
      *
-     * @param {GitHubTypes.GistCreateParam} content Gist content.
+     * @param {GistCreateParam} content Gist content.
      *
      * @throws {IEnhancedError}
      */
-    public async create(content: GitHubTypes.GistCreateParam): Promise<GitHubTypes.IGist>
+    public async create(content: GistCreateParam): Promise<IGist>
     {
         try
         {
-            return (await this._api.gists.create(content as any)).data as GitHubTypes.IGist;
+            return (await this._api.gists.create(content as any)).data as IGist;
         }
         catch (err: any)
         {
@@ -250,7 +257,7 @@ export class Gist
      *
      * @throws {IEnhancedError}
      */
-    public createSettings(files = {}, isPublic = false): Promise<GitHubTypes.IGist>
+    public createSettings(files = {}, isPublic = false): Promise<IGist>
     {
         return this.create({
             files,
@@ -274,16 +281,16 @@ export class Gist
         uploads: ISetting[],
         upsert = true,
         showIndicator = false
-    ): Promise<GitHubTypes.IGist>
+    ): Promise<IGist>
     {
         if (showIndicator)
         {
-            Toast.showSpinner(localize("toast.settings.uploading"));
+            showSpinner(localize("toast.settings.uploading"));
         }
 
         try
         {
-            let result: GitHubTypes.IGist;
+            let result: IGist;
             const exists = await this.exists(id);
 
             // Preparing local gist.
@@ -317,7 +324,7 @@ export class Gist
                         {
                             const okButton = localize("pokaYoke.continue.upload");
                             const message = localize("pokaYoke.continue.upload.message");
-                            const selection = await Toast.showConfirmBox(
+                            const selection = await showConfirmBox(
                                 message,
                                 okButton,
                                 localize("pokaYoke.cancel")
@@ -351,7 +358,7 @@ export class Gist
 
             if (showIndicator)
             {
-                Toast.clearSpinner("");
+                clearSpinner("");
             }
             return result;
         }
@@ -359,7 +366,7 @@ export class Gist
         {
             if (showIndicator)
             {
-                Toast.statusError(localize("toast.settings.uploading.failed", error.message));
+                statusError(localize("toast.settings.uploading.failed", error.message));
             }
             throw error;
         }
@@ -368,22 +375,22 @@ export class Gist
     /**
      * Compares the local and remote files, returns the modified files or `undefined`.
      *
-     * @param {GitHubTypes.IGistFiles} localFiles Local files.
-     * @param {GitHubTypes.IGistFiles} [remoteFiles] Remote files.
+     * @param {IGistFiles} localFiles Local files.
+     * @param {IGistFiles} [remoteFiles] Remote files.
      */
     public getModifiedFiles(
-        localFiles: GitHubTypes.IGistFiles,
-        remoteFiles?: GitHubTypes.IGistFiles
-    ): GitHubTypes.IGistFiles | undefined
+        localFiles: IGistFiles,
+        remoteFiles?: IGistFiles
+    ): IGistFiles | undefined
     {
         if (!remoteFiles)
         {
             return localFiles;
         }
 
-        let localFile: GitHubTypes.IGistFile;
-        let remoteFile: GitHubTypes.IGistFile;
-        const result = {} as GitHubTypes.IGistFiles;
+        let localFile: IGistFile;
+        let remoteFile: IGistFile;
+        const result = {} as IGistFiles;
         const recordedKeys = [];
         for (const key of Object.keys(remoteFiles))
         {
@@ -447,7 +454,7 @@ export class Gist
     /**
      * Calculates the number of differences between the local and remote files.
      */
-    private _diffSettings(localFiles: GitHubTypes.IGistFiles, remoteFiles: GitHubTypes.IGistFiles): number
+    private _diffSettings(localFiles: IGistFiles, remoteFiles: IGistFiles): number
     {
         const left = this._parseToJSON(localFiles);
         const right = this._parseToJSON(pick(remoteFiles, Object.keys(localFiles)));
@@ -455,20 +462,20 @@ export class Gist
     }
 
     /**
-     * Converts the `content` of `GitHubTypes.IGistFiles` into a `JSON object`.
+     * Converts the `content` of `IGistFiles` into a `JSON object`.
      */
-    private _parseToJSON(files: GitHubTypes.IGistFiles): Record<string, any>
+    private _parseToJSON(files: IGistFiles): Record<string, any>
     {
         const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
         let parsed: any;
-        let file: GitHubTypes.IGistFile;
+        let file: IGistFile;
         const result: Record<string, any> = {};
         for (const key of Object.keys(files))
         {
             file = files[key];
             if (file)
             {
-                parsed = parse(file.content || "");
+                parsed = parse(file.content ?? "");
 
                 if (key === extensionsRemoteFilename && Array.isArray(parsed))
                 {

@@ -1,7 +1,7 @@
-import { Stats } from "fs-extra";
 import { basename } from "path";
 import * as junk from "junk";
 import debounce = require("lodash.debounce");
+import type { Stats } from "fs-extra";
 
 import { AbstractWatcher, WatcherEvent } from "./AbstractWatcher";
 import { ChokidarFileWatcher } from "./ChokidarFileWatcher";

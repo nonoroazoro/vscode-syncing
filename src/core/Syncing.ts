@@ -3,10 +3,10 @@ import * as fs from "fs-extra";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
 import { isEmptyString } from "../utils/lang";
-import { ISyncingSettings } from "../types/SyncingTypes";
 import { localize } from "../i18n";
 import { openFile } from "../utils/vscodeAPI";
 import * as Toast from "./Toast";
+import type { ISyncingSettings } from "../types";
 
 /**
  * `Syncing` wrapper.

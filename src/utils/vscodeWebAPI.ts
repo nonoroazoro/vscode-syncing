@@ -1,13 +1,7 @@
 import { CaseInsensitiveMap } from "../collections";
-import
-{
-    ExtensionAssetType,
-    IExtensionMeta,
-    IExtensionVersion,
-    QueryFilterType,
-    QueryFlag
-} from "../types/VSCodeWebAPITypes";
+import { ExtensionAssetType, QueryFilterType, QueryFlag } from "../types";
 import { post } from "./ajax";
+import type { IExtensionMeta, IExtensionVersion } from "../types";
 
 /**
  * Query the extensions' meta data.
@@ -46,7 +40,7 @@ export async function queryExtensions(
             const { results } = JSON.parse(res);
             if (results.length > 0)
             {
-                (results[0].extensions || []).forEach((extension: IExtensionMeta) =>
+                (results[0].extensions ?? []).forEach((extension: IExtensionMeta) =>
                 {
                     // Use extension's fullname as the key.
                     result.set(`${extension.publisher.publisherName}.${extension.extensionName}`, extension);

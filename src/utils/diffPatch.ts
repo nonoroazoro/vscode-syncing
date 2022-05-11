@@ -3,7 +3,7 @@ import { DiffPatcher } from "jsondiffpatch";
 import { isFunction } from "./lang";
 
 const diffPatcher = new DiffPatcher({
-    objectHash(obj: any) { return obj.id || obj.key; },
+    objectHash(obj: any) { return obj.id ?? obj.key; },
     propertyFilter(name: string, context: any)
     {
         // Ignore function properties.

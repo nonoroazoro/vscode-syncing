@@ -1,18 +1,15 @@
-import { Stats } from "fs-extra";
-import * as chokidar from "chokidar";
+import { watch } from "chokidar";
+import type { WatchOptions, FSWatcher } from "chokidar";
+import type { Stats } from "fs-extra";
 
 import { WatcherEvent, AbstractWatcher } from "./AbstractWatcher";
-
-export type ChokidarPaths = string | string[];
-
-export type ChokidarOptions = chokidar.WatchOptions | { ignored?: ChokidarIgnored };
-
-export type ChokidarIgnored = string | ChokidarIgnoredFunction | Array<string | ChokidarIgnoredFunction>;
 
 /**
  * Returns `true` to ignore the path.
  */
 export type ChokidarIgnoredFunction = (path: string, stats: Stats) => boolean;
+export type ChokidarOptions = WatchOptions | { ignored?: ChokidarIgnored };
+export type ChokidarIgnored = Array<ChokidarIgnoredFunction | string> | ChokidarIgnoredFunction | string;
 
 export class ChokidarFileWatcher extends AbstractWatcher
 {
@@ -25,11 +22,11 @@ export class ChokidarFileWatcher extends AbstractWatcher
         ignorePermissionErrors: true
     };
 
-    private _paths: ChokidarPaths;
+    private _paths: string[] | string;
     private _options: ChokidarOptions;
-    private _watcher: chokidar.FSWatcher | undefined;
+    private _watcher: FSWatcher | undefined;
 
-    constructor(paths: ChokidarPaths, options?: ChokidarOptions)
+    constructor(paths: string[] | string, options?: ChokidarOptions)
     {
         super();
         this._paths = paths;
@@ -40,7 +37,7 @@ export class ChokidarFileWatcher extends AbstractWatcher
     {
         if (!this._watcher && this._paths)
         {
-            this._watcher = chokidar.watch(this._paths, this._options);
+            this._watcher = watch(this._paths, this._options as any);
             this._watcher.on("all", this._handleWatcherEvent);
         }
     }
