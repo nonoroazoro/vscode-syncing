@@ -2,7 +2,6 @@ import * as jsonc from "jsonc-parser";
 import * as micromatch from "micromatch";
 
 import { getJSONFormatOnSaveSetting } from "./vscodeAPI";
-import { JSONObject } from "../typings/json";
 import { SETTING_EXCLUDED_SETTINGS } from "../constants";
 
 /**
@@ -74,7 +73,7 @@ export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: 
     if (sSettingsJSON && dSettingsJSON)
     {
         // Get all of the matched properties from the source and destination settings.
-        const sPatterns = sSettingsJSON[SETTING_EXCLUDED_SETTINGS] || [];
+        const sPatterns = sSettingsJSON[SETTING_EXCLUDED_SETTINGS] ?? [];
         const sExcludedKeys = getExcludedKeys(sSettingsJSON, sPatterns);
         const dExcludedKeys = getExcludedKeys(dSettingsJSON, sPatterns);
         const excludedKeys = Array.from<string>(new Set([...sExcludedKeys, ...dExcludedKeys])).sort((a, b) => a.localeCompare(b));

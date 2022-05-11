@@ -1,13 +1,12 @@
 import * as vscode from "vscode";
 
 import { Gist } from "./Gist";
-import { IGist } from "../types/GitHubTypes";
 import { isAfter } from "../utils/date";
-import { ISyncingSettings, ISetting } from "../types/SyncingTypes";
 import { localize } from "../i18n";
 import { SettingsWatcherService, WatcherEvent } from "../watcher";
 import { VSCodeSetting } from "./VSCodeSetting";
 import * as Toast from "./Toast";
+import type { IGist, ISetting, ISyncingSettings } from "../types";
 
 export class AutoSyncService
 {

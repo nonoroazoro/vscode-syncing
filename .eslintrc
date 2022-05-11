@@ -1,9 +1,11 @@
 {
     "extends": [
         "eslint-config-zoro/eslint",
-        "eslint-config-zoro/typescript"
+        "eslint-config-zoro/typescript",
+        "eslint-config-zoro/node"
     ],
     "env": {
+        "node": true,
         "jest": true
     },
     "parserOptions": {

@@ -1,10 +1,10 @@
-import * as vscode from "vscode";
+import type { ExtensionContext } from "vscode";
 
 import { Gist, Syncing, VSCodeSetting, AutoSyncService } from "./core";
-import { ISyncedItem } from "./types/SyncingTypes";
 import { localize, setup } from "./i18n";
 import { registerCommand } from "./utils/vscodeAPI";
 import * as Toast from "./core/Toast";
+import type { ISyncedItem } from "./types";
 
 let _syncing: Syncing;
 let _vscodeSetting: VSCodeSetting;
@@ -12,7 +12,7 @@ let _autoSyncService: AutoSyncService;
 let _isReady: boolean;
 let _isSynchronizing: boolean;
 
-export function activate(context: vscode.ExtensionContext)
+export function activate(context: ExtensionContext)
 {
     _initCommands(context);
     _initSyncing(context);
@@ -27,7 +27,7 @@ export function deactivate()
 /**
  * Init the commands.
  */
-function _initCommands(context: vscode.ExtensionContext)
+function _initCommands(context: ExtensionContext)
 {
     registerCommand(context, "syncing.uploadSettings", _uploadVSCodeSettings);
     registerCommand(context, "syncing.downloadSettings", _downloadVSCodeSettings);
@@ -37,7 +37,7 @@ function _initCommands(context: vscode.ExtensionContext)
 /**
  * Init the extension.
  */
-function _initSyncing(context: vscode.ExtensionContext)
+function _initSyncing(context: ExtensionContext)
 {
     try
     {

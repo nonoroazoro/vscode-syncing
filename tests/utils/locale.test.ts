@@ -1,4 +1,4 @@
-import { NormalizedLocale } from "../../src/types/NormalizedLocale";
+import { NormalizedLocale } from "../../src/types";
 import { normalize } from "../../src/utils/locale";
 
 describe("Syncing/utils/locale", () =>

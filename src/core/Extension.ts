@@ -16,11 +16,10 @@ import { downloadFile } from "../utils/ajax";
 import { Environment } from "./Environment";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
 import { getLatestVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
-import { IExtension, ISyncedItem } from "../types/SyncingTypes";
-import { IExtensionMeta } from "../types/VSCodeWebAPITypes";
 import { localize } from "../i18n";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
+import type { IExtension, IExtensionMeta, ISyncedItem } from "../types";
 
 tmp.setGracefulCleanup();
 
@@ -103,7 +102,7 @@ export class Extension
                 result.push(item);
             }
         }
-        return result.sort((a, b) => (a.id || "").localeCompare(b.id || ""));
+        return result.sort((a, b) => (a.id ?? "").localeCompare(b.id ?? ""));
     }
 
     /**

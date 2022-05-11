@@ -2,9 +2,9 @@ import * as vscode from "vscode";
 
 import { localize } from "../i18n";
 import { normalize } from "./locale";
-import { NormalizedLocale } from "../types/NormalizedLocale";
 import { VSCODE_BUILTIN_ENVIRONMENTS } from "../constants";
-import { VSCodeEdition } from "../types/VSCodeEdition";
+import { VSCodeEdition } from "../types";
+import type { NormalizedLocale } from "../types";
 
 /**
  * Gets the VSCode extension by id.

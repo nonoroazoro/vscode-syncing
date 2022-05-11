@@ -1,13 +1,8 @@
-import
-{
-    formatDistance as rawFormatDistance,
-    isAfter as rawIsAfter,
-    parseISO
-} from "date-fns";
+import { formatDistance as rawFormatDistance, isAfter as rawIsAfter, parseISO } from "date-fns";
 import { enUS, zhCN } from "date-fns/locale";
 
 import { isDate, isString } from "./lang";
-import { NormalizedLocale } from "../types/NormalizedLocale";
+import { NormalizedLocale } from "../types";
 
 /**
  * Parses the given value and returns the `Date` the input value represents.

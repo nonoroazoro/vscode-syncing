@@ -1,16 +1,21 @@
 /**
+ * JSON scalar.
+ */
+type JSONScalar = boolean | number | string | null;
+
+/**
  * JSON value.
  */
-export type JSONValue = string | number | boolean | null | JSONObject | JSONArray;
+type JSONValue = JSONArray | JSONObject | JSONScalar;
 
 /**
  * JSON object.
  */
-export type JSONObject = {
+type JSONObject = {
     [key in string]?: JSONValue
 };
 
 /**
  * JSON array.
  */
-export interface JSONArray extends Array<JSONValue> { }
+interface JSONArray extends Array<JSONValue> { }

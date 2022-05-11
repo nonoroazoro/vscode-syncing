@@ -9,7 +9,6 @@ yarn.lock
 .eslintignore
 .eslintrc
 .gitignore
-.huskyrc
 .lintstagedrc
 tsconfig.eslint.json
 tsconfig.json

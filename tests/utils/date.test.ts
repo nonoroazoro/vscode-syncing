@@ -1,4 +1,4 @@
-import { NormalizedLocale } from "../../src/types/NormalizedLocale";
+import { NormalizedLocale } from "../../src/types";
 import { formatDistance, isAfter, parse } from "../../src/utils/date";
 
 describe("Syncing/utils/date", () =>
