@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const ESLintPlugin = require("eslint-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 const Webpackbar = require("webpackbar");
@@ -7,7 +8,7 @@ const Webpackbar = require("webpackbar");
 const ROOT_PATH = fs.realpathSync(process.cwd());
 const BUILD_PATH = path.join(ROOT_PATH, "dist");
 
-// See https://github.com/Microsoft/vscode/blob/master/extensions/shared.webpack.config.js
+// See https://github.com/microsoft/vscode/blob/main/extensions/shared.webpack.config.js
 module.exports = {
     context: ROOT_PATH,
     mode: "production",
@@ -36,7 +37,7 @@ module.exports = {
     resolve: {
         extensions: [".ts", ".js"],
         alias: {
-            "universal-user-agent$": "universal-user-agent/dist-node/index.js"
+            // "universal-user-agent$": "universal-user-agent/dist-node/index.js"
         }
     },
     externals: {
@@ -45,16 +46,8 @@ module.exports = {
     module: {
         rules: [
             {
-                enforce: "pre",
-                test: /\.ts$/,
-                loader: "eslint-loader",
-                options: { cache: true },
-                exclude: /node_modules/
-            },
-            {
                 test: /\.ts$/,
                 use: [
-                    "cache-loader",
                     {
                         loader: "ts-loader",
                         options: { transpileOnly: true }
@@ -69,11 +62,8 @@ module.exports = {
         ]
     },
     plugins: [
-        new ForkTsCheckerWebpackPlugin({
-            eslint: {
-                files: "{scripts,src,tests}/**/*.{js,jsx,ts,tsx}"
-            }
-        }),
+        new ESLintPlugin(),
+        new ForkTsCheckerWebpackPlugin(),
         new Webpackbar()
     ],
     stats: {
