@@ -117,7 +117,7 @@ export class Extension
 
         // Add, update or remove extensions.
         const { added, updated, removed, total } = diff;
-        const result = { extension: {} } as ISyncedItem;
+        const result = { extension: {} };
         const tasks = [
             this._addExtensions.bind(this, {
                 extensions: added,
@@ -153,7 +153,7 @@ export class Extension
         // Added since VSCode v1.20.
         await this.updateObsolete(added, updated, removed);
 
-        return result;
+        return result as ISyncedItem;
     }
 
     /**
