@@ -16,27 +16,6 @@
 > *Keep it simple & reliable!*
 
 
-## Breaking Changes
-
-* From ***version 3.0.0*** onwards:
-
-    1. Supports **auto-sync** (finally...), here's a brief guide:
-
-        1. ***Disclaimer***, by enabling auto-sync, you may **unintentionally overwrite** your settings ([see the discussion here](https://github.com/nonoroazoro/vscode-syncing/issues/6)), make sure you know what you're doing before you continue!
-
-        1. It's **highly recommended** that you perform a `Download Settings` (which will set a baseline) before the following steps.
-
-        1. `Open Syncing Settings` ([Don't known how to open?](#auto-sync-settings)) and enable the **auto-sync** like the followings:
-
-            ```json
-            "auto_sync": true
-            ```
-
-        1. Reload or reopen your VSCode and enjoy!
-
-        > BTW, don't forget to fill in the correct `Github Personal Access Token` and `Gist ID`, otherwise auto-sync will not work.
-
-
 ## Features
 
 *Syncing* will `keep the consistency of your VSCode settings between your devices`, it'll let you:
@@ -56,7 +35,7 @@
     * You can download settings from `a public Gist`, such as your friend's VSCode settings, [check out here](#getting-started) for more details.
     * You can `exclude some VSCode User Settings and Extensions` from being downloaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
-Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of course, you'll have a `progress indicator` during the synchronization :).
+Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of course, you can turn on the [auto-sync](#auto-sync-settings) to simplify the synchronization :).
 
 
 ## Commands
