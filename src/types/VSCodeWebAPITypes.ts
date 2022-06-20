@@ -29,8 +29,14 @@ export interface IExtensionVersion
     files: IExtensionFile[];
     flags: string;
     lastUpdated: string;
-    properties: any[];
+    properties: IExtensionProperty[];
     version: string;
+}
+
+export interface IExtensionProperty
+{
+    key: string;
+    value: string;
 }
 
 export interface IExtensionFile
