@@ -15,7 +15,7 @@ import
 import { downloadFile } from "../utils/ajax";
 import { Environment } from "./Environment";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
-import { getLatestVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
+import { findLatestSupportedVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
 import { localize } from "../i18n";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
@@ -323,7 +323,7 @@ export class Extension
                     const extensionMeta = queriedExtensions.get(ext.id);
                     if (extensionMeta)
                     {
-                        const latestVersion = getLatestVSIXVersion(extensionMeta);
+                        const latestVersion = findLatestSupportedVSIXVersion(extensionMeta);
                         if (latestVersion != null)
                         {
                             ext.version = latestVersion;
