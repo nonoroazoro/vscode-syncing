@@ -140,7 +140,7 @@
         "@types/lodash.debounce": "^4.0.7",
         "@types/lodash.pick": "^4.4.7",
         "@types/micromatch": "^4.0.2",
-        "@types/node": "^18.0.0",
+        "@types/node": "^10.11.0",
         "@types/vscode": "^1.37.0",
         "@typescript-eslint/eslint-plugin": "^5.28.0",
         "@typescript-eslint/parser": "^5.28.0",
