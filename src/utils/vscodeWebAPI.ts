@@ -69,7 +69,7 @@ export function getLatestVSIXVersion(extensionMeta: IExtensionMeta): string | un
 /**
  * Gets the VSIX download URL.
  *
- * @deprecated The download speed of this URL is too slow.
+ * @deprecated The download speed of this URL is too low.
  *
  * @param {IExtensionVersion} version The extension's version object.
  */
