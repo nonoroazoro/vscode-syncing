@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.3.0 - June 20, 2022
+
+- Fixed: Validate minimum supported extension version
+
+
 ## 3.2.1 - June 20, 2022
 
 - Changed: Revert min required VSCode version to 1.37.0
