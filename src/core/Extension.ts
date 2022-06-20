@@ -15,7 +15,7 @@ import
 import { downloadFile } from "../utils/ajax";
 import { Environment } from "./Environment";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
-import { getLatestVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
+import { findLatestSupportedVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
 import { localize } from "../i18n";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
@@ -117,7 +117,7 @@ export class Extension
 
         // Add, update or remove extensions.
         const { added, updated, removed, total } = diff;
-        const result = { extension: {} } as ISyncedItem;
+        const result = { extension: {} };
         const tasks = [
             this._addExtensions.bind(this, {
                 extensions: added,
@@ -153,7 +153,7 @@ export class Extension
         // Added since VSCode v1.20.
         await this.updateObsolete(added, updated, removed);
 
-        return result;
+        return result as ISyncedItem;
     }
 
     /**
@@ -323,7 +323,7 @@ export class Extension
                     const extensionMeta = queriedExtensions.get(ext.id);
                     if (extensionMeta)
                     {
-                        const latestVersion = getLatestVSIXVersion(extensionMeta);
+                        const latestVersion = findLatestSupportedVSIXVersion(extensionMeta);
                         if (latestVersion != null)
                         {
                             ext.version = latestVersion;

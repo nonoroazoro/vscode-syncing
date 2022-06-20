@@ -1,7 +1,15 @@
+import { satisfies } from "compare-versions";
+import * as vscode from "vscode";
+
 import { CaseInsensitiveMap } from "../collections";
 import { ExtensionAssetType, QueryFilterType, QueryFlag } from "../types";
 import { post } from "./ajax";
 import type { IExtensionMeta, IExtensionVersion } from "../types";
+
+/**
+ * Represents the property key of the extension engine.
+ */
+export const EXTENSION_ENGINE_PROPERTY_KEY = "Microsoft.VisualStudio.Code.Engine";
 
 /**
  * Query the extensions' meta data.
@@ -56,20 +64,19 @@ export async function queryExtensions(
 }
 
 /**
- * Gets the latest version of the VSIX file.
+ * Finds the latest supported version of the VSIX file.
  *
  * @param {IExtensionMeta} extensionMeta The extension's meta object.
  */
-export function getLatestVSIXVersion(extensionMeta: IExtensionMeta): string | undefined
+export function findLatestSupportedVSIXVersion(extensionMeta: IExtensionMeta): string | undefined
 {
-    const versionMeta = extensionMeta.versions[0];
-    return versionMeta ? versionMeta.version : undefined;
+    return extensionMeta.versions.find(v => isVSIXSupported(v))?.version;
 }
 
 /**
  * Gets the VSIX download URL.
  *
- * @deprecated The download speed of this URL is too slow.
+ * @deprecated The download speed of this URL is too low.
  *
  * @param {IExtensionVersion} version The extension's version object.
  */
@@ -85,4 +92,15 @@ export function getVSIXDownloadURL(version: IExtensionVersion): string | undefin
         }
     }
     return;
+}
+
+/**
+ * Checks if the extension version is supported by current VSCode.
+ *
+ * @param {IExtensionVersion} version The specified extension version.
+ */
+export function isVSIXSupported(version: IExtensionVersion)
+{
+    const requiredVersion = version.properties?.find(p => p.key === EXTENSION_ENGINE_PROPERTY_KEY)?.value;
+    return requiredVersion == null ? true : satisfies(vscode.version, requiredVersion);
 }
