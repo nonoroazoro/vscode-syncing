@@ -2,7 +2,7 @@
 
 ## 3.3.1 - July 27, 2022
 
-- Fixed: Handle exception while comparing versions.
+- Fixed: Handle exceptions while comparing versions.
 
 
 ## 3.3.0 - June 20, 2022
