@@ -2,4 +2,4 @@
 
 set -ex
 
-ncu -u -x "@types/node @types/vscode"
+ncu -u -x "@types/node @types/vscode junk"

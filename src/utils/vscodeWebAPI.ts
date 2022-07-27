@@ -102,5 +102,12 @@ export function getVSIXDownloadURL(version: IExtensionVersion): string | undefin
 export function isVSIXSupported(version: IExtensionVersion)
 {
     const requiredVersion = version.properties?.find(p => p.key === EXTENSION_ENGINE_PROPERTY_KEY)?.value;
-    return requiredVersion == null ? true : satisfies(vscode.version, requiredVersion);
+    try
+    {
+        return requiredVersion == null ? true : satisfies(vscode.version, requiredVersion);
+    }
+    catch
+    {
+        return false;
+    }
 }

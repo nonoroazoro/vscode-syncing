@@ -1,8 +1,13 @@
 # Changelogs
 
+## 3.3.1 - July 27, 2022
+
+- Fixed: Handle exception while comparing versions.
+
+
 ## 3.3.0 - June 20, 2022
 
-- Fixed: Validate minimum supported extension version
+- Fixed: Validate minimum supported extension version.
 
 
 ## 3.2.1 - June 20, 2022
