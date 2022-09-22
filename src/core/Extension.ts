@@ -19,7 +19,7 @@ import { findLatestSupportedVSIXVersion, queryExtensions } from "../utils/vscode
 import { localize } from "../i18n";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
-import type { IExtension, IExtensionMeta, ISyncedItem } from "../types";
+import type { IExtension, ExtensionMeta, ISyncedItem } from "../types";
 
 tmp.setGracefulCleanup();
 
@@ -303,7 +303,7 @@ export class Extension
         if (extensions)
         {
             // 1. Auto update extensions: Query the latest extensions.
-            let queriedExtensions: CaseInsensitiveMap<string, IExtensionMeta> = new CaseInsensitiveMap();
+            let queriedExtensions: CaseInsensitiveMap<string, ExtensionMeta> = new CaseInsensitiveMap();
             const autoUpdateExtensions = getVSCodeSetting<boolean>(
                 CONFIGURATION_KEY,
                 CONFIGURATION_EXTENSIONS_AUTOUPDATE
