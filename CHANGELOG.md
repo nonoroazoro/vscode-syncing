@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.3.2 - September 22, 2022
+
+- Fixed: Add support for pre-release extensions.
+
+
 ## 3.3.1 - July 27, 2022
 
 - Fixed: Handle exceptions while comparing versions.
