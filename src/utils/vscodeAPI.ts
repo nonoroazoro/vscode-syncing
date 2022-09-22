@@ -19,7 +19,7 @@ export function getExtensionById(id: string, ignoreCase = true)
         if (ignoreCase)
         {
             const targetId = id.toLocaleLowerCase();
-            return vscode.extensions.all.find((ext) => (ext.id.toLocaleLowerCase() === targetId));
+            return vscode.extensions.all.find(ext => (ext.id.toLocaleLowerCase() === targetId));
         }
         return vscode.extensions.getExtension(id);
     }
