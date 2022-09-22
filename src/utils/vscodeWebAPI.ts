@@ -2,14 +2,9 @@ import { satisfies } from "compare-versions";
 import * as vscode from "vscode";
 
 import { CaseInsensitiveMap } from "../collections";
-import { ExtensionAssetType, QueryFilterType, QueryFlag } from "../types";
+import { ExtensionAssetType, ExtensionPropertyType, QueryFilterType, QueryFlag } from "../types";
 import { post } from "./ajax";
-import type { IExtensionMeta, IExtensionVersion } from "../types";
-
-/**
- * Represents the property key of the extension engine.
- */
-export const EXTENSION_ENGINE_PROPERTY_KEY = "Microsoft.VisualStudio.Code.Engine";
+import type { ExtensionMeta, ExtensionVersion } from "../types";
 
 /**
  * Query the extensions' meta data.
@@ -17,12 +12,9 @@ export const EXTENSION_ENGINE_PROPERTY_KEY = "Microsoft.VisualStudio.Code.Engine
  * @param {string[]} ids The id list of extensions. The id is in the form of: `publisher.name`.
  * @param {string} [proxy] The proxy settings.
  */
-export async function queryExtensions(
-    ids: string[],
-    proxy?: string
-): Promise<CaseInsensitiveMap<string, IExtensionMeta>>
+export async function queryExtensions(ids: string[], proxy?: string)
 {
-    const result = new CaseInsensitiveMap<string, IExtensionMeta>();
+    const result = new CaseInsensitiveMap<string, ExtensionMeta>();
     if (ids.length > 0)
     {
         const api = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery";
@@ -30,16 +22,13 @@ export async function queryExtensions(
         const data = {
             filters: [
                 {
-                    criteria: ids.map((name) =>
-                    {
-                        return {
-                            filterType: QueryFilterType.NAME,
-                            value: name
-                        };
-                    })
+                    criteria: ids.map(name => ({
+                        filterType: QueryFilterType.EXTENSION_NAME,
+                        value: name
+                    }))
                 }
             ],
-            flags: QueryFlag.LATEST_VERSION_WITH_FILES
+            flags: QueryFlag.IncludeVersionProperties | QueryFlag.ExcludeNonValidated
         };
 
         try
@@ -48,7 +37,7 @@ export async function queryExtensions(
             const { results } = JSON.parse(res);
             if (results.length > 0)
             {
-                (results[0].extensions ?? []).forEach((extension: IExtensionMeta) =>
+                (results[0].extensions ?? []).forEach((extension: ExtensionMeta) =>
                 {
                     // Use extension's fullname as the key.
                     result.set(`${extension.publisher.publisherName}.${extension.extensionName}`, extension);
@@ -66,11 +55,12 @@ export async function queryExtensions(
 /**
  * Finds the latest supported version of the VSIX file.
  *
- * @param {IExtensionMeta} extensionMeta The extension's meta object.
+ * @param {ExtensionMeta} extensionMeta The extension's meta object.
+ * @param {boolean} [includePreRelease=false] Whether to include the pre-release version. Defaults to `false`.
  */
-export function findLatestSupportedVSIXVersion(extensionMeta: IExtensionMeta): string | undefined
+export function findLatestSupportedVSIXVersion(extensionMeta: ExtensionMeta, includePreRelease = false): string | undefined
 {
-    return extensionMeta.versions.find(v => isVSIXSupported(v))?.version;
+    return extensionMeta.versions.find(v => isVSIXSupported(v, includePreRelease))?.version;
 }
 
 /**
@@ -78,14 +68,14 @@ export function findLatestSupportedVSIXVersion(extensionMeta: IExtensionMeta): s
  *
  * @deprecated The download speed of this URL is too low.
  *
- * @param {IExtensionVersion} version The extension's version object.
+ * @param {ExtensionVersion} version The extension's version object.
  */
-export function getVSIXDownloadURL(version: IExtensionVersion): string | undefined
+export function getVSIXDownloadURL(version: ExtensionVersion): string | undefined
 {
     const files = version.files;
     if (files != null)
     {
-        const file = files.find(f => (f.assetType === ExtensionAssetType.SERVICES_VSIXPACKAGE));
+        const file = files.find(f => (f.assetType === ExtensionAssetType.VSIX));
         if (file != null)
         {
             return file.source;
@@ -97,11 +87,21 @@ export function getVSIXDownloadURL(version: IExtensionVersion): string | undefin
 /**
  * Checks if the extension version is supported by current VSCode.
  *
- * @param {IExtensionVersion} version The specified extension version.
+ * @param {ExtensionVersion} version The specified extension version.
+ * @param {boolean} includePreRelease Whether to include the pre-release version.
  */
-export function isVSIXSupported(version: IExtensionVersion)
+export function isVSIXSupported(version: ExtensionVersion, includePreRelease: boolean)
 {
-    const requiredVersion = version.properties?.find(p => p.key === EXTENSION_ENGINE_PROPERTY_KEY)?.value;
+    if (!includePreRelease)
+    {
+        if (version.properties?.find(p => p.key === ExtensionPropertyType.PRE_RELEASE)?.value === "true")
+        {
+            // Exclude pre-release version.
+            return false;
+        }
+    }
+
+    const requiredVersion = version.properties?.find(p => p.key === ExtensionPropertyType.ENGINE)?.value;
     try
     {
         return requiredVersion == null ? true : satisfies(vscode.version, requiredVersion);
