@@ -104,6 +104,9 @@ export function getVSCodeEdition()
         case "Code - OSS":
             return VSCodeEdition.OSS;
 
+        case "code-server":
+            return VSCodeEdition.CODER;
+
         default:
             throw new Error(localize("error.env.unknown.vscode"));
     }

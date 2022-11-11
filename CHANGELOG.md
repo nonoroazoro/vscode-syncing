@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.3.3 - September 22, 2022
+
+- Fixed: Add support for code-server ([@achembarpu](https://github.com/achembarpu)).
+
+
 ## 3.3.2 - September 22, 2022
 
 - Fixed: Add support for pre-release extensions.
@@ -131,7 +136,7 @@
 
 - Added: Add support for the VSCode exploration builds.
 
-- Added: Add support for the self-compiled version of VSCode under [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json) (Thank [@Backfighter](https://github.com/Backfighter) for the PR).
+- Added: Add support for the self-compiled version of VSCode under [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json) ([@Backfighter](https://github.com/Backfighter)).
 
 
 ## 2.1.0 - January 30, 2019
