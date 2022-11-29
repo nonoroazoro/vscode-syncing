@@ -59,5 +59,9 @@ export const VSCODE_BUILTIN_ENVIRONMENTS: Record<VSCodeEdition, {
     [VSCodeEdition.CODER]: {
         dataDirectoryName: "Code",
         extensionsDirectoryName: "vscode"
+    },
+    [VSCodeEdition.CODESERVER]: {
+        dataDirectoryName: "code-server",
+        extensionsDirectoryName: ".config/code-server"
     }
 };

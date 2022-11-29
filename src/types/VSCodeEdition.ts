@@ -32,5 +32,10 @@ export enum VSCodeEdition
     /**
      * The VSCode provided by [Coder](https://coder.com), which is running on a remote or self-hosted server.
      */
-    CODER
+    CODER,
+
+    /**
+     * The OSS VSCode server provided by [Coder](https://coder.com), which is running on a remote or self-hosted server.
+     */
+    CODESERVER
 }

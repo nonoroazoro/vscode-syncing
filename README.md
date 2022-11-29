@@ -242,3 +242,9 @@ You can now let Syncing auto-sync your settings. Here are the steps:
 1. Download:
 
     ![download example](docs/gif/Example-Download.gif)
+
+## Frequently Asked Questions
+
+1. How do I make this work with [code-server](https://github.com/coder/code-server)?
+
+    Code-server follows the XDG spec to set config & data directories. When using their [Docker image](https://hub.docker.com/r/codercom/code-server), you can set `XDG_DATA_HOME="/home/coder/.config/"` to store everything files in the same directory. This enables vscode-syncing to easily pickup the right locations. Since it is also a recommended volume path, it ensures persistence of your changes.
