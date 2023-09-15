@@ -18,7 +18,7 @@
                 "DEBUG_SYNCING_EXTENSION": "true"
             },
             "outFiles": [
-                "${workspaceFolder}/out/**/*.js"
+                "${workspaceFolder}/dist/**/*.js"
             ],
             "osx": {
                 "preLaunchTask": "tsc-watch"
