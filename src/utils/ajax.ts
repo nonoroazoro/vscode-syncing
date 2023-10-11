@@ -1,4 +1,4 @@
-import * as createHttpsProxyAgent from "https-proxy-agent";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import * as fs from "fs-extra";
 import * as https from "https";
 import * as zlib from "zlib";
@@ -28,7 +28,7 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
         };
         if (proxy != null && !isEmptyString(proxy))
         {
-            options.agent = createHttpsProxyAgent(proxy);
+            options.agent = new HttpsProxyAgent(proxy);
         }
 
         const req = https.request(api, options, res =>
@@ -74,7 +74,7 @@ export function downloadFile(uri: string, savepath: string, proxy?: string): Pro
         const options: https.RequestOptions = {};
         if (proxy != null && !isEmptyString(proxy))
         {
-            options.agent = createHttpsProxyAgent(proxy);
+            options.agent = new HttpsProxyAgent(proxy);
         }
 
         const file = fs.createWriteStream(savepath);

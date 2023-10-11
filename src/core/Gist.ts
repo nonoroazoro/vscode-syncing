@@ -1,5 +1,5 @@
 import { Octokit } from "@octokit/rest";
-import * as createHttpsProxyAgent from "https-proxy-agent";
+import { HttpsProxyAgent } from "https-proxy-agent";
 import pick = require("lodash.pick");
 
 import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast";
@@ -44,7 +44,7 @@ export class Gist
         const options: { auth?: any; request: { agent?: any; timeout?: number } } = { request: { timeout: 8000 } };
         if (proxy != null && !isEmptyString(proxy))
         {
-            options.request.agent = createHttpsProxyAgent(proxy);
+            options.request.agent = new HttpsProxyAgent(proxy);
         }
 
         this._token = token;
