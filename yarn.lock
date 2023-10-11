@@ -1875,11 +1875,6 @@ commander@^2.20.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
 
-compare-versions@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/compare-versions/-/compare-versions-6.1.0.tgz#3f2131e3ae93577df111dba133e6db876ffe127a"
-  integrity sha512-LNZQXhqUvqUTotpZ00qLSaify3b4VFD588aRr8MKFw4CMUr98ytzCW5wDH5qx/DEY5kCDXcbcRuCqL0szEf2tg==
-
 concat-map@0.0.1:
   version "0.0.1"
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
@@ -2107,10 +2102,10 @@ escape-string-regexp@^4.0.0:
   resolved "https://registry.yarnpkg.com/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz#14ba83a5d373e3d311e5afca29cf5bfad965bf34"
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
-eslint-config-zoro@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/eslint-config-zoro/-/eslint-config-zoro-6.0.0.tgz#b62949dfbc1be452c6bfd33a5c7218f4400c5db6"
-  integrity sha512-6KrqejHH2JbUaG4KnmJW8cvaoAEf0th7c05uVRZiE2lWB4WXEaN/G3y0b5tTYIon/UBtAYRv3RS8zmsEBTVLwg==
+eslint-config-zoro@^6.0.1:
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/eslint-config-zoro/-/eslint-config-zoro-6.0.1.tgz#4c38bafc2525d13c4edef2a7f1bf17cdc9fe7e80"
+  integrity sha512-LlLyeF/l5gTROo7le5iVVPUf2eFcwM4i60g7zXv+1WwIYP1KaZ0M08RCvjTBorHYcSsh3drSWKw+fh29SUEdhw==
 
 eslint-plugin-es@^3.0.0:
   version "3.0.1"

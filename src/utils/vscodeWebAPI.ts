@@ -1,4 +1,4 @@
-import { satisfies } from "compare-versions";
+import { coerce, satisfies } from "semver";
 import * as vscode from "vscode";
 
 import { CaseInsensitiveMap } from "../collections";
@@ -101,10 +101,10 @@ export function isVSIXSupported(version: ExtensionVersion, includePreRelease: bo
         }
     }
 
-    const requiredVersion = version.properties?.find(p => p.key === ExtensionPropertyType.ENGINE)?.value;
+    const requiredVersion = coerce(version.properties?.find(p => p.key === ExtensionPropertyType.ENGINE)?.value)?.version;
     try
     {
-        return requiredVersion == null ? true : satisfies(vscode.version, requiredVersion);
+        return requiredVersion == null ? true : satisfies(vscode.version, `^${requiredVersion}`);
     }
     catch
     {
