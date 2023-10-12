@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.3.5 - October 12, 2023
+
+- Fixed: Fix version comparison.
+
+
 ## 3.3.4 - November 29, 2022
 
 - Fixed: Fix code version for code-server ([@achembarpu](https://github.com/achembarpu)).
