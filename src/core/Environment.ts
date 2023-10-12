@@ -57,9 +57,14 @@ export class Environment
     public readonly snippetsDirectory: string;
 
     /**
-     * Gets the full path of VSCode's `.obsolete file`.
+     * Gets the full path of VSCode's `.obsolete` file.
      */
     public readonly obsoleteFilePath: string;
+
+    /**
+     * Gets the full path of VSCode's `extensions.json` file.
+     */
+    public readonly extensionsFilePath: string;
 
     private static _instance: Environment;
 
@@ -76,6 +81,7 @@ export class Environment
         this.userDirectory = path.join(this.dataDirectory, "User");
         this.snippetsDirectory = this.getSettingsFilePath("snippets");
         this.obsoleteFilePath = path.join(this.extensionsDirectory, ".obsolete");
+        this.extensionsFilePath = path.join(this.extensionsDirectory, "extensions.json");
     }
 
     /**

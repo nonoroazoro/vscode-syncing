@@ -151,7 +151,7 @@ export class Extension
         }
 
         // Added since VSCode v1.20.
-        await this.updateObsolete(added, updated, removed);
+        await this.removeVSCodeExtensionFiles();
 
         return result as ISyncedItem;
     }
@@ -233,52 +233,21 @@ export class Extension
     }
 
     /**
-     * Updates the VSCode `.obsolete` file.
+     * Removes VSCode `.obsolete` and `extensions.json` file.
      */
-    public async updateObsolete(
-        added: IExtension[] = [],
-        removed: IExtension[] = [],
-        updated: IExtension[] = []
-    ): Promise<void>
+    public async removeVSCodeExtensionFiles(): Promise<void>
     {
-        const filepath = this._env.obsoleteFilePath;
-        // Record<extensionFolderName, boolean>
-        let obsolete: Record<string, boolean> | undefined;
         try
         {
-            obsolete = await fs.readJson(filepath);
+            await fs.remove(this._env.obsoleteFilePath);
         }
-        catch
+        catch { }
+
+        try
         {
+            await fs.remove(this._env.extensionsFilePath);
         }
-
-        if (obsolete != null)
-        {
-            for (const ext of [...added, ...updated])
-            {
-                delete obsolete[this._env.getExtensionDirectoryName(ext)];
-            }
-
-            for (const ext of removed)
-            {
-                obsolete[this._env.getExtensionDirectoryName(ext)] = true;
-            }
-
-            try
-            {
-                if (Object.keys(obsolete).length > 0)
-                {
-                    await fs.outputJson(filepath, obsolete);
-                }
-                else
-                {
-                    await fs.remove(filepath);
-                }
-            }
-            catch
-            {
-            }
-        }
+        catch { }
     }
 
     /**

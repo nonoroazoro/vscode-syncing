@@ -4,6 +4,7 @@ import { Environment } from "./Environment";
 import { Gist } from "./Gist";
 import { isEmptyString } from "../utils/lang";
 import { localize } from "../i18n";
+import { normalizeHttpProxy } from "../utils/normalizer";
 import { openFile } from "../utils/vscodeAPI";
 import * as Toast from "./Toast";
 import type { ISyncingSettings } from "../types";
@@ -202,7 +203,7 @@ export class Syncing
             proxy = process.env["http_proxy"] ?? process.env["https_proxy"];
         }
 
-        return { ...settings, http_proxy: proxy };
+        return { ...settings, http_proxy: normalizeHttpProxy(proxy) };
     }
 
     /**
