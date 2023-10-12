@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.3.6 - October 12, 2023
+
+- Fixed: Remove svg badges.
+
+
 ## 3.3.5 - October 12, 2023
 
 - Fixed: Fix version comparison.
