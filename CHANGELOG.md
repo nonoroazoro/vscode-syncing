@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.3.7 - November 17, 2023
+
+- Fixed: Code-server configs ([@qinyang912](https://github.com/qinyang912)).
+
+
 ## 3.3.6 - October 12, 2023
 
 - Fixed: Remove svg badges.

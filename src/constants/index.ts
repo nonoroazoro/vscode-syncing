@@ -61,7 +61,7 @@ export const VSCODE_BUILTIN_ENVIRONMENTS: Record<VSCodeEdition, {
         extensionsDirectoryName: "vscode"
     },
     [VSCodeEdition.CODESERVER]: {
-        dataDirectoryName: "code-server",
-        extensionsDirectoryName: ".config/code-server"
+        dataDirectoryName: "../.local/share/code-server",
+        extensionsDirectoryName: ".local/share/code-server"
     }
 };
