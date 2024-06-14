@@ -101,6 +101,9 @@ export function getVSCodeEdition()
         case "VSCodium":
             return VSCodeEdition.VSCODIUM;
 
+        case "VSCodium - Insiders":
+            return VSCodeEdition.VSCODIUM_INSIDERS;
+
         case "Code - OSS":
             return VSCodeEdition.OSS;
 
