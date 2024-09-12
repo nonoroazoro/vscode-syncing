@@ -107,6 +107,9 @@ export function getVSCodeEdition()
         case "code-server":
             return VSCodeEdition.CODESERVER;
 
+        case "Cursor":
+            return VSCodeEdition.CURSOR;
+
         default:
             throw new Error(localize("error.env.unknown.vscode"));
     }

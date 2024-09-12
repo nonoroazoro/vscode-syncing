@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.3.8 - September 12, 2024
+
+- Fixed: Add support for [Cursor](https://www.cursor.com).
+
+
 ## 3.3.7 - November 17, 2023
 
 - Fixed: Code-server configs ([@qinyang912](https://github.com/qinyang912)).
