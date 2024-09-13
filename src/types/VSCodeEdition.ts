@@ -24,6 +24,11 @@ export enum VSCodeEdition
     VSCODIUM,
 
     /**
+     * The VSCode Insiders under FLOSS license, see [VSCodium](https://github.com/VSCodium/vscodium).
+     */
+    VSCODIUM_INSIDERS,
+
+    /**
      * The self-compiled version of VSCode under
      * [the default configuration](https://github.com/Microsoft/vscode/blob/master/product.json).
      */
