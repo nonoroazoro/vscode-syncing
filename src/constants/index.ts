@@ -52,6 +52,10 @@ export const VSCODE_BUILTIN_ENVIRONMENTS: Record<VSCodeEdition, {
         dataDirectoryName: "VSCodium",
         extensionsDirectoryName: ".vscode-oss"
     },
+    [VSCodeEdition.VSCODIUM_INSIDERS]: {
+        dataDirectoryName: "VSCodium - Insiders",
+        extensionsDirectoryName: ".vscodium-insiders"
+    },
     [VSCodeEdition.OSS]: {
         dataDirectoryName: "Code - OSS",
         extensionsDirectoryName: ".vscode-oss"
