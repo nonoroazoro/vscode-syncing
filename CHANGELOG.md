@@ -1,5 +1,10 @@
 # Changelogs
 
+## 3.3.9 - September 13, 2024
+
+- Fixed: Add support for [VSCodium Insiders](https://github.com/VSCodium/vscodium) ([@clague](https://github.com/clague)).
+
+
 ## 3.3.8 - September 12, 2024
 
 - Fixed: Add support for [Cursor](https://www.cursor.com).
