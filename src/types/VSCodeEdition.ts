@@ -42,5 +42,10 @@ export enum VSCodeEdition
     /**
      * The OSS VSCode server provided by [Coder](https://coder.com), which is running on a remote or self-hosted server.
      */
-    CODESERVER
+    CODESERVER,
+
+    /**
+     * Cursor AI Code Editor, see [Cursor](https://www.cursor.com/).
+     */
+    CURSOR
 }

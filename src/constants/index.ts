@@ -67,5 +67,9 @@ export const VSCODE_BUILTIN_ENVIRONMENTS: Record<VSCodeEdition, {
     [VSCodeEdition.CODESERVER]: {
         dataDirectoryName: "../.local/share/code-server",
         extensionsDirectoryName: ".local/share/code-server"
+    },
+    [VSCodeEdition.CURSOR]: {
+        dataDirectoryName: "Cursor",
+        extensionsDirectoryName: ".cursor"
     }
 };
