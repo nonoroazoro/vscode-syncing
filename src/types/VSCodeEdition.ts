@@ -1,8 +1,7 @@
 /**
  * Represents the editions of VSCode.
  */
-export enum VSCodeEdition
-{
+export enum VSCodeEdition {
     /**
      * The VSCode Standard Builds.
      */
@@ -47,5 +46,11 @@ export enum VSCodeEdition
     /**
      * Cursor AI Code Editor, see [Cursor](https://www.cursor.com/).
      */
-    CURSOR
+    CURSOR,
+
+
+    /**
+     * WindSurf AI Code Editor, see [WindSurf](https://codeium.com/windsurf).
+     */
+    WINDSURF
 }
