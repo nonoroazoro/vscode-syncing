@@ -221,7 +221,7 @@ export function showConfirmBox(message: string, ...buttons: string[])
     return vscode.window.showInformationMessage(message, ...buttons);
 }
 
-let spinnerTimer: NodeJS.Timer | null;
+let spinnerTimer: NodeJS.Timeout | null;
 const spinner = {
     frames: ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
     interval: 100

@@ -1,12 +1,16 @@
 import { DiffPatcher } from "jsondiffpatch";
+import type { Delta } from "jsondiffpatch";
 
-import { isFunction } from "./lang";
+import { isFunction, isObject, isString } from "./lang";
 
 const diffPatcher = new DiffPatcher({
-    objectHash(obj: any) { return obj.id ?? obj.key; },
-    propertyFilter(name: string, context: any)
+    objectHash(item)
     {
-        // Ignore function properties.
+        return isString(item) ? item : (item.id ?? item.key)
+    },
+    propertyFilter(name, context)
+    {
+        // Ignore functions.
         return !isFunction(context.left[name]) && !isFunction(context.right[name]);
     }
 });
@@ -16,45 +20,38 @@ const diffPatcher = new DiffPatcher({
  */
 export function diff(left: any, right: any): number
 {
-    const result = diffPatcher.diff(left, right);
-    if (result)
-    {
-        let value: any;
-        // Filter out the "_t" key.
-        return Object.keys(result).filter((key) => (key !== "_t")).reduce((prev, cur) =>
-        {
-            value = result[cur];
-            if (value != null)
-            {
-                if (Array.isArray(value))
-                {
-                    // Filter out the keys of the items moved inside the array.
-                    if (!_isArrayItemMoved(value))
-                    {
-                        return prev + 1;
-                    }
-                }
-                else
-                {
-                    // Filter out the "_t" key and the keys of the items moved inside the array.
-                    return prev + Object.keys(value).filter((key) =>
-                    {
-                        return (key !== "_t") && !_isArrayItemMoved(value[key]);
-                    }).length;
-                }
-            }
-            return prev;
-        }, 0);
-    }
-    return 0;
+    return _countChanges(diffPatcher.diff(left, right));
 }
 
-/**
- * Detects if the value represents the item moved inside the array.
- *
- * See https://github.com/benjamine/jsondiffpatch/issues/79#issuecomment-250468970.
- */
-function _isArrayItemMoved(value: any)
+function _countChanges(delta: Delta | undefined, changes = 0)
 {
-    return Array.isArray(value) && value[2] === 3;
+    if (delta == null) { return changes; }
+
+    if (Array.isArray(delta))
+    {
+        const { length } = delta;
+        if (
+            length === 1
+            || length === 2
+            || length === 3 && delta[2] === 0
+        )
+        {
+            // Added/Modified/Deleted
+            changes++;
+        }
+        // Ignore array item move.
+    }
+    else if (isObject(delta))
+    {
+        for (const key in delta)
+        {
+            // Ignore the "_t" key.
+            if (key !== '_t')
+            {
+                changes = _countChanges(delta[key], changes);
+            }
+        }
+    }
+
+    return changes;
 }

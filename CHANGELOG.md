@@ -1,5 +1,12 @@
 # Changelogs
 
+## 3.4.0 - May 23, 2025
+
+- Fixed: Add support for WindSurf, Trae.
+
+- Fixed: Incremental synchronization.
+
+
 ## 3.3.9 - September 13, 2024
 
 - Fixed: Add support for [VSCodium Insiders](https://github.com/VSCodium/vscodium) ([@clague](https://github.com/clague)).

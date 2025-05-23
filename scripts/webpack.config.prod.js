@@ -35,10 +35,7 @@ module.exports = {
         libraryTarget: "commonjs"
     },
     resolve: {
-        extensions: [".ts", ".js"],
-        alias: {
-            // "universal-user-agent$": "universal-user-agent/dist-node/index.js"
-        }
+        extensions: [".ts", ".js"]
     },
     externals: {
         "vscode": "commonjs vscode"
@@ -54,10 +51,6 @@ module.exports = {
                     }
                 ],
                 exclude: /node_modules/
-            },
-            {
-                test: /\.node$/,
-                use: "native-ext-loader"
             }
         ]
     },

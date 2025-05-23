@@ -71,5 +71,17 @@ export const VSCODE_BUILTIN_ENVIRONMENTS: Record<VSCodeEdition, {
     [VSCodeEdition.CURSOR]: {
         dataDirectoryName: "Cursor",
         extensionsDirectoryName: ".cursor"
+    },
+    [VSCodeEdition.WINDSURF]: {
+        dataDirectoryName: "WindSurf",
+        extensionsDirectoryName: ".windsurf"
+    },
+    [VSCodeEdition.TRAE]: {
+        dataDirectoryName: "Trae",
+        extensionsDirectoryName: ".trae"
+    },
+    [VSCodeEdition.TRAE_CN]: {
+        dataDirectoryName: "Trae CN",
+        extensionsDirectoryName: ".trae-cn"
     }
 };

@@ -1,3 +1,4 @@
+import { lte } from "semver";
 import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
 import * as micromatch from "micromatch";
@@ -150,8 +151,11 @@ export class Extension
             Toast.clearSpinner("");
         }
 
-        // Added since VSCode v1.20.
-        await this.removeVSCodeExtensionFiles();
+        if (total > 0)
+        {
+            // Added since VSCode v1.20.
+            await this.removeVSCodeExtensionFiles();
+        }
 
         return result as ISyncedItem;
     }
@@ -303,20 +307,20 @@ export class Extension
                 const localExtension = getExtensionById(ext.id);
                 if (localExtension)
                 {
-                    if (localExtension.packageJSON.version === ext.version)
+                    if (lte(ext.version, localExtension.packageJSON.version))
                     {
-                        // Reserved.
+                        // Reserve local extension.
                         reservedExtensionIDs.add(ext.id);
                     }
                     else
                     {
-                        // Updated.
+                        // Update local extension.
                         result.updated.push(ext);
                     }
                 }
                 else
                 {
-                    // Added.
+                    // Add new extension.
                     result.added.push(ext);
                 }
             }

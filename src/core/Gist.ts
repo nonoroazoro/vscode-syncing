@@ -1,6 +1,5 @@
 import { Octokit } from "@octokit/rest";
 import { HttpsProxyAgent } from "https-proxy-agent";
-import pick = require("lodash.pick");
 
 import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast";
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
@@ -10,6 +9,7 @@ import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { isEmptyString } from "../utils/lang";
 import { localize } from "../i18n";
 import { parse } from "../utils/jsonc";
+import { pick } from "../utils/object";
 import { SettingType } from "../types";
 import type {
     GistCreateParam,
