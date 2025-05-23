@@ -47,5 +47,10 @@ export enum VSCodeEdition
     /**
      * Cursor AI Code Editor, see [Cursor](https://www.cursor.com/).
      */
-    CURSOR
+    CURSOR,
+
+    /**
+     * WindSurf AI Code Editor, see [WindSurf](https://windsurf.com/).
+     */
+    WINDSURF
 }

@@ -113,6 +113,9 @@ export function getVSCodeEdition()
         case "Cursor":
             return VSCodeEdition.CURSOR;
 
+        case "WindSurf":
+            return VSCodeEdition.WINDSURF;
+
         default:
             throw new Error(localize("error.env.unknown.vscode"));
     }
