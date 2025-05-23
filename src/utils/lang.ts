@@ -1,15 +1,31 @@
 /**
+ * Checks if the input is an object.
+ */
+export function isObject(input: unknown): input is object
+{
+    return Object.prototype.toString.call(input) === '[object Object]';
+}
+
+/**
+ * Checks if the input value is a `String` primitive or object.
+ */
+export function isString(input: unknown): input is string
+{
+    return (typeof input === "string" || input instanceof String);
+}
+
+/**
  * Checks if the input value is a `Date` object.
  */
-export function isDate(input: any): input is Date
+export function isDate(input: unknown): input is Date
 {
-    return (input instanceof Date);
+    return input instanceof Date;
 }
 
 /**
  * Checks if the input value is an `empty` string.
  */
-export function isEmptyString(input: any): boolean
+export function isEmptyString(input: unknown): boolean
 {
     if (isString(input))
     {
@@ -21,15 +37,7 @@ export function isEmptyString(input: any): boolean
 /**
  * Checks if the input value is a `Function`.
  */
-export function isFunction(input: any): input is Function
+export function isFunction(input: unknown): input is Function
 {
     return typeof input === "function";
-}
-
-/**
- * Checks if the input value is a `String` primitive or object.
- */
-export function isString(input: any): input is string
-{
-    return (typeof input === "string" || input instanceof String);
 }
