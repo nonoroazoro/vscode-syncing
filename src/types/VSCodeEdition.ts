@@ -52,5 +52,15 @@ export enum VSCodeEdition
     /**
      * WindSurf AI Code Editor, see [WindSurf](https://windsurf.com/).
      */
-    WINDSURF
+    WINDSURF,
+
+    /**
+     * Trae AI Code Editor, see [Trae](https://www.trae.ai/).
+     */
+    TRAE,
+
+    /**
+     * Trae AI Code Editor CN version, see [Trae CN](https://www.trae.com.cn/).
+     */
+    TRAE_CN
 }

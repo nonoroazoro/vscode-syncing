@@ -116,8 +116,14 @@ export function getVSCodeEdition()
         case "WindSurf":
             return VSCodeEdition.WINDSURF;
 
+        case "Trae":
+            return VSCodeEdition.TRAE;
+
+        case "Trae CN":
+            return VSCodeEdition.TRAE_CN;
+
         default:
-            throw new Error(localize("error.env.unknown.vscode"));
+            throw new Error(localize("error.env.unknown.vscode", vscode.env.appName));
     }
 
     // if (vscode.extensions.getExtension("coder.coder"))
