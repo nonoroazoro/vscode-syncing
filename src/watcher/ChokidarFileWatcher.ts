@@ -1,23 +1,14 @@
 import { watch } from "chokidar";
-import type { WatchOptions, FSWatcher } from "chokidar";
-import type { Stats } from "fs-extra";
+import type { ChokidarOptions, FSWatcher } from "chokidar";
 
 import { WatcherEvent, AbstractWatcher } from "./AbstractWatcher";
 
-/**
- * Returns `true` to ignore the path.
- */
-export type ChokidarIgnoredFunction = (path: string, stats: Stats) => boolean;
-export type ChokidarOptions = WatchOptions | { ignored?: ChokidarIgnored };
-export type ChokidarIgnored = Array<ChokidarIgnoredFunction | string> | ChokidarIgnoredFunction | string;
-
 export class ChokidarFileWatcher extends AbstractWatcher
 {
-    private static readonly _DEFAULT_OPTIONS = {
+    private static readonly _DEFAULT_OPTIONS: ChokidarOptions = {
         depth: 2,
         interval: 1000, // Increase the intervals when the chokidar fallbacks to polling,
         binaryInterval: 1000,
-        disableGlobbing: true,
         ignoreInitial: true,
         ignorePermissionErrors: true
     };
