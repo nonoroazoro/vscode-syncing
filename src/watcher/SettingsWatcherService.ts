@@ -1,10 +1,9 @@
-import { basename } from "path";
+import { basename } from "node:path";
 import * as junk from "junk";
-import debounce = require("lodash.debounce");
-import type { Stats } from "fs-extra";
 
 import { AbstractWatcher, WatcherEvent } from "./AbstractWatcher";
 import { ChokidarFileWatcher } from "./ChokidarFileWatcher";
+import { debounce } from "../utils/timer";
 import { Environment, Syncing } from "../core";
 import { VSCodeExtensionWatcher } from "./VSCodeExtensionWatcher";
 
@@ -63,17 +62,21 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
                 env.userDirectory,
                 {
                     ignored: [
-                        syncing.settingsPath, // Ignore Syncing's settings file.
-                        "**/globalStorage/**",
-                        "**/workspaceStorage/**",
-                        (path: string, stats: Stats) =>
+                        // Ignore Syncing's settings file.
+                        syncing.settingsPath,
+
+                        // Ignore VSCode's directories.
+                        "./globalStorage/",
+                        "./History/",
+                        "./workspaceStorage/",
+
+                        // Ignore non-json files and junk files but keep directories.
+                        (path, stats) =>
                         {
-                            if (stats && stats.isFile())
+                            if (stats?.isFile())
                             {
-                                // Ignore junk files and non-json files.
-                                return junk.is(basename(path)) || !path.endsWith(".json");
+                                return !path.endsWith(".json") || junk.is(basename(path));
                             }
-                            // Do not ignore directories.
                             return false;
                         }
                     ]
