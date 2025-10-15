@@ -75,5 +75,10 @@ export enum QueryFlag
     /**
      * Include the details if an extension is in conflict list or not
      */
-    IncludeNameConflictInfo = 0x8000
+    IncludeNameConflictInfo = 0x8000,
+
+    /**
+     * Include the latest prerelease and stable version only
+     */
+    IncludeLatestPrereleaseAndStableVersionOnly = 0x10000
 }
