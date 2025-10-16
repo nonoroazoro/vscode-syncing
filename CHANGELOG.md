@@ -1,5 +1,12 @@
 # Changelogs
 
+## 3.4.1 - October 16, 2025
+
+- Changed: Disable auto-update, let VSCode handle it itself.
+
+- Fixed: Windsurf environments.
+
+
 ## 3.4.0 - May 23, 2025
 
 - Fixed: Add support for Windsurf, Trae.
