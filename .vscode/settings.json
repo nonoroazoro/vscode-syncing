@@ -2,8 +2,7 @@
     "editor.defaultFormatter": "dprint.dprint",
     "search.exclude": {
         "**/dist": true,
-        "**/pnpm-lock.yaml": true,
-        "**/yarn.lock": true
+        "**/package-lock.json": true
     },
     "typescript.tsdk": "node_modules/typescript/lib"
 }
