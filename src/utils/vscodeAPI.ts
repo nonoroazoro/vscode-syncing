@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 
 import { VSCODE_BUILTIN_ENVIRONMENTS } from "../constants";
+import { Logger } from "../core";
 import { localize } from "../i18n";
 import { VSCodeEdition } from "../types";
 import type { NormalizedLocale } from "../types";
@@ -115,6 +116,7 @@ export function getVSCodeEdition()
             return VSCodeEdition.TRAE_CN;
 
         default:
+            Logger.instance.info(localize("info.vscode.env.appName", vscode.env.appName));
             throw new Error(localize("error.env.unknown.vscode", vscode.env.appName));
     }
 }

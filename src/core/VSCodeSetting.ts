@@ -22,6 +22,7 @@ import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Extension } from "./Extension";
+import { Logger } from "./Logger";
 import * as Toast from "./Toast";
 
 /**
@@ -155,7 +156,7 @@ export class VSCodeSetting
 
             if (errorFiles.length > 0)
             {
-                console.error(localize("error.invalid.settings", errorFiles.join("\r\n")));
+                Logger.instance.error(localize("error.invalid.settings", errorFiles.join("\r\n")));
             }
         }
 
@@ -394,7 +395,7 @@ export class VSCodeSetting
         }
         catch
         {
-            console.error(localize("error.loading.snippets"));
+            Logger.instance.error(localize("error.loading.snippets"));
         }
         return results;
     }
@@ -454,7 +455,7 @@ export class VSCodeSetting
             catch (err)
             {
                 content = undefined;
-                console.error(localize("error.loading.settings", setting.remoteFilename, err));
+                Logger.instance.error(localize("error.loading.settings", setting.remoteFilename, err));
             }
             result.push({ ...setting, content, lastModified });
         }

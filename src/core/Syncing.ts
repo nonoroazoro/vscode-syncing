@@ -7,6 +7,7 @@ import { normalizeHttpProxy } from "../utils/normalizer";
 import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
+import { Logger } from "./Logger";
 import * as Toast from "./Toast";
 
 /**
@@ -190,7 +191,7 @@ export class Syncing
         }
         catch (err)
         {
-            console.error(localize("error.loading.syncing.settings"), err);
+            Logger.instance.error(localize("error.loading.syncing.settings"), err);
         }
 
         // Read proxy setting from environment variables.

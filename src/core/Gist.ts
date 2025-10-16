@@ -20,6 +20,7 @@ import { parse } from "../utils/jsonc";
 import { isEmptyString } from "../utils/lang";
 import { pick } from "../utils/object";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
+import { Logger } from "./Logger";
 import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast";
 
 /**
@@ -454,7 +455,7 @@ export class Gist
         {
             message = localize("error.check.gist.id");
         }
-        console.error("Syncing:", error);
+        Logger.instance.error(localize("displayName"), error);
         return createError(message, status);
     }
 
