@@ -42,11 +42,11 @@ function _initSyncing(context: ExtensionContext)
 {
     try
     {
-        // 1. Setup i18n.
-        setup(context.extensionPath);
-
-        // 2. Initialize logger
+        // 1. Initialize logger
         Logger.initialize(context);
+
+        // 2. Setup i18n.
+        setup(context.extensionPath);
 
         // 3. Initialize Syncing.
         _syncing = Syncing.create();
