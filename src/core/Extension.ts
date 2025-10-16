@@ -12,6 +12,7 @@ import { localize } from "../i18n";
 import type { IExtension, ISyncedItem } from "../types";
 import { downloadFile } from "../utils/ajax";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
+import { getExtensionDownloadURL } from "../utils/vscodeWebAPI";
 import { Environment } from "./Environment";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
@@ -160,13 +161,8 @@ export class Extension
      */
     public async downloadExtension(extension: IExtension): Promise<IExtension>
     {
+        extension.downloadURL = getExtensionDownloadURL(extension);
         const filepath = (await tmp.file({ postfix: `.${extension.id}.zip` })).path;
-
-        // Calculates the VSIX download URL.
-        extension.downloadURL = `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
-            + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
-            + "assetbyname/Microsoft.VisualStudio.Services.VSIXPackage?install=true";
-
         await downloadFile(extension.downloadURL, filepath, this._syncing.proxy);
         return { ...extension, vsixFilepath: filepath };
     }

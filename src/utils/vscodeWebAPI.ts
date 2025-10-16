@@ -3,7 +3,7 @@ import * as vscode from "vscode";
 
 import { CaseInsensitiveMap } from "../collections";
 import { ExtensionAssetType, ExtensionPropertyType, QueryFilterType, QueryFlag } from "../types";
-import type { ExtensionMeta, ExtensionVersion, Query } from "../types";
+import type { ExtensionMeta, ExtensionVersion, IExtension, Query } from "../types";
 import { post } from "./ajax";
 
 /**
@@ -81,6 +81,19 @@ export function getVSIXDownloadURL(version: ExtensionVersion): string | undefine
         }
     }
     return;
+}
+
+/**
+ * Gets the extension's offline install package url.
+ */
+export function getExtensionDownloadURL(extension: IExtension)
+{
+    // See:
+    // https://vscode-docs1.readthedocs.io/en/latest/editor/extension-gallery/
+    // https://gist.github.com/wanglf/7acc591890dc0d8ceff1e7ec9af32a55
+    return `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
+        + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
+        + "assetbyname/Microsoft.VisualStudio.Services.VSIXPackage";
 }
 
 /**
