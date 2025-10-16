@@ -11,17 +11,17 @@ export interface IEnhancedError extends Error
     /**
      * The request, if available.
      */
-    request?: any;
+    request?: unknown;
 
     /**
      * The response, if available.
      */
-    response?: any;
+    response?: unknown;
 
     /**
      * The meta data, if available.
      */
-    meta?: any;
+    meta?: unknown;
 }
 
 /**
@@ -30,17 +30,17 @@ export interface IEnhancedError extends Error
  *
  * @param {string} message The error message.
  * @param {(number | string)} [code] The error code.
- * @param {any} [request] The request.
- * @param {any} [response] The response.
- * @param {any} [meta] The meta data.
+ * @param {unknown} [request] The request.
+ * @param {unknown} [response] The response.
+ * @param {unknown} [meta] The meta data.
  * @returns {Error} The created error.
  */
 export function createError(
     message?: string,
     code?: number | string,
-    request?: any,
-    response?: any,
-    meta?: any
+    request?: unknown,
+    response?: unknown,
+    meta?: unknown
 ): IEnhancedError
 {
     return enhanceError(new Error(message), code, request, response, meta);
@@ -52,35 +52,35 @@ export function createError(
  *
  * @param {(Error | IEnhancedError)} error The error to enhance.
  * @param {(number | string)} [code] The error code.
- * @param {any} [request] The request.
- * @param {any} [response] The response.
- * @param {any} [meta] The meta data.
+ * @param {unknown} [request] The request.
+ * @param {unknown} [response] The response.
+ * @param {unknown} [meta] The meta data.
  */
 export function enhanceError(
     error: Error | IEnhancedError,
     code?: number | string,
-    request?: any,
-    response?: any,
-    meta?: any
+    request?: unknown,
+    response?: unknown,
+    meta?: unknown
 ): IEnhancedError
 {
     const e: IEnhancedError = error;
-    if (code !== undefined)
+    if (code != null)
     {
         e.code = code;
     }
 
-    if (request !== undefined)
+    if (request != null)
     {
         e.request = request;
     }
 
-    if (response !== undefined)
+    if (response != null)
     {
         e.response = response;
     }
 
-    if (meta !== undefined)
+    if (meta != null)
     {
         e.meta = meta;
     }

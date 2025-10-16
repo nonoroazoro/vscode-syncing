@@ -1,10 +1,11 @@
 import type { ExtensionContext } from "vscode";
 
-import { Gist, Syncing, VSCodeSetting, AutoSyncService } from "./core";
-import { localize, setup } from "./i18n";
-import { registerCommand } from "./utils/vscodeAPI";
+import { AutoSyncService, Gist, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
+import { localize, setup } from "./i18n";
 import type { ISyncedItem } from "./types";
+import type { IEnhancedError } from "./utils/errors";
+import { registerCommand } from "./utils/vscodeAPI";
 
 let _syncing: Syncing;
 let _vscodeSetting: VSCodeSetting;
@@ -50,7 +51,7 @@ function _initSyncing(context: ExtensionContext)
 
         _isReady = true;
     }
-    catch (err: any)
+    catch (err)
     {
         _isReady = false;
         Toast.statusFatal(localize("error.initialization", err.message));
@@ -71,7 +72,7 @@ function _initAutoSync()
             {
                 _autoSyncService = AutoSyncService.create();
                 // 1. Synchronization on activation.
-                _autoSyncService.synchronize(syncingSettings);
+                await _autoSyncService.synchronize(syncingSettings);
 
                 // 2. Start watching.
                 _autoSyncService.start();
@@ -137,15 +138,16 @@ async function _downloadVSCodeSettings()
                     Toast.showReloadBox();
                 }
             }
-            catch (err: any)
+            catch (err)
             {
-                if (err.code === 401)
+                const code = (err as IEnhancedError).code;
+                if (code === 401)
                 {
-                    _syncing.clearGitHubToken();
+                    await _syncing.clearGitHubToken();
                 }
-                else if (err.code === 404)
+                else if (code === 404)
                 {
-                    _syncing.clearGistID();
+                    await _syncing.clearGistID();
                 }
             }
         }
@@ -160,25 +162,28 @@ async function _downloadVSCodeSettings()
 /**
  * Opens the Syncing's settings file in a VSCode editor.
  */
-function _openSyncingSettings()
+async function _openSyncingSettings()
 {
     if (_isReady)
     {
-        _syncing.openSettings();
+        await _syncing.openSettings();
     }
 }
 
 /**
  * Determines whether the extensions are actually synchronized.
  */
-function _isExtensionsSynced(syncedItems: { updated: ISyncedItem[]; removed: ISyncedItem[] }): boolean
+function _isExtensionsSynced(syncedItems: { updated: ISyncedItem[]; removed: ISyncedItem[]; }): boolean
 {
     for (const item of syncedItems.updated)
     {
-        if (item.extension && (
-            item.extension.added.length > 0
-            || item.extension.removed.length > 0
-            || item.extension.updated.length > 0)
+        if (
+            item.extension
+            && (
+                item.extension.added.length > 0
+                || item.extension.removed.length > 0
+                || item.extension.updated.length > 0
+            )
         )
         {
             return true;

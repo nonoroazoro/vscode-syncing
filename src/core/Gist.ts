@@ -1,25 +1,26 @@
 import { Octokit } from "@octokit/rest";
 import { HttpsProxyAgent } from "https-proxy-agent";
 
-import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast";
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
-import { createError } from "../utils/errors";
-import { diff } from "../utils/diffPatch";
-import { getVSCodeSetting } from "../utils/vscodeAPI";
-import { isEmptyString } from "../utils/lang";
 import { localize } from "../i18n";
-import { parse } from "../utils/jsonc";
-import { pick } from "../utils/object";
 import { SettingType } from "../types";
 import type {
     GistCreateParam,
     GistUpdateParam,
+    IExtension,
     IGist,
     IGistFile,
     IGistFiles,
     IGistUser,
     ISetting
 } from "../types";
+import { diff } from "../utils/diffPatch";
+import { createError } from "../utils/errors";
+import { parse } from "../utils/jsonc";
+import { isEmptyString } from "../utils/lang";
+import { pick } from "../utils/object";
+import { getVSCodeSetting } from "../utils/vscodeAPI";
+import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast";
 
 /**
  * GitHub Gist utils.
@@ -41,7 +42,14 @@ export class Gist
     {
         this._proxy = proxy;
 
-        const options: { auth?: any; request: { agent?: any; timeout?: number } } = { request: { timeout: 8000 } };
+        const options: {
+            auth?: unknown;
+            request: {
+                agent?: unknown;
+                timeout?: number;
+            };
+        } = { request: { timeout: 8000 } };
+
         if (proxy != null && !isEmptyString(proxy))
         {
             options.request.agent = new HttpsProxyAgent(proxy);
@@ -64,7 +72,7 @@ export class Gist
      */
     public static create(token?: string, proxy?: string): Gist
     {
-        if (!Gist._instance || Gist._instance.token !== token || Gist._instance.proxy !== proxy)
+        if (Gist._instance?.token !== token || Gist._instance.proxy !== proxy)
         {
             Gist._instance = new Gist(token, proxy);
         }
@@ -98,7 +106,7 @@ export class Gist
         {
             return (await this._api.users.getAuthenticated()).data;
         }
-        catch (err: any)
+        catch (err)
         {
             throw this._createError(err);
         }
@@ -112,7 +120,7 @@ export class Gist
      *
      * @throws {IEnhancedError}
      */
-    public async get(id: string, showIndicator: boolean = false): Promise<IGist>
+    public async get(id: string, showIndicator = false): Promise<IGist>
     {
         if (showIndicator)
         {
@@ -128,7 +136,7 @@ export class Gist
             }
             return result;
         }
-        catch (err: any)
+        catch (err)
         {
             const error = this._createError(err);
             if (showIndicator)
@@ -155,7 +163,7 @@ export class Gist
                 .filter(gist => (gist.description === Gist.GIST_DESCRIPTION || gist.files[extensionsRemoteFilename]))
                 .sort((a, b) => new Date(a.updated_at).getTime() - new Date(b.updated_at).getTime());
         }
-        catch (err: any)
+        catch (err)
         {
             throw this._createError(err);
         }
@@ -174,7 +182,7 @@ export class Gist
         {
             await this._api.gists.delete({ gist_id: id });
         }
-        catch (err: any)
+        catch (err)
         {
             throw this._createError(err);
         }
@@ -191,9 +199,10 @@ export class Gist
     {
         try
         {
+            // TODO: fix Octokit shit.
             return (await this._api.gists.update(content as any)).data as IGist;
         }
-        catch (err: any)
+        catch (err)
         {
             throw this._createError(err);
         }
@@ -241,9 +250,10 @@ export class Gist
     {
         try
         {
+            // TODO: fix Octokit shit.
             return (await this._api.gists.create(content as any)).data as IGist;
         }
-        catch (err: any)
+        catch (err)
         {
             throw this._createError(err);
         }
@@ -257,7 +267,7 @@ export class Gist
      *
      * @throws {IEnhancedError}
      */
-    public createSettings(files = {}, isPublic = false): Promise<IGist>
+    public async createSettings(files = {}, isPublic = false): Promise<IGist>
     {
         return this.create({
             files,
@@ -294,22 +304,24 @@ export class Gist
             const exists = await this.exists(id);
 
             // Preparing local gist.
-            const localGist: { gist_id: string; files: any } = { gist_id: id, files: {} };
+            const localGist: { gist_id: string; files: IGistFiles; } = { gist_id: id, files: {} };
             for (const item of uploads)
             {
                 // Filter out `null` content.
                 if (item.content != null)
                 {
-                    localGist.files[item.remoteFilename] = { content: item.content };
+                    localGist.files[item.remoteFilename] = { content: item.content } as IGistFile;
                 }
             }
 
             if (exists)
             {
                 // Upload if the local files are modified.
-                localGist.files = this.getModifiedFiles(localGist.files, exists.files);
-                if (localGist.files)
+                const modifiedFiles = this.getModifiedFiles(localGist.files, exists.files);
+                if (modifiedFiles)
                 {
+                    localGist.files = modifiedFiles;
+
                     // poka-yoke - Determines whether there're too much changes since the last uploading.
                     const threshold = getVSCodeSetting<number>(CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD);
                     if (threshold > 0)
@@ -362,13 +374,13 @@ export class Gist
             }
             return result;
         }
-        catch (error: any)
+        catch (err)
         {
             if (showIndicator)
             {
-                statusError(localize("toast.settings.uploading.failed", error.message));
+                statusError(localize("toast.settings.uploading.failed", err.message));
             }
-            throw error;
+            throw err;
         }
     }
 
@@ -378,28 +390,23 @@ export class Gist
      * @param {IGistFiles} localFiles Local files.
      * @param {IGistFiles} [remoteFiles] Remote files.
      */
-    public getModifiedFiles(
-        localFiles: IGistFiles,
-        remoteFiles?: IGistFiles
-    ): IGistFiles | undefined
+    public getModifiedFiles(localFiles: IGistFiles, remoteFiles?: IGistFiles): IGistFiles | undefined
     {
         if (!remoteFiles)
         {
             return localFiles;
         }
 
-        let localFile: IGistFile;
-        let remoteFile: IGistFile;
+        let localFile: IGistFile | undefined;
         const result = {} as IGistFiles;
         const recordedKeys = [];
         for (const key of Object.keys(remoteFiles))
         {
             localFile = localFiles[key];
-            remoteFile = remoteFiles[key];
             if (localFile)
             {
                 // Ignore null local file.
-                if (localFile.content != null && localFile.content !== remoteFile.content)
+                if (localFile.content != null && localFile.content !== remoteFiles[key]?.content)
                 {
                     result[key] = localFile;
                 }
@@ -409,7 +416,7 @@ export class Gist
                 // Remove the remote files except keybindings and settings.
                 if (!key.includes(SettingType.Keybindings) && !key.includes(SettingType.Settings))
                 {
-                    result[key] = null as any;
+                    result[key] = null as unknown as IGistFile;
                 }
             }
             recordedKeys.push(key);
@@ -422,7 +429,7 @@ export class Gist
             {
                 // Ignore null local file.
                 localFile = localFiles[key];
-                if (localFile.content)
+                if (localFile?.content)
                 {
                     result[key] = localFile;
                 }
@@ -435,7 +442,7 @@ export class Gist
     /**
      * Creates the error from an error code.
      */
-    private _createError(error: Error & { status: number })
+    private _createError(error: Error & { status: number; })
     {
         const { status } = error;
         let message = localize("error.check.internet");
@@ -464,12 +471,12 @@ export class Gist
     /**
      * Converts the `content` of `IGistFiles` into a `JSON object`.
      */
-    private _parseToJSON(files: IGistFiles): Record<string, any>
+    private _parseToJSON(files: IGistFiles): Record<string, unknown>
     {
         const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
-        let parsed: any;
-        let file: IGistFile;
-        const result: Record<string, any> = {};
+        let parsed: unknown;
+        let file: IGistFile | undefined;
+        const result: Record<string, unknown> = {};
         for (const key of Object.keys(files))
         {
             file = files[key];
@@ -479,7 +486,7 @@ export class Gist
 
                 if (key === extensionsRemoteFilename && Array.isArray(parsed))
                 {
-                    for (const ext of parsed)
+                    for (const ext of (parsed as Array<Partial<IExtension & { uuid: string; }>>))
                     {
                         if (ext["id"] != null)
                         {

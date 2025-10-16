@@ -1,13 +1,13 @@
 import * as fs from "fs-extra";
 
-import { Environment } from "./Environment";
-import { Gist } from "./Gist";
-import { isEmptyString } from "../utils/lang";
 import { localize } from "../i18n";
+import type { ISyncingSettings } from "../types";
+import { isEmptyString } from "../utils/lang";
 import { normalizeHttpProxy } from "../utils/normalizer";
 import { openFile } from "../utils/vscodeAPI";
+import { Environment } from "./Environment";
+import { Gist } from "./Gist";
 import * as Toast from "./Toast";
-import type { ISyncingSettings } from "../types";
 
 /**
  * `Syncing` wrapper.
@@ -78,7 +78,7 @@ export class Syncing
     /**
      * Init the `Syncing`'s settings file.
      */
-    public initSettings(): Promise<void>
+    public async initSettings(): Promise<void>
     {
         return this.saveSettings(Syncing._DEFAULT_SETTINGS);
     }
@@ -86,7 +86,7 @@ export class Syncing
     /**
      * Clears the GitHub Personal Access Token and save to `Syncing`'s settings file.
      */
-    public clearGitHubToken(): Promise<void>
+    public async clearGitHubToken(): Promise<void>
     {
         const settings: ISyncingSettings = this.loadSettings();
         settings.token = "";
@@ -96,7 +96,7 @@ export class Syncing
     /**
      * Clears the Gist ID and save to `Syncing`'s settings file.
      */
-    public clearGistID(): Promise<void>
+    public async clearGistID(): Promise<void>
     {
         const settings: ISyncingSettings = this.loadSettings();
         settings.id = "";
@@ -108,7 +108,7 @@ export class Syncing
      *
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public prepareUploadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
+    public async prepareUploadSettings(showIndicator = false): Promise<ISyncingSettings>
     {
         // GitHub Token must exist, but Gist ID could be none.
         return this.prepareSettings(true, showIndicator);
@@ -119,7 +119,7 @@ export class Syncing
      *
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public prepareDownloadSettings(showIndicator: boolean = false): Promise<ISyncingSettings>
+    public async prepareDownloadSettings(showIndicator = false): Promise<ISyncingSettings>
     {
         // GitHub Token could be none, but Gist ID must exist.
         return this.prepareSettings(false, showIndicator);
@@ -131,7 +131,7 @@ export class Syncing
      * @param forUpload Whether to show messages for upload. Defaults to `true`.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public async prepareSettings(forUpload: boolean = true, showIndicator: boolean = false): Promise<ISyncingSettings>
+    public async prepareSettings(forUpload = true, showIndicator = false): Promise<ISyncingSettings>
     {
         if (showIndicator)
         {
@@ -163,17 +163,17 @@ export class Syncing
             }
             return settings;
         }
-        catch (error: any)
+        catch (err)
         {
             if (showIndicator)
             {
                 Toast.statusError(
                     forUpload
-                        ? localize("toast.settings.uploading.canceled", error.message)
-                        : localize("toast.settings.downloading.canceled", error.message)
+                        ? localize("toast.settings.uploading.canceled", err.message)
+                        : localize("toast.settings.downloading.canceled", err.message)
                 );
             }
-            throw error;
+            throw err;
         }
     }
 
@@ -190,7 +190,7 @@ export class Syncing
                 ...fs.readJsonSync(this.settingsPath, { encoding: "utf8" })
             };
         }
-        catch (err: any)
+        catch (err)
         {
             console.error(localize("error.loading.syncing.settings"), err);
         }
@@ -225,7 +225,7 @@ export class Syncing
      * @param settings Syncing's Settings.
      * @param showToast Whether to show error toast. Defaults to `false`.
      */
-    public async saveSettings(settings: ISyncingSettings, showToast: boolean = false): Promise<void>
+    public async saveSettings(settings: ISyncingSettings, showToast = false): Promise<void>
     {
         const target = { ...settings };
 
@@ -240,7 +240,7 @@ export class Syncing
         {
             await fs.outputFile(this.settingsPath, content);
         }
-        catch (err: any)
+        catch (err)
         {
             if (showToast)
             {
@@ -255,7 +255,7 @@ export class Syncing
      * @param token GitHub Personal Access Token.
      * @param forUpload Whether to show messages for upload. Defaults to `true`.
      */
-    private async _requestGistID(token: string, forUpload: boolean = true): Promise<string>
+    private async _requestGistID(token: string, forUpload = true): Promise<string>
     {
         if (token != null && !isEmptyString(token))
         {

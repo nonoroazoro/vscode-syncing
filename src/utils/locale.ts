@@ -3,10 +3,15 @@ import { NormalizedLocale } from "../types";
 /**
  * Normalizes the locale string.
  *
- * @param {string} locale The locale string, such as `"zh-CN"`, `"en-US"`...
+ * @param {string} [locale] The locale string, such as `"zh-CN"`, `"en-US"`...
  */
-export function normalize(locale: string | undefined): NormalizedLocale
+export function normalize(locale?: string): NormalizedLocale
 {
+    if (locale == null)
+    {
+        return NormalizedLocale.EN_US;
+    }
+
     switch (locale)
     {
         case "zh-cn":

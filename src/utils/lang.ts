@@ -3,7 +3,7 @@
  */
 export function isObject(input: unknown): input is object
 {
-    return Object.prototype.toString.call(input) === '[object Object]';
+    return Object.prototype.toString.call(input) === "[object Object]";
 }
 
 /**
@@ -37,7 +37,7 @@ export function isEmptyString(input: unknown): boolean
 /**
  * Checks if the input value is a `Function`.
  */
-export function isFunction(input: unknown): input is Function
+export function isFunction(input: unknown): input is (...args: unknown[]) => unknown
 {
     return typeof input === "function";
 }

@@ -3,11 +3,11 @@ import type { ExtensionProperty } from "./ExtensionProperty";
 
 export interface ExtensionVersion
 {
-    assetUri: string;
-    fallbackAssetUri: string;
-    files: ExtensionFile[];
+    version: string;
+    targetPlatform: string;
     flags: string;
     lastUpdated: string;
-    properties: ExtensionProperty[];
-    version: string;
+
+    files?: ExtensionFile[];
+    properties?: ExtensionProperty[];
 }

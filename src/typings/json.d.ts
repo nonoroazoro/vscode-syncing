@@ -11,11 +11,9 @@ type JSONValue = JSONArray | JSONObject | JSONScalar;
 /**
  * JSON object.
  */
-type JSONObject = {
-    [key in string]?: JSONValue
-};
+type JSONObject = { [key in string]?: JSONValue; };
 
 /**
  * JSON array.
  */
-interface JSONArray extends Array<JSONValue> { }
+interface JSONArray extends Array<JSONValue> {}

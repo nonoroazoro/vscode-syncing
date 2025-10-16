@@ -2,4 +2,4 @@
 
 set -ex
 
-ncu -u -x "@types/node @types/vscode junk"
+ncu -u -x "@types/node @types/vscode junk jsondiffpatch @octokit/rest"

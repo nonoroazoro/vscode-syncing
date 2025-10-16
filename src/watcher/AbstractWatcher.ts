@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+import { EventEmitter } from "node:events";
 
 export enum WatcherEvent
 {
@@ -14,7 +14,7 @@ export abstract class AbstractWatcher<EventType extends string | symbol = Watche
     private _isPaused = false;
     private _emitter = new EventEmitter();
 
-    protected emit(event: EventType, ...args: any[]): boolean
+    protected emit(event: EventType, ...args: unknown[]): boolean
     {
         if (this._isPaused)
         {
@@ -38,7 +38,7 @@ export abstract class AbstractWatcher<EventType extends string | symbol = Watche
         this._isPaused = false;
     }
 
-    public on(event: EventType, fn: (...args: any[]) => void): this
+    public on(event: EventType, fn: (...args: unknown[]) => void): this
     {
         this._emitter.on(event, fn);
         return this;

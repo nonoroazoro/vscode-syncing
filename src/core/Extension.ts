@@ -1,28 +1,24 @@
-import { lte } from "semver";
 import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
 import * as micromatch from "micromatch";
-import * as path from "path";
+import * as path from "node:path";
+import { lte } from "semver";
 import * as tmp from "tmp-promise";
 import * as vscode from "vscode";
 
-import { CaseInsensitiveMap, CaseInsensitiveSet } from "../collections";
-import
-{
-    CONFIGURATION_EXCLUDED_EXTENSIONS,
-    CONFIGURATION_EXTENSIONS_AUTOUPDATE,
-    CONFIGURATION_KEY
-} from "../constants";
-import { downloadFile } from "../utils/ajax";
-import { Environment } from "./Environment";
-import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
-import { findLatestSupportedVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
+import { CaseInsensitiveSet } from "../collections";
+import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_KEY } from "../constants";
 import { localize } from "../i18n";
+import type { IExtension, ISyncedItem } from "../types";
+import { downloadFile } from "../utils/ajax";
+import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
+import { getExtensionDownloadURL } from "../utils/vscodeWebAPI";
+import { Environment } from "./Environment";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
-import type { IExtension, ExtensionMeta, ISyncedItem } from "../types";
 
-tmp.setGracefulCleanup();
+// TODO: tweak or remove this.
+(tmp.setGracefulCleanup as () => void)();
 
 /**
  * Represents the options of synchronization.
@@ -91,7 +87,7 @@ export class Extension
         {
             if (
                 !ext.packageJSON.isBuiltin
-                && !excludedPatterns.some((pattern) => micromatch.isMatch(ext.id, pattern, { nocase: true }))
+                && !excludedPatterns.some(pattern => micromatch.isMatch(ext.id, pattern, { nocase: true }))
             )
             {
                 item = {
@@ -112,7 +108,7 @@ export class Extension
      * @param extensions Extensions to be synced.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public async sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
+    public async sync(extensions: IExtension[], showIndicator = false): Promise<ISyncedItem>
     {
         const diff = await this._getDifferentExtensions(extensions);
 
@@ -165,14 +161,8 @@ export class Extension
      */
     public async downloadExtension(extension: IExtension): Promise<IExtension>
     {
+        extension.downloadURL = getExtensionDownloadURL(extension);
         const filepath = (await tmp.file({ postfix: `.${extension.id}.zip` })).path;
-
-        // Calculates the VSIX download URL.
-        extension.downloadURL =
-            `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
-            + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
-            + "assetbyname/Microsoft.VisualStudio.Services.VSIXPackage?install=true";
-
         await downloadFile(extension.downloadURL, filepath, this._syncing.proxy);
         return { ...extension, vsixFilepath: filepath };
     }
@@ -207,7 +197,7 @@ export class Extension
                 await fs.copy(path.join(dirPath, "extension"), extPath);
                 return extension;
             }
-            catch (err: any)
+            catch (err)
             {
                 throw new Error(localize("error.extract.extension-1", extension.id, err.message));
             }
@@ -245,13 +235,17 @@ export class Extension
         {
             await fs.remove(this._env.obsoleteFilePath);
         }
-        catch { }
+        catch
+        {
+        }
 
         try
         {
             await fs.remove(this._env.extensionsFilePath);
         }
-        catch { }
+        catch
+        {
+        }
     }
 
     /**
@@ -276,33 +270,33 @@ export class Extension
         if (extensions)
         {
             // 1. Auto update extensions: Query the latest extensions.
-            let queriedExtensions: CaseInsensitiveMap<string, ExtensionMeta> = new CaseInsensitiveMap();
-            const autoUpdateExtensions = getVSCodeSetting<boolean>(
-                CONFIGURATION_KEY,
-                CONFIGURATION_EXTENSIONS_AUTOUPDATE
-            );
-            if (autoUpdateExtensions)
-            {
-                queriedExtensions = await queryExtensions(extensions.map((ext) => ext.id), this._syncing.proxy);
-            }
+            // let queriedExtensions = new CaseInsensitiveMap<string, ExtensionMeta>();
+            // const autoUpdateExtensions = getVSCodeSetting<boolean>(
+            //     CONFIGURATION_KEY,
+            //     CONFIGURATION_EXTENSIONS_AUTOUPDATE
+            // );
+            // if (autoUpdateExtensions)
+            // {
+            //     queriedExtensions = await queryExtensions(extensions.map(ext => ext.id), this._syncing.proxy);
+            // }
 
             // Find added & updated extensions.
             const reservedExtensionIDs = new CaseInsensitiveSet<string>();
             for (const ext of extensions)
             {
                 // 2. Auto update extensions: Update to the latest version.
-                if (autoUpdateExtensions)
-                {
-                    const extensionMeta = queriedExtensions.get(ext.id);
-                    if (extensionMeta)
-                    {
-                        const latestVersion = findLatestSupportedVSIXVersion(extensionMeta);
-                        if (latestVersion != null)
-                        {
-                            ext.version = latestVersion;
-                        }
-                    }
-                }
+                // if (autoUpdateExtensions)
+                // {
+                //     const extensionMeta = queriedExtensions.get(ext.id);
+                //     if (extensionMeta)
+                //     {
+                //         const latestVersion = findLatestSupportedVSIXVersion(extensionMeta);
+                //         if (latestVersion != null)
+                //         {
+                //             ext.version = latestVersion;
+                //         }
+                //     }
+                // }
 
                 const localExtension = getExtensionById(ext.id);
                 if (localExtension)
@@ -340,7 +334,7 @@ export class Extension
             }
 
             // Release resources.
-            queriedExtensions.clear();
+            // queriedExtensions.clear();
             reservedExtensionIDs.clear();
         }
         return result;

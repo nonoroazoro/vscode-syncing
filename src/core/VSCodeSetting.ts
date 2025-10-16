@@ -1,10 +1,9 @@
 import * as fs from "fs-extra";
-import * as junk from "junk";
+import { not } from "junk";
 import * as micromatch from "micromatch";
-import * as path from "path";
+import * as path from "node:path";
 
-import
-{
+import {
     CONFIGURATION_EXCLUDED_EXTENSIONS,
     CONFIGURATION_EXCLUDED_SETTINGS,
     CONFIGURATION_KEY,
@@ -14,16 +13,16 @@ import
     SETTING_EXCLUDED_SETTINGS,
     VSCODE_SETTINGS_LIST
 } from "../constants";
-import { diff } from "../utils/diffPatch";
-import { Environment } from "./Environment";
-import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
-import { Extension } from "./Extension";
-import { getVSCodeSetting } from "../utils/vscodeAPI";
 import { localize } from "../i18n";
-import { readLastModified, writeLastModified } from "../utils/file";
 import { SettingType } from "../types";
+import type { IExtension, IGist, IGistFile, ISetting, ISyncedItem } from "../types";
+import { diff } from "../utils/diffPatch";
+import { readLastModified, writeLastModified } from "../utils/file";
+import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
+import { getVSCodeSetting } from "../utils/vscodeAPI";
+import { Environment } from "./Environment";
+import { Extension } from "./Extension";
 import * as Toast from "./Toast";
-import type { IExtension, ISetting, ISyncedItem, IGist, IGistFile } from "../types";
 
 /**
  * `VSCode Settings` wrapper.
@@ -85,8 +84,8 @@ export class VSCodeSetting
      * @param {SettingType[]} [settingsList=VSCODE_SETTINGS_LIST] Specifies the settings to get.
      */
     public async getSettings(
-        loadFileContent: boolean = false,
-        showIndicator: boolean = false,
+        loadFileContent = false,
+        showIndicator = false,
         settingsList: SettingType[] = VSCODE_SETTINGS_LIST
     ): Promise<ISetting[]>
     {
@@ -177,8 +176,8 @@ export class VSCodeSetting
         return Math.max.apply(
             null,
             vscodeSettings
-                .filter((s) => s.lastModified != null)
-                .map((s) => s.lastModified)
+                .filter(s => s.lastModified != null)
+                .map(s => s.lastModified)
         );
     }
 
@@ -188,7 +187,7 @@ export class VSCodeSetting
      * @param gist `VSCode Settings` from GitHub Gist.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public async saveSettings(gist: IGist, showIndicator: boolean = false): Promise<{
+    public async saveSettings(gist: IGist, showIndicator = false): Promise<{
         updated: ISyncedItem[];
         removed: ISyncedItem[];
     }>
@@ -207,7 +206,7 @@ export class VSCodeSetting
                 const settingsToRemove: ISetting[] = [];
                 const settingsToSave: ISetting[] = [];
                 let extensionsSetting: ISetting | undefined;
-                let gistFile: IGistFile;
+                let gistFile: IGistFile | undefined;
 
                 const settings = await this.getSettings();
                 for (const setting of settings)
@@ -251,7 +250,7 @@ export class VSCodeSetting
                     if (!existsFileKeys.includes(key))
                     {
                         gistFile = files[key];
-                        if (gistFile.filename.startsWith(VSCodeSetting._SNIPPET_PREFIX))
+                        if (gistFile?.filename.startsWith(VSCodeSetting._SNIPPET_PREFIX))
                         {
                             // Snippets.
                             filename = gistFile.filename.slice(VSCodeSetting._SNIPPET_PREFIX.length);
@@ -295,9 +294,9 @@ export class VSCodeSetting
                             const saved = await this._saveSetting(setting, lastModified);
                             syncedItems.updated.push(saved);
                         }
-                        catch (error: any)
+                        catch (err)
                         {
-                            throw new Error(localize("error.save.file", setting.remoteFilename, error.message));
+                            throw new Error(localize("error.save.file", setting.remoteFilename, err.message));
                         }
                     }
 
@@ -321,13 +320,13 @@ export class VSCodeSetting
                 throw new Error(localize("error.gist.files.notfound"));
             }
         }
-        catch (error: any)
+        catch (err)
         {
             if (showIndicator)
             {
-                Toast.statusError(localize("toast.settings.downloading.failed", error.message));
+                Toast.statusError(localize("toast.settings.downloading.failed", err.message));
             }
-            throw error;
+            throw err;
         }
     }
 
@@ -364,9 +363,9 @@ export class VSCodeSetting
                 await fs.remove(setting.localFilePath);
                 removed.push({ setting });
             }
-            catch (error: any)
+            catch (err)
             {
-                throw new Error(localize("error.remove.file", setting.remoteFilename, error.message));
+                throw new Error(localize("error.remove.file", setting.remoteFilename, err.message));
             }
         }
         return removed;
@@ -383,7 +382,7 @@ export class VSCodeSetting
         try
         {
             const filenames = await fs.readdir(snippetsDir);
-            filenames.filter(junk.not).forEach((filename: string) =>
+            filenames.filter(not).forEach(filename =>
             {
                 // Add prefix to all snippets.
                 results.push({
@@ -406,7 +405,7 @@ export class VSCodeSetting
      * @param settings `VSCode Settings`.
      * @param exclude Default is `true`, exclude some `VSCode Settings` base on the exclude list of `Syncing`.
      */
-    private async _loadContent(settings: ISetting[], exclude: boolean = true): Promise<ISetting[]>
+    private async _loadContent(settings: ISetting[], exclude = true): Promise<ISetting[]>
     {
         const result: ISetting[] = [];
         for (const setting of settings)
@@ -452,7 +451,7 @@ export class VSCodeSetting
                     lastModified = await readLastModified(setting.localFilePath);
                 }
             }
-            catch (err: any)
+            catch (err)
             {
                 content = undefined;
                 console.error(localize("error.loading.settings", setting.remoteFilename, err));
@@ -473,7 +472,7 @@ export class VSCodeSetting
         if (setting.type === SettingType.Extensions)
         {
             // Sync extensions.
-            const extensions: IExtension[] = parse(setting.content ?? "[]");
+            const extensions = parse(setting.content ?? "[]") as IExtension[];
             result = await this._ext.sync(extensions, true);
         }
         else
@@ -483,7 +482,7 @@ export class VSCodeSetting
             {
                 // Sync settings.
                 const localFiles = await this._loadContent([setting], false);
-                const localSettings = localFiles[0] && localFiles[0].content;
+                const localSettings = localFiles[0]?.content;
                 if (localSettings)
                 {
                     // Merge remote and local settings.
@@ -504,7 +503,7 @@ export class VSCodeSetting
     /**
      * Save the `VSCode Setting` to disk.
      */
-    private _saveToFile(setting: ISetting)
+    private async _saveToFile(setting: ISetting)
     {
         return fs.outputFile(setting.localFilePath, setting.content ?? "{}").then(() => ({ setting } as ISyncedItem));
     }
@@ -529,7 +528,7 @@ export class VSCodeSetting
             // Here clone the settings to avoid manipulation.
             let excludedSettings = this._excludeSettings(
                 localSettings,
-                settingsToSave.map((setting) => ({ ...setting })),
+                settingsToSave.map(setting => ({ ...setting })),
                 SettingType.Settings
             );
 
@@ -548,7 +547,7 @@ export class VSCodeSetting
                 const okButton = localize("pokaYoke.continue.download");
                 const message = localize("pokaYoke.continue.download.message");
                 const selection = await Toast.showConfirmBox(message, okButton, localize("pokaYoke.cancel"));
-                result = (selection === okButton);
+                result = selection === okButton;
             }
         }
         return result;
@@ -559,33 +558,37 @@ export class VSCodeSetting
      */
     private _excludeSettings(localSettings: ISetting[], remoteSettings: ISetting[], type: SettingType)
     {
-        const lSetting = localSettings.find((setting) => (setting.type === type));
-        const rSetting = remoteSettings.find((setting) => (setting.type === type));
-        if (lSetting && lSetting.content && rSetting && rSetting.content)
+        const lSetting = localSettings.find(setting => (setting.type === type));
+        const rSetting = remoteSettings.find(setting => (setting.type === type));
+        if (lSetting?.content && rSetting?.content)
         {
-            const lSettingJSON = parse(lSetting.content);
-            const rSettingJSON = parse(rSetting.content);
+            const lSettingJSON = parse(lSetting.content) as JSONObject;
+            const rSettingJSON = parse(rSetting.content) as JSONObject;
             if (lSettingJSON && rSettingJSON)
             {
                 if (type === SettingType.Settings)
                 {
                     // Exclude settings.
-                    const patterns = rSettingJSON[SETTING_EXCLUDED_SETTINGS] ?? [];
+                    const patterns = (rSettingJSON[SETTING_EXCLUDED_SETTINGS] ?? []) as string[];
                     lSetting.content = excludeSettings(lSetting.content, lSettingJSON, patterns);
                     rSetting.content = excludeSettings(rSetting.content, rSettingJSON, patterns);
                 }
                 else if (type === SettingType.Extensions)
                 {
                     // Exclude extensions.
-                    const rVSCodeSettings = remoteSettings.find((setting) => (setting.type === SettingType.Settings));
-                    if (rVSCodeSettings && rVSCodeSettings.content)
+                    const rVSCodeSettings = remoteSettings.find(setting => (setting.type === SettingType.Settings));
+                    if (rVSCodeSettings?.content)
                     {
-                        const rVSCodeSettingsJSON = parse(rVSCodeSettings.content);
+                        const rVSCodeSettingsJSON = parse(rVSCodeSettings.content) as JSONObject;
                         if (rVSCodeSettingsJSON)
                         {
-                            const patterns: string[] = rVSCodeSettingsJSON[SETTING_EXCLUDED_EXTENSIONS] ?? [];
-                            lSetting.content = JSON.stringify(this._getExcludedExtensions(lSettingJSON, patterns));
-                            rSetting.content = JSON.stringify(this._getExcludedExtensions(rSettingJSON, patterns));
+                            const patterns = (rVSCodeSettingsJSON[SETTING_EXCLUDED_EXTENSIONS] ?? []) as string[];
+                            lSetting.content = JSON.stringify(
+                                this._getExcludedExtensions(lSettingJSON as unknown as IExtension[], patterns)
+                            );
+                            rSetting.content = JSON.stringify(
+                                this._getExcludedExtensions(rSettingJSON as unknown as IExtension[], patterns)
+                            );
                         }
                     }
                 }
@@ -599,10 +602,7 @@ export class VSCodeSetting
      */
     private _getExcludedExtensions(extensions: IExtension[], patterns: string[])
     {
-        return extensions.filter((ext) =>
-        {
-            return !patterns.some((pattern) => micromatch.isMatch(ext.id, pattern));
-        });
+        return extensions.filter(ext => !patterns.some(pattern => micromatch.isMatch(ext.id, pattern)));
     }
 
     /**
@@ -618,11 +618,11 @@ export class VSCodeSetting
     /**
      * Converts the `content` of `ISetting[]` into a `JSON object`.
      */
-    private _parseToJSON(settings: ISetting[]): Record<string, any>
+    private _parseToJSON(settings: ISetting[]): Record<string, unknown>
     {
-        let parsed: any;
+        let parsed: unknown;
         let content: string;
-        const result: Record<string, any> = {};
+        const result: Record<string, unknown> = {};
         for (const setting of settings)
         {
             content = setting.content ?? "";
@@ -634,7 +634,7 @@ export class VSCodeSetting
                 {
                     if (ext["id"] != null)
                     {
-                        ext["id"] = ext["id"].toLocaleLowerCase();
+                        ext["id"] = (ext["id"] as string).toLocaleLowerCase();
                     }
 
                     // Only compares id and version.

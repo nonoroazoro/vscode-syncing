@@ -1,32 +1,32 @@
 /**
  * Debounce a function.
  *
- * @param {Function} func The function to debounce.
+ * @param {(...args: unknown[]) => void} func The function to debounce.
  * @param {number} delay The number of milliseconds to delay.
  */
-export function debounce<T extends Function>(func: T, delay: number)
+export function debounce(func: (...args: unknown[]) => void, delay: number)
 {
-    let timeout: NodeJS.Timeout | undefined;
-    const _debounced = function (this: any)
+    let timer: NodeJS.Timeout | undefined;
+    const d = function debounced(this: unknown)
     {
-        if (timeout != null)
+        if (timer != null)
         {
-            clearTimeout(timeout);
+            clearTimeout(timer);
         }
 
-        timeout = setTimeout(() =>
+        timer = setTimeout(() =>
         {
-            timeout = undefined;
+            timer = undefined;
             func.apply(this);
         }, delay);
-    }
-    _debounced.cancel = () =>
+    };
+    d.cancel = () =>
     {
-        if (timeout)
+        if (timer)
         {
-            clearTimeout(timeout);
-            timeout = undefined;
+            clearTimeout(timer);
+            timer = undefined;
         }
-    }
-    return _debounced;
+    };
+    return d;
 }

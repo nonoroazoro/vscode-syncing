@@ -21,7 +21,7 @@ describe("Syncing/utils/template", () =>
     it("replace multiple templates with values", () =>
     {
         const template = "{0} * {1} is not equal to {0} + {1}";
-        const values = [3, 5];
+        const values = ["3", "5"];
         const target = "3 * 5 is not equal to 3 + 5";
         expect(format(template, ...values)).toBe(target);
     });
