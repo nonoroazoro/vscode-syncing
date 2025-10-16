@@ -105,7 +105,7 @@ export function getVSCodeEdition()
         case "Cursor":
             return VSCodeEdition.CURSOR;
 
-        case "WindSurf":
+        case "Windsurf":
             return VSCodeEdition.WINDSURF;
 
         case "Trae":

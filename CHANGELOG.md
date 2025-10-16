@@ -2,7 +2,7 @@
 
 ## 3.4.0 - May 23, 2025
 
-- Fixed: Add support for WindSurf, Trae.
+- Fixed: Add support for Windsurf, Trae.
 
 - Fixed: Incremental synchronization.
 

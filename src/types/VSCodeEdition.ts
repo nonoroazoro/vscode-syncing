@@ -50,7 +50,7 @@ export enum VSCodeEdition
     CURSOR = "cursor",
 
     /**
-     * WindSurf AI Code Editor, see [WindSurf](https://windsurf.com/).
+     * Windsurf AI Code Editor, see [Windsurf](https://windsurf.com/).
      */
     WINDSURF = "windsurf",
 
