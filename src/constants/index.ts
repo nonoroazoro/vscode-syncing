@@ -1,5 +1,7 @@
 import { SettingType, VSCodeEdition } from "../types";
 
+export const EXTENSION_NAME = "Syncing";
+
 /**
  * Note that this is an ordered list, to ensure that the smaller files
  * (such as `settings.json`, `keybindings.json`) are synced first.

@@ -148,6 +148,14 @@ export function reloadWindow()
 }
 
 /**
+ * Register an output channel on VSCode.
+ */
+export function registerOutputChannel(context: vscode.ExtensionContext, outputChannel: vscode.OutputChannel)
+{
+    context.subscriptions.push(outputChannel);
+}
+
+/**
  * Register extension command on VSCode.
  */
 export function registerCommand(context: vscode.ExtensionContext, command: string, callback: () => void)

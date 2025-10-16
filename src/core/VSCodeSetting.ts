@@ -46,7 +46,7 @@ export class VSCodeSetting
 
     private constructor()
     {
-        this._env = Environment.create();
+        this._env = Environment.instance;
         this._ext = Extension.create();
     }
 

@@ -53,12 +53,10 @@ export class Extension
 {
     private static _instance: Extension;
 
-    private _env: Environment;
     private _syncing: Syncing;
 
     private constructor()
     {
-        this._env = Environment.create();
         this._syncing = Syncing.create();
     }
 
@@ -192,7 +190,7 @@ export class Extension
                 await extractZip(vsixFilepath, { dir: dirPath });
 
                 // Copy to vscode extension dir.
-                const extPath = this._env.getExtensionDirectory(extension);
+                const extPath = Environment.instance.getExtensionDirectory(extension);
                 await fs.emptyDir(extPath);
                 await fs.copy(path.join(dirPath, "extension"), extPath);
                 return extension;
@@ -214,7 +212,7 @@ export class Extension
         const localExtension = getExtensionById(extension.id);
         const extensionPath = localExtension
             ? localExtension.extensionPath
-            : this._env.getExtensionDirectory(extension);
+            : Environment.instance.getExtensionDirectory(extension);
         try
         {
             await fs.remove(extensionPath);
@@ -233,7 +231,7 @@ export class Extension
     {
         try
         {
-            await fs.remove(this._env.obsoleteFilePath);
+            await fs.remove(Environment.instance.obsoleteFilePath);
         }
         catch
         {
@@ -241,7 +239,7 @@ export class Extension
 
         try
         {
-            await fs.remove(this._env.extensionsFilePath);
+            await fs.remove(Environment.instance.extensionsFilePath);
         }
         catch
         {

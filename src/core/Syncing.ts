@@ -26,13 +26,11 @@ export class Syncing
         auto_sync: false
     };
 
-    private _env: Environment;
     private _settingsPath: string;
 
     private constructor()
     {
-        this._env = Environment.create();
-        this._settingsPath = this._env.getSettingsFilePath("syncing.json");
+        this._settingsPath = Environment.instance.getSettingsFilePath("syncing.json");
     }
 
     /**
