@@ -1,4 +1,5 @@
 {
+    "editor.defaultFormatter": "dprint.dprint",
     "search.exclude": {
         "**/dist": true,
         "**/pnpm-lock.yaml": true,

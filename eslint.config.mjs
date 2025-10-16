@@ -1,61 +1,29 @@
-import { configs } from "@eslint/js";
-import { defineConfig, globalIgnores } from "eslint/config";
-import { fileURLToPath } from "node:url";
-import { FlatCompat } from "@eslint/eslintrc";
+import { ESLINT_CONFIGS } from "eslint-config-zoro/eslint";
+import { NODE_CONFIGS } from "eslint-config-zoro/node";
+import { STYLISTIC_CONFIGS } from "eslint-config-zoro/stylistic";
+import { TYPESCRIPT_CONFIGS } from "eslint-config-zoro/typescript";
 import * as globals from "globals";
-import * as path from "node:path";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const compat = new FlatCompat(
+export default [
+    { ignores: ["dist/*"] },
+    ...ESLINT_CONFIGS,
+    ...NODE_CONFIGS,
+    ...STYLISTIC_CONFIGS,
+    ...TYPESCRIPT_CONFIGS,
     {
-        baseDirectory: __dirname,
-        recommendedConfig: configs.recommended,
-        allConfig: configs.all
-    }
-);
-
-export default defineConfig(
-    [
-        globalIgnores(["**/dist"]),
-        {
-            extends: compat.extends(
-                "eslint-config-zoro/eslint",
-                "eslint-config-zoro/typescript",
-                "eslint-config-zoro/node",
-            ),
-            languageOptions:
-            {
-                globals:
-                {
-                    ...globals.node,
-                    ...globals.jest,
-                },
-                ecmaVersion: 5,
-                sourceType: "commonjs",
-                parserOptions:
-                {
-                    project: "./tsconfig.eslint.json",
-                }
+        languageOptions: {
+            globals: {
+                ...globals.node,
+                ...globals.jest
             },
-            rules:
-            {
-                "@typescript-eslint/naming-convention":
-                    [
-                        "error",
-                        {
-                            selector: "variable",
-                            format: [
-                                "camelCase",
-                                "PascalCase",
-                                "snake_case",
-                                "UPPER_CASE"
-                            ],
-                            leadingUnderscore: "allow",
-                            trailingUnderscore: "forbid",
-                        }
-                    ]
+            ecmaVersion: 5,
+            sourceType: "commonjs",
+            parserOptions: {
+                project: "./tsconfig.eslint.json"
             }
+        },
+        rules: {
+            "@typescript-eslint/no-unsafe-member-access": "off"
         }
-    ]
-);
+    }
+];

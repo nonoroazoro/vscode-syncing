@@ -1,6 +1,6 @@
 {
-	"recommendations": [
-		"dbaeumer.vscode-eslint"
-	],
-	"unwantedRecommendations": []
+    "recommendations": [
+        "dprint.dprint"
+    ],
+    "unwantedRecommendations": []
 }
