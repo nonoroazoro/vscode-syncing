@@ -6,17 +6,12 @@ import { lte } from "semver";
 import * as tmp from "tmp-promise";
 import * as vscode from "vscode";
 
-import { CaseInsensitiveMap, CaseInsensitiveSet } from "../collections";
-import {
-    CONFIGURATION_EXCLUDED_EXTENSIONS,
-    CONFIGURATION_EXTENSIONS_AUTOUPDATE,
-    CONFIGURATION_KEY
-} from "../constants";
+import { CaseInsensitiveSet } from "../collections";
+import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_KEY } from "../constants";
 import { localize } from "../i18n";
-import type { ExtensionMeta, IExtension, ISyncedItem } from "../types";
+import type { IExtension, ISyncedItem } from "../types";
 import { downloadFile } from "../utils/ajax";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
-import { findLatestSupportedVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
 import { Environment } from "./Environment";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
@@ -279,33 +274,33 @@ export class Extension
         if (extensions)
         {
             // 1. Auto update extensions: Query the latest extensions.
-            let queriedExtensions = new CaseInsensitiveMap<string, ExtensionMeta>();
-            const autoUpdateExtensions = getVSCodeSetting<boolean>(
-                CONFIGURATION_KEY,
-                CONFIGURATION_EXTENSIONS_AUTOUPDATE
-            );
-            if (autoUpdateExtensions)
-            {
-                queriedExtensions = await queryExtensions(extensions.map(ext => ext.id), this._syncing.proxy);
-            }
+            // let queriedExtensions = new CaseInsensitiveMap<string, ExtensionMeta>();
+            // const autoUpdateExtensions = getVSCodeSetting<boolean>(
+            //     CONFIGURATION_KEY,
+            //     CONFIGURATION_EXTENSIONS_AUTOUPDATE
+            // );
+            // if (autoUpdateExtensions)
+            // {
+            //     queriedExtensions = await queryExtensions(extensions.map(ext => ext.id), this._syncing.proxy);
+            // }
 
             // Find added & updated extensions.
             const reservedExtensionIDs = new CaseInsensitiveSet<string>();
             for (const ext of extensions)
             {
                 // 2. Auto update extensions: Update to the latest version.
-                if (autoUpdateExtensions)
-                {
-                    const extensionMeta = queriedExtensions.get(ext.id);
-                    if (extensionMeta)
-                    {
-                        const latestVersion = findLatestSupportedVSIXVersion(extensionMeta);
-                        if (latestVersion != null)
-                        {
-                            ext.version = latestVersion;
-                        }
-                    }
-                }
+                // if (autoUpdateExtensions)
+                // {
+                //     const extensionMeta = queriedExtensions.get(ext.id);
+                //     if (extensionMeta)
+                //     {
+                //         const latestVersion = findLatestSupportedVSIXVersion(extensionMeta);
+                //         if (latestVersion != null)
+                //         {
+                //             ext.version = latestVersion;
+                //         }
+                //     }
+                // }
 
                 const localExtension = getExtensionById(ext.id);
                 if (localExtension)
@@ -343,7 +338,7 @@ export class Extension
             }
 
             // Release resources.
-            queriedExtensions.clear();
+            // queriedExtensions.clear();
             reservedExtensionIDs.clear();
         }
         return result;
