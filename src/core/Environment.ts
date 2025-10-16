@@ -1,17 +1,15 @@
 import * as os from "node:os";
 import * as path from "node:path";
-import * as vscode from "vscode";
 
-import { EXTENSION_NAME } from "../constants";
 import { localize } from "../i18n";
 import { Platform } from "../types";
 import type { IExtension } from "../types";
-import { getVSCodeBuiltinEnvironment, registerOutputChannel } from "../utils/vscodeAPI";
+import { getVSCodeBuiltinEnvironment } from "../utils/vscodeAPI";
 
 /**
  * VSCode environment wrapper.
  */
-export class Environment implements Pick<vscode.LogOutputChannel, "info" | "error">
+export class Environment
 {
     /**
      * Gets a value indicating whether the current operating system is `Linux`.
@@ -70,13 +68,8 @@ export class Environment implements Pick<vscode.LogOutputChannel, "info" | "erro
 
     private static _instance: Environment;
 
-    private _outputChannel: vscode.LogOutputChannel;
-
-    private constructor(context: vscode.ExtensionContext)
+    private constructor()
     {
-        this._outputChannel = vscode.window.createOutputChannel(EXTENSION_NAME, { log: true });
-        registerOutputChannel(context, this._outputChannel);
-
         this.platform = this._getPlatform();
         this.isLinux = this.platform === Platform.LINUX;
         this.isMac = this.platform === Platform.MACINTOSH;
@@ -92,25 +85,13 @@ export class Environment implements Pick<vscode.LogOutputChannel, "info" | "erro
     }
 
     /**
-     * Initialize the singleton instance of {@link Environment}.
-     */
-    public static initialize(context: vscode.ExtensionContext)
-    {
-        if (!Environment._instance)
-        {
-            Environment._instance = new Environment(context);
-        }
-        return Environment._instance;
-    }
-
-    /**
      * Get the singleton instance of {@link Environment}.
      */
     public static get instance()
     {
         if (!Environment._instance)
         {
-            throw new Error("Environment is not initialized, please call Environment.initialize() first.");
+            Environment._instance = new Environment();
         }
         return Environment._instance;
     }
@@ -149,16 +130,6 @@ export class Environment implements Pick<vscode.LogOutputChannel, "info" | "erro
     public getExtensionDirectoryName(extension: IExtension): string
     {
         return `${extension.publisher}.${extension.name}-${extension.version}`;
-    }
-
-    public info(message: string, ...args: unknown[])
-    {
-        this._outputChannel.info(message, ...args);
-    }
-
-    public error(error: string | Error, ...args: unknown[])
-    {
-        this._outputChannel.error(error, ...args);
     }
 
     /**
