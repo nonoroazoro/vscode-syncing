@@ -3,8 +3,8 @@ import * as vscode from "vscode";
 
 import { CaseInsensitiveMap } from "../collections";
 import { ExtensionAssetType, ExtensionPropertyType, QueryFilterType, QueryFlag } from "../types";
+import type { ExtensionMeta, ExtensionVersion, Query } from "../types";
 import { post } from "./ajax";
-import type { ExtensionMeta, ExtensionVersion } from "../types";
 
 /**
  * Query the extensions' meta data.
@@ -18,8 +18,8 @@ export async function queryExtensions(ids: string[], proxy?: string)
     if (ids.length > 0)
     {
         const api = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery";
-        const headers = { Accept: "application/json;api-version=5.1-preview.1" };
-        const data = {
+        const headers = { "Accept": "application/json;api-version=7.2-preview.1;excludeUrls=true" };
+        const data: Query = {
             filters: [
                 {
                     criteria: ids.map(name => ({
@@ -28,21 +28,20 @@ export async function queryExtensions(ids: string[], proxy?: string)
                     }))
                 }
             ],
-            flags: QueryFlag.IncludeVersionProperties | QueryFlag.ExcludeNonValidated
+            flags: QueryFlag.IncludeLatestVersionOnly
+                | QueryFlag.IncludeVersionProperties
+                | QueryFlag.ExcludeNonValidated
         };
 
         try
         {
             const res = await post(api, data, headers, proxy);
-            const { results } = JSON.parse(res);
-            if (results.length > 0)
+            const results = JSON.parse(res).results as Array<{ extensions?: ExtensionMeta[]; }> | undefined;
+            results?.[0]?.extensions?.forEach(extension =>
             {
-                (results[0].extensions ?? []).forEach((extension: ExtensionMeta) =>
-                {
-                    // Use extension's fullname as the key.
-                    result.set(`${extension.publisher.publisherName}.${extension.extensionName}`, extension);
-                });
-            }
+                // Use extension's fullname as the key.
+                result.set(`${extension.publisher.publisherName}.${extension.extensionName}`, extension);
+            });
         }
         catch
         {
@@ -56,11 +55,11 @@ export async function queryExtensions(ids: string[], proxy?: string)
  * Finds the latest supported version of the VSIX file.
  *
  * @param {ExtensionMeta} extensionMeta The extension's meta object.
- * @param {boolean} [includePreRelease=false] Whether to include the pre-release version. Defaults to `false`.
+ * @param {boolean} [allowPreReleaseVersions=false] Whether to allow pre-release versions. Defaults to `false`.
  */
-export function findLatestSupportedVSIXVersion(extensionMeta: ExtensionMeta, includePreRelease = false): string | undefined
+export function findLatestSupportedVSIXVersion(extensionMeta: ExtensionMeta, allowPreReleaseVersions = false)
 {
-    return extensionMeta.versions.find(v => isVSIXSupported(v, includePreRelease))?.version;
+    return extensionMeta.versions.find(v => isVSIXSupported(v, allowPreReleaseVersions))?.version;
 }
 
 /**
@@ -88,11 +87,11 @@ export function getVSIXDownloadURL(version: ExtensionVersion): string | undefine
  * Checks if the extension version is supported by current VSCode.
  *
  * @param {ExtensionVersion} version The specified extension version.
- * @param {boolean} includePreRelease Whether to include the pre-release version.
+ * @param {boolean} allowPreReleaseVersions Whether to allow pre-release versions.
  */
-export function isVSIXSupported(version: ExtensionVersion, includePreRelease: boolean)
+export function isVSIXSupported(version: ExtensionVersion, allowPreReleaseVersions: boolean)
 {
-    if (!includePreRelease)
+    if (!allowPreReleaseVersions)
     {
         if (version.properties?.find(p => p.key === ExtensionPropertyType.PRE_RELEASE)?.value === "true")
         {
@@ -101,7 +100,8 @@ export function isVSIXSupported(version: ExtensionVersion, includePreRelease: bo
         }
     }
 
-    const requiredVersion = coerce(version.properties?.find(p => p.key === ExtensionPropertyType.ENGINE)?.value)?.version;
+    const requiredVersion = coerce(version.properties?.find(p => p.key === ExtensionPropertyType.ENGINE)?.value)
+        ?.version;
     try
     {
         return requiredVersion == null ? true : lte(requiredVersion, vscode.version);
