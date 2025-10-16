@@ -1,16 +1,15 @@
 import * as vscode from "vscode";
 
-import { localize } from "../i18n";
-import { normalize } from "./locale";
 import { VSCODE_BUILTIN_ENVIRONMENTS } from "../constants";
+import { localize } from "../i18n";
 import { VSCodeEdition } from "../types";
 import type { NormalizedLocale } from "../types";
+import { normalize } from "./locale";
 
 /**
  * Gets the VSCode extension by id.
  *
  * The id is `case-insensitive` by default.
- *
  */
 export function getExtensionById(id: string, ignoreCase = true)
 {
@@ -37,22 +36,15 @@ export function getVSCodeSetting<T>(section: string, key: string, defaultValue?:
 /**
  * Gets the `editor.formatOnSave` setting from settings JSON.
  */
-export function getJSONFormatOnSaveSetting(settingsJSON: any): boolean | undefined
+export function getJSONFormatOnSaveSetting(settingsJSON: JSONObject): boolean | undefined
 {
     let result: boolean | undefined;
-    const key = "editor.formatOnSave";
     if (settingsJSON)
     {
-        result = settingsJSON["[json]"] && settingsJSON["[json]"][key];
-        if (result == null)
-        {
-            result = settingsJSON["[jsonc]"] && settingsJSON["[jsonc]"][key];
-        }
-
-        if (result == null)
-        {
-            result = settingsJSON[key];
-        }
+        const key = "editor.formatOnSave";
+        result = (settingsJSON["[json]"] as Record<string, boolean>)?.[key]
+            ?? (settingsJSON["[jsonc]"] as Record<string, boolean>)?.[key]
+            ?? settingsJSON[key] as boolean;
     }
     return result;
 }
@@ -72,7 +64,7 @@ export function getVSCodeLocale(): string | undefined
 {
     try
     {
-        return JSON.parse(process.env.VSCODE_NLS_CONFIG ?? "{}").locale;
+        return (JSON.parse(process.env.VSCODE_NLS_CONFIG ?? "{}") as { locale?: string; }).locale;
     }
     catch
     {
@@ -125,11 +117,6 @@ export function getVSCodeEdition()
         default:
             throw new Error(localize("error.env.unknown.vscode", vscode.env.appName));
     }
-
-    // if (vscode.extensions.getExtension("coder.coder"))
-    // {
-    //     return VSCodeEdition.CODER;
-    // }
 }
 
 /**

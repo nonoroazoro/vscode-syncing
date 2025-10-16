@@ -13,7 +13,7 @@ export class CaseInsensitiveSet<T> extends Set<T>
     {
         if (isString(value))
         {
-            return super.add(value.toLocaleLowerCase() as any as T);
+            return super.add(value.toLocaleLowerCase() as T);
         }
         return super.add(value);
     }
@@ -22,7 +22,7 @@ export class CaseInsensitiveSet<T> extends Set<T>
     {
         if (isString(value))
         {
-            return super.delete(value.toLocaleLowerCase() as any as T);
+            return super.delete(value.toLocaleLowerCase() as T);
         }
         return super.delete(value);
     }
@@ -31,7 +31,7 @@ export class CaseInsensitiveSet<T> extends Set<T>
     {
         if (isString(value))
         {
-            return super.has(value.toLocaleLowerCase() as any as T);
+            return super.has(value.toLocaleLowerCase() as T);
         }
         return super.has(value);
     }

@@ -6,9 +6,9 @@
  * With the template `"Hello, {0} and {1}!"` and the values `["Jack", "Rose"]`, you'll get `"Hello, Jack and Rose!"`.
  *
  * @param {string} template The template string.
- * @param {...any[]} values The values.
+ * @param {...string[]} values The values.
  */
-export function format(template: string, ...values: any[])
+export function format(template: string, ...values: string[])
 {
     if (template == null)
     {

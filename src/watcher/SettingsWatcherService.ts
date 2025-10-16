@@ -1,10 +1,10 @@
+import { is } from "junk";
 import { basename } from "node:path";
-import * as junk from "junk";
 
+import { Environment, Syncing } from "../core";
+import { debounce } from "../utils/timer";
 import { AbstractWatcher, WatcherEvent } from "./AbstractWatcher";
 import { ChokidarFileWatcher } from "./ChokidarFileWatcher";
-import { debounce } from "../utils/timer";
-import { Environment, Syncing } from "../core";
 import { VSCodeExtensionWatcher } from "./VSCodeExtensionWatcher";
 
 export interface SettingsWatcherServiceOptions
@@ -75,7 +75,7 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
                         {
                             if (stats?.isFile())
                             {
-                                return !path.endsWith(".json") || junk.is(basename(path));
+                                return !path.endsWith(".json") || is(basename(path));
                             }
                             return false;
                         }
@@ -103,7 +103,7 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
         // Note: The debounce queue must be cleared here instead of in `pause`.
         if (this._options.debounce)
         {
-            (this._handleWatcherEvent as any).cancel();
+            (this._handleWatcherEvent as { (this: unknown): void; cancel(): void; }).cancel();
         }
     }
 

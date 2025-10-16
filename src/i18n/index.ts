@@ -1,16 +1,16 @@
 import { readJsonSync } from "fs-extra";
-import * as path from "path";
+import * as path from "node:path";
 
+import { NormalizedLocale } from "../types";
 import { format } from "../utils/template";
 import { getNormalizedVSCodeLocale } from "../utils/vscodeAPI";
-import { NormalizedLocale } from "../types";
 
 let instance: I18n;
 
 class I18n
 {
     private static _instance: I18n;
-    private static _DEFAULT_LOCALE_FILENAME: string = "package.nls.json";
+    private static _DEFAULT_LOCALE_FILENAME = "package.nls.json";
 
     private _bundle: Record<string, string>;
     private _extensionPath: string;
@@ -28,7 +28,7 @@ class I18n
      */
     public static create(extensionPath: string): I18n
     {
-        if (!I18n._instance || I18n._instance._extensionPath !== extensionPath)
+        if (I18n._instance?._extensionPath !== extensionPath)
         {
             I18n._instance = new I18n(extensionPath);
         }
@@ -47,17 +47,17 @@ class I18n
      * Gets the localized message.
      *
      * @param {string} key The key of the message.
-     * @param {...any[]} templateValues If the message is a template string,
+     * @param {...string[]} templateValues If the message is a template string,
      * these args will be used to replace the templates.
      */
-    public localize(key: string, ...templateValues: any[]): string
+    public localize(key: string, ...templateValues: string[]): string
     {
         const message = this._bundle[key];
-        if (templateValues.length > 0)
+        if (message != null && templateValues.length > 0)
         {
             return format(message, ...templateValues);
         }
-        return message;
+        return message ?? key;
     }
 
     private _prepare()
@@ -102,10 +102,10 @@ export function locale(): NormalizedLocale
  * Gets the localized message.
  *
  * @param {string} key The key of the message.
- * @param {...any[]} templateValues If the message is a template string,
+ * @param {...string[]} templateValues If the message is a template string,
  * these args will be used to replace the templates.
  */
-export function localize(key: string, ...templateValues: any[]): string
+export function localize(key: string, ...templateValues: string[]): string
 {
     return instance.localize(key, ...templateValues);
 }

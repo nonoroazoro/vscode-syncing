@@ -1,28 +1,28 @@
-import { lte } from "semver";
 import * as extractZip from "extract-zip";
 import * as fs from "fs-extra";
 import * as micromatch from "micromatch";
-import * as path from "path";
+import * as path from "node:path";
+import { lte } from "semver";
 import * as tmp from "tmp-promise";
 import * as vscode from "vscode";
 
 import { CaseInsensitiveMap, CaseInsensitiveSet } from "../collections";
-import
-{
+import {
     CONFIGURATION_EXCLUDED_EXTENSIONS,
     CONFIGURATION_EXTENSIONS_AUTOUPDATE,
     CONFIGURATION_KEY
 } from "../constants";
+import { localize } from "../i18n";
+import type { ExtensionMeta, IExtension, ISyncedItem } from "../types";
 import { downloadFile } from "../utils/ajax";
-import { Environment } from "./Environment";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
 import { findLatestSupportedVSIXVersion, queryExtensions } from "../utils/vscodeWebAPI";
-import { localize } from "../i18n";
+import { Environment } from "./Environment";
 import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
-import type { IExtension, ExtensionMeta, ISyncedItem } from "../types";
 
-tmp.setGracefulCleanup();
+// TODO: tweak or remove this.
+(tmp.setGracefulCleanup as () => void)();
 
 /**
  * Represents the options of synchronization.
@@ -91,7 +91,7 @@ export class Extension
         {
             if (
                 !ext.packageJSON.isBuiltin
-                && !excludedPatterns.some((pattern) => micromatch.isMatch(ext.id, pattern, { nocase: true }))
+                && !excludedPatterns.some(pattern => micromatch.isMatch(ext.id, pattern, { nocase: true }))
             )
             {
                 item = {
@@ -112,7 +112,7 @@ export class Extension
      * @param extensions Extensions to be synced.
      * @param showIndicator Whether to show the progress indicator. Defaults to `false`.
      */
-    public async sync(extensions: IExtension[], showIndicator: boolean = false): Promise<ISyncedItem>
+    public async sync(extensions: IExtension[], showIndicator = false): Promise<ISyncedItem>
     {
         const diff = await this._getDifferentExtensions(extensions);
 
@@ -168,8 +168,7 @@ export class Extension
         const filepath = (await tmp.file({ postfix: `.${extension.id}.zip` })).path;
 
         // Calculates the VSIX download URL.
-        extension.downloadURL =
-            `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
+        extension.downloadURL = `https://${extension.publisher}.gallery.vsassets.io/_apis/public/gallery/`
             + `publisher/${extension.publisher}/extension/${extension.name}/${extension.version}/`
             + "assetbyname/Microsoft.VisualStudio.Services.VSIXPackage?install=true";
 
@@ -207,7 +206,7 @@ export class Extension
                 await fs.copy(path.join(dirPath, "extension"), extPath);
                 return extension;
             }
-            catch (err: any)
+            catch (err)
             {
                 throw new Error(localize("error.extract.extension-1", extension.id, err.message));
             }
@@ -245,13 +244,17 @@ export class Extension
         {
             await fs.remove(this._env.obsoleteFilePath);
         }
-        catch { }
+        catch
+        {
+        }
 
         try
         {
             await fs.remove(this._env.extensionsFilePath);
         }
-        catch { }
+        catch
+        {
+        }
     }
 
     /**
@@ -276,14 +279,14 @@ export class Extension
         if (extensions)
         {
             // 1. Auto update extensions: Query the latest extensions.
-            let queriedExtensions: CaseInsensitiveMap<string, ExtensionMeta> = new CaseInsensitiveMap();
+            let queriedExtensions = new CaseInsensitiveMap<string, ExtensionMeta>();
             const autoUpdateExtensions = getVSCodeSetting<boolean>(
                 CONFIGURATION_KEY,
                 CONFIGURATION_EXTENSIONS_AUTOUPDATE
             );
             if (autoUpdateExtensions)
             {
-                queriedExtensions = await queryExtensions(extensions.map((ext) => ext.id), this._syncing.proxy);
+                queriedExtensions = await queryExtensions(extensions.map(ext => ext.id), this._syncing.proxy);
             }
 
             // Find added & updated extensions.

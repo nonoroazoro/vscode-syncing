@@ -14,7 +14,7 @@ export class CaseInsensitiveMap<K, V> extends Map<K, V>
     {
         if (isString(key))
         {
-            return super.delete(key.toLocaleLowerCase() as any as K);
+            return super.delete(key.toLocaleLowerCase() as K);
         }
         return super.delete(key);
     }
@@ -23,7 +23,7 @@ export class CaseInsensitiveMap<K, V> extends Map<K, V>
     {
         if (isString(key))
         {
-            return super.get(key.toLocaleLowerCase() as any as K);
+            return super.get(key.toLocaleLowerCase() as K);
         }
         return super.get(key);
     }
@@ -32,7 +32,7 @@ export class CaseInsensitiveMap<K, V> extends Map<K, V>
     {
         if (isString(key))
         {
-            return super.has(key.toLocaleLowerCase() as any as K);
+            return super.has(key.toLocaleLowerCase() as K);
         }
         return super.has(key);
     }
@@ -41,7 +41,7 @@ export class CaseInsensitiveMap<K, V> extends Map<K, V>
     {
         if (isString(key))
         {
-            return super.set(key.toLocaleLowerCase() as any as K, value);
+            return super.set(key.toLocaleLowerCase() as K, value);
         }
         return super.set(key, value);
     }

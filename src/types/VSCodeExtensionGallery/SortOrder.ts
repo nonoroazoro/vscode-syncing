@@ -1,4 +1,3 @@
-
 export enum SortOrder
 {
     Default = 0,

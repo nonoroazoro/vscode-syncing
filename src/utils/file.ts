@@ -1,4 +1,4 @@
-import * as fs from "fs-extra";
+import { stat, utimes } from "fs-extra";
 
 import { parse } from "./date";
 
@@ -14,7 +14,7 @@ export async function readLastModified(path: string): Promise<number | undefined
     let result: number | undefined;
     try
     {
-        result = (await fs.stat(path)).mtimeMs;
+        result = (await stat(path)).mtimeMs;
     }
     catch
     {
@@ -34,7 +34,7 @@ export async function writeLastModified(path: string, mtime: Date | number | str
     try
     {
         const newMTime = parse(mtime);
-        await fs.utimes(path, newMTime, newMTime);
+        await utimes(path, newMTime, newMTime);
     }
     catch
     {

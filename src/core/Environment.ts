@@ -1,10 +1,10 @@
-import * as os from "os";
-import * as path from "path";
+import * as os from "node:os";
+import * as path from "node:path";
 
-import { getVSCodeBuiltinEnvironment } from "../utils/vscodeAPI";
 import { localize } from "../i18n";
 import { Platform } from "../types";
 import type { IExtension } from "../types";
+import { getVSCodeBuiltinEnvironment } from "../utils/vscodeAPI";
 
 /**
  * VSCode environment wrapper.
@@ -71,10 +71,10 @@ export class Environment
     private constructor()
     {
         this.platform = this._getPlatform();
-        this.isLinux = (this.platform === Platform.LINUX);
-        this.isMac = (this.platform === Platform.MACINTOSH);
-        this.isWindows = (this.platform === Platform.WINDOWS);
-        this.isPortable = (process.env.VSCODE_PORTABLE != null);
+        this.isLinux = this.platform === Platform.LINUX;
+        this.isMac = this.platform === Platform.MACINTOSH;
+        this.isWindows = this.platform === Platform.WINDOWS;
+        this.isPortable = process.env.VSCODE_PORTABLE != null;
 
         this.extensionsDirectory = this._getExtensionsDirectory(this.isPortable);
         this.dataDirectory = this._getDataDirectory(this.isPortable, this.platform);

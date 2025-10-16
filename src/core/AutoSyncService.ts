@@ -1,12 +1,12 @@
 import * as vscode from "vscode";
 
-import { Gist } from "./Gist";
-import { isAfter } from "../utils/date";
 import { localize } from "../i18n";
+import type { IGist, IGistFile, IGistFiles, ISetting, ISyncingSettings } from "../types";
+import { isAfter } from "../utils/date";
 import { SettingsWatcherService, WatcherEvent } from "../watcher";
-import { VSCodeSetting } from "./VSCodeSetting";
+import { Gist } from "./Gist";
 import * as Toast from "./Toast";
-import type { IGist, ISetting, ISyncingSettings } from "../types";
+import { VSCodeSetting } from "./VSCodeSetting";
 
 export class AutoSyncService
 {
@@ -74,11 +74,11 @@ export class AutoSyncService
         Toast.showSpinner(localize("toast.settings.autoSync.checkingSettings"));
         try
         {
-            const { token, id, http_proxy } = syncingSettings;
+            const { token, id, http_proxy: proxy } = syncingSettings;
             const localSettings = await this._vscodeSetting.getSettings(true);
             const localLastModified = this._vscodeSetting.getLastModified(localSettings);
 
-            const api = Gist.create(token, http_proxy);
+            const api = Gist.create(token, proxy);
             const remoteSettings = await api.get(id);
             const remoteLastModified = remoteSettings.updated_at;
             if (this._isModified(localSettings, remoteSettings, api))
@@ -101,7 +101,7 @@ export class AutoSyncService
                 Toast.statusInfo(localize("toast.settings.autoSync.nothingChanged"));
             }
         }
-        catch (err: any)
+        catch (err)
         {
             Toast.statusError(localize("toast.settings.autoSync.failed", err.message));
         }
@@ -115,13 +115,13 @@ export class AutoSyncService
 
     private _isModified(localSettings: ISetting[], remoteSettings: IGist, api: Gist): boolean
     {
-        const localFiles = {} as any;
+        const localFiles: IGistFiles = {};
         for (const item of localSettings)
         {
             // Filter out `null` content.
             if (item.content)
             {
-                localFiles[item.remoteFilename] = { content: item.content };
+                localFiles[item.remoteFilename] = { content: item.content } as IGistFile;
             }
         }
         return api.getModifiedFiles(localFiles, remoteSettings.files) != null;

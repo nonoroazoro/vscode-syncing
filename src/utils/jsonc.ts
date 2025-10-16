@@ -1,8 +1,8 @@
 import * as jsonc from "jsonc-parser";
 import * as micromatch from "micromatch";
 
-import { getJSONFormatOnSaveSetting } from "./vscodeAPI";
 import { SETTING_EXCLUDED_SETTINGS } from "../constants";
+import { getJSONFormatOnSaveSetting } from "./vscodeAPI";
 
 /**
  * The default `ModificationOptions` of `jsonc-parser`.
@@ -46,7 +46,7 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: JSONOb
         if (modified)
         {
             const formatOnSave = getJSONFormatOnSaveSetting(settingsJSON);
-            if (formatOnSave == null || formatOnSave)
+            if (formatOnSave)
             {
                 // Format if the result is modified and formatOnSave is true or undefined.
                 result = format(result);
@@ -68,18 +68,19 @@ export function excludeSettings(settingsJSONString: string, settingsJSON: JSONOb
 export function mergeSettings(sSettingsJSONString: string, dSettingsJSONString: string): string
 {
     let result = sSettingsJSONString;
-    const sSettingsJSON = parse(result);
-    const dSettingsJSON = parse(dSettingsJSONString);
+    const sSettingsJSON = parse(result) as JSONObject;
+    const dSettingsJSON = parse(dSettingsJSONString) as JSONObject;
     if (sSettingsJSON && dSettingsJSON)
     {
         // Get all of the matched properties from the source and destination settings.
-        const sPatterns = sSettingsJSON[SETTING_EXCLUDED_SETTINGS] ?? [];
+        const sPatterns = (sSettingsJSON[SETTING_EXCLUDED_SETTINGS] ?? []) as string[];
         const sExcludedKeys = getExcludedKeys(sSettingsJSON, sPatterns);
         const dExcludedKeys = getExcludedKeys(dSettingsJSON, sPatterns);
-        const excludedKeys = Array.from<string>(new Set([...sExcludedKeys, ...dExcludedKeys])).sort((a, b) => a.localeCompare(b));
+        const excludedKeys = Array.from<string>(new Set([...sExcludedKeys, ...dExcludedKeys]))
+            .sort((a, b) => a.localeCompare(b));
 
         // Replace the source properties with the corresponding destination properties values.
-        let dValue: any;
+        let dValue: JSONValue | undefined;
         let modified = false;
         let edits: jsonc.Edit[];
         for (const key of excludedKeys)
@@ -121,7 +122,7 @@ export function getExcludedKeys(settingsJSON: JSONObject, patterns: string[]): s
     for (const key of keys)
     {
         // Get JSON path that matches with the exclude list.
-        if (patterns.some((pattern) => micromatch.isMatch(key, pattern)))
+        if (patterns.some(pattern => micromatch.isMatch(key, pattern)))
         {
             excludeKeys.push(key);
         }
@@ -141,7 +142,7 @@ export function format(jsonString: string, formattingOptions = JSONC_MODIFICATIO
 /**
  * Parses the given text and returns the object the JSON content represents.
  */
-export function parse(text: string)
+export function parse(text: string): unknown
 {
     // Evaluates in a fault tolerant fashion and never throw exceptions.
     return jsonc.parse(text);

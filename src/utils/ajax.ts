@@ -1,7 +1,7 @@
-import { HttpsProxyAgent } from "https-proxy-agent";
 import * as fs from "fs-extra";
-import * as https from "https";
-import * as zlib from "zlib";
+import { HttpsProxyAgent } from "https-proxy-agent";
+import * as https from "node:https";
+import * as zlib from "node:zlib";
 
 import { isEmptyString } from "./lang";
 
@@ -9,11 +9,16 @@ import { isEmptyString } from "./lang";
  * Posts a request.
  *
  * @param {string} api The post url.
- * @param {any} data The post data.
- * @param {any} headers The headers.
+ * @param {unknown} data The post data.
+ * @param {Record<string, string>} headers The headers.
  * @param {string} [proxy] The proxy settings.
  */
-export function post(api: string, data: any, headers: any, proxy?: string): Promise<string>
+export async function post(
+    api: string,
+    data: unknown,
+    headers: Record<string, string>,
+    proxy?: string
+): Promise<string>
 {
     return new Promise((resolve, reject) =>
     {
@@ -48,7 +53,7 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
             }
             else
             {
-                reject();
+                reject(new Error(res.statusMessage));
             }
         }).on("error", err =>
         {
@@ -67,7 +72,7 @@ export function post(api: string, data: any, headers: any, proxy?: string): Prom
  * @param {string} savepath The path where the file will be saved;
  * @param {string} [proxy] The proxy settings.
  */
-export function downloadFile(uri: string, savepath: string, proxy?: string): Promise<void>
+export async function downloadFile(uri: string, savepath: string, proxy?: string): Promise<void>
 {
     return new Promise((resolve, reject) =>
     {
@@ -109,13 +114,15 @@ export function downloadFile(uri: string, savepath: string, proxy?: string): Pro
             }
             else
             {
-                reject();
+                reject(new Error(res.statusMessage));
             }
         }).on("error", err =>
         {
             // Close and remove the temp file.
             file.close();
-            fs.remove(savepath).catch(() => { }).then(() => { reject(err); });
+            fs.remove(savepath)
+                .catch(() => {})
+                .finally(() => { reject(err); });
         });
     });
 }

@@ -1,4 +1,3 @@
-
 export enum SortBy
 {
     NoneOrRelevance = 0,

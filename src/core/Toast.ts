@@ -4,8 +4,8 @@
 
 import * as vscode from "vscode";
 
-import { formatDistance } from "../utils/date";
 import { locale, localize } from "../i18n";
+import { formatDistance } from "../utils/date";
 import { reloadWindow } from "../utils/vscodeAPI";
 import type { Gist } from "./Gist";
 
@@ -76,7 +76,7 @@ export function statusFatal(message: string): void
  *
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export async function showGitHubTokenInputBox(forUpload: boolean = true): Promise<string>
+export async function showGitHubTokenInputBox(forUpload = true): Promise<string>
 {
     const placeHolder = forUpload
         ? localize("toast.box.enter.github.token.upload")
@@ -110,7 +110,7 @@ export async function showGitHubTokenInputBox(forUpload: boolean = true): Promis
  *
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export async function showGistInputBox(forUpload: boolean = true): Promise<string>
+export async function showGistInputBox(forUpload = true): Promise<string>
 {
     const placeHolder = forUpload
         ? localize("toast.box.enter.gist.id.upload")
@@ -144,7 +144,7 @@ export async function showGistInputBox(forUpload: boolean = true): Promise<strin
  * @param api GitHub Gist utils.
  * @param forUpload Whether to show messages for upload. Defaults to `true`.
  */
-export async function showRemoteGistListBox(api: Gist, forUpload: boolean = true): Promise<string>
+export async function showRemoteGistListBox(api: Gist, forUpload = true): Promise<string>
 {
     showSpinner(localize("toast.settings.checking.remote.gists"));
     const gists = await api.getAll();
@@ -160,7 +160,7 @@ export async function showRemoteGistListBox(api: Gist, forUpload: boolean = true
     // Show quick pick dialog only if the gists is not empty.
     if (gists.length > 0)
     {
-        const items: IGistListBoxItem[] = gists.map((gist) => ({
+        const items: IGistListBoxItem[] = gists.map(gist => ({
             data: gist.id,
             description: localize(
                 "toast.box.gist.last.uploaded",
@@ -204,7 +204,7 @@ export function showReloadBox(): void
 {
     const reloadButton = localize("toast.box.reload");
     const message = localize("toast.box.reload.message");
-    vscode.window.showInformationMessage(message, reloadButton).then((selection) =>
+    vscode.window.showInformationMessage(message, reloadButton).then(selection =>
     {
         if (selection === reloadButton)
         {
@@ -246,7 +246,7 @@ export function showSpinner(message: string, progress?: number, total?: number):
 
     if (message != null)
     {
-        text = text ? `${text} ${message}` : `${message}`;
+        text = text ? `${text} ${message}` : message;
     }
 
     if (text)
@@ -254,7 +254,7 @@ export function showSpinner(message: string, progress?: number, total?: number):
         text = ` ${text.trim()}`;
     }
 
-    let step: number = 0;
+    let step = 0;
     const frames: string[] = spinner.frames;
     const length: number = frames.length;
     spinnerTimer = setInterval(() =>

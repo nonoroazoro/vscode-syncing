@@ -1,7 +1,7 @@
 import { watch } from "chokidar";
 import type { ChokidarOptions, FSWatcher } from "chokidar";
 
-import { WatcherEvent, AbstractWatcher } from "./AbstractWatcher";
+import { AbstractWatcher, WatcherEvent } from "./AbstractWatcher";
 
 export class ChokidarFileWatcher extends AbstractWatcher
 {
@@ -28,7 +28,7 @@ export class ChokidarFileWatcher extends AbstractWatcher
     {
         if (!this._watcher && this._paths)
         {
-            this._watcher = watch(this._paths, this._options as any);
+            this._watcher = watch(this._paths, this._options);
             this._watcher.on("all", this._handleWatcherEvent);
         }
     }
@@ -38,7 +38,7 @@ export class ChokidarFileWatcher extends AbstractWatcher
         if (this._watcher)
         {
             super.stop();
-            this._watcher.close();
+            this._watcher.close().catch(() => {});
             this._watcher = undefined;
         }
     }

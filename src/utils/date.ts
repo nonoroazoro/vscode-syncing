@@ -1,8 +1,8 @@
 import { formatDistance as rawFormatDistance, isAfter as rawIsAfter, parseISO } from "date-fns";
 import { enUS, zhCN } from "date-fns/locale";
 
-import { isDate, isString } from "./lang";
 import { NormalizedLocale } from "../types";
+import { isDate, isString } from "./lang";
 
 /**
  * Parses the given value and returns the `Date` the input value represents.
@@ -58,6 +58,11 @@ export function formatDistance(date: Date, baseDate: Date, locale?: NormalizedLo
  */
 function _getDateLocale(locale?: NormalizedLocale)
 {
+    if (locale == null)
+    {
+        return enUS;
+    }
+
     switch (locale)
     {
         case NormalizedLocale.ZH_CN:
