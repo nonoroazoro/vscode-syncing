@@ -20,9 +20,7 @@
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"
             ],
-            "osx": {
-                "preLaunchTask": "tsc-watch"
-            }
+            "preLaunchTask": "tsc-watch"
         }
     ]
 }
