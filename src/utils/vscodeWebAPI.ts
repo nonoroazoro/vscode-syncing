@@ -14,7 +14,7 @@ import { post } from "./ajax";
  */
 export async function queryExtensions(ids: string[], proxy?: string)
 {
-    const result = new CaseInsensitiveMap<string, ExtensionMeta>();
+    const result = new CaseInsensitiveMap<ExtensionMeta>();
     if (ids.length > 0)
     {
         const api = "https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery";

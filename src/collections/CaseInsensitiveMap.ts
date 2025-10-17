@@ -1,48 +1,34 @@
-import { isString } from "../utils/lang";
-
 /**
- * A `case-insensitive` `Map`.
+ * A case-insensitive Map.
  *
- * All the keys are converted to lowercase in a locale-independent fashion.
+ * All keys are normalized to lowercase in a locale-independent fashion.
  *
- * @template K The type of the keys in this map.
  * @template V The type of the values in this map.
  */
-export class CaseInsensitiveMap<K, V> extends Map<K, V>
+export class CaseInsensitiveMap<V> extends Map<string, V>
 {
-    public delete(key: K): boolean
+    public delete(key: string): boolean
     {
-        if (isString(key))
-        {
-            return super.delete(key.toLocaleLowerCase() as K);
-        }
-        return super.delete(key);
+        return super.delete(this._normalizeKey(key));
     }
 
-    public get(key: K)
+    public get(key: string): V | undefined
     {
-        if (isString(key))
-        {
-            return super.get(key.toLocaleLowerCase() as K);
-        }
-        return super.get(key);
+        return super.get(this._normalizeKey(key));
     }
 
-    public has(key: K)
+    public has(key: string): boolean
     {
-        if (isString(key))
-        {
-            return super.has(key.toLocaleLowerCase() as K);
-        }
-        return super.has(key);
+        return super.has(this._normalizeKey(key));
     }
 
-    public set(key: K, value: V)
+    public set(key: string, value: V): this
     {
-        if (isString(key))
-        {
-            return super.set(key.toLocaleLowerCase() as K, value);
-        }
-        return super.set(key, value);
+        return super.set(this._normalizeKey(key), value);
+    }
+
+    private _normalizeKey(key: string)
+    {
+        return key.toLocaleLowerCase();
     }
 }
