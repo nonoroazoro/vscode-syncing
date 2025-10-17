@@ -59,7 +59,7 @@ export class Gist
         this._token = token;
         if (token != null && !isEmptyString(token))
         {
-            options.auth = `token ${token}`;
+            options.auth = token;
         }
 
         this._api = new Octokit(options);
