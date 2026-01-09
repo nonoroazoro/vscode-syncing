@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import { diff } from "../../src/utils/diffPatch";
 
 describe("Syncing/utils/diffPatch", () =>

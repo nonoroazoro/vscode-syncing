@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import { pick } from "../../src/utils/object";
 
 describe("Syncing/utils/object", () =>

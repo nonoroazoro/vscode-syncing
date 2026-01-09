@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import { NormalizedLocale } from "../../src/types";
 import { formatDistance, isAfter, parse } from "../../src/utils/date";
 

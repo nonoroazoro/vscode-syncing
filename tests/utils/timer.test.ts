@@ -1,25 +1,28 @@
-import { debounce } from "../../src/utils/timer";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-jest.useFakeTimers();
+import { debounce } from "../../src/utils/timer";
 
 describe("Syncing/utils/timer", () =>
 {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
     it("debounce", () =>
     {
-        const func = jest.fn();
+        const func = vi.fn();
         const debounced = debounce(func, 100);
         expect(func).not.toHaveBeenCalled();
 
         debounced();
-        jest.advanceTimersByTime(10);
+        vi.advanceTimersByTime(10);
 
         expect(func).not.toHaveBeenCalled();
         debounced();
 
-        jest.advanceTimersByTime(10);
+        vi.advanceTimersByTime(10);
         expect(func).not.toHaveBeenCalled();
 
-        jest.advanceTimersByTime(100);
+        vi.advanceTimersByTime(100);
         expect(func).toHaveBeenCalled();
     });
 });

@@ -1,5 +1,5 @@
 import * as fs from "fs-extra";
-import { not } from "junk";
+import { isNotJunk } from "junk";
 import * as micromatch from "micromatch";
 import * as path from "node:path";
 
@@ -383,7 +383,7 @@ export class VSCodeSetting
         try
         {
             const filenames = await fs.readdir(snippetsDir);
-            filenames.filter(not).forEach(filename =>
+            filenames.filter(isNotJunk).forEach(filename =>
             {
                 // Add prefix to all snippets.
                 results.push({
