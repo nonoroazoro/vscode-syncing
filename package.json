@@ -72,11 +72,6 @@
                         "default": [],
                         "description": "%configuration.syncing.excludedSettings%"
                     },
-                    "syncing.extensions.autoUpdate": {
-                        "type": "boolean",
-                        "default": true,
-                        "description": "%configuration.syncing.extensions.autoUpdate%"
-                    },
                     "syncing.pokaYokeThreshold": {
                         "type": "number",
                         "default": 10,

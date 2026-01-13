@@ -21,7 +21,6 @@ export const VSCODE_SETTINGS_LIST = [
 export const CONFIGURATION_KEY = "syncing";
 export const CONFIGURATION_EXCLUDED_EXTENSIONS = "excludedExtensions";
 export const CONFIGURATION_EXCLUDED_SETTINGS = "excludedSettings";
-export const CONFIGURATION_EXTENSIONS_AUTOUPDATE = "extensions.autoUpdate";
 export const CONFIGURATION_POKA_YOKE_THRESHOLD = "pokaYokeThreshold";
 export const CONFIGURATION_SEPARATE_KEYBINDINGS = "separateKeybindings";
 
