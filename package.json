@@ -2,7 +2,7 @@
     "name": "syncing",
     "displayName": "%displayName%",
     "description": "%description%",
-    "version": "3.4.1",
+    "version": "3.5.0",
     "publisher": "nonoroazoro",
     "author": {
         "email": "xiaochao.k@gmail.com",
@@ -134,7 +134,7 @@
         "@types/micromatch": "^4.0.10",
         "@types/node": "^25.0.3",
         "@types/semver": "^7.7.1",
-        "@types/vscode": "^1.108.0",
+        "@types/vscode": "^1.37.0",
         "@typescript-eslint/eslint-plugin": "^8.52.0",
         "@typescript-eslint/parser": "^8.52.0",
         "dprint": "^0.51.1",
