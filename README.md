@@ -15,9 +15,10 @@
 
 ## Features
 
-> ⚠️ **Breaking Change (v3.5.0)**:
+> ⚠️ **Breaking Change (v3.5.1)**:
 >
-> The `http_proxy` setting in `syncing.json` has been removed. Please use VSCode's `http.proxy` setting instead, see [`proxy settings`](#proxy-settings).
+> - `Syncing` now supports any VSCode variant, including `VSCodium`, `Cursor`, `Windsurf`, `Trae`, and more.
+> - The `http_proxy` setting in `syncing.json` has been removed. Please use VSCode's `http.proxy` setting instead, see [`proxy settings`](#proxy-settings).
 
 _Syncing_ will `keep the consistency of your VSCode settings between your devices`, it'll let you:
 
