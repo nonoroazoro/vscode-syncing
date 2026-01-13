@@ -1,9 +1,5 @@
 import * as vscode from "vscode";
 
-import { VSCODE_BUILTIN_ENVIRONMENTS } from "../constants";
-import { Logger } from "../core";
-import { localize } from "../i18n";
-import { VSCodeEdition } from "../types";
 import type { NormalizedLocale } from "../types";
 import { normalize } from "./locale";
 
@@ -71,64 +67,6 @@ export function getVSCodeLocale(): string | undefined
     {
         return;
     }
-}
-
-/**
- * Gets the edition of the current running VSCode.
- *
- * @throws {Error} Throws an error when the edition is unknown.
- */
-export function getVSCodeEdition()
-{
-    switch (vscode.env.appName)
-    {
-        case "Visual Studio Code":
-            return VSCodeEdition.STANDARD;
-
-        case "Visual Studio Code - Insiders":
-            return VSCodeEdition.INSIDERS;
-
-        case "Visual Studio Code - Exploration":
-            return VSCodeEdition.EXPLORATION;
-
-        case "VSCodium":
-            return VSCodeEdition.VSCODIUM;
-
-        case "VSCodium - Insiders":
-            return VSCodeEdition.VSCODIUM_INSIDERS;
-
-        case "Code - OSS":
-            return VSCodeEdition.OSS;
-
-        case "code-server":
-            return VSCodeEdition.CODESERVER;
-
-        case "Cursor":
-            return VSCodeEdition.CURSOR;
-
-        case "Windsurf":
-            return VSCodeEdition.WINDSURF;
-
-        case "Trae":
-            return VSCodeEdition.TRAE;
-
-        case "Trae CN":
-            return VSCodeEdition.TRAE_CN;
-
-        default:
-            Logger.instance.info(localize("info.vscode.env.appName", vscode.env.appName));
-            throw new Error(localize("error.env.unknown.vscode", vscode.env.appName));
-    }
-}
-
-/**
- * Gets the builtin-environment of the current running VSCode.
- *
- * @throws {Error} Throws an error when the environment is not found.
- */
-export function getVSCodeBuiltinEnvironment()
-{
-    return VSCODE_BUILTIN_ENVIRONMENTS[getVSCodeEdition()];
 }
 
 /**

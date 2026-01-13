@@ -1,10 +1,10 @@
-import * as os from "node:os";
 import * as path from "node:path";
+import type { ExtensionContext } from "vscode";
 
 import { localize } from "../i18n";
 import { Platform } from "../types";
 import type { IExtension } from "../types";
-import { getVSCodeBuiltinEnvironment } from "../utils/vscodeAPI";
+import { Logger } from "./Logger";
 
 /**
  * VSCode environment wrapper.
@@ -37,19 +37,14 @@ export class Environment
     public readonly platform: Platform;
 
     /**
-     * Gets the full path of VSCode's `extensions directory`.
-     */
-    public readonly extensionsDirectory: string;
-
-    /**
-     * Gets the full path of VSCode's `data directory`.
-     */
-    public readonly dataDirectory: string;
-
-    /**
      * Gets the full path of VSCode's `user directory`.
      */
     public readonly userDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's `extensions directory`.
+     */
+    public readonly extensionsDirectory: string;
 
     /**
      * Gets the full path of VSCode's `snippets directory`.
@@ -58,7 +53,7 @@ export class Environment
 
     private static _instance: Environment;
 
-    private constructor()
+    private constructor(context: ExtensionContext)
     {
         this.platform = this._getPlatform();
         this.isLinux = this.platform === Platform.LINUX;
@@ -66,10 +61,25 @@ export class Environment
         this.isWindows = this.platform === Platform.WINDOWS;
         this.isPortable = process.env.VSCODE_PORTABLE != null;
 
-        this.extensionsDirectory = this._getExtensionsDirectory(this.isPortable);
-        this.dataDirectory = this._getDataDirectory(this.isPortable, this.platform);
-        this.userDirectory = path.join(this.dataDirectory, "User");
+        this.userDirectory = path.dirname(path.dirname(context.globalStorageUri.fsPath));
+        Logger.instance.info("UserDirectory", this.userDirectory);
+
+        this.extensionsDirectory = this._getExtensionsDirectory(this.isPortable, context);
+        Logger.instance.info("ExtensionsDirectory", this.extensionsDirectory);
+
         this.snippetsDirectory = this.getSettingsFilePath("snippets");
+        Logger.instance.info("SnippetsDirectory", this.snippetsDirectory);
+    }
+
+    /**
+     * Initialize the singleton instance of {@link Environment}.
+     */
+    public static initialize(context: ExtensionContext)
+    {
+        if (!Environment._instance)
+        {
+            Environment._instance = new Environment(context);
+        }
     }
 
     /**
@@ -79,7 +89,7 @@ export class Environment
     {
         if (!Environment._instance)
         {
-            Environment._instance = new Environment();
+            throw new Error("Environment is not initialized, please call Environment.initialize() first.");
         }
         return Environment._instance;
     }
@@ -123,52 +133,14 @@ export class Environment
     /**
      * Gets the extensions directory of VSCode.
      */
-    private _getExtensionsDirectory(isPortable: boolean)
+    private _getExtensionsDirectory(isPortable: boolean, context: ExtensionContext)
     {
         if (isPortable)
         {
             // Such as the "/Applications/code-portable-data/extensions" directory in MacOS.
             return path.join(process.env.VSCODE_PORTABLE ?? "", "extensions");
         }
-        return path.join(
-            os.homedir(),
-            getVSCodeBuiltinEnvironment().extensionsDirectoryName,
-            "extensions"
-        );
-    }
-
-    /**
-     * Gets the data directory of VSCode.
-     */
-    private _getDataDirectory(isPortable: boolean, platform: Platform): string
-    {
-        if (isPortable)
-        {
-            // Such as the "/Applications/code-portable-data/user-data" directory in MacOS.
-            return path.join(process.env.VSCODE_PORTABLE ?? "", "user-data");
-        }
-        const { dataDirectoryName } = getVSCodeBuiltinEnvironment();
-        switch (platform)
-        {
-            case Platform.WINDOWS:
-                return path.join(process.env.APPDATA ?? "", dataDirectoryName);
-
-            case Platform.MACINTOSH:
-                return path.join(
-                    os.homedir(),
-                    "Library",
-                    "Application Support",
-                    dataDirectoryName
-                );
-
-            case Platform.LINUX:
-            default:
-                return path.join(
-                    os.homedir(),
-                    ".config",
-                    dataDirectoryName
-                );
-        }
+        return path.dirname(context.extensionUri.fsPath);
     }
 
     /**

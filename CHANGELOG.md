@@ -1,5 +1,9 @@
 # Changelogs
 
+## 3.5.1 - January 13, 2026
+
+- Changed: Add directory resolution to support any VSCode variant, including `VSCodium`, `Cursor`, `Windsurf`, `Trae`, and more.
+
 ## 3.5.0 - January 13, 2026
 
 - Changed: Use VSCode built-in commands for extension management.

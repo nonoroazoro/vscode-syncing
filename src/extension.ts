@@ -1,6 +1,6 @@
 import type { ExtensionContext } from "vscode";
 
-import { AutoSyncService, Gist, Logger, Syncing, VSCodeSetting } from "./core";
+import { AutoSyncService, Environment, Gist, Logger, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
 import { localize, setup } from "./i18n";
 import type { ISyncedItem } from "./types";
@@ -42,13 +42,16 @@ function _initSyncing(context: ExtensionContext)
 {
     try
     {
-        // 1. Initialize logger
+        // 1. Initialize Logger.
         Logger.initialize(context);
 
-        // 2. Setup i18n.
+        // 2. Initialize Environment.
+        Environment.initialize(context);
+
+        // 3. Setup i18n.
         setup(context.extensionPath);
 
-        // 3. Initialize Syncing.
+        // 4. Initialize Syncing.
         _syncing = Syncing.create();
         _vscodeSetting = VSCodeSetting.create();
 

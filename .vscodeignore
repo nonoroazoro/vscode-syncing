@@ -6,16 +6,16 @@ yarn.lock
 .vscode/**
 
 # Configuration files
-.eslintignore
-.eslintrc
 .gitignore
-.lintstagedrc
+.husky
+dprint.json
+eslint.config.mjs
 tsconfig.eslint.json
 tsconfig.json
+webpack.config.prod.js
 
 # Project specific stuff
 .github/**
 docs/**
-scripts/**
 src/**
 tests/**
