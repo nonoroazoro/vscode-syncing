@@ -59,7 +59,6 @@
     "error.loading.syncing.settings": "Syncing: 无法载入 Syncing 的配置",
     "error.remove.file": "无法删除文件: {0} : {1}",
     "error.save.file": "无法保存文件: {0} : {1}",
-    "error.uninstall.extension": "无法卸载扩展: {0}",
     "pokaYoke.cancel": "取消",
     "pokaYoke.continue.download": "继续下载",
     "pokaYoke.continue.download.message": "即将下载的配置与本地配置之间存在较大差异，确定要继续下载并覆盖本地配置吗?",

@@ -88,16 +88,6 @@ export interface IExtension
      * The extension's version.
      */
     version: string;
-
-    /**
-     * The downloaded extension's vsix file path.
-     */
-    vsixFilepath?: string;
-
-    /**
-     * The extension's download url in marketplace.
-     */
-    downloadURL?: string;
 }
 
 /**

@@ -59,7 +59,6 @@
     "error.loading.syncing.settings": "Syncing: Error loading Syncing's settings.",
     "error.remove.file": "Cannot remove file: {0} : {1}",
     "error.save.file": "Cannot save file: {0} : {1}",
-    "error.uninstall.extension": "Cannot uninstall extension: {0}.",
     "pokaYoke.cancel": "Cancel",
     "pokaYoke.continue.download": "Continue to download",
     "pokaYoke.continue.download.message": "A lot of changes have been made since your last sync. Are you sure to OVERWRITE THE LOCAL SETTINGS?",
