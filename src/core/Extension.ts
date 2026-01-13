@@ -1,24 +1,13 @@
-import * as extractZip from "extract-zip";
-import * as fs from "fs-extra";
 import * as micromatch from "micromatch";
-import * as path from "node:path";
 import { lte } from "semver";
-import * as tmp from "tmp-promise";
 import * as vscode from "vscode";
 
 import { CaseInsensitiveSet } from "../collections";
 import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_KEY } from "../constants";
 import { localize } from "../i18n";
 import type { IExtension, ISyncedItem } from "../types";
-import { downloadFile } from "../utils/ajax";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
-import { getExtensionDownloadURL } from "../utils/vscodeWebAPI";
-import { Environment } from "./Environment";
-import { Syncing } from "./Syncing";
 import * as Toast from "./Toast";
-
-// TODO: tweak or remove this.
-(tmp.setGracefulCleanup as () => void)();
 
 /**
  * Represents the options of synchronization.
@@ -53,12 +42,8 @@ export class Extension
 {
     private static _instance: Extension;
 
-    private _syncing: Syncing;
-
     private constructor()
-    {
-        this._syncing = Syncing.create();
-    }
+    {}
 
     /**
      * Creates an instance of the singleton class `Extension`.
@@ -145,105 +130,25 @@ export class Extension
             Toast.clearSpinner("");
         }
 
-        if (total > 0)
-        {
-            // Added since VSCode v1.20.
-            await this.removeVSCodeExtensionFiles();
-        }
-
         return result as ISyncedItem;
     }
 
     /**
-     * Downloads extension from VSCode marketplace.
+     * Install or update an extension.
      */
-    public async downloadExtension(extension: IExtension): Promise<IExtension>
+    public async installExtension(extension: IExtension): Promise<IExtension>
     {
-        extension.downloadURL = getExtensionDownloadURL(extension);
-        const filepath = (await tmp.file({ postfix: `.${extension.id}.zip` })).path;
-        await downloadFile(extension.downloadURL, filepath, this._syncing.proxy);
-        return { ...extension, vsixFilepath: filepath };
+        await vscode.commands.executeCommand("workbench.extensions.installExtension", extension.id);
+        return extension;
     }
 
     /**
-     * Extracts (install) extension vsix package.
-     */
-    public async extractExtension(extension: IExtension): Promise<IExtension>
-    {
-        const { vsixFilepath } = extension;
-        if (vsixFilepath != null)
-        {
-            let dirPath: string;
-            try
-            {
-                // Create temp dir.
-                dirPath = (await tmp.dir({ postfix: `.${extension.id}`, unsafeCleanup: true })).path;
-            }
-            catch
-            {
-                throw new Error(localize("error.extract.extension-2", extension.id));
-            }
-
-            try
-            {
-                // Extract extension to temp dir.
-                await extractZip(vsixFilepath, { dir: dirPath });
-
-                // Copy to vscode extension dir.
-                const extPath = Environment.instance.getExtensionDirectory(extension);
-                await fs.emptyDir(extPath);
-                await fs.copy(path.join(dirPath, "extension"), extPath);
-                return extension;
-            }
-            catch (err)
-            {
-                throw new Error(localize("error.extract.extension-1", extension.id, err.message));
-            }
-        }
-
-        throw new Error(localize("error.extract.extension-3", extension.id));
-    }
-
-    /**
-     * Uninstall extension.
+     * Uninstall an extension.
      */
     public async uninstallExtension(extension: IExtension): Promise<IExtension>
     {
-        const localExtension = getExtensionById(extension.id);
-        const extensionPath = localExtension
-            ? localExtension.extensionPath
-            : Environment.instance.getExtensionDirectory(extension);
-        try
-        {
-            await fs.remove(extensionPath);
-            return extension;
-        }
-        catch
-        {
-            throw new Error(localize("error.uninstall.extension", extension.id));
-        }
-    }
-
-    /**
-     * Removes VSCode `.obsolete` and `extensions.json` file.
-     */
-    public async removeVSCodeExtensionFiles(): Promise<void>
-    {
-        try
-        {
-            await fs.remove(Environment.instance.obsoleteFilePath);
-        }
-        catch
-        {
-        }
-
-        try
-        {
-            await fs.remove(Environment.instance.extensionsFilePath);
-        }
-        catch
-        {
-        }
+        await vscode.commands.executeCommand("workbench.extensions.uninstallExtension", extension.id);
+        return extension;
     }
 
     /**
@@ -267,35 +172,10 @@ export class Extension
         };
         if (extensions)
         {
-            // 1. Auto update extensions: Query the latest extensions.
-            // let queriedExtensions = new CaseInsensitiveMap<string, ExtensionMeta>();
-            // const autoUpdateExtensions = getVSCodeSetting<boolean>(
-            //     CONFIGURATION_KEY,
-            //     CONFIGURATION_EXTENSIONS_AUTOUPDATE
-            // );
-            // if (autoUpdateExtensions)
-            // {
-            //     queriedExtensions = await queryExtensions(extensions.map(ext => ext.id), this._syncing.proxy);
-            // }
-
-            // Find added & updated extensions.
+            // Find added, updated and reserved extensions.
             const reservedExtensionIDs = new CaseInsensitiveSet<string>();
             for (const ext of extensions)
             {
-                // 2. Auto update extensions: Update to the latest version.
-                // if (autoUpdateExtensions)
-                // {
-                //     const extensionMeta = queriedExtensions.get(ext.id);
-                //     if (extensionMeta)
-                //     {
-                //         const latestVersion = findLatestSupportedVSIXVersion(extensionMeta);
-                //         if (latestVersion != null)
-                //         {
-                //             ext.version = latestVersion;
-                //         }
-                //     }
-                // }
-
                 const localExtension = getExtensionById(ext.id);
                 if (localExtension)
                 {
@@ -326,13 +206,11 @@ export class Extension
             {
                 if (!reservedExtensionIDs.has(ext.id))
                 {
-                    // Removed.
+                    // Remove local extension.
                     result.removed.push(ext);
                 }
             }
 
-            // Release resources.
-            // queriedExtensions.clear();
             reservedExtensionIDs.clear();
         }
         return result;
@@ -358,15 +236,9 @@ export class Extension
 
                 if (showIndicator)
                 {
-                    Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
-                }
-                const extension = await this.downloadExtension(item);
-
-                if (showIndicator)
-                {
                     Toast.showSpinner(localize("toast.settings.installing.extension", item.id), steps, total);
                 }
-                await this.extractExtension(extension);
+                await this.installExtension(item);
 
                 result.added.push(item);
             }
@@ -398,21 +270,9 @@ export class Extension
 
                 if (showIndicator)
                 {
-                    Toast.showSpinner(localize("toast.settings.downloading.extension", item.id), steps, total);
+                    Toast.showSpinner(localize("toast.settings.updating.extension", item.id), steps, total);
                 }
-                let extension = await this.downloadExtension(item);
-
-                if (showIndicator)
-                {
-                    Toast.showSpinner(localize("toast.settings.removing.outdated.extension", item.id), steps, total);
-                }
-                extension = await this.uninstallExtension(extension);
-
-                if (showIndicator)
-                {
-                    Toast.showSpinner(localize("toast.settings.installing.extension", item.id), steps, total);
-                }
-                await this.extractExtension(extension);
+                await this.installExtension(item);
 
                 result.updated.push(item);
             }
