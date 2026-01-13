@@ -3,7 +3,6 @@ import * as fs from "fs-extra";
 import { localize } from "../i18n";
 import type { ISyncingSettings } from "../types";
 import { isEmptyString } from "../utils/lang";
-import { normalizeHttpProxy } from "../utils/normalizer";
 import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
@@ -23,7 +22,6 @@ export class Syncing
     private static readonly _DEFAULT_SETTINGS: ISyncingSettings = {
         id: "",
         token: "",
-        http_proxy: "",
         auto_sync: false
     };
 
@@ -52,16 +50,6 @@ export class Syncing
     public get settingsPath(): string
     {
         return this._settingsPath;
-    }
-
-    /**
-     * Gets the proxy setting of `Syncing`.
-     *
-     * If the proxy setting is not set, it will read from the `http_proxy` and `https_proxy` environment variables.
-     */
-    public get proxy(): string | undefined
-    {
-        return this.loadSettings().http_proxy;
     }
 
     /**
@@ -177,7 +165,7 @@ export class Syncing
     }
 
     /**
-     * Loads the `Syncing`'s settings from the settings file (`syncing.json`) and environment variables.
+     * Loads the `Syncing`'s settings from the settings file (`syncing.json`).
      */
     public loadSettings(): ISyncingSettings
     {
@@ -193,16 +181,7 @@ export class Syncing
         {
             Logger.instance.error(localize("error.loading.syncing.settings"), err);
         }
-
-        // Read proxy setting from environment variables.
-        // Note that the proxy will eventually be normalized to either `undefined` or a correct string value.
-        let proxy = settings.http_proxy;
-        if (proxy == null || isEmptyString(proxy))
-        {
-            proxy = process.env["http_proxy"] ?? process.env["https_proxy"];
-        }
-
-        return { ...settings, http_proxy: normalizeHttpProxy(proxy) };
+        return settings;
     }
 
     /**
@@ -226,18 +205,12 @@ export class Syncing
      */
     public async saveSettings(settings: ISyncingSettings, showToast = false): Promise<void>
     {
-        const target = { ...settings };
-
-        // Normalize null proxy to an empty string.
-        if (target.http_proxy == null)
-        {
-            target.http_proxy = "";
-        }
-
-        const content = JSON.stringify(target, null, 4);
         try
         {
-            await fs.outputFile(this.settingsPath, content);
+            await fs.outputFile(
+                this.settingsPath,
+                JSON.stringify(settings, null, 4)
+            );
         }
         catch (err)
         {
@@ -258,7 +231,7 @@ export class Syncing
     {
         if (token != null && !isEmptyString(token))
         {
-            const api: Gist = Gist.create(token, this.proxy);
+            const api: Gist = Gist.create(token);
             const id = await Toast.showRemoteGistListBox(api, forUpload);
             if (isEmptyString(id))
             {

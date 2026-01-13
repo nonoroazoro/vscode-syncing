@@ -95,7 +95,7 @@ async function _uploadVSCodeSettings()
         try
         {
             const syncingSettings = await _syncing.prepareUploadSettings(true);
-            const api = Gist.create(syncingSettings.token, _syncing.proxy);
+            const api = Gist.create(syncingSettings.token);
             const settings = await _vscodeSetting.getSettings(true, true);
             const gist = await api.findAndUpdate(syncingSettings.id, settings, true, true);
             if (gist.id !== syncingSettings.id)
@@ -130,7 +130,7 @@ async function _downloadVSCodeSettings()
         try
         {
             const syncingSettings = await _syncing.prepareDownloadSettings(true);
-            const api = Gist.create(syncingSettings.token, _syncing.proxy);
+            const api = Gist.create(syncingSettings.token);
             try
             {
                 const gist = await api.get(syncingSettings.id, true);

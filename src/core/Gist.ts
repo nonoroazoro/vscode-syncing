@@ -36,13 +36,10 @@ export class Gist
     private static readonly GIST_DESCRIPTION: string = "VSCode's Settings - Syncing";
 
     private _api: Octokit;
-    private _proxy?: string;
     private _token?: string;
 
-    private constructor(token?: string, proxy?: string)
+    private constructor(token?: string)
     {
-        this._proxy = proxy;
-
         const options: {
             auth?: unknown;
             request: {
@@ -51,13 +48,14 @@ export class Gist
             };
         } = { request: { timeout: 8000 } };
 
-        if (proxy != null && !isEmptyString(proxy))
+        const proxy = getVSCodeSetting<string>("http", "proxy") ?? process.env.HTTP_PROXY ?? process.env.HTTPS_PROXY;
+        if (!isEmptyString(proxy))
         {
             options.request.agent = new HttpsProxyAgent(proxy);
         }
 
         this._token = token;
-        if (token != null && !isEmptyString(token))
+        if (!isEmptyString(token))
         {
             options.auth = token;
         }
@@ -69,31 +67,14 @@ export class Gist
      * Creates an instance of the class `Gist`, only create a new instance if the params are changed.
      *
      * @param token GitHub Personal Access Token.
-     * @param proxy Proxy url.
      */
-    public static create(token?: string, proxy?: string): Gist
+    public static create(token?: string): Gist
     {
-        if (Gist._instance?.token !== token || Gist._instance.proxy !== proxy)
+        if (Gist._instance?._token !== token)
         {
-            Gist._instance = new Gist(token, proxy);
+            Gist._instance = new Gist(token);
         }
         return Gist._instance;
-    }
-
-    /**
-     * Gets the GitHub Personal Access Token.
-     */
-    public get token()
-    {
-        return this._token;
-    }
-
-    /**
-     * Gets the proxy url.
-     */
-    public get proxy()
-    {
-        return this._proxy;
     }
 
     /**
@@ -221,7 +202,7 @@ export class Gist
             try
             {
                 const gist = await this.get(id);
-                if (this.token != null)
+                if (this._token != null)
                 {
                     const user = await this.user();
                     // Determines whether the owner of the gist is the currently authenticated user.

@@ -74,11 +74,11 @@ export class AutoSyncService
         Toast.showSpinner(localize("toast.settings.autoSync.checkingSettings"));
         try
         {
-            const { token, id, http_proxy: proxy } = syncingSettings;
+            const { token, id } = syncingSettings;
             const localSettings = await this._vscodeSetting.getSettings(true);
             const localLastModified = this._vscodeSetting.getLastModified(localSettings);
 
-            const api = Gist.create(token, proxy);
+            const api = Gist.create(token);
             const remoteSettings = await api.get(id);
             const remoteLastModified = remoteSettings.updated_at;
             if (this._isModified(localSettings, remoteSettings, api))

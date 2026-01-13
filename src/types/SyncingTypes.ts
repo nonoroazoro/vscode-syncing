@@ -14,11 +14,6 @@ export interface ISyncingSettings
     token: string;
 
     /**
-     * Store the http proxy setting.
-     */
-    http_proxy: string | undefined;
-
-    /**
      * Store the auto-sync setting.
      */
     auto_sync: boolean;
