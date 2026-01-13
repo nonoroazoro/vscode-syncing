@@ -1,4 +1,4 @@
-import { is } from "junk";
+import { isJunk } from "junk";
 import { basename } from "node:path";
 
 import { Environment, Syncing } from "../core";
@@ -56,10 +56,9 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
     {
         if (!this._fileWatcher)
         {
-            const env = Environment.create();
             const syncing = Syncing.create();
             this._fileWatcher = new ChokidarFileWatcher(
-                env.userDirectory,
+                Environment.instance.userDirectory,
                 {
                     ignored: [
                         // Ignore Syncing's settings file.
@@ -75,7 +74,7 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
                         {
                             if (stats?.isFile())
                             {
-                                return !path.endsWith(".json") || is(basename(path));
+                                return !path.endsWith(".json") || isJunk(basename(path));
                             }
                             return false;
                         }

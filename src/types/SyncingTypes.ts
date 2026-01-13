@@ -14,11 +14,6 @@ export interface ISyncingSettings
     token: string;
 
     /**
-     * Store the http proxy setting.
-     */
-    http_proxy: string | undefined;
-
-    /**
      * Store the auto-sync setting.
      */
     auto_sync: boolean;
@@ -88,16 +83,6 @@ export interface IExtension
      * The extension's version.
      */
     version: string;
-
-    /**
-     * The downloaded extension's vsix file path.
-     */
-    vsixFilepath?: string;
-
-    /**
-     * The extension's download url in marketplace.
-     */
-    downloadURL?: string;
 }
 
 /**

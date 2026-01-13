@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import { format } from "../../src/utils/template";
 
 describe("Syncing/utils/template", () =>

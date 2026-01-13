@@ -1,167 +1,136 @@
 # Syncing
 
+[![Installs](https://img.shields.io/visual-studio-marketplace/i/nonoroazoro.syncing)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
+[![Rating](https://img.shields.io/visual-studio-marketplace/r/nonoroazoro.syncing)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![License: 996ICU](https://img.shields.io/badge/License-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
 [English](README.md) | [中文](README.zh-CN.md)
 
-**Syncing** *([View Source Code](https://github.com/nonoroazoro/vscode-syncing))* is a VSCode extension, designed to **synchronize all of your VSCode settings across multiple devices** with your [GitHub Gist](https://gist.github.com).
+**Syncing** _([View Source Code](https://github.com/nonoroazoro/vscode-syncing))_ is a VSCode extension, designed to **synchronize all of your VSCode settings across multiple devices** with your [GitHub Gist](https://gist.github.com).
 
 [Getting started](#getting-started) or [check out the examples](#examples).
 
-> *Keep it simple & reliable!*
-
+> _Keep it simple & reliable!_
 
 ## Features
 
-*Syncing* will `keep the consistency of your VSCode settings between your devices`, it'll let you:
+> ⚠️ **Breaking Change (v3.5.0)**:
+>
+> The `http_proxy` setting in `syncing.json` has been removed. Please use VSCode's `http.proxy` setting instead, see [`proxy settings`](#proxy-settings).
+
+_Syncing_ will `keep the consistency of your VSCode settings between your devices`, it'll let you:
 
 1. **Upload VSCode Settings**:
 
-    * Including your `User Settings`, `Keybindings`, `Extensions`, `Locales` and `Snippets`.
-    * The `keybindings` of `MacOS` and `non-MacOS` will be synchronized separately, in case you have multiple devices of different operating systems.
-    * Automatically create a new Gist to store your settings.
-    * Use an incremental algorithm to boost the synchronization.
-    * You can `exclude some VSCode User Settings and Extensions` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
+   - Including your `User Settings`, `Keybindings`, `Extensions`, `Locales` and `Snippets`.
+   - The `keybindings` of `MacOS` and `non-MacOS` will be synchronized separately, in case you have multiple devices of different operating systems.
+   - Automatically create a new Gist to store your settings.
+   - Use an incremental algorithm to boost the synchronization.
+   - You can `exclude some VSCode User Settings and Extensions` from being uploaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
 1. **Download VSCode Settings**:
 
-    * **Always overwrite** local settings.
-    * Automatically `install, update` and `remove` extensions.
-    * You can download settings from `a public Gist`, such as your friend's VSCode settings, [check out here](#getting-started) for more details.
-    * You can `exclude some VSCode User Settings and Extensions` from being downloaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
+   - **Always overwrite** local settings.
+   - Automatically `install, update` and `remove` extensions.
+   - You can download settings from `a public Gist`, such as your friend's VSCode settings, [check out here](#getting-started) for more details.
+   - You can `exclude some VSCode User Settings and Extensions` from being downloaded, [check out the VSCode User Settings](#vscode-user-settings) for more details.
 
 Besides, you can [set up a proxy](#proxy-settings) to accelerate the synchronization. And of course, you can turn on the [auto-sync](#auto-sync-settings) to simplify the synchronization :).
-
 
 ## Commands
 
 You can type `"upload"`, `"download"` (or `"syncing"`) in `VSCode Command Palette` to access these commands:
 
-1. ***`Syncing: Upload Settings`***
+1. _**`Syncing: Upload Settings`**_
 
-    > Upload settings to GitHub Gist.
+   > Upload settings to GitHub Gist.
 
-1. ***`Syncing: Download Settings`***
+1. _**`Syncing: Download Settings`**_
 
-    > Download settings from GitHub Gist.
+   > Download settings from GitHub Gist.
 
-1. ***`Syncing: Open Syncing Settings`***
+1. _**`Syncing: Open Syncing Settings`**_
 
-    > Set your `GitHub Personal Access Token`, `Gist ID` or `HTTP Proxy` settings.
-
+   > Set your `GitHub Personal Access Token`, `Gist ID` or `HTTP Proxy` settings.
 
 ## Keybindings
 
 The keybindings **are unassigned by default**, but you can easily turn them on by updating `VSCode Keyboard Shortcuts`:
 
-1. For VSCode versions >= 1.11 (***recommended***):
-
-    ![keyboard shortcuts](docs/gif/Keyboard-Shortcuts.gif)
-
-1. For VSCode versions < 1.11, for example:
-
-    ```json
-    {
-        "key": "alt+cmd+u",
-        "command": "syncing.uploadSettings"
-    },
-    {
-        "key": "alt+cmd+d",
-        "command": "syncing.downloadSettings"
-    },
-    {
-        "key": "alt+cmd+s",
-        "command": "syncing.openSettings"
-    }
-    ```
-
+![keyboard shortcuts](docs/gif/Keyboard-Shortcuts.gif)
 
 ## VSCode User Settings
 
 You can find the following `Syncing Settings` in your `VSCode User Settings`.
 
-1. ***`syncing.excludedExtensions`***
+1. _**`syncing.excludedExtensions`**_
 
-    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode Extensions` from being synchronized.
+   You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode Extensions` from being synchronized.
 
-    > Note that the extensions not listed here will still be synchronized.
+   > Note that the extensions not listed here will still be synchronized.
 
-    Take this for example:
+   Take this for example:
 
-    ```json
-    "syncing.excludedExtensions" : [
-        "somepublisher.*",
-        "nonoroazoro.syncing"
-    ]
-    ```
+   ```json
+   "syncing.excludedExtensions" : [
+       "somepublisher.*",
+       "nonoroazoro.syncing"
+   ]
+   ```
 
-    Note that the excluded `extension name` is actually the `extension id` (you can find it in the `VSCode Extensions View`), such as:
+   Note that the excluded `extension name` is actually the `extension id` (you can find it in the `VSCode Extensions View`), such as:
 
-    ![exclude extensions](docs/png/Exclude-Extensions.png)
+   ![exclude extensions](docs/png/Exclude-Extensions.png)
 
-    Now the extension `nonoroazoro.syncing` (i.e., `Syncing`) and all the extensions of the author `somepublisher` will no longer be synchronized.
+   Now the extension `nonoroazoro.syncing` (i.e., `Syncing`) and all the extensions of the author `somepublisher` will no longer be synchronized.
 
-1. ***`syncing.excludedSettings`***
+1. _**`syncing.excludedSettings`**_
 
-    You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synchronized.
+   You can configure [glob patterns](https://github.com/isaacs/minimatch) for excluding some `VSCode User Settings` from being synchronized.
 
-    > Note that the settings not listed here will still be synchronized.
+   > Note that the settings not listed here will still be synchronized.
 
-    Take this for example:
+   Take this for example:
 
-    ```json
-    "syncing.excludedSettings" : [
-        "editor.*",
-        "workbench.colorTheme"
-    ]
-    ```
+   ```json
+   "syncing.excludedSettings" : [
+       "editor.*",
+       "workbench.colorTheme"
+   ]
+   ```
 
-    Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synchronized.
+   Now the `workbench.colorTheme` setting and all the settings of `editor` will no longer be synchronized.
 
-1. ***`syncing.extensions.autoUpdate`***
+1. _**`syncing.pokaYokeThreshold`**_
 
-    You can configure this setting to let `Syncing` automatically update your extensions during the synchronization.
+   During the synchronization, `Syncing` will check the changes between your local and remote settings, and display a `confirm dialog` if the changes exceed this threshold.
 
-    This is `enabled by default` but you can turn it off in your `VSCode User Settings`.
+   The `default value` of this setting is `10`, and you can `disable this feature` by setting to a number `less than or equal to zero` (`<= 0`).
 
-1. ***`syncing.pokaYokeThreshold`***
+   Take this for example:
 
-    During the synchronization, `Syncing` will check the changes between your local and remote settings, and display a `confirm dialog` if the changes exceed this threshold.
+   ```json
+   "syncing.pokaYokeThreshold" : 10
+   ```
 
-    The `default value` of this setting is `10`, and you can `disable this feature` by setting to a number `less than or equal to zero` (`<= 0`).
+1. _**`syncing.separateKeybindings`**_
 
-    Take this for example:
+   Synchronize the `keybindings` separately for different operating systems.
 
-    ```json
-    "syncing.pokaYokeThreshold" : 10
-    ```
+   You may disable it since `VSCode` has introduced the [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) from `version 1.27`. But please make sure you've already `merged your keybindings` before disabling this setting.
 
-1. ***`syncing.separateKeybindings`***
-
-    Synchronize the `keybindings` separately for different operating systems.
-
-    You may disable it since `VSCode` has introduced the [Platform Specific Keybindings](https://code.visualstudio.com/updates/v1_27#_platform-specific-keybindings) from `version 1.27`. But please make sure you've already `merged your keybindings` before disabling this setting.
-
-    This is `enabled by default` but you can turn it off in your `VSCode User Settings`.
-
+   This is `enabled by default` but you can turn it off in your `VSCode User Settings`.
 
 ## Proxy Settings
 
-You can set up a proxy to accelerate the synchronization. Here are the steps:
+`Syncing` will use VSCode's `http.proxy` setting as its proxy settings, for example:
 
-1. Type `"Syncing: Open Syncing Settings"` (or just `"opensync"`) in `VSCode Command Palette` to open `Syncing`'s own settings file (i.e. `syncing.json`).
+```json
+"http.proxy": "http://127.0.0.1:1080"
+```
 
-1. Change the `"http_proxy"` setting, for example:
-
-    ```json
-    "http_proxy": "http://127.0.0.1:1080"
-    ```
-
-Moreover, if the `"http_proxy"` is unset, `Syncing` will try to read the `http_proxy` and `https_proxy` environment variables as a fallback.
-
-> Please note that unlike the settings in [VSCode User Settings](#vscode-user-settings), `Syncing` **will not upload** its own settings file because it contains your personal information.
-
+If VSCode's `http.proxy` is not set, `Syncing` will fall back to the `http_proxy` and `https_proxy` environment variables.
 
 ## Auto-sync Settings
 
@@ -171,76 +140,74 @@ You can now let Syncing auto-sync your settings. Here are the steps:
 
 1. Enable the `"auto_sync"` setting, for example:
 
-    ```json
-    "auto_sync": true
-    ```
+   ```json
+   "auto_sync": true
+   ```
 
 1. Reload or reopen VSCode to take effect.
-
 
 ## Getting Started
 
 1. Get your own `GitHub Personal Access Token` (3 steps).
 
-    1. Login to your **[GitHub Personal Access Tokens page](https://github.com/settings/tokens)** and click **`Generate new token`**.
+   1. Login to your **[GitHub Personal Access Tokens page](https://github.com/settings/tokens)** and click **`Generate new token`**.
 
-        ![generate new token](docs/png/Generate-New-Token.png)
+      ![generate new token](docs/png/Generate-New-Token.png)
 
-    1. Give your token a descriptive **`name`**, check **`gist`** and click **`Generate token`**.
+   1. Give your token a descriptive **`name`**, check **`gist`** and click **`Generate token`**.
 
-        ![allow gist](docs/png/Allow-Gist.png)
+      ![allow gist](docs/png/Allow-Gist.png)
 
-    1. **`Copy`** and **`backup`** your token.
+   1. **`Copy`** and **`backup`** your token.
 
-        ![copy and backup token](docs/png/Copy-Token.png)
+      ![copy and backup token](docs/png/Copy-Token.png)
 
 1. Sync your VSCode settings.
 
-    *`Syncing`* will ask for necessary information `for the first time` and `save for later use`.
+   _`Syncing`_ will ask for necessary information `for the first time` and `save for later use`.
 
-    1. **Upload**
+   1. **Upload**
 
-        1. Type `upload` in `VSCode Command Palette`.
+      1. Type `upload` in `VSCode Command Palette`.
 
-            ![upload settings](docs/png/Upload-Settings.png)
+         ![upload settings](docs/png/Upload-Settings.png)
 
-        1. Enter your `GitHub Personal Access Token`.
+      1. Enter your `GitHub Personal Access Token`.
 
-        1. Select or enter your `Gist ID`.
+      1. Select or enter your `Gist ID`.
 
-            > You can `leave it blank` to create a new `Gist` automatically.
+         > You can `leave it blank` to create a new `Gist` automatically.
 
-        1. Done!
+      1. Done!
 
-        1. *After it's done, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com). Also, you can `Edit` and `make it public` to share your settings with others.*
+      1. _After it's done, you can find the settings and the corresponding `Gist ID` in your [GitHub Gist](https://gist.github.com). Also, you can `Edit` and `make it public` to share your settings with others._
 
-    1. **Download**
+   1. **Download**
 
-        1. Type `download` in `VSCode Command Palette`.
+      1. Type `download` in `VSCode Command Palette`.
 
-            ![download settings](docs/png/Download-Settings.png)
+         ![download settings](docs/png/Download-Settings.png)
 
-        1. Enter your `GitHub Personal Access Token`.
+      1. Enter your `GitHub Personal Access Token`.
 
-            > You can `leave it blank` if you want to download from a `public Gist`, such as your friend's VSCode settings.
+         > You can `leave it blank` if you want to download from a `public Gist`, such as your friend's VSCode settings.
 
-        1. Select or enter your `Gist ID` or a `public Gist ID`.
+      1. Select or enter your `Gist ID` or a `public Gist ID`.
 
-        1. Done!
-
+      1. Done!
 
 ## Examples
 
 1. Upload:
 
-    ![upload example](docs/gif/Example-Upload.gif)
+   ![upload example](docs/gif/Example-Upload.gif)
 
 1. Download:
 
-    ![download example](docs/gif/Example-Download.gif)
+   ![download example](docs/gif/Example-Download.gif)
 
 ## Frequently Asked Questions
 
 1. How do I make this work with [code-server](https://github.com/coder/code-server)?
 
-    Code-server follows the XDG spec to set config & data directories. When using their [Docker image](https://hub.docker.com/r/codercom/code-server), you can set `XDG_DATA_HOME="/home/coder/.config/"` to store everything files in the same directory. This enables vscode-syncing to easily pickup the right locations. Since it is also a recommended volume path, it ensures persistence of your changes.
+   Code-server follows the XDG spec to set config & data directories. When using their [Docker image](https://hub.docker.com/r/codercom/code-server), you can set `XDG_DATA_HOME="/home/coder/.config/"` to store everything files in the same directory. This enables vscode-syncing to easily pickup the right locations. Since it is also a recommended volume path, it ensures persistence of your changes.

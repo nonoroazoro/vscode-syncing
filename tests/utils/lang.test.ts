@@ -1,3 +1,5 @@
+import { describe, expect, it } from "vitest";
+
 import { isEmptyString, isString } from "../../src/utils/lang";
 
 describe("Syncing/utils/lang", () =>
@@ -7,9 +9,9 @@ describe("Syncing/utils/lang", () =>
         expect(isString("date")).toBe(true);
         expect(isString("123")).toBe(true);
         expect(isString("*@#!@#")).toBe(true);
-        expect(isString(String("date"))).toBe(true);
+        expect(isString("date")).toBe(true);
         expect(isString(String(123))).toBe(true);
-        expect(isString(String("*@#!@#"))).toBe(true);
+        expect(isString("*@#!@#")).toBe(true);
     });
 
     it("is not a string", () =>
@@ -19,7 +21,8 @@ describe("Syncing/utils/lang", () =>
         expect(isString(undefined)).toBe(false);
         expect(isString(123)).toBe(false);
         expect(isString(NaN)).toBe(false);
-        expect(isString(() => { })).toBe(false);
+        expect(isString(() =>
+        {})).toBe(false);
     });
 
     it("is an empty string", () =>

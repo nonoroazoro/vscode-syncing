@@ -1,6 +1,6 @@
 import type { ExtensionContext } from "vscode";
 
-import { AutoSyncService, Gist, Syncing, VSCodeSetting } from "./core";
+import { AutoSyncService, Gist, Logger, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
 import { localize, setup } from "./i18n";
 import type { ISyncedItem } from "./types";
@@ -15,9 +15,9 @@ let _isSynchronizing: boolean;
 
 export function activate(context: ExtensionContext)
 {
-    _initCommands(context);
     _initSyncing(context);
     _initAutoSync();
+    _initCommands(context);
 }
 
 export function deactivate()
@@ -42,10 +42,13 @@ function _initSyncing(context: ExtensionContext)
 {
     try
     {
-        // 1. Setup i18n.
+        // 1. Initialize logger
+        Logger.initialize(context);
+
+        // 2. Setup i18n.
         setup(context.extensionPath);
 
-        // 2. Init Syncing.
+        // 3. Initialize Syncing.
         _syncing = Syncing.create();
         _vscodeSetting = VSCodeSetting.create();
 
@@ -92,7 +95,7 @@ async function _uploadVSCodeSettings()
         try
         {
             const syncingSettings = await _syncing.prepareUploadSettings(true);
-            const api = Gist.create(syncingSettings.token, _syncing.proxy);
+            const api = Gist.create(syncingSettings.token);
             const settings = await _vscodeSetting.getSettings(true, true);
             const gist = await api.findAndUpdate(syncingSettings.id, settings, true, true);
             if (gist.id !== syncingSettings.id)
@@ -127,7 +130,7 @@ async function _downloadVSCodeSettings()
         try
         {
             const syncingSettings = await _syncing.prepareDownloadSettings(true);
-            const api = Gist.create(syncingSettings.token, _syncing.proxy);
+            const api = Gist.create(syncingSettings.token);
             try
             {
                 const gist = await api.get(syncingSettings.id, true);
