@@ -631,17 +631,18 @@ export class VSCodeSetting
 
             if (setting.type === SettingType.Extensions && Array.isArray(parsed))
             {
-                for (const ext of parsed)
+                for (const ext of (parsed as Array<Partial<IExtension & { uuid: string; }>>))
                 {
-                    if (ext["id"] != null)
+                    if (ext.id != null)
                     {
-                        ext["id"] = (ext["id"] as string).toLocaleLowerCase();
+                        ext.id = ext.id.toLocaleLowerCase();
                     }
 
-                    // Only compares id and version.
-                    delete ext["name"];
-                    delete ext["publisher"];
-                    delete ext["uuid"];
+                    // Only compares id.
+                    delete ext.name;
+                    delete ext.publisher;
+                    delete ext.version;
+                    delete ext.uuid;
                 }
             }
 
