@@ -1,9 +1,18 @@
 import { Octokit } from "@octokit/rest";
 import { HttpsProxyAgent } from "https-proxy-agent";
 
+import { Logger } from "./Logger";
+import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast";
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
 import { localize } from "../i18n";
 import { SettingType } from "../types";
+import { diff } from "../utils/diffPatch";
+import { createError } from "../utils/errors";
+import { parse } from "../utils/jsonc";
+import { isEmptyString } from "../utils/lang";
+import { pick } from "../utils/object";
+import { getVSCodeSetting } from "../utils/vscodeAPI";
+
 import type {
     GistCreateParam,
     GistUpdateParam,
@@ -14,14 +23,6 @@ import type {
     IGistUser,
     ISetting
 } from "../types";
-import { diff } from "../utils/diffPatch";
-import { createError } from "../utils/errors";
-import { parse } from "../utils/jsonc";
-import { isEmptyString } from "../utils/lang";
-import { pick } from "../utils/object";
-import { getVSCodeSetting } from "../utils/vscodeAPI";
-import { Logger } from "./Logger";
-import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast";
 
 /**
  * GitHub Gist utils.
@@ -195,7 +196,7 @@ export class Gist
      *
      * @param id Gist id.
      */
-    public async exists(id: string): Promise<IGist | false>
+    public async exists(id: string): Promise<false | IGist>
     {
         if (id != null && !isEmptyString(id))
         {
@@ -424,7 +425,7 @@ export class Gist
     /**
      * Creates the error from an error code.
      */
-    private _createError(error: Error & { status: number; })
+    private _createError(error: { status: number; } & Error)
     {
         const { status } = error;
         let message = localize("error.check.internet");
@@ -468,7 +469,7 @@ export class Gist
 
                 if (key === extensionsRemoteFilename && Array.isArray(parsed))
                 {
-                    for (const ext of (parsed as Array<Partial<IExtension & { uuid: string; }>>))
+                    for (const ext of (parsed as Array<Partial<{ uuid: string; } & IExtension>>))
                     {
                         if (ext.id != null)
                         {

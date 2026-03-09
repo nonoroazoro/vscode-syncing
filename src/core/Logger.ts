@@ -6,7 +6,7 @@ import { registerOutputChannel } from "../utils/vscodeAPI";
 /**
  * `Syncing` logger.
  */
-export class Logger implements Pick<vscode.LogOutputChannel, "info" | "error">
+export class Logger implements Pick<vscode.LogOutputChannel, "error" | "info">
 {
     private static _instance: Logger;
 
@@ -47,7 +47,7 @@ export class Logger implements Pick<vscode.LogOutputChannel, "info" | "error">
         this._outputChannel.info(message, ...args);
     }
 
-    public error(error: string | Error, ...args: unknown[])
+    public error(error: Error | string, ...args: unknown[])
     {
         this._outputChannel.error(error, ...args);
     }

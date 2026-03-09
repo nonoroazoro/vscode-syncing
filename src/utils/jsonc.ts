@@ -1,8 +1,8 @@
 import * as jsonc from "jsonc-parser";
 import * as micromatch from "micromatch";
 
-import { SETTING_EXCLUDED_SETTINGS } from "../constants";
 import { getJSONFormatOnSaveSetting } from "./vscodeAPI";
+import { SETTING_EXCLUDED_SETTINGS } from "../constants";
 
 /**
  * The default `ModificationOptions` of `jsonc-parser`.

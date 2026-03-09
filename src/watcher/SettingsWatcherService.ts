@@ -1,11 +1,11 @@
-import { isJunk } from "junk";
 import { basename } from "node:path";
+import { isJunk } from "junk";
 
-import { Environment, Syncing } from "../core";
-import { debounce } from "../utils/timer";
 import { AbstractWatcher, WatcherEvent } from "./AbstractWatcher";
 import { ChokidarFileWatcher } from "./ChokidarFileWatcher";
 import { VSCodeExtensionWatcher } from "./VSCodeExtensionWatcher";
+import { Environment, Syncing } from "../core";
+import { debounce } from "../utils/timer";
 
 export interface SettingsWatcherServiceOptions
 {

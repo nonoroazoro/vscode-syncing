@@ -1,10 +1,12 @@
 import * as path from "node:path";
+
 import type { ExtensionContext } from "vscode";
 
+import { Logger } from "./Logger";
 import { localize } from "../i18n";
 import { Platform } from "../types";
+
 import type { IExtension } from "../types";
-import { Logger } from "./Logger";
 
 /**
  * VSCode environment wrapper.

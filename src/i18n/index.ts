@@ -1,5 +1,5 @@
-import { readJsonSync } from "fs-extra";
 import * as path from "node:path";
+import { readJsonSync } from "fs-extra";
 
 import { NormalizedLocale } from "../types";
 import { format } from "../utils/template";
