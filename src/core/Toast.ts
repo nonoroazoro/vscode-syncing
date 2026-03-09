@@ -7,6 +7,7 @@ import * as vscode from "vscode";
 import { locale, localize } from "../i18n";
 import { formatDistance } from "../utils/date";
 import { reloadWindow } from "../utils/vscodeAPI";
+
 import type { Gist } from "./Gist";
 
 /**

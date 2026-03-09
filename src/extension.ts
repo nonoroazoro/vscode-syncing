@@ -3,9 +3,10 @@ import type { ExtensionContext } from "vscode";
 import { AutoSyncService, Environment, Gist, Logger, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
 import { localize, setup } from "./i18n";
+import { registerCommand } from "./utils/vscodeAPI";
+
 import type { ISyncedItem } from "./types";
 import type { IEnhancedError } from "./utils/errors";
-import { registerCommand } from "./utils/vscodeAPI";
 
 let _syncing: Syncing;
 let _vscodeSetting: VSCodeSetting;

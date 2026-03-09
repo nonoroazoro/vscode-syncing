@@ -1,5 +1,9 @@
 # Changelogs
 
+## 3.5.2 - March 09, 2026
+
+- Changed: Exclude extension version from poka-yoke diff.
+
 ## 3.5.1 - January 13, 2026
 
 - Changed: Add directory resolution to support any VSCode variant, including `VSCodium`, `Cursor`, `Windsurf`, `Trae`, and more.

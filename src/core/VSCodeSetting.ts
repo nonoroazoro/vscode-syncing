@@ -1,8 +1,12 @@
+import * as path from "node:path";
 import * as fs from "fs-extra";
 import { isNotJunk } from "junk";
 import * as micromatch from "micromatch";
-import * as path from "node:path";
 
+import { Environment } from "./Environment";
+import { Extension } from "./Extension";
+import { Logger } from "./Logger";
+import * as Toast from "./Toast";
 import {
     CONFIGURATION_EXCLUDED_EXTENSIONS,
     CONFIGURATION_EXCLUDED_SETTINGS,
@@ -15,15 +19,12 @@ import {
 } from "../constants";
 import { localize } from "../i18n";
 import { SettingType } from "../types";
-import type { IExtension, IGist, IGistFile, ISetting, ISyncedItem } from "../types";
 import { diff } from "../utils/diffPatch";
 import { readLastModified, writeLastModified } from "../utils/file";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
 import { getVSCodeSetting } from "../utils/vscodeAPI";
-import { Environment } from "./Environment";
-import { Extension } from "./Extension";
-import { Logger } from "./Logger";
-import * as Toast from "./Toast";
+
+import type { IExtension, IGist, IGistFile, ISetting, ISyncedItem } from "../types";
 
 /**
  * `VSCode Settings` wrapper.
@@ -631,17 +632,18 @@ export class VSCodeSetting
 
             if (setting.type === SettingType.Extensions && Array.isArray(parsed))
             {
-                for (const ext of parsed)
+                for (const ext of (parsed as Array<Partial<{ uuid: string; } & IExtension>>))
                 {
-                    if (ext["id"] != null)
+                    if (ext.id != null)
                     {
-                        ext["id"] = (ext["id"] as string).toLocaleLowerCase();
+                        ext.id = ext.id.toLocaleLowerCase();
                     }
 
-                    // Only compares id and version.
-                    delete ext["name"];
-                    delete ext["publisher"];
-                    delete ext["uuid"];
+                    // Only compares id.
+                    delete ext.name;
+                    delete ext.publisher;
+                    delete ext.version;
+                    delete ext.uuid;
                 }
             }
 

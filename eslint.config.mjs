@@ -1,29 +1,17 @@
-import { ESLINT_CONFIGS } from "eslint-config-zoro/eslint";
-import { NODE_CONFIGS } from "eslint-config-zoro/node";
-import { STYLISTIC_CONFIGS } from "eslint-config-zoro/stylistic";
-import { TYPESCRIPT_CONFIGS } from "eslint-config-zoro/typescript";
-import * as globals from "globals";
+import { defineConfig } from "eslint-config-zoro";
 
-export default [
-    { ignores: ["dist/*"] },
-    ...ESLINT_CONFIGS,
-    ...NODE_CONFIGS,
-    ...STYLISTIC_CONFIGS,
-    ...TYPESCRIPT_CONFIGS,
-    {
-        languageOptions: {
-            globals: {
-                ...globals.node,
-                ...globals.jest
-            },
-            ecmaVersion: 5,
-            sourceType: "commonjs",
-            parserOptions: {
-                project: "./tsconfig.eslint.json"
-            }
-        },
-        rules: {
-            "@typescript-eslint/no-unsafe-member-access": "off"
+export default defineConfig({
+    node: true,
+    typescript: true,
+    ignores: ["dist/**"],
+    languageOptions: {
+        parserOptions: {
+            project: "./tsconfig.eslint.json"
         }
+    },
+    rules: {
+        "@typescript-eslint/no-unsafe-member-access": "off",
+        "@typescript-eslint/strict-void-return": "off",
+        "perfectionist/sort-object-types": "off"
     }
-];
+});

@@ -1,13 +1,14 @@
 import * as fs from "fs-extra";
 
-import { localize } from "../i18n";
-import type { ISyncingSettings } from "../types";
-import { isEmptyString } from "../utils/lang";
-import { openFile } from "../utils/vscodeAPI";
 import { Environment } from "./Environment";
 import { Gist } from "./Gist";
 import { Logger } from "./Logger";
 import * as Toast from "./Toast";
+import { localize } from "../i18n";
+import { isEmptyString } from "../utils/lang";
+import { openFile } from "../utils/vscodeAPI";
+
+import type { ISyncingSettings } from "../types";
 
 /**
  * `Syncing` wrapper.

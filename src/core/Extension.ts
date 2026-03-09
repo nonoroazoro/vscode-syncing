@@ -2,12 +2,13 @@ import * as micromatch from "micromatch";
 import { lte } from "semver";
 import * as vscode from "vscode";
 
+import * as Toast from "./Toast";
 import { CaseInsensitiveSet } from "../collections";
 import { CONFIGURATION_EXCLUDED_EXTENSIONS, CONFIGURATION_KEY } from "../constants";
 import { localize } from "../i18n";
-import type { IExtension, ISyncedItem } from "../types";
 import { getExtensionById, getVSCodeSetting } from "../utils/vscodeAPI";
-import * as Toast from "./Toast";
+
+import type { IExtension, ISyncedItem } from "../types";
 
 /**
  * Represents the options of synchronization.

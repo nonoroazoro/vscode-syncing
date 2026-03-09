@@ -5,8 +5,8 @@ export enum WatcherEvent
     ALL = "all",
 
     ADDED = "added",
-    UPDATED = "updated",
-    DELETED = "deleted"
+    DELETED = "deleted",
+    UPDATED = "updated"
 }
 
 export abstract class AbstractWatcher<EventType extends string | symbol = WatcherEvent>

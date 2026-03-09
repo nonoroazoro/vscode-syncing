@@ -1,7 +1,8 @@
 import * as vscode from "vscode";
 
-import type { NormalizedLocale } from "../types";
 import { normalize } from "./locale";
+
+import type { NormalizedLocale } from "../types";
 
 /**
  * Gets the VSCode extension by id.

@@ -3,7 +3,7 @@
  */
 export enum Platform
 {
-    WINDOWS = "win32",
+    LINUX = "linux",
     MACINTOSH = "darwin",
-    LINUX = "linux"
+    WINDOWS = "win32"
 }
