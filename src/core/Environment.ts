@@ -1,4 +1,5 @@
 import * as path from "node:path";
+import * as vscode from "vscode";
 
 import type { ExtensionContext } from "vscode";
 
@@ -34,6 +35,11 @@ export class Environment
     public readonly isPortable: boolean;
 
     /**
+     * Gets a value indicating whether the extension is running in a remote extension host.
+     */
+    public readonly isRemote: boolean;
+
+    /**
      * Gets a value indicating the type of the current operating system.
      */
     public readonly platform: Platform;
@@ -42,6 +48,11 @@ export class Environment
      * Gets the full path of VSCode's `user directory`.
      */
     public readonly userDirectory: string;
+
+    /**
+     * Gets the full path of VSCode's settings directory for the current extension host.
+     */
+    public readonly settingsDirectory: string;
 
     /**
      * Gets the full path of VSCode's `extensions directory`.
@@ -55,28 +66,40 @@ export class Environment
 
     private static _instance: Environment;
 
-    private constructor(context: ExtensionContext)
+    private constructor(context: {
+        extensionUri: Pick<ExtensionContext["extensionUri"], "fsPath">;
+        globalStorageUri: Pick<ExtensionContext["globalStorageUri"], "fsPath">;
+    })
     {
         this.platform = this._getPlatform();
         this.isLinux = this.platform === Platform.LINUX;
         this.isMac = this.platform === Platform.MACINTOSH;
         this.isWindows = this.platform === Platform.WINDOWS;
         this.isPortable = process.env.VSCODE_PORTABLE != null;
+        this.isRemote = vscode.env.remoteName != null;
 
         this.userDirectory = path.dirname(path.dirname(context.globalStorageUri.fsPath));
         Logger.instance.info("UserDirectory", this.userDirectory);
 
-        this.extensionsDirectory = this._getExtensionsDirectory(this.isPortable, context);
+        this.settingsDirectory = this.isRemote
+            ? path.join(path.dirname(this.userDirectory), "Machine")
+            : this.userDirectory;
+        Logger.instance.info("SettingsDirectory", this.settingsDirectory);
+
+        this.extensionsDirectory = this._getExtensionsDirectory(this.isPortable, context.extensionUri.fsPath);
         Logger.instance.info("ExtensionsDirectory", this.extensionsDirectory);
 
-        this.snippetsDirectory = this.getSettingsFilePath("snippets");
+        this.snippetsDirectory = this.getUserFilePath("snippets");
         Logger.instance.info("SnippetsDirectory", this.snippetsDirectory);
     }
 
     /**
      * Initialize the singleton instance of {@link Environment}.
      */
-    public static initialize(context: ExtensionContext)
+    public static initialize(context: {
+        extensionUri: Pick<ExtensionContext["extensionUri"], "fsPath">;
+        globalStorageUri: Pick<ExtensionContext["globalStorageUri"], "fsPath">;
+    })
     {
         if (!Environment._instance)
         {
@@ -113,6 +136,16 @@ export class Environment
      */
     public getSettingsFilePath(filename: string): string
     {
+        return path.join(this.settingsDirectory, filename);
+    }
+
+    /**
+     * Gets the full path of a file in VSCode's user directory.
+     *
+     * @param filename The user filename.
+     */
+    public getUserFilePath(filename: string): string
+    {
         return path.join(this.userDirectory, filename);
     }
 
@@ -135,14 +168,14 @@ export class Environment
     /**
      * Gets the extensions directory of VSCode.
      */
-    private _getExtensionsDirectory(isPortable: boolean, context: ExtensionContext)
+    private _getExtensionsDirectory(isPortable: boolean, extensionPath: string)
     {
         if (isPortable)
         {
             // Such as the "/Applications/code-portable-data/extensions" directory in MacOS.
             return path.join(process.env.VSCODE_PORTABLE ?? "", "extensions");
         }
-        return path.dirname(context.extensionUri.fsPath);
+        return path.dirname(extensionPath);
     }
 
     /**

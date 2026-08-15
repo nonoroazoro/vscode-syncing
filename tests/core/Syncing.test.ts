@@ -34,7 +34,7 @@ vi.mock("vscode", () => ({
 vi.mock("../../src/core/Environment", () => ({
     Environment: {
         instance: {
-            getSettingsFilePath: () => "syncing.json"
+            getUserFilePath: () => "syncing.json"
         }
     }
 }));

@@ -58,7 +58,7 @@ export class SettingsWatcherService extends AbstractWatcher<WatcherEvent.ALL>
         {
             const syncing = Syncing.create();
             this._fileWatcher = new ChokidarFileWatcher(
-                Environment.instance.userDirectory,
+                Environment.instance.settingsDirectory,
                 {
                     ignored: [
                         // Ignore Syncing's settings file.

@@ -8,12 +8,13 @@ import type { IGist, ISetting, ISyncingSettings } from "../../src/types";
 const mocks = vi.hoisted(() => ({
     api: {
         get: vi.fn(),
-        getModifiedFiles: vi.fn()
+        getModifiedSettings: vi.fn()
     },
     executeCommand: vi.fn(),
     settings: {
         getLastModified: vi.fn(),
-        getSettings: vi.fn()
+        getSettings: vi.fn(),
+        managedGistFilePrefixes: ["snippet-"]
     },
     toast: {
         clearSpinner: vi.fn(),
@@ -101,8 +102,9 @@ describe("Syncing/core/AutoSyncService", () =>
         vi.clearAllMocks();
         mocks.settings.getSettings.mockResolvedValue(localSettings);
         mocks.settings.getLastModified.mockReturnValue(localSettings[0]?.lastModified);
+        mocks.settings.managedGistFilePrefixes = ["snippet-"];
         mocks.api.get.mockResolvedValue(remoteSettings);
-        mocks.api.getModifiedFiles.mockReturnValue({ "settings.json": { content: "changed" } });
+        mocks.api.getModifiedSettings.mockReturnValue({ "settings.json": { content: "changed" } });
     });
 
     it.each([
@@ -120,11 +122,16 @@ describe("Syncing/core/AutoSyncService", () =>
 
     it("does not synchronize unchanged settings", async () =>
     {
-        mocks.api.getModifiedFiles.mockReturnValue(undefined);
+        mocks.api.getModifiedSettings.mockReturnValue(undefined);
 
         await service.synchronize(syncingSettings);
 
         expect(mocks.executeCommand).not.toHaveBeenCalled();
+        expect(mocks.api.getModifiedSettings).toHaveBeenCalledWith(
+            localSettings,
+            remoteSettings.files,
+            mocks.settings.managedGistFilePrefixes
+        );
         expect(mocks.toast.clearSpinner).toHaveBeenCalledWith("");
         expect(mocks.toast.statusInfo).toHaveBeenCalledWith("toast.settings.autoSync.nothingChanged");
     });
@@ -137,5 +144,40 @@ describe("Syncing/core/AutoSyncService", () =>
 
         expect(mocks.executeCommand).not.toHaveBeenCalled();
         expect(mocks.toast.statusError).toHaveBeenCalledWith("toast.settings.autoSync.failed:offline");
+    });
+
+    it("uploads when a Remote scope file is missing regardless of timestamps", async () =>
+    {
+        const remoteScopeSettings: ISetting[] = [{
+            ...localSettings[0],
+            localFilePath: "/server/data/Machine/settings.json",
+            remoteFilename: "remote-settings.json"
+        }];
+        mocks.settings.getSettings.mockResolvedValue(remoteScopeSettings);
+        mocks.settings.getLastModified.mockReturnValue(Date.parse("2026-08-14T23:00:00Z"));
+        mocks.settings.managedGistFilePrefixes = [];
+        mocks.api.get.mockResolvedValue({ ...remoteSettings, files: {} });
+
+        await service.synchronize(syncingSettings);
+
+        expect(mocks.executeCommand).toHaveBeenCalledWith("syncing.uploadSettings");
+    });
+
+    it("does not resurrect a deleted Local scope file", async () =>
+    {
+        const snippetSettings: ISetting[] = [{
+            content: "{}",
+            lastModified: Date.parse("2026-08-14T23:00:00Z"),
+            localFilePath: "/user/snippets/example.json",
+            remoteFilename: "snippet-example.json",
+            type: SettingType.Snippets
+        }];
+        mocks.settings.getSettings.mockResolvedValue(snippetSettings);
+        mocks.settings.getLastModified.mockReturnValue(snippetSettings[0]?.lastModified);
+        mocks.api.get.mockResolvedValue({ ...remoteSettings, files: {} });
+
+        await service.synchronize(syncingSettings);
+
+        expect(mocks.executeCommand).toHaveBeenCalledWith("syncing.downloadSettings");
     });
 });

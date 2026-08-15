@@ -3,12 +3,13 @@ import * as vscode from "vscode";
 import { Gist } from "./Gist";
 import * as Toast from "./Toast";
 import { VSCodeSetting } from "./VSCodeSetting";
+import { REMOTE_FILE_PREFIX } from "../constants";
 import { localize } from "../i18n";
 import { getErrorMessage } from "../utils";
 import { isAfter } from "../utils/date";
 import { SettingsWatcherService, WatcherEvent } from "../watcher";
 
-import type { IGist, IGistFile, IGistFiles, ISetting, ISyncingSettings } from "../types";
+import type { IGist, ISetting, ISyncingSettings } from "../types";
 
 export class AutoSyncService
 {
@@ -85,7 +86,8 @@ export class AutoSyncService
             const remoteLastModified = remoteSettings.updated_at;
             if (this._isModified(localSettings, remoteSettings, api))
             {
-                if (isAfter(localLastModified, remoteLastModified))
+                const hasMissingRemoteScopeFile = this._hasMissingRemoteScopeFile(localSettings, remoteSettings);
+                if (hasMissingRemoteScopeFile || isAfter(localLastModified, remoteLastModified))
                 {
                     // Upload settings.
                     await vscode.commands.executeCommand("syncing.uploadSettings");
@@ -115,17 +117,24 @@ export class AutoSyncService
         vscode.commands.executeCommand("syncing.uploadSettings");
     }
 
+    private _hasMissingRemoteScopeFile(localSettings: ISetting[], remoteSettings: IGist): boolean
+    {
+        return localSettings.some(setting => this._isMissingRemoteScopeFile(setting, remoteSettings));
+    }
+
     private _isModified(localSettings: ISetting[], remoteSettings: IGist, api: Gist): boolean
     {
-        const localFiles: IGistFiles = {};
-        for (const item of localSettings)
-        {
-            // Filter out `null` content.
-            if (item.content)
-            {
-                localFiles[item.remoteFilename] = { content: item.content } as IGistFile;
-            }
-        }
-        return api.getModifiedFiles(localFiles, remoteSettings.files) != null;
+        return api.getModifiedSettings(
+            localSettings,
+            remoteSettings.files,
+            this._vscodeSetting.managedGistFilePrefixes
+        ) != null;
+    }
+
+    private _isMissingRemoteScopeFile(localSetting: ISetting, remoteSettings: IGist): boolean
+    {
+        return localSetting.content != null
+            && localSetting.remoteFilename.startsWith(REMOTE_FILE_PREFIX)
+            && remoteSettings.files[localSetting.remoteFilename] == null;
     }
 }

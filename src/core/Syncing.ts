@@ -31,7 +31,7 @@ export class Syncing
 
     private constructor()
     {
-        this._settingsPath = Environment.instance.getSettingsFilePath("syncing.json");
+        this._settingsPath = Environment.instance.getUserFilePath("syncing.json");
     }
 
     /**

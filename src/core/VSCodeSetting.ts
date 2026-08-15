@@ -13,8 +13,10 @@ import {
     CONFIGURATION_KEY,
     CONFIGURATION_POKA_YOKE_THRESHOLD,
     CONFIGURATION_SEPARATE_KEYBINDINGS,
+    REMOTE_FILE_PREFIX,
     SETTING_EXCLUDED_EXTENSIONS,
     SETTING_EXCLUDED_SETTINGS,
+    SNIPPET_FILE_PREFIX,
     VSCODE_SETTINGS_LIST
 } from "../constants";
 import { localize } from "../i18n";
@@ -39,11 +41,6 @@ export class VSCodeSetting
      */
     private static readonly _MAC_SUFFIX: string = "-mac";
 
-    /**
-     * Prefix of remote snippet files.
-     */
-    private static readonly _SNIPPET_PREFIX: string = "snippet-";
-
     private _env: Environment;
     private _ext: Extension;
 
@@ -63,6 +60,14 @@ export class VSCodeSetting
             VSCodeSetting._instance = new VSCodeSetting();
         }
         return VSCodeSetting._instance;
+    }
+
+    /**
+     * Gets the Gist filename prefixes managed by the current extension host.
+     */
+    public get managedGistFilePrefixes(): readonly string[]
+    {
+        return this._env.isRemote ? [] : [SNIPPET_FILE_PREFIX];
     }
 
     /**
@@ -104,6 +109,15 @@ export class VSCodeSetting
 
         for (const settingType of settingsList)
         {
+            if (
+                this._env.isRemote
+                && settingType !== SettingType.Settings
+                && settingType !== SettingType.Extensions
+            )
+            {
+                continue;
+            }
+
             if (settingType === SettingType.Snippets)
             {
                 // Attention: Snippets may be empty.
@@ -112,7 +126,9 @@ export class VSCodeSetting
             else
             {
                 localFilename = `${settingType}.json`;
-                remoteFilename = localFilename;
+                remoteFilename = this._env.isRemote
+                    ? `${REMOTE_FILE_PREFIX}${localFilename}`
+                    : localFilename;
                 if (settingType === SettingType.Keybindings)
                 {
                     // Separate the keybindings.
@@ -139,26 +155,18 @@ export class VSCodeSetting
 
         if (loadFileContent)
         {
-            const contents = await this._loadContent(results);
-
-            const errorFiles: string[] = [];
-            results = [];
-            contents.forEach((value: ISetting) =>
+            try
             {
-                // Success if the content is not `null`.
-                if (value.content != null)
-                {
-                    results.push(value);
-                }
-                else
-                {
-                    errorFiles.push(value.localFilePath);
-                }
-            });
-
-            if (errorFiles.length > 0)
+                results = await this._loadContent(results);
+            }
+            catch (error)
             {
-                Logger.instance.error(localize("error.invalid.settings", errorFiles.join("\r\n")));
+                if (showIndicator)
+                {
+                    Toast.clearSpinner("");
+                    Toast.statusError(localize("toast.settings.uploading.failed", getErrorMessage(error)));
+                }
+                throw error;
             }
         }
 
@@ -253,10 +261,10 @@ export class VSCodeSetting
                     if (!existsFileKeys.includes(key))
                     {
                         gistFile = files[key];
-                        if (gistFile?.filename.startsWith(VSCodeSetting._SNIPPET_PREFIX))
+                        if (!this._env.isRemote && gistFile?.filename.startsWith(SNIPPET_FILE_PREFIX))
                         {
                             // Snippets.
-                            filename = gistFile.filename.slice(VSCodeSetting._SNIPPET_PREFIX.length);
+                            filename = gistFile.filename.slice(SNIPPET_FILE_PREFIX.length);
                             if (filename)
                             {
                                 settingsToSave.push({
@@ -394,20 +402,24 @@ export class VSCodeSetting
                 // Add prefix to all snippets.
                 results.push({
                     localFilePath: path.join(snippetsDir, filename),
-                    remoteFilename: `${VSCodeSetting._SNIPPET_PREFIX}${filename}`,
+                    remoteFilename: `${SNIPPET_FILE_PREFIX}${filename}`,
                     type: SettingType.Snippets
                 });
             });
         }
-        catch
+        catch (error)
         {
-            Logger.instance.error(localize("error.loading.snippets"));
+            if (!this._isFileNotFoundError(error))
+            {
+                Logger.instance.error(localize("error.loading.snippets"));
+                throw error;
+            }
         }
         return results;
     }
 
     /**
-     * Load the content of `VSCode Settings` files. The `content` will exactly be `undefined` when failure happens.
+     * Loads the content of `VSCode Settings` files. Missing files have `undefined` content.
      *
      * @param settings `VSCode Settings`.
      * @param exclude Default is `true`, exclude some `VSCode Settings` base on the exclude list of `Syncing`.
@@ -460,14 +472,31 @@ export class VSCodeSetting
             }
             catch (err)
             {
+                if (!this._isFileNotFoundError(err))
+                {
+                    Logger.instance.error(
+                        localize("error.loading.settings", setting.remoteFilename, getErrorMessage(err))
+                    );
+                    throw err;
+                }
                 content = undefined;
-                Logger.instance.error(
-                    localize("error.loading.settings", setting.remoteFilename, getErrorMessage(err))
-                );
             }
             result.push({ ...setting, content, lastModified });
         }
         return result;
+    }
+
+    /**
+     * Determines whether an unknown error represents a missing file.
+     *
+     * @param error The unknown error value.
+     */
+    private _isFileNotFoundError(error: unknown): boolean
+    {
+        return typeof error === "object"
+            && error != null
+            && "code" in error
+            && error.code === "ENOENT";
     }
 
     /**

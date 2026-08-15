@@ -102,7 +102,15 @@ async function _uploadVSCodeSettings()
             const syncingSettings = await _syncing.prepareUploadSettings(true);
             const api = Gist.create(syncingSettings.token);
             const settings = await _vscodeSetting.getSettings(true, true);
-            const gist = await api.findAndUpdate(syncingSettings.id, settings, true, true);
+            const gist = await api.findAndUpdate(
+                syncingSettings.id,
+                settings,
+                {
+                    managedFilePrefixes: _vscodeSetting.managedGistFilePrefixes,
+                    showIndicator: true,
+                    upsert: true
+                }
+            );
             if (gist.id !== syncingSettings.id)
             {
                 await _syncing.saveSettings({ ...syncingSettings, id: gist.id });

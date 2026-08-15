@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { SNIPPET_FILE_PREFIX } from "../../src/constants";
 import { Gist } from "../../src/core";
 import { SettingType } from "../../src/types";
 
@@ -172,24 +173,70 @@ describe("Syncing/core/Gist", () =>
         });
     });
 
-    it("returns an exact patch without deleting protected files", () =>
+    it("updates and deletes only files managed by the local scope", () =>
     {
-        const localFiles: IGistFiles = {
-            "settings.json": { content: '{"changed": true}', filename: "settings.json" },
-            "snippets-empty.json": { content: "", filename: "snippets-empty.json" }
-        };
+        const localSettings: ISetting[] = [
+            {
+                content: '{"changed": true}',
+                localFilePath: "/user/settings.json",
+                remoteFilename: "settings.json",
+                type: SettingType.Settings
+            },
+            {
+                localFilePath: "/extensions",
+                remoteFilename: "extensions.json",
+                type: SettingType.Extensions
+            },
+            {
+                content: "",
+                localFilePath: "/user/snippets/empty.json",
+                remoteFilename: "snippet-empty.json",
+                type: SettingType.Snippets
+            }
+        ];
         const remoteFiles: IGistFiles = {
             "extensions.json": { content: "[]", filename: "extensions.json" },
             "keybindings-linux.json": { content: "[]", filename: "keybindings-linux.json" },
+            "remote-extensions.json": { content: "[]", filename: "remote-extensions.json" },
             "settings.json": { content: '{"changed": false}', filename: "settings.json" },
-            "snippets-old.json": { content: "old", filename: "snippets-old.json" }
+            "snippet-old.json": { content: "old", filename: "snippet-old.json" },
+            "unmanaged.json": { content: "keep", filename: "unmanaged.json" }
         };
 
-        expect(api.getModifiedFiles(localFiles, remoteFiles)).toEqual({
+        expect(api.getModifiedSettings(localSettings, remoteFiles, [SNIPPET_FILE_PREFIX])).toEqual({
             "extensions.json": null,
-            "settings.json": localFiles["settings.json"],
-            "snippets-empty.json": localFiles["snippets-empty.json"],
-            "snippets-old.json": null
+            "settings.json": { content: '{"changed": true}' },
+            "snippet-empty.json": { content: "" },
+            "snippet-old.json": null
+        });
+    });
+
+    it("preserves local and unmanaged files while updating the remote scope", () =>
+    {
+        const remoteScopeSettings: ISetting[] = [
+            {
+                localFilePath: "/server/data/Machine/settings.json",
+                remoteFilename: "remote-settings.json",
+                type: SettingType.Settings
+            },
+            {
+                content: "[]",
+                localFilePath: "/server/extensions",
+                remoteFilename: "remote-extensions.json",
+                type: SettingType.Extensions
+            }
+        ];
+        const remoteFiles: IGistFiles = {
+            "extensions.json": { content: "[]", filename: "extensions.json" },
+            "remote-extensions.json": { content: "[]", filename: "remote-extensions.json" },
+            "remote-settings.json": { content: "{}", filename: "remote-settings.json" },
+            "settings.json": { content: "{}", filename: "settings.json" },
+            "snippet-local.json": { content: "keep", filename: "snippet-local.json" },
+            "unmanaged.json": { content: "keep", filename: "unmanaged.json" }
+        };
+
+        expect(api.getModifiedSettings(remoteScopeSettings, remoteFiles)).toEqual({
+            "remote-settings.json": null
         });
     });
 });

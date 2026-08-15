@@ -22,6 +22,11 @@ export interface IGist
 export type IGistFiles = Record<string, IGistFile>;
 
 /**
+ * Represents file changes sent when updating a GitHub Gist.
+ */
+export type IGistFileChanges = Record<string, Pick<IGistFile, "content"> | null>;
+
+/**
  * Represents the `file` of the GitHub Gist.
  */
 export interface IGistFile
@@ -59,7 +64,7 @@ export interface IGistHistory
  */
 export interface GistCreateParam
 {
-    files: IGistFiles;
+    files: Record<string, Pick<IGistFile, "content">>;
 
     description?: string;
     public?: boolean;
@@ -75,7 +80,7 @@ export interface GistUpdateParam
     /**
      * Set file to `null` to delete the Gist file.
      */
-    files?: IGistFiles;
+    files?: IGistFileChanges;
 
     description?: string;
 }

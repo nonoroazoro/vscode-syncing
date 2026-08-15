@@ -3,7 +3,7 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 
 import { Logger } from "./Logger";
 import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast";
-import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
+import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD, REMOTE_FILE_PREFIX } from "../constants";
 import { localize } from "../i18n";
 import { SettingType } from "../types";
 import { getErrorMessage } from "../utils";
@@ -20,6 +20,7 @@ import type {
     IExtension,
     IGist,
     IGistFile,
+    IGistFileChanges,
     IGistFiles,
     IGistUser,
     ISetting
@@ -39,6 +40,10 @@ export class Gist
     private static readonly GIST_DESCRIPTION: string = "VSCode's Settings - Syncing";
     private static readonly _GIST_CHECK_MAX_ATTEMPTS = 3;
     private static readonly _GIST_CHECK_RETRY_DELAY = 250;
+    private static readonly _EXTENSION_FILENAMES = new Set([
+        `${SettingType.Extensions}.json`,
+        `${REMOTE_FILE_PREFIX}${SettingType.Extensions}.json`
+    ]);
 
     private _api: Octokit;
 
@@ -185,7 +190,9 @@ export class Gist
     {
         try
         {
-            return (await this._api.gists.update({ ...content })).data as IGist;
+            // GitHub accepts a null file to delete it, but Octokit's generated type omits null.
+            const request = content as unknown as Parameters<typeof this._api.gists.update>[0];
+            return (await this._api.gists.update(request)).data as IGist;
         }
         catch (err)
         {
@@ -272,18 +279,25 @@ export class Gist
      *
      * @param id Gist id.
      * @param uploads Settings that will be uploaded.
-     * @param upsert Default is `true`, create new if gist not exists.
-     * @param showIndicator Defaults to `false`, don't show progress indicator.
+     * @param options Update behavior and ownership options.
      *
      * @throws {IEnhancedError}
      */
     public async findAndUpdate(
         id: string,
         uploads: ISetting[],
-        upsert = true,
-        showIndicator = false
+        options: {
+            managedFilePrefixes?: readonly string[];
+            showIndicator?: boolean;
+            upsert?: boolean;
+        } = {}
     ): Promise<IGist>
     {
+        const {
+            managedFilePrefixes = [],
+            showIndicator = false,
+            upsert = true
+        } = options;
         if (showIndicator)
         {
             showSpinner(localize("toast.settings.uploading"));
@@ -295,20 +309,16 @@ export class Gist
             const exists = await this.exists(id);
 
             // Preparing local gist.
-            const localGist: { gist_id: string; files: IGistFiles; } = { gist_id: id, files: {} };
-            for (const item of uploads)
-            {
-                // Filter out `null` content.
-                if (item.content != null)
-                {
-                    localGist.files[item.remoteFilename] = { content: item.content } as IGistFile;
-                }
-            }
+            const localFiles = this._createFiles(uploads);
+            const localGist: GistUpdateParam = {
+                gist_id: id,
+                files: localFiles
+            };
 
             if (exists)
             {
                 // Upload if the local files are modified.
-                const modifiedFiles = this.getModifiedFiles(localGist.files, exists.files);
+                const modifiedFiles = this.getModifiedSettings(uploads, exists.files, managedFilePrefixes);
                 if (modifiedFiles)
                 {
                     localGist.files = modifiedFiles;
@@ -318,11 +328,11 @@ export class Gist
                     if (threshold > 0)
                     {
                         // Note that the local settings here have already been excluded.
-                        const localFiles = { ...localGist.files };
-                        const remoteFiles = pick(exists.files, Object.keys(localFiles));
+                        const changedFiles = { ...localGist.files };
+                        const remoteFiles = pick(exists.files, Object.keys(changedFiles));
 
                         // Diff settings.
-                        const changes = this._diffSettings(localFiles, remoteFiles);
+                        const changes = this._diffSettings(changedFiles, remoteFiles);
                         if (changes >= threshold)
                         {
                             const okButton = localize("pokaYoke.continue.upload");
@@ -351,7 +361,7 @@ export class Gist
                 if (upsert)
                 {
                     // TODO: Pass gist public option.
-                    result = await this.createSettings(localGist.files);
+                    result = await this.createSettings(localFiles);
                 }
                 else
                 {
@@ -376,21 +386,46 @@ export class Gist
     }
 
     /**
-     * Compares the local and remote files, returns the modified files or `undefined`.
+     * Compares local settings with remote files using explicit ownership rules.
      *
-     * @param {IGistFiles} localFiles Local files.
-     * @param {IGistFiles} [remoteFiles] Remote files.
+     * @param localSettings Local settings from the current extension host.
+     * @param remoteFiles Remote Gist files.
+     * @param managedPrefixes Gist filename prefixes managed by the current extension host.
      */
-    public getModifiedFiles(localFiles: IGistFiles, remoteFiles?: IGistFiles): IGistFiles | undefined
+    public getModifiedSettings(
+        localSettings: ISetting[],
+        remoteFiles?: IGistFiles,
+        managedPrefixes: readonly string[] = []
+    ): IGistFileChanges | undefined
+    {
+        const localFiles = this._createFiles(localSettings);
+        const managedFilenames = new Set(localSettings.map(setting => setting.remoteFilename));
+        return this._getModifiedFiles(localFiles, remoteFiles, managedFilenames, managedPrefixes);
+    }
+
+    /**
+     * Compares local and remote files using explicit ownership rules.
+     *
+     * @param localFiles Local files with content.
+     * @param remoteFiles Remote Gist files.
+     * @param managedFilenames Exact filenames managed by the current extension host.
+     * @param managedPrefixes Filename prefixes managed by the current extension host.
+     */
+    private _getModifiedFiles(
+        localFiles: Record<string, Pick<IGistFile, "content">>,
+        remoteFiles: IGistFiles | undefined,
+        managedFilenames: ReadonlySet<string>,
+        managedPrefixes: readonly string[] = []
+    ): IGistFileChanges | undefined
     {
         if (!remoteFiles)
         {
             return localFiles;
         }
 
-        let localFile: IGistFile | undefined;
-        const result = {} as IGistFiles;
-        const recordedKeys = [];
+        let localFile: Pick<IGistFile, "content"> | undefined;
+        const result: IGistFileChanges = {};
+        const recordedKeys = new Set<string>();
         for (const key of Object.keys(remoteFiles))
         {
             localFile = localFiles[key];
@@ -404,19 +439,20 @@ export class Gist
             }
             else
             {
-                // Remove the remote files except keybindings and settings.
-                if (!key.includes(SettingType.Keybindings) && !key.includes(SettingType.Settings))
+                const isManaged = managedFilenames.has(key)
+                    || managedPrefixes.some(prefix => key.startsWith(prefix));
+                if (isManaged)
                 {
-                    result[key] = null as unknown as IGistFile;
+                    result[key] = null;
                 }
             }
-            recordedKeys.push(key);
+            recordedKeys.add(key);
         }
 
         // Add the rest local files.
         for (const key of Object.keys(localFiles))
         {
-            if (!recordedKeys.includes(key))
+            if (!recordedKeys.has(key))
             {
                 // Ignore null local file.
                 localFile = localFiles[key];
@@ -428,6 +464,24 @@ export class Gist
         }
 
         return (Object.keys(result).length === 0) ? undefined : result;
+    }
+
+    /**
+     * Converts settings with content into Gist files.
+     *
+     * @param settings Settings from the current extension host.
+     */
+    private _createFiles(settings: ISetting[]): Record<string, Pick<IGistFile, "content">>
+    {
+        const files: Record<string, Pick<IGistFile, "content">> = {};
+        for (const setting of settings)
+        {
+            if (setting.content != null)
+            {
+                files[setting.remoteFilename] = { content: setting.content };
+            }
+        }
+        return files;
     }
 
     /**
@@ -487,7 +541,7 @@ export class Gist
     /**
      * Calculates the number of differences between the local and remote files.
      */
-    private _diffSettings(localFiles: IGistFiles, remoteFiles: IGistFiles): number
+    private _diffSettings(localFiles: IGistFileChanges, remoteFiles: IGistFiles): number
     {
         const left = this._parseToJSON(localFiles);
         const right = this._parseToJSON(pick(remoteFiles, Object.keys(localFiles)));
@@ -497,11 +551,10 @@ export class Gist
     /**
      * Converts the `content` of `IGistFiles` into a `JSON object`.
      */
-    private _parseToJSON(files: IGistFiles): Record<string, unknown>
+    private _parseToJSON(files: IGistFileChanges | IGistFiles): Record<string, unknown>
     {
-        const extensionsRemoteFilename = `${SettingType.Extensions}.json`;
         let parsed: unknown;
-        let file: IGistFile | undefined;
+        let file: Pick<IGistFile, "content"> | null | undefined;
         const result: Record<string, unknown> = {};
         for (const key of Object.keys(files))
         {
@@ -510,7 +563,7 @@ export class Gist
             {
                 parsed = parse(file.content ?? "");
 
-                if (key === extensionsRemoteFilename && Array.isArray(parsed))
+                if (Gist._EXTENSION_FILENAMES.has(key) && Array.isArray(parsed))
                 {
                     for (const ext of (parsed as Array<Partial<{ uuid: string; } & IExtension>>))
                     {

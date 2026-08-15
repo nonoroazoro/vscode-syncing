@@ -59,7 +59,7 @@ export class Extension
     }
 
     /**
-     * Gets all installed extensions (Disabled extensions aren't included).
+     * Gets all extensions available to the current extension host.
      *
      * @param excludedPatterns The glob patterns of the extensions that should be excluded.
      */
