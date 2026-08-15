@@ -1,5 +1,9 @@
 # Changelogs
 
+## 3.5.5 - August 15, 2026
+
+- Fixed: Replace retired Shields.io Visual Studio Marketplace badges.
+
 ## 3.5.4 - August 15, 2026
 
 - Fixed: Synchronize settings and extensions separately in Remote SSH, WSL, Dev Container, and other remote extension hosts.

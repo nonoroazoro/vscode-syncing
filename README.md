@@ -1,7 +1,7 @@
 # Syncing
 
-[![Installs](https://img.shields.io/visual-studio-marketplace/i/nonoroazoro.syncing)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
-[![Rating](https://img.shields.io/visual-studio-marketplace/r/nonoroazoro.syncing)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
+[![Installs](https://badgen.net/vs-marketplace/i/nonoroazoro.syncing)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
+[![Rating](https://badgen.net/vs-marketplace/rating/nonoroazoro.syncing)](https://marketplace.visualstudio.com/items?itemName=nonoroazoro.syncing)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![License: 996ICU](https://img.shields.io/badge/License-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 
