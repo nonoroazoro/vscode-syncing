@@ -38,6 +38,7 @@ module.exports = {
         extensions: [".ts", ".js"]
     },
     externals: {
+        "kerberos": "commonjs kerberos",
         "vscode": "commonjs vscode"
     },
     module: {

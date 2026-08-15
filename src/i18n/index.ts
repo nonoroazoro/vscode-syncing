@@ -12,7 +12,7 @@ class I18n
     private static _instance: I18n;
     private static _DEFAULT_LOCALE_FILENAME = "package.nls.json";
 
-    private _bundle: Record<string, string>;
+    private _bundle: Record<string, string> = {};
     private _extensionPath: string;
     private _locale: NormalizedLocale;
 

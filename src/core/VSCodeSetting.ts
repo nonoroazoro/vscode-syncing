@@ -19,6 +19,7 @@ import {
 } from "../constants";
 import { localize } from "../i18n";
 import { SettingType } from "../types";
+import { getErrorMessage } from "../utils";
 import { diff } from "../utils/diffPatch";
 import { readLastModified, writeLastModified } from "../utils/file";
 import { excludeSettings, mergeSettings, parse } from "../utils/jsonc";
@@ -178,7 +179,7 @@ export class VSCodeSetting
         return Math.max.apply(
             null,
             vscodeSettings
-                .filter(s => s.lastModified != null)
+                .filter((s): s is { lastModified: number; } & ISetting => s.lastModified != null)
                 .map(s => s.lastModified)
         );
     }
@@ -298,7 +299,9 @@ export class VSCodeSetting
                         }
                         catch (err)
                         {
-                            throw new Error(localize("error.save.file", setting.remoteFilename, err.message));
+                            throw new Error(
+                                localize("error.save.file", setting.remoteFilename, getErrorMessage(err))
+                            );
                         }
                     }
 
@@ -326,7 +329,7 @@ export class VSCodeSetting
         {
             if (showIndicator)
             {
-                Toast.statusError(localize("toast.settings.downloading.failed", err.message));
+                Toast.statusError(localize("toast.settings.downloading.failed", getErrorMessage(err)));
             }
             throw err;
         }
@@ -367,7 +370,9 @@ export class VSCodeSetting
             }
             catch (err)
             {
-                throw new Error(localize("error.remove.file", setting.remoteFilename, err.message));
+                throw new Error(
+                    localize("error.remove.file", setting.remoteFilename, getErrorMessage(err))
+                );
             }
         }
         return removed;
@@ -456,7 +461,9 @@ export class VSCodeSetting
             catch (err)
             {
                 content = undefined;
-                Logger.instance.error(localize("error.loading.settings", setting.remoteFilename, err));
+                Logger.instance.error(
+                    localize("error.loading.settings", setting.remoteFilename, getErrorMessage(err))
+                );
             }
             result.push({ ...setting, content, lastModified });
         }
@@ -507,7 +514,7 @@ export class VSCodeSetting
      */
     private async _saveToFile(setting: ISetting)
     {
-        return fs.outputFile(setting.localFilePath, setting.content ?? "{}").then(() => ({ setting } as ISyncedItem));
+        return fs.outputFile(setting.localFilePath, setting.content ?? "{}").then(() => ({ setting }));
     }
 
     /**

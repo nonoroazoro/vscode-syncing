@@ -7,22 +7,22 @@ describe("Syncing/utils/timer", () =>
     beforeEach(() => vi.useFakeTimers());
     afterEach(() => vi.useRealTimers());
 
-    it("debounce", () =>
+    it("runs only the latest call and supports cancellation", () =>
     {
         const func = vi.fn();
         const debounced = debounce(func, 100);
-        expect(func).not.toHaveBeenCalled();
 
-        debounced();
-        vi.advanceTimersByTime(10);
-
-        expect(func).not.toHaveBeenCalled();
-        debounced();
-
-        vi.advanceTimersByTime(10);
-        expect(func).not.toHaveBeenCalled();
-
+        debounced("first");
+        vi.advanceTimersByTime(50);
+        debounced("latest");
         vi.advanceTimersByTime(100);
-        expect(func).toHaveBeenCalled();
+
+        expect(func).toHaveBeenCalledOnce();
+        expect(func).toHaveBeenCalledWith("latest");
+
+        debounced("canceled");
+        debounced.cancel();
+        vi.advanceTimersByTime(100);
+        expect(func).toHaveBeenCalledOnce();
     });
 });

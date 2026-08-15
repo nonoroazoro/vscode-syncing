@@ -4,10 +4,10 @@
  * @param {(...args: unknown[]) => void} func The function to debounce.
  * @param {number} delay The number of milliseconds to delay.
  */
-export function debounce(func: (...args: unknown[]) => void, delay: number)
+export function debounce<TArgs extends unknown[]>(func: (...args: TArgs) => void, delay: number)
 {
     let timer: NodeJS.Timeout | undefined;
-    const d = function debounced(this: unknown)
+    const d = function debounced(this: unknown, ...args: TArgs)
     {
         if (timer != null)
         {
@@ -17,7 +17,7 @@ export function debounce(func: (...args: unknown[]) => void, delay: number)
         timer = setTimeout(() =>
         {
             timer = undefined;
-            func.apply(this);
+            func.apply(this, args);
         }, delay);
     };
     d.cancel = () =>

@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
         "outDir": "dist",
-        "module": "commonjs",
+        "module": "esnext",
         "target": "es2017",
+        "rootDir": "src",
         "declaration": false,
         "sourceMap": true,
-        "moduleResolution": "node",
+        "moduleResolution": "bundler",
         "allowUnreachableCode": true,
         "experimentalDecorators": true,
         "noImplicitAny": true,
