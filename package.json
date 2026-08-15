@@ -155,5 +155,8 @@
         "webpack": "^5.109.2",
         "webpack-cli": "^7.2.2",
         "webpackbar": "^7.0.0"
+    },
+    "allowScripts": {
+        "dprint@0.55.2": true
     }
 }
