@@ -3,6 +3,7 @@ import type { ExtensionContext } from "vscode";
 import { AutoSyncService, Environment, Gist, Logger, Syncing, VSCodeSetting } from "./core";
 import * as Toast from "./core/Toast";
 import { localize, setup } from "./i18n";
+import { getErrorMessage } from "./utils";
 import { registerCommand } from "./utils/vscodeAPI";
 
 import type { ISyncedItem } from "./types";
@@ -61,7 +62,7 @@ function _initSyncing(context: ExtensionContext)
     catch (err)
     {
         _isReady = false;
-        Toast.statusFatal(localize("error.initialization", err.message));
+        Toast.statusFatal(localize("error.initialization", getErrorMessage(err)));
     }
 }
 

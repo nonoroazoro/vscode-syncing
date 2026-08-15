@@ -5,6 +5,7 @@ import { Gist } from "./Gist";
 import { Logger } from "./Logger";
 import * as Toast from "./Toast";
 import { localize } from "../i18n";
+import { getErrorMessage } from "../utils";
 import { isEmptyString } from "../utils/lang";
 import { openFile } from "../utils/vscodeAPI";
 
@@ -157,8 +158,8 @@ export class Syncing
             {
                 Toast.statusError(
                     forUpload
-                        ? localize("toast.settings.uploading.canceled", err.message)
-                        : localize("toast.settings.downloading.canceled", err.message)
+                        ? localize("toast.settings.uploading.canceled", getErrorMessage(err))
+                        : localize("toast.settings.downloading.canceled", getErrorMessage(err))
                 );
             }
             throw err;
@@ -217,8 +218,9 @@ export class Syncing
         {
             if (showToast)
             {
-                Toast.statusError(localize("toast.syncing.save.settings", err));
+                Toast.statusError(localize("toast.syncing.save.settings", getErrorMessage(err)));
             }
+            throw err;
         }
     }
 

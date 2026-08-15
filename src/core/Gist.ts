@@ -6,6 +6,7 @@ import { clearSpinner, showConfirmBox, showSpinner, statusError } from "./Toast"
 import { CONFIGURATION_KEY, CONFIGURATION_POKA_YOKE_THRESHOLD } from "../constants";
 import { localize } from "../i18n";
 import { SettingType } from "../types";
+import { getErrorMessage } from "../utils";
 import { diff } from "../utils/diffPatch";
 import { createError } from "../utils/errors";
 import { parse } from "../utils/jsonc";
@@ -30,14 +31,16 @@ import type {
 export class Gist
 {
     private static _instance: Gist;
+    private static _token?: string;
 
     /**
      * The description of Syncing's gists.
      */
     private static readonly GIST_DESCRIPTION: string = "VSCode's Settings - Syncing";
+    private static readonly _GIST_CHECK_MAX_ATTEMPTS = 3;
+    private static readonly _GIST_CHECK_RETRY_DELAY = 250;
 
     private _api: Octokit;
-    private _token?: string;
 
     private constructor(token?: string)
     {
@@ -55,7 +58,6 @@ export class Gist
             options.request.agent = new HttpsProxyAgent(proxy);
         }
 
-        this._token = token;
         if (!isEmptyString(token))
         {
             options.auth = token;
@@ -71,8 +73,9 @@ export class Gist
      */
     public static create(token?: string): Gist
     {
-        if (Gist._instance?._token !== token)
+        if (!Gist._instance || Gist._token !== token)
         {
+            Gist._token = token;
             Gist._instance = new Gist(token);
         }
         return Gist._instance;
@@ -182,8 +185,7 @@ export class Gist
     {
         try
         {
-            // TODO: fix Octokit shit.
-            return (await this._api.gists.update(content as any)).data as IGist;
+            return (await this._api.gists.update({ ...content })).data as IGist;
         }
         catch (err)
         {
@@ -200,23 +202,30 @@ export class Gist
     {
         if (id != null && !isEmptyString(id))
         {
-            try
+            for (let attempt = 0; attempt < Gist._GIST_CHECK_MAX_ATTEMPTS; attempt += 1)
             {
-                const gist = await this.get(id);
-                if (this._token != null)
+                try
                 {
-                    const user = await this.user();
-                    // Determines whether the owner of the gist is the currently authenticated user.
-                    if (user.id !== gist.owner.id)
+                    return await this.get(id);
+                }
+                catch (error)
+                {
+                    const code = this._getErrorCode(error);
+                    if (code === 404)
                     {
                         return false;
                     }
+                    if (!this._isRetryableError(code) || attempt === Gist._GIST_CHECK_MAX_ATTEMPTS - 1)
+                    {
+                        throw error;
+                    }
+
+                    const delay = Gist._GIST_CHECK_RETRY_DELAY * (2 ** attempt);
+                    await new Promise<void>(resolve =>
+                    {
+                        setTimeout(resolve, delay);
+                    });
                 }
-                return gist;
-            }
-            catch
-            {
-                // Ignore error.
             }
         }
         return false;
@@ -233,8 +242,7 @@ export class Gist
     {
         try
         {
-            // TODO: fix Octokit shit.
-            return (await this._api.gists.create(content as any)).data as IGist;
+            return (await this._api.gists.create({ ...content })).data as IGist;
         }
         catch (err)
         {
@@ -361,7 +369,7 @@ export class Gist
         {
             if (showIndicator)
             {
-                statusError(localize("toast.settings.uploading.failed", err.message));
+                statusError(localize("toast.settings.uploading.failed", getErrorMessage(err)));
             }
             throw err;
         }
@@ -412,7 +420,7 @@ export class Gist
             {
                 // Ignore null local file.
                 localFile = localFiles[key];
-                if (localFile?.content)
+                if (localFile?.content != null)
                 {
                     result[key] = localFile;
                 }
@@ -425,9 +433,17 @@ export class Gist
     /**
      * Creates the error from an error code.
      */
-    private _createError(error: { status: number; } & Error)
+    private _createError(error: unknown)
     {
-        const { status } = error;
+        let status: number | undefined;
+        if (typeof error === "object" && error != null && "status" in error)
+        {
+            const errorStatus = error.status;
+            if (typeof errorStatus === "number")
+            {
+                status = errorStatus;
+            }
+        }
         let message = localize("error.check.internet");
         if (status === 401)
         {
@@ -439,6 +455,33 @@ export class Gist
         }
         Logger.instance.error(localize("displayName"), error);
         return createError(message, status);
+    }
+
+    /**
+     * Gets the error code from an unknown error value.
+     */
+    private _getErrorCode(error: unknown): number | string | undefined
+    {
+        if (typeof error === "object" && error != null && "code" in error)
+        {
+            const code = error.code;
+            if (typeof code === "number" || typeof code === "string")
+            {
+                return code;
+            }
+        }
+        return;
+    }
+
+    /**
+     * Determines whether a gist check error can be retried safely.
+     */
+    private _isRetryableError(code: number | string | undefined): boolean
+    {
+        return code == null
+            || code === 408
+            || code === 429
+            || (typeof code === "number" && code >= 500);
     }
 
     /**

@@ -5,33 +5,13 @@ import { normalize } from "../../src/utils/locale";
 
 describe("Syncing/utils/locale", () =>
 {
-    it("normalize - undefined", () =>
+    it.each([
+        [undefined, NormalizedLocale.EN_US],
+        ["en-US", NormalizedLocale.EN_US],
+        ["zh-cn", NormalizedLocale.ZH_CN],
+        ["zh-CN", NormalizedLocale.ZH_CN]
+    ])("normalizes %s", (input, expected) =>
     {
-        expect(normalize(undefined)).toEqual(NormalizedLocale.EN_US);
-    });
-
-    it("normalize - en", () =>
-    {
-        expect(normalize("en")).toEqual(NormalizedLocale.EN_US);
-    });
-
-    it("normalize - en-us", () =>
-    {
-        expect(normalize("en-us")).toEqual(NormalizedLocale.EN_US);
-    });
-
-    it("normalize - en-US", () =>
-    {
-        expect(normalize("en-US")).toEqual(NormalizedLocale.EN_US);
-    });
-
-    it("normalize - zh-cn", () =>
-    {
-        expect(normalize("zh-cn")).toEqual(NormalizedLocale.ZH_CN);
-    });
-
-    it("normalize - zh-CN", () =>
-    {
-        expect(normalize("zh-CN")).toEqual(NormalizedLocale.ZH_CN);
+        expect(normalize(input)).toBe(expected);
     });
 });

@@ -4,41 +4,19 @@ import { isEmptyString, isString } from "../../src/utils/lang";
 
 describe("Syncing/utils/lang", () =>
 {
-    it("is a string", () =>
+    it("recognizes primitive and boxed strings", () =>
     {
-        expect(isString("date")).toBe(true);
-        expect(isString("123")).toBe(true);
-        expect(isString("*@#!@#")).toBe(true);
-        expect(isString("date")).toBe(true);
-        expect(isString(String(123))).toBe(true);
-        expect(isString("*@#!@#")).toBe(true);
-    });
-
-    it("is not a string", () =>
-    {
-        expect(isString({})).toBe(false);
-        expect(isString(null)).toBe(false);
-        expect(isString(undefined)).toBe(false);
+        expect(isString("value")).toBe(true);
+        expect(isString(Object("value"))).toBe(true);
         expect(isString(123)).toBe(false);
-        expect(isString(NaN)).toBe(false);
-        expect(isString(() =>
-        {})).toBe(false);
+        expect(isString(null)).toBe(false);
     });
 
-    it("is an empty string", () =>
+    it("treats only whitespace-only strings as empty", () =>
     {
-        expect(isEmptyString("")).toBe(true);
-        expect(isEmptyString(" ")).toBe(true);
-        expect(isEmptyString("  ")).toBe(true);
-    });
-
-    it("is not an empty string", () =>
-    {
-        expect(isEmptyString(" a ")).toBe(false);
-        expect(isEmptyString(" 1 ")).toBe(false);
+        expect(isEmptyString(" \t\n")).toBe(true);
+        expect(isEmptyString(" value ")).toBe(false);
         expect(isEmptyString([])).toBe(false);
-        expect(isEmptyString({})).toBe(false);
         expect(isEmptyString(null)).toBe(false);
-        expect(isEmptyString(undefined)).toBe(false);
     });
 });

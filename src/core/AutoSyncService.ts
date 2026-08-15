@@ -4,6 +4,7 @@ import { Gist } from "./Gist";
 import * as Toast from "./Toast";
 import { VSCodeSetting } from "./VSCodeSetting";
 import { localize } from "../i18n";
+import { getErrorMessage } from "../utils";
 import { isAfter } from "../utils/date";
 import { SettingsWatcherService, WatcherEvent } from "../watcher";
 
@@ -104,7 +105,7 @@ export class AutoSyncService
         }
         catch (err)
         {
-            Toast.statusError(localize("toast.settings.autoSync.failed", err.message));
+            Toast.statusError(localize("toast.settings.autoSync.failed", getErrorMessage(err)));
         }
     }
 
