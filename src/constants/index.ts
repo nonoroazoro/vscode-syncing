@@ -1,6 +1,8 @@
 import { SettingType } from "../types";
 
 export const EXTENSION_NAME = "Syncing";
+export const REMOTE_FILE_PREFIX = "remote-";
+export const SNIPPET_FILE_PREFIX = "snippet-";
 
 /**
  * Note that this is an ordered list, to ensure that the smaller files

@@ -128,6 +128,17 @@ You can find the following `Syncing Settings` in your `VSCode User Settings`.
 
 If VSCode's `http.proxy` is not set, `Syncing` will fall back to the `http_proxy` and `https_proxy` environment variables.
 
+## Remote Development
+
+When Syncing runs in a Remote SSH, WSL, Dev Container, or another remote extension host, it synchronizes the remote machine settings and extensions separately:
+
+- `remote-settings.json` stores the remote `Machine/settings.json`.
+- `remote-extensions.json` stores the extensions available to the remote extension host.
+
+Local user settings continue to use `settings.json` and `extensions.json`. Keybindings, locale, and snippets belong to the local VSCode client and are not read from the remote extension host.
+
+Upgrade Syncing on every device before using remote synchronization. Earlier versions do not recognize the remote files and may remove them during upload.
+
 ## Auto-sync Settings
 
 You can now let Syncing auto-sync your settings. Here are the steps:

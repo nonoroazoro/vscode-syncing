@@ -130,6 +130,17 @@ _Syncing_ 支持 VSCode 及其兼容变体，包括 `VSCodium`、`Cursor`、`Win
 
 此外，这里如果没有配置代理的话，`Syncing` 会尝试从系统环境中读取 `http_proxy` 和 `https_proxy` 作为代理设置。
 
+## Remote 开发
+
+当 Syncing 运行在 Remote SSH、WSL、Dev Container 或其他 Remote extension host 中时，它会单独同步远端机器的配置和扩展：
+
+- `remote-settings.json` 保存远端的 `Machine/settings.json`。
+- `remote-extensions.json` 保存 Remote extension host 中可用的扩展。
+
+本地用户配置继续使用 `settings.json` 和 `extensions.json`。快捷键、语言设置和代码片段属于本地 VSCode 客户端，Remote extension host 不会读取这些内容。
+
+使用 Remote 同步前，请先升级所有设备上的 Syncing。旧版本无法识别 Remote 文件，并可能在上传时删除它们。
+
 ## 配置自动同步
 
 Syncing 现在支持配置自动同步了，具体步骤如下：

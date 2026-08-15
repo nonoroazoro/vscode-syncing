@@ -1,5 +1,13 @@
 # Changelogs
 
+## 3.5.4 - August 15, 2026
+
+- Fixed: Synchronize settings and extensions separately in Remote SSH, WSL, Dev Container, and other remote extension hosts.
+
+- Fixed: Preserve local and unmanaged Gist files when synchronizing remote settings.
+
+- Changed: Allow the dprint install script when using npm 11.
+
 ## 3.5.3 - August 15, 2026
 
 - Fixed: Prevent transient Gist lookup failures from creating duplicate Gists.
