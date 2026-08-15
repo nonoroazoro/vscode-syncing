@@ -15,12 +15,7 @@
 
 ## 功能
 
-> ⚠️ **Breaking Change (v3.5.1)**:
->
-> - `Syncing` 目前理论上支持所有 VSCode 变体，包括但不限于 `VSCodium`, `Cursor`, `Windsurf`, `Trae` 等等；
-> - 使用 VSCode `http.proxy` 作为代理配置，废弃并删除 `syncing.json` 中的 `http_proxy` 配置项，具体请参考[代理设置](#代理设置)。
-
-_Syncing_ 可以在`本地和云端之间同步您的所有 VSCode 配置`，包括：
+_Syncing_ 支持 VSCode 及其兼容变体，包括 `VSCodium`、`Cursor`、`Windsurf`、`Trae` 等。它可以在`本地和云端之间同步您的所有 VSCode 配置`，包括：
 
 1. **上传 VSCode 配置**:
 

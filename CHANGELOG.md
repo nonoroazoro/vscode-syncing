@@ -1,5 +1,15 @@
 # Changelogs
 
+## 3.5.3 - August 15, 2026
+
+- Fixed: Prevent transient Gist lookup failures from creating duplicate Gists.
+
+- Fixed: Abort uploads when the Gist ID cannot be saved.
+
+- Fixed: Upload empty snippet files correctly.
+
+- Changed: Upgrade dependencies.
+
 ## 3.5.2 - March 09, 2026
 
 - Changed: Exclude extension version from poka-yoke diff.
